@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sparkles, BookOpen, Target, Users, Heart, LogOut, Settings, Brain } from "lucide-react";
+import { Sparkles, BookOpen, Target, Users, Heart, LogOut, Settings, Brain, MessageSquare } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Profile {
@@ -204,8 +204,26 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
+          {/* Debate History */}
+          <Card className="hover:shadow-glow transition-smooth cursor-pointer" onClick={() => navigate("/debate-history")}>
+            <CardHeader>
+              <div className="w-12 h-12 rounded-full bg-secondary/20 flex items-center justify-center mb-4">
+                <MessageSquare className="w-6 h-6 text-secondary" />
+              </div>
+              <CardTitle>Historial de Debates</CardTitle>
+              <CardDescription>
+                Revisa tus debates anteriores y tu progreso en Fe, Razón y Amor
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button variant="outline" className="w-full">
+                Ver Historial
+              </Button>
+            </CardContent>
+          </Card>
+
           {/* Profile */}
-          <Card className="hover:shadow-glow transition-smooth">
+          <Card className="hover:shadow-glow transition-smooth cursor-pointer" onClick={() => navigate("/profile")}>
             <CardHeader>
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                 <Settings className="w-6 h-6 text-primary" />
@@ -216,10 +234,9 @@ const Dashboard = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-sm text-muted-foreground space-y-1">
-                <p><strong>Perfil:</strong> {profile?.perfil_doctrinal}</p>
-                <p><strong>Edad:</strong> {profile?.edad_segmento}</p>
-              </div>
+              <Button variant="outline" className="w-full">
+                Editar Perfil
+              </Button>
             </CardContent>
           </Card>
         </div>

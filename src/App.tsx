@@ -11,6 +11,8 @@ import Cards from "./pages/Cards";
 import Habits from "./pages/Habits";
 import Community from "./pages/Community";
 import Library from "./pages/Library";
+import Profile from "./pages/Profile";
+import DebateHistory from "./pages/DebateHistory";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +32,8 @@ const App = () => (
           <Route path="/habits" element={<Habits />} />
           <Route path="/community" element={<Community />} />
           <Route path="/library" element={<Library />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/debate-history" element={<DebateHistory />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
