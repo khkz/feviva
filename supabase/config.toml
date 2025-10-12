@@ -1,1 +1,4 @@
 project_id = "duggdnqpemwojkojfyei"
+
+[functions.debate-coach]
+verify_jwt = true
