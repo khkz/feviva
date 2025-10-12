@@ -169,11 +169,16 @@ const Cards = () => {
                     {selectedCard.citas_biblicas && selectedCard.citas_biblicas.length > 0 && (
                       <div className="mt-6 bg-primary/5 p-4 rounded-lg">
                         <h3 className="font-medium mb-3">Fundamentos Bíblicos</h3>
-                        <div className="space-y-2">
-                          {selectedCard.citas_biblicas.map((cita, index) => (
-                            <p key={index} className="text-sm text-muted-foreground italic">
-                              {cita}
-                            </p>
+                        <div className="space-y-3">
+                          {selectedCard.citas_biblicas.map((cita: any, index: number) => (
+                            <div key={index} className="text-sm">
+                              <p className="text-muted-foreground italic">
+                                "{cita.texto}"
+                              </p>
+                              <p className="text-primary font-medium mt-1">
+                                — {cita.referencia}
+                              </p>
+                            </div>
                           ))}
                         </div>
                       </div>
@@ -182,13 +187,20 @@ const Cards = () => {
                     {selectedCard.puentes_empaticos && selectedCard.puentes_empaticos.length > 0 && (
                       <div className="mt-6 bg-secondary/10 p-4 rounded-lg">
                         <h3 className="font-medium mb-3">Puentes Empáticos</h3>
-                        <ul className="space-y-2">
-                          {selectedCard.puentes_empaticos.map((puente, index) => (
-                            <li key={index} className="text-sm text-muted-foreground">
-                              • {puente}
-                            </li>
+                        <div className="space-y-4">
+                          {selectedCard.puentes_empaticos.map((item: any, index: number) => (
+                            <div key={index} className="space-y-1">
+                              <p className="text-sm text-muted-foreground">
+                                {item.puente}
+                              </p>
+                              {item.contexto && (
+                                <p className="text-xs text-secondary font-medium">
+                                  {item.contexto}
+                                </p>
+                              )}
+                            </div>
                           ))}
-                        </ul>
+                        </div>
                       </div>
                     )}
                   </CardContent>
