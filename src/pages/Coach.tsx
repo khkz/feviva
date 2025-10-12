@@ -21,6 +21,17 @@ interface Evaluation {
   feedback: string;
 }
 
+interface Suggestion {
+  sugerencias: Array<{
+    categoria: "Fe" | "Razón" | "Amor";
+    titulo: string;
+    consejo: string;
+    ejemplo: string;
+  }>;
+  versiculo_sugerido: string;
+  argumento_clave: string;
+}
+
 const personas = [
   { value: "ateo_cientifico", label: "Ateo Científico", description: "Busca evidencia empírica" },
   { value: "agnostico", label: "Agnóstico Curioso", description: "Abierto pero escéptico" },
@@ -48,6 +59,8 @@ const Coach = () => {
   const [debateStarted, setDebateStarted] = useState(false);
   const [evaluation, setEvaluation] = useState<Evaluation | null>(null);
   const [debateId, setDebateId] = useState<string | null>(null);
+  const [suggestion, setSuggestion] = useState<Suggestion | null>(null);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -175,6 +188,41 @@ const Coach = () => {
       toast({
         title: "Error",
         description: "No se pudo enviar el mensaje",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getSuggestions = async () => {
+    if (loading || messages.length < 2) return;
+
+    setLoading(true);
+    setShowSuggestions(true);
+
+    try {
+      const response = await supabase.functions.invoke("debate-coach", {
+        body: {
+          persona: selectedPersona,
+          tema: selectedTema,
+          messages,
+          action: "suggest",
+        },
+      });
+
+      if (response.error) throw response.error;
+
+      setSuggestion(response.data);
+      toast({
+        title: "Sugerencias recibidas",
+        description: "Revisa los consejos para mejorar tu respuesta",
+      });
+    } catch (error) {
+      console.error("Error getting suggestions:", error);
+      toast({
+        title: "Error",
+        description: "No se pudieron obtener sugerencias",
         variant: "destructive",
       });
     } finally {
@@ -323,10 +371,11 @@ const Coach = () => {
         </div>
       </header>
 
-      <main className="flex-1 container mx-auto px-4 py-6 flex flex-col max-w-4xl">
+      <main className="flex-1 container mx-auto px-4 py-6 flex gap-4 max-w-7xl">
         {!evaluation ? (
           <>
-            <div className="flex-1 overflow-y-auto mb-4 space-y-4">
+            <div className="flex-1 flex flex-col">
+              <div className="flex-1 overflow-y-auto mb-4 space-y-4">
               {messages.map((message, index) => (
                 <div
                   key={index}
@@ -348,35 +397,85 @@ const Coach = () => {
               <div ref={messagesEndRef} />
             </div>
 
-            <div className="flex gap-2">
-              <Textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Escribe tu respuesta..."
-                className="resize-none"
-                rows={3}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage();
-                  }
-                }}
-              />
-              <div className="flex flex-col gap-2">
-                <Button onClick={sendMessage} disabled={loading || !input.trim()} size="icon">
-                  <Send className="w-4 h-4" />
-                </Button>
-                <Button
-                  onClick={evaluateDebate}
-                  variant="outline"
-                  size="icon"
-                  disabled={loading || messages.length < 4}
-                  title="Evaluar debate"
-                >
-                  <TrendingUp className="w-4 h-4" />
-                </Button>
+              <div className="flex gap-2">
+                <Textarea
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Escribe tu respuesta..."
+                  className="resize-none"
+                  rows={3}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      sendMessage();
+                    }
+                  }}
+                />
+                <div className="flex flex-col gap-2">
+                  <Button onClick={sendMessage} disabled={loading || !input.trim()} size="icon">
+                    <Send className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    onClick={getSuggestions}
+                    variant="outline"
+                    size="icon"
+                    disabled={loading || messages.length < 2}
+                    title="Pedir ayuda"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    onClick={evaluateDebate}
+                    variant="outline"
+                    size="icon"
+                    disabled={loading || messages.length < 4}
+                    title="Evaluar debate"
+                  >
+                    <TrendingUp className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
             </div>
+
+            {showSuggestions && suggestion && (
+              <Card className="w-96 flex-shrink-0">
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span>Sugerencias</span>
+                    <Button variant="ghost" size="sm" onClick={() => setShowSuggestions(false)}>
+                      ✕
+                    </Button>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="bg-accent p-3 rounded-lg">
+                    <h4 className="font-medium text-sm mb-1">Argumento Clave</h4>
+                    <p className="text-sm text-muted-foreground">{suggestion.argumento_clave}</p>
+                  </div>
+
+                  <div className="bg-accent p-3 rounded-lg">
+                    <h4 className="font-medium text-sm mb-1">Versículo Sugerido</h4>
+                    <p className="text-sm text-muted-foreground italic">{suggestion.versiculo_sugerido}</p>
+                  </div>
+
+                  <div className="space-y-3">
+                    <h4 className="font-medium text-sm">Mejora tu respuesta:</h4>
+                    {suggestion.sugerencias.map((sug, idx) => (
+                      <div key={idx} className="border-l-2 border-primary pl-3 space-y-1">
+                        <div className="flex items-center gap-2">
+                          {sug.categoria === "Fe" && <BookOpen className="w-4 h-4 text-secondary" />}
+                          {sug.categoria === "Razón" && <Brain className="w-4 h-4 text-primary" />}
+                          {sug.categoria === "Amor" && <Heart className="w-4 h-4 text-secondary" />}
+                          <span className="font-medium text-sm">{sug.titulo}</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground">{sug.consejo}</p>
+                        <p className="text-xs text-muted-foreground italic">💡 {sug.ejemplo}</p>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </>
         ) : (
           <Card>

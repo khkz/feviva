@@ -106,6 +106,75 @@ Responde al último mensaje del usuario. Mantén un estilo conversacional. Si en
       });
     }
 
+    // SUGGEST action - provide contextual help
+    if (action === 'suggest') {
+      const lastUserMessage = messages
+        .filter((m: any) => m.role === 'user')
+        .slice(-1)[0]?.content || '';
+      
+      const lastAIMessage = messages
+        .filter((m: any) => m.role === 'assistant')
+        .slice(-1)[0]?.content || '';
+
+      const suggestionPrompt = `Eres un mentor de apologética cristiana ayudando a entrenar a un evangelista.
+
+El interlocutor (${personaPrompts[persona as keyof typeof personaPrompts]}) acaba de decir:
+"${lastAIMessage}"
+
+El usuario respondió:
+"${lastUserMessage}"
+
+Tema: "${tema}"
+
+Proporciona 3 sugerencias prácticas y específicas para mejorar esta respuesta en formato JSON:
+{
+  "sugerencias": [
+    {
+      "categoria": "Fe" | "Razón" | "Amor",
+      "titulo": "título breve",
+      "consejo": "consejo específico de 2-3 oraciones",
+      "ejemplo": "ejemplo concreto de cómo aplicarlo"
+    }
+  ],
+  "versiculo_sugerido": "cita bíblica relevante con referencia",
+  "argumento_clave": "1-2 oraciones con el punto principal a destacar"
+}`;
+
+      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash',
+          messages: [
+            { role: 'user', content: suggestionPrompt }
+          ],
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('AI Gateway error:', response.status, errorText);
+        throw new Error(`AI Gateway error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const content = data.choices[0].message.content;
+      
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new Error('Could not parse suggestion JSON');
+      }
+      
+      const suggestion = JSON.parse(jsonMatch[0]);
+
+      return new Response(JSON.stringify(suggestion), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     // EVALUATE action - assess the conversation
     if (action === 'evaluate') {
       const conversationText = messages
