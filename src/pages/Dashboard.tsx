@@ -3,8 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sparkles, BookOpen, Target, Users, Heart, LogOut, Settings, Brain, MessageSquare } from "lucide-react";
+import { Sparkles, BookOpen, Target, Users, Heart, LogOut, Settings, Brain, MessageSquare, Trophy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useUserStats } from "@/hooks/useUserStats";
+import { LevelDisplay } from "@/components/gamification/LevelDisplay";
 
 interface Profile {
   nombre: string;
@@ -17,9 +19,16 @@ const Dashboard = () => {
   const { toast } = useToast();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const {
+    stats,
+    getPointsForNextLevel,
+    getProgressToNextLevel,
+    updateStreak,
+  } = useUserStats();
 
   useEffect(() => {
     checkAuth();
+    updateStreak(); // Update daily streak
   }, []);
 
   const checkAuth = async () => {
@@ -94,6 +103,18 @@ const Dashboard = () => {
             Entrena tu capacidad de responder con verdad, razón y amor
           </p>
         </div>
+
+        {/* Gamification Section */}
+        {stats && (
+          <div className="mb-8">
+            <LevelDisplay
+              nivel={stats.nivel}
+              puntos_totales={stats.puntos_totales}
+              puntosParaSiguienteNivel={getPointsForNextLevel()}
+              progreso={getProgressToNextLevel()}
+            />
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Debate Coach */}
@@ -218,6 +239,24 @@ const Dashboard = () => {
             <CardContent>
               <Button variant="outline" className="w-full">
                 Ver Historial
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Gamification */}
+          <Card className="hover:shadow-glow transition-smooth cursor-pointer" onClick={() => navigate("/gamification")}>
+            <CardHeader>
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <Trophy className="w-6 h-6 text-primary" />
+              </div>
+              <CardTitle>Logros y Progreso</CardTitle>
+              <CardDescription>
+                Visualiza tus logros, nivel y estadísticas completas
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button variant="outline" className="w-full">
+                Ver Logros
               </Button>
             </CardContent>
           </Card>

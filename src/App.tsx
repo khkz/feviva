@@ -13,6 +13,7 @@ import Community from "./pages/Community";
 import Library from "./pages/Library";
 import Profile from "./pages/Profile";
 import DebateHistory from "./pages/DebateHistory";
+import Gamification from "./pages/Gamification";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/library" element={<Library />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/debate-history" element={<DebateHistory />} />
+          <Route path="/gamification" element={<Gamification />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

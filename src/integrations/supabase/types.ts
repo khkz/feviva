@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          categoria: string
+          codigo: string
+          created_at: string | null
+          debates_requeridos: number | null
+          descripcion: string
+          icono: string
+          id: string
+          lecciones_requeridas: number | null
+          nombre: string
+          puntos_requeridos: number | null
+          racha_requerida: number | null
+        }
+        Insert: {
+          categoria: string
+          codigo: string
+          created_at?: string | null
+          debates_requeridos?: number | null
+          descripcion: string
+          icono: string
+          id?: string
+          lecciones_requeridas?: number | null
+          nombre: string
+          puntos_requeridos?: number | null
+          racha_requerida?: number | null
+        }
+        Update: {
+          categoria?: string
+          codigo?: string
+          created_at?: string | null
+          debates_requeridos?: number | null
+          descripcion?: string
+          icono?: string
+          id?: string
+          lecciones_requeridas?: number | null
+          nombre?: string
+          puntos_requeridos?: number | null
+          racha_requerida?: number | null
+        }
+        Relationships: []
+      }
       argument_cards: {
         Row: {
           autor_id: string | null
@@ -340,6 +382,35 @@ export type Database = {
         }
         Relationships: []
       }
+      user_achievements: {
+        Row: {
+          achievement_id: string
+          desbloqueado_en: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          achievement_id: string
+          desbloqueado_en?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          achievement_id?: string
+          desbloqueado_en?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_lesson_progress: {
         Row: {
           completado: boolean | null
@@ -396,12 +467,60 @@ export type Database = {
         }
         Relationships: []
       }
+      user_stats: {
+        Row: {
+          created_at: string | null
+          debates_completados: number
+          id: string
+          lecciones_completadas: number
+          nivel: number
+          puntos_totales: number
+          racha_actual_dias: number
+          racha_maxima_dias: number
+          tarjetas_estudiadas: number
+          ultima_actividad: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          debates_completados?: number
+          id?: string
+          lecciones_completadas?: number
+          nivel?: number
+          puntos_totales?: number
+          racha_actual_dias?: number
+          racha_maxima_dias?: number
+          tarjetas_estudiadas?: number
+          ultima_actividad?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          debates_completados?: number
+          id?: string
+          lecciones_completadas?: number
+          nivel?: number
+          puntos_totales?: number
+          racha_actual_dias?: number
+          racha_maxima_dias?: number
+          tarjetas_estudiadas?: number
+          ultima_actividad?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      calculate_level: {
+        Args: { puntos: number }
+        Returns: number
+      }
     }
     Enums: {
       app_role:

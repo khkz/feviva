@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, ArrowLeft, Send, BookOpen, Heart, Brain, TrendingUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useUserStats } from "@/hooks/useUserStats";
 
 interface Message {
   role: "user" | "assistant";
@@ -51,6 +52,7 @@ const temas = [
 const Coach = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { incrementDebates } = useUserStats();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -261,6 +263,9 @@ const Coach = () => {
           feedback: evalData.feedback,
         })
         .eq("id", debateId);
+
+      // Update user stats
+      await incrementDebates();
 
       toast({
         title: "Evaluación completada",

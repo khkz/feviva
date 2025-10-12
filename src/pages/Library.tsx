@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { BookOpen, CheckCircle2, ArrowLeft, ExternalLink } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useUserStats } from "@/hooks/useUserStats";
 
 interface Lesson {
   id: string;
@@ -36,6 +37,7 @@ const Library = () => {
   const [selectedLevel, setSelectedLevel] = useState<number>(0);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { incrementLessons } = useUserStats();
 
   useEffect(() => {
     checkAuth();
@@ -110,6 +112,12 @@ const Library = () => {
       });
     } else {
       await fetchProgress();
+      
+      // Update user stats when completing a lesson
+      if (!isCompleted) {
+        await incrementLessons();
+      }
+      
       toast({
         title: isCompleted ? "Marcada como no completada" : "¡Lección completada!",
         description: isCompleted ? "" : "Sigue avanzando en tu formación",
