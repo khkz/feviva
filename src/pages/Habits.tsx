@@ -87,7 +87,8 @@ const Habits = () => {
 
     if (!existingHabits || existingHabits.length === 0) {
       // Create default habits
-      const defaultHabits = ["oracion", "gratitud", "servicio", "lectura_biblica", "descanso"];
+      const defaultHabits: Array<"oracion" | "gratitud" | "servicio" | "lectura_biblica" | "descanso"> = 
+        ["oracion", "gratitud", "servicio", "lectura_biblica", "descanso"];
       const newHabits = defaultHabits.map(tipo => ({
         user_id: session.user.id,
         tipo,

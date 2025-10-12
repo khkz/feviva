@@ -118,9 +118,9 @@ const Community = () => {
       .from("posts")
       .insert({
         user_id: session.user.id,
-        tipo: newPostType,
+        tipo: newPostType as "testimonio" | "peticion_oracion" | "reflexion",
         contenido: newPostContent,
-        estado: "publicado",
+        estado: "publicado" as const,
       });
 
     if (error) {
