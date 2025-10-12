@@ -221,6 +221,42 @@ export type Database = {
           },
         ]
       }
+      library_lessons: {
+        Row: {
+          categoria: string
+          contenido: string
+          created_at: string | null
+          descripcion: string
+          id: string
+          nivel: number
+          orden: number | null
+          recursos: Json | null
+          titulo: string
+        }
+        Insert: {
+          categoria: string
+          contenido: string
+          created_at?: string | null
+          descripcion: string
+          id?: string
+          nivel: number
+          orden?: number | null
+          recursos?: Json | null
+          titulo: string
+        }
+        Update: {
+          categoria?: string
+          contenido?: string
+          created_at?: string | null
+          descripcion?: string
+          id?: string
+          nivel?: number
+          orden?: number | null
+          recursos?: Json | null
+          titulo?: string
+        }
+        Relationships: []
+      }
       posts: {
         Row: {
           contenido: string
@@ -303,6 +339,41 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      user_lesson_progress: {
+        Row: {
+          completado: boolean | null
+          created_at: string | null
+          fecha_completado: string | null
+          id: string
+          lesson_id: string
+          user_id: string
+        }
+        Insert: {
+          completado?: boolean | null
+          created_at?: string | null
+          fecha_completado?: string | null
+          id?: string
+          lesson_id: string
+          user_id: string
+        }
+        Update: {
+          completado?: boolean | null
+          created_at?: string | null
+          fecha_completado?: string | null
+          id?: string
+          lesson_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_lesson_progress_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "library_lessons"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {

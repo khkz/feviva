@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sparkles, BookOpen, Target, Users, Heart, LogOut, Settings } from "lucide-react";
+import { Sparkles, BookOpen, Target, Users, Heart, LogOut, Settings, Brain } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Profile {
@@ -146,6 +146,24 @@ const Dashboard = () => {
             <CardContent>
               <Button variant="outline" className="w-full">
                 Ver Progreso
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Library */}
+          <Card className="hover:shadow-glow transition-smooth cursor-pointer" onClick={() => navigate("/library")}>
+            <CardHeader>
+              <div className="w-12 h-12 rounded-full bg-secondary/20 flex items-center justify-center mb-4">
+                <Brain className="w-6 h-6 text-secondary" />
+              </div>
+              <CardTitle>Biblioteca de Fe</CardTitle>
+              <CardDescription>
+                Lecciones fundamentales sobre apologética, doctrina y vida cristiana
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button variant="outline" className="w-full">
+                Explorar Lecciones
               </Button>
             </CardContent>
           </Card>
