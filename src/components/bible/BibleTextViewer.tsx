@@ -46,29 +46,32 @@ export const BibleTextViewer = ({ reference, label }: BibleTextViewerProps) => {
   };
 
   return (
-    <div className="border rounded-xl overflow-hidden">
+    <div className="glass-card rounded-xl overflow-hidden">
       <Button
         variant="ghost"
-        className="w-full justify-between p-4 h-auto hover:bg-muted/50"
+        className="w-full justify-between p-4 h-auto hover:bg-white/5 min-h-[64px]"
         onClick={fetchText}
         disabled={loading}
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+          <div className="w-11 h-11 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
             <Book className="w-5 h-5 text-primary" />
           </div>
           <div className="text-left">
             {label && <p className="text-xs text-muted-foreground">{label}</p>}
-            <p className="font-semibold">{reference}</p>
+            <p className="font-semibold text-base">{reference}</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0 ml-2">
           {loading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
           ) : isExpanded ? (
-            <ChevronUp className="w-4 h-4" />
+            <ChevronUp className="w-5 h-5 text-muted-foreground" />
           ) : (
-            <ChevronDown className="w-4 h-4" />
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs text-muted-foreground hidden sm:inline">Leer</span>
+              <ChevronDown className="w-5 h-5 text-muted-foreground" />
+            </div>
           )}
         </div>
       </Button>
@@ -82,18 +85,18 @@ export const BibleTextViewer = ({ reference, label }: BibleTextViewerProps) => {
             transition={{ duration: 0.3 }}
             className="overflow-hidden"
           >
-            <div className="p-4 pt-0 max-h-96 overflow-y-auto">
+            <div className="p-4 pt-0 max-h-[60vh] overflow-y-auto overscroll-contain">
               <div className="prose prose-sm dark:prose-invert max-w-none">
                 {text.split('\n').map((line, i) => {
                   if (line.startsWith('**')) {
                     return (
-                      <h4 key={i} className="font-bold text-primary mt-4 mb-2 first:mt-0">
+                      <h4 key={i} className="font-bold text-primary mt-4 mb-2 first:mt-0 text-base">
                         {line.replace(/\*\*/g, '')}
                       </h4>
                     );
                   }
                   return (
-                    <p key={i} className="text-sm leading-relaxed mb-1">
+                    <p key={i} className="text-[15px] leading-relaxed mb-2 text-foreground/90">
                       {line}
                     </p>
                   );
