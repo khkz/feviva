@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { BookOpen, CheckCircle2, ArrowLeft, Trophy, Sparkles, Headphones } from "lucide-react";
+import { BookOpen, CheckCircle2, ArrowLeft, Trophy, Sparkles, Headphones, Wand2, Loader2 } from "lucide-react";
 import { useUserStats } from "@/hooks/useUserStats";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { LessonDetailModal } from "@/components/library/LessonDetailModal";
@@ -39,6 +39,7 @@ const Library = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedLevel, setSelectedLevel] = useState<number>(0);
+  const [batchEnriching, setBatchEnriching] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { incrementLessons } = useUserStats();
@@ -139,6 +140,50 @@ const Library = () => {
   const progressPercentage = lessons.length > 0 ? (completedCount / lessons.length) * 100 : 0;
   const enrichedCount = lessons.filter(l => l.contenido_enriquecido).length;
   const audioCount = lessons.filter(l => l.audio_url).length;
+  const pendingEnrichment = lessons.length - enrichedCount;
+
+  const handleBatchEnrich = async () => {
+    if (pendingEnrichment === 0) {
+      toast({
+        title: "Ya está completo",
+        description: "Todas las lecciones ya están enriquecidas",
+      });
+      return;
+    }
+
+    setBatchEnriching(true);
+    toast({
+      title: "Enriquecimiento iniciado",
+      description: `Procesando ${pendingEnrichment} lecciones con IA...`,
+    });
+
+    try {
+      const response = await supabase.functions.invoke('batch-enrich-lessons');
+      
+      if (response.error) {
+        throw new Error(response.error.message);
+      }
+
+      const result = response.data;
+      
+      toast({
+        title: "¡Enriquecimiento completado!",
+        description: `${result.successCount} lecciones enriquecidas, ${result.errorCount} errores`,
+      });
+
+      // Refresh lessons
+      await fetchLessons();
+    } catch (error) {
+      console.error('Batch enrich error:', error);
+      toast({
+        title: "Error en el proceso",
+        description: error instanceof Error ? error.message : "Error desconocido",
+        variant: "destructive",
+      });
+    } finally {
+      setBatchEnriching(false);
+    }
+  };
 
   const getLevelBadgeColor = (nivel: number) => {
     switch (nivel) {
@@ -212,6 +257,34 @@ const Library = () => {
               <p className="text-xs text-muted-foreground">Con Audio</p>
             </div>
           </motion.div>
+
+          {/* Batch Enrich Button */}
+          {pendingEnrichment > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.35 }}
+              className="mt-4"
+            >
+              <Button
+                onClick={handleBatchEnrich}
+                disabled={batchEnriching}
+                className="w-full glass-button bg-gradient-to-r from-primary/20 to-secondary/20 hover:from-primary/30 hover:to-secondary/30 border border-primary/30"
+              >
+                {batchEnriching ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Enriqueciendo {pendingEnrichment} lecciones...
+                  </>
+                ) : (
+                  <>
+                    <Wand2 className="h-4 w-4 mr-2" />
+                    Enriquecer {pendingEnrichment} lecciones con IA
+                  </>
+                )}
+              </Button>
+            </motion.div>
+          )}
 
           {/* Progress Card */}
           <motion.div 
