@@ -7,6 +7,58 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const MAX_CHARS = 4000;
+
+function splitTextIntoChunks(text: string): string[] {
+  const chunks: string[] = [];
+  let remaining = text;
+
+  while (remaining.length > 0) {
+    if (remaining.length <= MAX_CHARS) {
+      chunks.push(remaining);
+      break;
+    }
+
+    let splitIndex = MAX_CHARS;
+    const searchArea = remaining.substring(0, MAX_CHARS);
+    
+    const lastPeriod = searchArea.lastIndexOf('. ');
+    const lastQuestion = searchArea.lastIndexOf('? ');
+    const lastExclamation = searchArea.lastIndexOf('! ');
+    const lastNewline = searchArea.lastIndexOf('\n');
+    
+    splitIndex = Math.max(lastPeriod, lastQuestion, lastExclamation, lastNewline);
+    
+    if (splitIndex <= 0) {
+      splitIndex = searchArea.lastIndexOf(' ');
+    }
+    
+    if (splitIndex <= 0) {
+      splitIndex = MAX_CHARS;
+    } else {
+      splitIndex += 1;
+    }
+
+    chunks.push(remaining.substring(0, splitIndex).trim());
+    remaining = remaining.substring(splitIndex).trim();
+  }
+
+  return chunks;
+}
+
+function concatenateAudioBuffers(buffers: ArrayBuffer[]): Uint8Array {
+  const totalLength = buffers.reduce((acc, buf) => acc + buf.byteLength, 0);
+  const result = new Uint8Array(totalLength);
+  let offset = 0;
+  
+  for (const buffer of buffers) {
+    result.set(new Uint8Array(buffer), offset);
+    offset += buffer.byteLength;
+  }
+  
+  return result;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -24,33 +76,48 @@ serve(async (req) => {
       throw new Error('OPENAI_API_KEY is not configured');
     }
 
-    console.log(`Generating TTS for lesson: ${titulo} (${text.length} chars) with voice: ${voice}`);
+    // Split text into chunks for long content
+    const chunks = splitTextIntoChunks(text);
+    console.log(`Generating TTS for lesson: ${titulo} (${text.length} chars, ${chunks.length} chunks) with voice: ${voice}`);
 
-    // Generate speech using OpenAI TTS
-    const response = await fetch('https://api.openai.com/v1/audio/speech', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openaiApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'tts-1-hd',
-        input: text,
-        voice: voice,
-        response_format: 'mp3',
-        speed: 0.95, // Slightly slower for better comprehension
-      }),
-    });
+    const audioBuffers: ArrayBuffer[] = [];
 
-    if (!response.ok) {
-      const error = await response.json();
-      console.error('OpenAI TTS error:', error);
-      throw new Error(error.error?.message || 'Failed to generate speech');
+    for (let i = 0; i < chunks.length; i++) {
+      const chunk = chunks[i];
+      console.log(`Processing chunk ${i + 1}/${chunks.length} (${chunk.length} chars)`);
+
+      const response = await fetch('https://api.openai.com/v1/audio/speech', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openaiApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'tts-1-hd',
+          input: chunk,
+          voice: voice,
+          response_format: 'mp3',
+          speed: 0.95,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error('OpenAI TTS error:', error);
+        throw new Error(error.error?.message || 'Failed to generate speech');
+      }
+
+      audioBuffers.push(await response.arrayBuffer());
+      
+      // Small delay between chunks to avoid rate limits
+      if (i < chunks.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 200));
+      }
     }
 
-    // Get audio as array buffer
-    const audioBuffer = await response.arrayBuffer();
-    console.log(`Generated audio: ${audioBuffer.byteLength} bytes`);
+    // Concatenate all audio buffers
+    const finalAudio = concatenateAudioBuffers(audioBuffers);
+    console.log(`Generated audio: ${finalAudio.byteLength} bytes from ${chunks.length} chunks`);
 
     // Upload to Supabase Storage
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -68,7 +135,7 @@ serve(async (req) => {
     
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('teachings-audio')
-      .upload(filePath, audioBuffer, {
+      .upload(filePath, finalAudio, {
         contentType: 'audio/mpeg',
         upsert: true
       });
