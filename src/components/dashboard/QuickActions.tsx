@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Hand, BookOpen, Flame, MessageCircle } from "lucide-react";
+import { Hand, BookOpen, Flame, MessageCircle, Moon, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 
 const actions = [
@@ -7,25 +7,36 @@ const actions = [
     icon: Hand, 
     label: "Orar", 
     path: "/oraciones",
-    gradient: "from-amber-500/20 to-orange-500/20"
+    gradient: "from-amber-400 to-orange-500",
+    bgGradient: "from-amber-500/20 to-orange-500/20"
   },
   { 
     icon: BookOpen, 
     label: "Rosario", 
     path: "/rosario",
-    gradient: "from-blue-500/20 to-indigo-500/20"
+    gradient: "from-blue-400 to-indigo-500",
+    bgGradient: "from-blue-500/20 to-indigo-500/20"
   },
   { 
     icon: Flame, 
     label: "Novenas", 
     path: "/novenas",
-    gradient: "from-red-500/20 to-pink-500/20"
+    gradient: "from-red-400 to-rose-500",
+    bgGradient: "from-red-500/20 to-pink-500/20"
+  },
+  { 
+    icon: Moon, 
+    label: "Dormir", 
+    path: "/sleep-stories",
+    gradient: "from-indigo-500 to-purple-600",
+    bgGradient: "from-indigo-500/20 to-purple-500/20"
   },
   { 
     icon: MessageCircle, 
     label: "Coach", 
     path: "/coach",
-    gradient: "from-emerald-500/20 to-teal-500/20"
+    gradient: "from-emerald-400 to-teal-500",
+    bgGradient: "from-emerald-500/20 to-teal-500/20"
   },
 ];
 
@@ -34,8 +45,8 @@ const containerVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.8,
+      staggerChildren: 0.08,
+      delayChildren: 0.6,
     },
   },
 } as const;
@@ -54,26 +65,32 @@ export function QuickActions() {
   const navigate = useNavigate();
 
   return (
-    <section className="px-5 -mt-4 relative z-20">
+    <section className="px-5 -mt-3 relative z-20">
       <motion.div 
-        className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide"
+        className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        {actions.map((action) => (
+        {actions.map((action, index) => (
           <motion.button
             key={action.path}
             onClick={() => navigate(action.path)}
-            className="glass-button flex-shrink-0 flex flex-col items-center gap-2 p-4 rounded-2xl min-w-[80px]"
+            className="group flex-shrink-0 flex flex-col items-center gap-2 p-3 rounded-2xl glass-button min-w-[72px] hover:scale-105 transition-transform"
             variants={itemVariants}
-            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <div className={`p-3 rounded-full bg-gradient-to-br ${action.gradient}`}>
-              <action.icon className="w-6 h-6 text-foreground" />
-            </div>
-            <span className="text-xs font-medium text-foreground/80">{action.label}</span>
+            <motion.div 
+              className={`relative p-3 rounded-2xl bg-gradient-to-br ${action.bgGradient}`}
+              whileHover={{ rotate: [0, -5, 5, 0] }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${action.gradient} opacity-0 group-hover:opacity-100 transition-opacity`} />
+              <action.icon className="relative w-5 h-5 text-foreground group-hover:text-white transition-colors" />
+            </motion.div>
+            <span className="text-xs font-medium text-foreground/80 group-hover:text-foreground transition-colors">
+              {action.label}
+            </span>
           </motion.button>
         ))}
       </motion.div>
