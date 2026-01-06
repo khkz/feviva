@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, BookOpen, Sparkles, Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,6 +12,27 @@ import { useNotifications } from "@/hooks/useNotifications";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2,
+    },
+  },
+} as const;
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 30, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: "spring" as const, stiffness: 200, damping: 20 },
+  },
+} as const;
 
 const Novenas = () => {
   const navigate = useNavigate();
@@ -121,129 +143,212 @@ const Novenas = () => {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <div className="container max-w-lg mx-auto p-4 space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate("/oraciones")}>
+      {/* Hero Header */}
+      <motion.div 
+        className="relative overflow-hidden"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-b from-secondary/20 via-secondary/10 to-background" />
+        <div className="relative z-10 p-5 pt-8">
+          {/* Back Button & Title */}
+          <motion.div 
+            className="flex items-center gap-4 mb-4"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <motion.button
+              onClick={() => navigate("/oraciones")}
+              className="glass-button p-2 rounded-full"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
               <ArrowLeft className="h-5 w-5" />
-            </Button>
+            </motion.button>
             <div>
-              <h1 className="text-2xl font-bold">Novenas</h1>
+              <h1 className="text-2xl font-bold font-heading">Novenas</h1>
               <p className="text-muted-foreground text-sm">
                 9 días de oración continua
               </p>
             </div>
-          </div>
-          
+          </motion.div>
+
+          {/* Generate All Button */}
           {novenasWithoutImage.length > 0 && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={generateAllImages}
-              disabled={isGeneratingAll}
-              className="shrink-0"
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
             >
-              {isGeneratingAll ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  {generationProgress.current}/{generationProgress.total}
-                </>
-              ) : (
-                <>
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Generar imágenes ({novenasWithoutImage.length})
-                </>
-              )}
-            </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={generateAllImages}
+                disabled={isGeneratingAll}
+                className="glass-button border-0"
+              >
+                {isGeneratingAll ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    {generationProgress.current}/{generationProgress.total}
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Generar imágenes ({novenasWithoutImage.length})
+                  </>
+                )}
+              </Button>
+            </motion.div>
           )}
         </div>
 
         {/* Info Card */}
-        <div className="bg-primary/10 rounded-lg p-4 flex items-start gap-3">
-          <BookOpen className="h-5 w-5 text-primary mt-0.5" />
-          <div className="text-sm">
-            <p className="font-medium text-foreground">¿Qué es una novena?</p>
-            <p className="text-muted-foreground mt-1">
-              Una novena es una práctica de oración que se realiza durante nueve días 
-              consecutivos, pidiendo una intención especial a Dios o a los santos.
-            </p>
+        <motion.div 
+          className="px-5 pb-5"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+        >
+          <div className="glass-card rounded-2xl p-4 flex items-start gap-3">
+            <div className="p-2 rounded-full bg-primary/20">
+              <BookOpen className="h-5 w-5 text-primary" />
+            </div>
+            <div className="text-sm">
+              <p className="font-medium text-foreground">¿Qué es una novena?</p>
+              <p className="text-muted-foreground mt-1">
+                Una práctica de oración durante nueve días consecutivos, 
+                pidiendo una intención especial.
+              </p>
+            </div>
           </div>
-        </div>
+        </motion.div>
+      </motion.div>
 
-        {/* Tabs */}
+      {/* Tabs */}
+      <motion.div 
+        className="px-5"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.5 }}
+      >
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-3 glass-card border-0">
             <TabsTrigger value="todas">Todas</TabsTrigger>
             <TabsTrigger value="progreso">
-              En Progreso {novenasEnProgreso.length > 0 && `(${novenasEnProgreso.length})`}
+              Progreso {novenasEnProgreso.length > 0 && `(${novenasEnProgreso.length})`}
             </TabsTrigger>
             <TabsTrigger value="completadas">Completadas</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="todas" className="space-y-4 mt-4">
+          <TabsContent value="todas" className="mt-4">
             {loading ? (
-              <>
-                <Skeleton className="h-40 w-full" />
-                <Skeleton className="h-40 w-full" />
-              </>
+              <div className="space-y-4">
+                <Skeleton className="h-40 w-full rounded-2xl" />
+                <Skeleton className="h-40 w-full rounded-2xl" />
+              </div>
             ) : novenas.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">
+              <motion.p 
+                className="text-center text-muted-foreground py-8"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
                 No hay novenas disponibles
-              </p>
+              </motion.p>
             ) : (
-              novenas.map((novena) => (
-                <NovenaCard
-                  key={novena.id}
-                  novena={novena}
-                  progress={getProgressForNovena(novena.id)}
-                  onStart={() => handleStartNovena(novena)}
-                  onContinue={() => handleContinueNovena(novena)}
-                  onImageGenerated={refetchNovenas}
-                />
-              ))
+              <motion.div 
+                className="space-y-4"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+              >
+                {novenas.map((novena) => (
+                  <motion.div key={novena.id} variants={cardVariants}>
+                    <NovenaCard
+                      novena={novena}
+                      progress={getProgressForNovena(novena.id)}
+                      onStart={() => handleStartNovena(novena)}
+                      onContinue={() => handleContinueNovena(novena)}
+                      onImageGenerated={refetchNovenas}
+                    />
+                  </motion.div>
+                ))}
+              </motion.div>
             )}
           </TabsContent>
 
-          <TabsContent value="progreso" className="space-y-4 mt-4">
+          <TabsContent value="progreso" className="mt-4">
             {novenasEnProgreso.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">
-                No tienes novenas en progreso
-              </p>
+              <motion.div 
+                className="text-center py-12"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+              >
+                <div className="glass-card rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                  <BookOpen className="h-10 w-10 text-muted-foreground/50" />
+                </div>
+                <p className="text-muted-foreground">No tienes novenas en progreso</p>
+              </motion.div>
             ) : (
-              novenasEnProgreso.map((novena) => (
-                <NovenaCard
-                  key={novena.id}
-                  novena={novena}
-                  progress={getProgressForNovena(novena.id)}
-                  onStart={() => handleStartNovena(novena)}
-                  onContinue={() => handleContinueNovena(novena)}
-                  onImageGenerated={refetchNovenas}
-                />
-              ))
+              <motion.div 
+                className="space-y-4"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+              >
+                {novenasEnProgreso.map((novena) => (
+                  <motion.div key={novena.id} variants={cardVariants}>
+                    <NovenaCard
+                      novena={novena}
+                      progress={getProgressForNovena(novena.id)}
+                      onStart={() => handleStartNovena(novena)}
+                      onContinue={() => handleContinueNovena(novena)}
+                      onImageGenerated={refetchNovenas}
+                    />
+                  </motion.div>
+                ))}
+              </motion.div>
             )}
           </TabsContent>
 
-          <TabsContent value="completadas" className="space-y-4 mt-4">
+          <TabsContent value="completadas" className="mt-4">
             {novenasCompletadas.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">
-                Aún no has completado ninguna novena
-              </p>
+              <motion.div 
+                className="text-center py-12"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+              >
+                <div className="glass-card rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                  <Sparkles className="h-10 w-10 text-muted-foreground/50" />
+                </div>
+                <p className="text-muted-foreground">Aún no has completado ninguna novena</p>
+              </motion.div>
             ) : (
-              novenasCompletadas.map((novena) => (
-                <NovenaCard
-                  key={novena.id}
-                  novena={novena}
-                  progress={getProgressForNovena(novena.id)}
-                  onStart={() => handleStartNovena(novena)}
-                  onContinue={() => handleContinueNovena(novena)}
-                  onImageGenerated={refetchNovenas}
-                />
-              ))
+              <motion.div 
+                className="space-y-4"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+              >
+                {novenasCompletadas.map((novena) => (
+                  <motion.div key={novena.id} variants={cardVariants}>
+                    <NovenaCard
+                      novena={novena}
+                      progress={getProgressForNovena(novena.id)}
+                      onStart={() => handleStartNovena(novena)}
+                      onContinue={() => handleContinueNovena(novena)}
+                      onImageGenerated={refetchNovenas}
+                    />
+                  </motion.div>
+                ))}
+              </motion.div>
             )}
           </TabsContent>
         </Tabs>
-      </div>
+      </motion.div>
+
       <BottomNavigation />
     </div>
   );
