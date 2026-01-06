@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Moon, Loader2, Sparkles, PlusCircle, Expand } from "lucide-react";
+import { ArrowLeft, Moon, Loader2, Sparkles, PlusCircle, Expand, Volume2 } from "lucide-react";
 import { useSleepStories, SleepStory } from "@/hooks/useSleepStories";
 import { SleepStoryCard } from "@/components/sleep/SleepStoryCard";
 import { SleepPlayer } from "@/components/sleep/SleepPlayer";
@@ -17,6 +17,7 @@ const SleepStories = () => {
   const [generatedAudioUrl, setGeneratedAudioUrl] = useState<string | null>(null);
   const [isCreatingStories, setIsCreatingStories] = useState(false);
   const [isExpandingStories, setIsExpandingStories] = useState(false);
+  const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
 
   const handleStorySelect = (story: SleepStory) => {
     setSelectedStory(story);
@@ -119,8 +120,54 @@ const SleepStories = () => {
     }
   };
 
+  const handleBatchGenerateAudio = async () => {
+    setIsGeneratingAudio(true);
+    let totalGenerated = 0;
+    
+    try {
+      let hasMore = true;
+      while (hasMore) {
+        toast.loading(`Generando audio TTS...`, { id: 'batch-audio' });
+        
+        const { data, error } = await supabase.functions.invoke('batch-sleep-tts', {
+          body: { limit: 1 }
+        });
+        
+        if (error) throw error;
+        
+        const successCount = data.results?.filter((r: any) => r.status === 'success').length || 0;
+        totalGenerated += successCount;
+        hasMore = data.hasMore;
+        
+        if (successCount > 0) {
+          const lastResult = data.results.find((r: any) => r.status === 'success');
+          toast.loading(`Audio generado: "${lastResult?.titulo}"`, { id: 'batch-audio' });
+        }
+        
+        if (data.results?.some((r: any) => r.status === 'error')) {
+          const errorResult = data.results.find((r: any) => r.status === 'error');
+          console.error('Error in batch:', errorResult.error);
+        }
+        
+        if (!hasMore) break;
+      }
+      
+      toast.success(`✅ Se generó audio para ${totalGenerated} historias`, { id: 'batch-audio' });
+      refetch();
+    } catch (error) {
+      console.error('Error generating audio:', error);
+      toast.error('Error al generar audio', { id: 'batch-audio' });
+    } finally {
+      setIsGeneratingAudio(false);
+    }
+  };
+
   // Count short stories (less than 5 min)
   const shortStoriesCount = stories.filter(s => s.duracion_estimada < 5).length;
+  // Count stories without audio
+  const storiesWithoutAudio = stories.filter(s => !s.audio_url).length;
+  
+  const isAnyProcessRunning = isCreatingStories || isExpandingStories || isGeneratingAudio;
 
   if (loading) {
     return (
@@ -163,7 +210,7 @@ const SleepStories = () => {
           variant="outline"
           className="w-full justify-start gap-2"
           onClick={handleCreateNewStories}
-          disabled={isCreatingStories || isExpandingStories}
+          disabled={isAnyProcessRunning}
         >
           {isCreatingStories ? (
             <Loader2 className="w-4 h-4 animate-spin" />
@@ -179,7 +226,7 @@ const SleepStories = () => {
             variant="outline"
             className="w-full justify-start gap-2"
             onClick={handleExpandStories}
-            disabled={isCreatingStories || isExpandingStories}
+            disabled={isAnyProcessRunning}
           >
             {isExpandingStories ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -187,6 +234,23 @@ const SleepStories = () => {
               <Expand className="w-4 h-4 text-primary" />
             )}
             <span>Expandir {shortStoriesCount} historias cortas a 10-15 min</span>
+            <Sparkles className="w-4 h-4 text-amber-500 ml-auto" />
+          </Button>
+        )}
+
+        {storiesWithoutAudio > 0 && (
+          <Button
+            variant="outline"
+            className="w-full justify-start gap-2"
+            onClick={handleBatchGenerateAudio}
+            disabled={isAnyProcessRunning}
+          >
+            {isGeneratingAudio ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Volume2 className="w-4 h-4 text-primary" />
+            )}
+            <span>Generar audio TTS para {storiesWithoutAudio} historias</span>
             <Sparkles className="w-4 h-4 text-amber-500 ml-auto" />
           </Button>
         )}

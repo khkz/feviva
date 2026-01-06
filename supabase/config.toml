@@ -23,3 +23,6 @@ verify_jwt = false
 
 [functions.generate-sleep-stories]
 verify_jwt = false
+
+[functions.batch-sleep-tts]
+verify_jwt = false
