@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Shield } from "lucide-react";
 import { useUserStats } from "@/hooks/useUserStats";
 import { useNovenas } from "@/hooks/useNovenas";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { HeroSection } from "@/components/dashboard/HeroSection";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 import { ProgressCard } from "@/components/dashboard/ProgressCard";
 import { NovenaCarousel } from "@/components/dashboard/NovenaCarousel";
 import { ExploreGrid } from "@/components/dashboard/ExploreGrid";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
+import { Button } from "@/components/ui/button";
 
 interface Profile {
   nombre: string;
@@ -29,6 +31,7 @@ const Dashboard = () => {
   } = useUserStats();
   
   const { novenas, loading: novenasLoading, getProgressForNovena } = useNovenas();
+  const { isAdmin } = useAdminAuth();
 
   useEffect(() => {
     checkAuth();
@@ -80,6 +83,20 @@ const Dashboard = () => {
         userName={profile?.nombre || "Peregrino"} 
         verse={dailyVerse}
       />
+
+      {/* Admin Access Button */}
+      {isAdmin && (
+        <div className="px-4 mb-4">
+          <Button 
+            onClick={() => navigate('/admin')}
+            variant="outline"
+            className="w-full border-primary/50 text-primary hover:bg-primary/10"
+          >
+            <Shield className="w-4 h-4 mr-2" />
+            Panel de Administración
+          </Button>
+        </div>
+      )}
 
       {/* Quick Actions */}
       <QuickActions />

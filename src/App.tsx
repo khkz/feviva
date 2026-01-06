@@ -24,6 +24,19 @@ import Rosario from "./pages/Rosario";
 import SleepStories from "./pages/SleepStories";
 import Novenas from "./pages/Novenas";
 import NotFound from "./pages/NotFound";
+import { AdminLayout } from "./layouts/AdminLayout";
+import {
+  AdminDashboard,
+  AdminUsers,
+  AdminContent,
+  AdminFeedback,
+  AdminProcessing,
+  AdminAnalytics,
+  AdminMedia,
+  AdminCourses,
+  AdminLiveSessions,
+  AdminMovies,
+} from "./pages/admin";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +67,21 @@ const App = () => (
             <Route path="/rosario" element={<Rosario />} />
             <Route path="/sleep" element={<SleepStories />} />
             <Route path="/novenas" element={<Novenas />} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="content" element={<AdminContent />} />
+              <Route path="feedback" element={<AdminFeedback />} />
+              <Route path="processing" element={<AdminProcessing />} />
+              <Route path="analytics" element={<AdminAnalytics />} />
+              <Route path="media" element={<AdminMedia />} />
+              <Route path="courses" element={<AdminCourses />} />
+              <Route path="live" element={<AdminLiveSessions />} />
+              <Route path="movies" element={<AdminMovies />} />
+            </Route>
+            
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
