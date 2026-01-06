@@ -331,6 +331,198 @@ async function generateLessonTTS(targetId: string): Promise<{ audioUrl: string }
   return { audioUrl };
 }
 
+async function generateBibleDay(targetId: string): Promise<{ dia: number }> {
+  console.log(`[bible_day] Generando día bíblico: ${targetId}`);
+  
+  // targetId es el número del día (1-365)
+  const dia = parseInt(targetId, 10);
+  
+  if (isNaN(dia) || dia < 1 || dia > 365) {
+    throw new Error(`Día inválido: ${targetId}`);
+  }
+  
+  // Verificar si el día ya existe
+  const { data: existing } = await supabase
+    .from('bible_reading_plan')
+    .select('id')
+    .eq('dia', dia)
+    .maybeSingle();
+  
+  if (existing) {
+    console.log(`[bible_day] Día ${dia} ya existe, saltando...`);
+    return { dia };
+  }
+  
+  // Plan de lectura basado en el día del año (distribuir la Biblia en 365 días)
+  const bibleStructure = [
+    { libro: 'Génesis', capitulos: 50 },
+    { libro: 'Éxodo', capitulos: 40 },
+    { libro: 'Levítico', capitulos: 27 },
+    { libro: 'Números', capitulos: 36 },
+    { libro: 'Deuteronomio', capitulos: 34 },
+    { libro: 'Josué', capitulos: 24 },
+    { libro: 'Jueces', capitulos: 21 },
+    { libro: 'Rut', capitulos: 4 },
+    { libro: '1 Samuel', capitulos: 31 },
+    { libro: '2 Samuel', capitulos: 24 },
+    { libro: '1 Reyes', capitulos: 22 },
+    { libro: '2 Reyes', capitulos: 25 },
+    { libro: '1 Crónicas', capitulos: 29 },
+    { libro: '2 Crónicas', capitulos: 36 },
+    { libro: 'Esdras', capitulos: 10 },
+    { libro: 'Nehemías', capitulos: 13 },
+    { libro: 'Ester', capitulos: 10 },
+    { libro: 'Job', capitulos: 42 },
+    { libro: 'Salmos', capitulos: 150 },
+    { libro: 'Proverbios', capitulos: 31 },
+    { libro: 'Eclesiastés', capitulos: 12 },
+    { libro: 'Cantar de los Cantares', capitulos: 8 },
+    { libro: 'Isaías', capitulos: 66 },
+    { libro: 'Jeremías', capitulos: 52 },
+    { libro: 'Lamentaciones', capitulos: 5 },
+    { libro: 'Ezequiel', capitulos: 48 },
+    { libro: 'Daniel', capitulos: 12 },
+    { libro: 'Oseas', capitulos: 14 },
+    { libro: 'Joel', capitulos: 3 },
+    { libro: 'Amós', capitulos: 9 },
+    { libro: 'Abdías', capitulos: 1 },
+    { libro: 'Jonás', capitulos: 4 },
+    { libro: 'Miqueas', capitulos: 7 },
+    { libro: 'Nahúm', capitulos: 3 },
+    { libro: 'Habacuc', capitulos: 3 },
+    { libro: 'Sofonías', capitulos: 3 },
+    { libro: 'Ageo', capitulos: 2 },
+    { libro: 'Zacarías', capitulos: 14 },
+    { libro: 'Malaquías', capitulos: 4 },
+    { libro: 'Mateo', capitulos: 28 },
+    { libro: 'Marcos', capitulos: 16 },
+    { libro: 'Lucas', capitulos: 24 },
+    { libro: 'Juan', capitulos: 21 },
+    { libro: 'Hechos', capitulos: 28 },
+    { libro: 'Romanos', capitulos: 16 },
+    { libro: '1 Corintios', capitulos: 16 },
+    { libro: '2 Corintios', capitulos: 13 },
+    { libro: 'Gálatas', capitulos: 6 },
+    { libro: 'Efesios', capitulos: 6 },
+    { libro: 'Filipenses', capitulos: 4 },
+    { libro: 'Colosenses', capitulos: 4 },
+    { libro: '1 Tesalonicenses', capitulos: 5 },
+    { libro: '2 Tesalonicenses', capitulos: 3 },
+    { libro: '1 Timoteo', capitulos: 6 },
+    { libro: '2 Timoteo', capitulos: 4 },
+    { libro: 'Tito', capitulos: 3 },
+    { libro: 'Filemón', capitulos: 1 },
+    { libro: 'Hebreos', capitulos: 13 },
+    { libro: 'Santiago', capitulos: 5 },
+    { libro: '1 Pedro', capitulos: 5 },
+    { libro: '2 Pedro', capitulos: 3 },
+    { libro: '1 Juan', capitulos: 5 },
+    { libro: '2 Juan', capitulos: 1 },
+    { libro: '3 Juan', capitulos: 1 },
+    { libro: 'Judas', capitulos: 1 },
+    { libro: 'Apocalipsis', capitulos: 22 },
+  ];
+  
+  // Total de capítulos: 1189, distribuir en 365 días (~3.26 capítulos por día)
+  const totalCapitulos = bibleStructure.reduce((acc, b) => acc + b.capitulos, 0);
+  const capitulosPorDia = totalCapitulos / 365;
+  
+  // Calcular qué capítulos leer en este día
+  const capituloInicio = Math.floor((dia - 1) * capitulosPorDia) + 1;
+  const capituloFin = Math.floor(dia * capitulosPorDia);
+  
+  // Encontrar libro y capítulo
+  let capituloAcumulado = 0;
+  let libroActual = '';
+  let capituloEnLibro = 0;
+  let libroFinal = '';
+  let capituloEnLibroFinal = 0;
+  
+  for (const libro of bibleStructure) {
+    if (capituloAcumulado + libro.capitulos >= capituloInicio && !libroActual) {
+      libroActual = libro.libro;
+      capituloEnLibro = capituloInicio - capituloAcumulado;
+    }
+    if (capituloAcumulado + libro.capitulos >= capituloFin) {
+      libroFinal = libro.libro;
+      capituloEnLibroFinal = capituloFin - capituloAcumulado;
+      break;
+    }
+    capituloAcumulado += libro.capitulos;
+  }
+  
+  const pasajeReferencia = libroActual === libroFinal 
+    ? `${libroActual} ${capituloEnLibro}${capituloEnLibro !== capituloEnLibroFinal ? `-${capituloEnLibroFinal}` : ''}`
+    : `${libroActual} ${capituloEnLibro} - ${libroFinal} ${capituloEnLibroFinal}`;
+  
+  // Usar Lovable AI para generar contenido
+  const response = await fetch('https://api.lovable.dev/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${Deno.env.get('LOVABLE_API_KEY')}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'google/gemini-2.5-flash',
+      messages: [
+        {
+          role: 'system',
+          content: `Eres un experto bíblico católico. Genera contenido para un plan de lectura de la Biblia en 365 días. 
+Responde SOLO con JSON válido sin markdown, con esta estructura exacta:
+{
+  "titulo": "Título breve y atractivo para el día",
+  "pasaje_texto": "Resumen del pasaje de 2-3 párrafos, destacando los puntos principales y el contexto histórico",
+  "reflexion": "Reflexión espiritual de 1-2 párrafos sobre cómo aplicar este pasaje en la vida diaria"
+}`
+        },
+        {
+          role: 'user',
+          content: `Genera el contenido para el Día ${dia} de 365. Pasaje: ${pasajeReferencia}. Recuerda responder SOLO con JSON válido.`
+        }
+      ],
+      temperature: 0.7,
+      max_tokens: 1500,
+    }),
+  });
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Lovable AI error: ${errorText}`);
+  }
+  
+  const aiData = await response.json();
+  let content;
+  
+  try {
+    const rawContent = aiData.choices[0].message.content;
+    // Limpiar posible markdown
+    const cleanContent = rawContent.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    content = JSON.parse(cleanContent);
+  } catch (e) {
+    console.error('[bible_day] Error parseando respuesta AI:', aiData.choices[0].message.content);
+    throw new Error('Error parseando respuesta de IA');
+  }
+  
+  // Insertar en la base de datos
+  const { error: insertError } = await supabase
+    .from('bible_reading_plan')
+    .insert({
+      dia,
+      titulo: content.titulo,
+      pasaje_referencia: pasajeReferencia,
+      pasaje_texto: content.pasaje_texto,
+      reflexion: content.reflexion,
+    });
+  
+  if (insertError) {
+    throw new Error(`Error insertando día: ${insertError.message}`);
+  }
+  
+  console.log(`[bible_day] Día ${dia} generado exitosamente: ${content.titulo}`);
+  
+  return { dia };
+}
+
 // ============ PROCESADOR PRINCIPAL ============
 
 async function processJob(job: ProcessingJob): Promise<void> {
@@ -354,6 +546,9 @@ async function processJob(job: ProcessingJob): Promise<void> {
         break;
       case 'lesson_tts':
         result = await generateLessonTTS(job.target_id);
+        break;
+      case 'bible_day':
+        result = await generateBibleDay(job.target_id);
         break;
       default:
         throw new Error(`Tipo de job desconocido: ${job.job_type}`);
