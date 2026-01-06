@@ -3,10 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sparkles, BookOpen, Target, Users, Heart, LogOut, Settings, Brain, MessageSquare, Trophy } from "lucide-react";
+import { Sparkles, BookOpen, Target, Users, Heart, LogOut, Settings, Brain, MessageSquare, Trophy, ChevronRight, Flame } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useUserStats } from "@/hooks/useUserStats";
 import { LevelDisplay } from "@/components/gamification/LevelDisplay";
+import { useNovenas } from "@/hooks/useNovenas";
 
 interface Profile {
   nombre: string;
@@ -25,6 +26,8 @@ const Dashboard = () => {
     getProgressToNextLevel,
     updateStreak,
   } = useUserStats();
+  
+  const { novenas, loading: novenasLoading, getProgressForNovena } = useNovenas();
 
   useEffect(() => {
     checkAuth();
@@ -115,6 +118,60 @@ const Dashboard = () => {
             />
           </div>
         )}
+
+        {/* Novenas Section */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Flame className="w-5 h-5 text-secondary" />
+              <h3 className="font-heading text-xl font-semibold text-foreground">Novenas</h3>
+            </div>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/novenas")} className="text-muted-foreground hover:text-primary">
+              Ver todas
+              <ChevronRight className="w-4 h-4 ml-1" />
+            </Button>
+          </div>
+          
+          {novenasLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="h-32 bg-muted animate-pulse rounded-lg" />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {novenas.slice(0, 3).map(novena => {
+                const progress = getProgressForNovena(novena.id);
+                return (
+                  <Card 
+                    key={novena.id} 
+                    className="cursor-pointer hover:shadow-glow transition-smooth overflow-hidden"
+                    onClick={() => navigate("/novenas")}
+                  >
+                    <div className="relative h-24 bg-gradient-to-br from-primary/20 to-secondary/20">
+                      {novena.imagen_url ? (
+                        <img src={novena.imagen_url} alt={novena.titulo} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <BookOpen className="w-8 h-8 text-muted-foreground/50" />
+                        </div>
+                      )}
+                      {progress && !progress.completada && (
+                        <div className="absolute bottom-2 right-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full">
+                          Día {progress.dia_actual}/9
+                        </div>
+                      )}
+                    </div>
+                    <CardContent className="p-3">
+                      <p className="font-medium text-sm line-clamp-1">{novena.titulo}</p>
+                      <p className="text-xs text-muted-foreground line-clamp-1">{novena.intencion}</p>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Debate Coach */}

@@ -33,6 +33,8 @@ export const NovenaCard = ({ novena, progress, onStart, onContinue, onImageGener
         return "from-orange-500/20 to-orange-600/20";
       case "santos":
         return "from-emerald-500/20 to-emerald-600/20";
+      case "devocion":
+        return "from-rose-500/20 to-rose-600/20";
       default:
         return "from-primary/20 to-primary/30";
     }
@@ -48,6 +50,8 @@ export const NovenaCard = ({ novena, progress, onStart, onContinue, onImageGener
         return "Espíritu Santo";
       case "santos":
         return "Santos";
+      case "devocion":
+        return "Devoción";
       default:
         return "General";
     }
