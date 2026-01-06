@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Check, ChevronDown, Play, Pause, RotateCcw } from "lucide-react";
+import { ArrowLeft, Check, ChevronDown, Play, Pause, RotateCcw, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
+import { Slider } from "@/components/ui/slider";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +15,7 @@ import {
 import { RosarioMisterio } from "@/components/rosario/RosarioMisterio";
 import { RosarioDecena } from "@/components/rosario/RosarioDecena";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
+import { AmbientSoundMixer } from "@/components/sleep/AmbientSoundMixer";
 import { 
   MISTERIOS, 
   ORACIONES_ROSARIO, 
@@ -58,6 +60,7 @@ export default function Rosario() {
   const [misterioActual, setMisterioActual] = useState(0);
   const [decenaActual, setDecenaActual] = useState(0);
   const [startTime, setStartTime] = useState<Date | null>(null);
+  const [masterVolume, setMasterVolume] = useState(0.5);
   
   const misterios = MISTERIOS[tipoMisterio];
   const totalDecenas = 5;
@@ -203,6 +206,26 @@ export default function Rosario() {
                 />
               ))}
             </div>
+
+            {/* Ambient Sound Mixer */}
+            <Card className="bg-muted/30">
+              <CardContent className="p-4">
+                <AmbientSoundMixer isPlaying={true} masterVolume={masterVolume} />
+                <div className="mt-4 flex items-center gap-3">
+                  <Volume2 className="h-4 w-4 text-muted-foreground" />
+                  <Slider
+                    value={[masterVolume]}
+                    max={1}
+                    step={0.1}
+                    onValueChange={(value) => setMasterVolume(value[0])}
+                    className="flex-1"
+                  />
+                  <span className="text-xs text-muted-foreground w-8 text-right">
+                    {Math.round(masterVolume * 100)}%
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Start button */}
             <Button onClick={handleStart} size="lg" className="w-full">

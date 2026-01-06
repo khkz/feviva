@@ -7,8 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Save, User } from "lucide-react";
+import { ArrowLeft, Save, User, Palette } from "lucide-react";
 import { z } from "zod";
+import { ThemeSelector } from "@/components/ui/theme-toggle";
 
 const profileSchema = z.object({
   nombre: z.string().min(1, "El nombre es requerido").max(100, "Máximo 100 caracteres"),
@@ -67,7 +68,6 @@ const Profile = () => {
     e.preventDefault();
     setErrors({});
 
-    // Validar con zod
     const validation = profileSchema.safeParse(formData);
     if (!validation.success) {
       const newErrors: Record<string, string> = {};
@@ -134,6 +134,22 @@ const Profile = () => {
           <ArrowLeft className="mr-2 h-4 w-4" />
           Volver al Dashboard
         </Button>
+
+        {/* Theme Selector Card */}
+        <Card className="mb-6">
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <Palette className="h-6 w-6 text-primary" />
+              <CardTitle className="text-xl">Apariencia</CardTitle>
+            </div>
+            <CardDescription>
+              Selecciona el tema de la aplicación
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ThemeSelector />
+          </CardContent>
+        </Card>
 
         <Card>
           <CardHeader>
