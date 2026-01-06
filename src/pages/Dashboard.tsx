@@ -10,6 +10,9 @@ import { QuickActions } from "@/components/dashboard/QuickActions";
 import { ProgressCard } from "@/components/dashboard/ProgressCard";
 import { NovenaCarousel } from "@/components/dashboard/NovenaCarousel";
 import { ExploreGrid } from "@/components/dashboard/ExploreGrid";
+import { DailyChallenge } from "@/components/dashboard/DailyChallenge";
+import { FeaturedContent } from "@/components/dashboard/FeaturedContent";
+import { GratitudePrompt } from "@/components/dashboard/GratitudePrompt";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { Button } from "@/components/ui/button";
 
@@ -77,7 +80,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background pb-24">
       {/* Hero Section with Immersive Background */}
       <HeroSection 
         userName={profile?.nombre || "Peregrino"} 
@@ -86,11 +89,12 @@ const Dashboard = () => {
 
       {/* Admin Access Button */}
       {isAdmin && (
-        <div className="px-4 mb-4">
+        <div className="px-5 py-2">
           <Button 
             onClick={() => navigate('/admin')}
             variant="outline"
-            className="w-full border-primary/50 text-primary hover:bg-primary/10"
+            size="sm"
+            className="w-full border-primary/30 text-primary hover:bg-primary/10"
           >
             <Shield className="w-4 h-4 mr-2" />
             Panel de Administración
@@ -100,6 +104,12 @@ const Dashboard = () => {
 
       {/* Quick Actions */}
       <QuickActions />
+
+      {/* Daily Challenge - NEW */}
+      <DailyChallenge />
+
+      {/* Gratitude Prompt - NEW */}
+      <GratitudePrompt />
 
       {/* Progress Card */}
       {stats && (
@@ -111,6 +121,9 @@ const Dashboard = () => {
           racha={stats.racha_actual_dias}
         />
       )}
+
+      {/* Featured Content - NEW (Hallow style) */}
+      <FeaturedContent />
 
       {/* Novena Carousel */}
       <NovenaCarousel
