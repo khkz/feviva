@@ -14,6 +14,10 @@ import Library from "./pages/Library";
 import Profile from "./pages/Profile";
 import DebateHistory from "./pages/DebateHistory";
 import Gamification from "./pages/Gamification";
+import Morning from "./pages/Morning";
+import Evening from "./pages/Evening";
+import Prayer from "./pages/Prayer";
+import Mission from "./pages/Mission";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +40,10 @@ const App = () => (
           <Route path="/profile" element={<Profile />} />
           <Route path="/debate-history" element={<DebateHistory />} />
           <Route path="/gamification" element={<Gamification />} />
+          <Route path="/morning" element={<Morning />} />
+          <Route path="/evening" element={<Evening />} />
+          <Route path="/prayer" element={<Prayer />} />
+          <Route path="/mission" element={<Mission />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

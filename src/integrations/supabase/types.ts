@@ -137,6 +137,54 @@ export type Database = {
           },
         ]
       }
+      daily_content: {
+        Row: {
+          audio_ensenanza_url: string | null
+          audio_versiculo_url: string | null
+          created_at: string | null
+          ensenanza_contenido: string | null
+          ensenanza_titulo: string | null
+          fecha: string
+          id: string
+          oracion_completas: string
+          oracion_laudes: string
+          reflexion_ia: string
+          tip_apologetico: string
+          versiculo_referencia: string
+          versiculo_texto: string
+        }
+        Insert: {
+          audio_ensenanza_url?: string | null
+          audio_versiculo_url?: string | null
+          created_at?: string | null
+          ensenanza_contenido?: string | null
+          ensenanza_titulo?: string | null
+          fecha: string
+          id?: string
+          oracion_completas: string
+          oracion_laudes: string
+          reflexion_ia: string
+          tip_apologetico: string
+          versiculo_referencia: string
+          versiculo_texto: string
+        }
+        Update: {
+          audio_ensenanza_url?: string | null
+          audio_versiculo_url?: string | null
+          created_at?: string | null
+          ensenanza_contenido?: string | null
+          ensenanza_titulo?: string | null
+          fecha?: string
+          id?: string
+          oracion_completas?: string
+          oracion_laudes?: string
+          reflexion_ia?: string
+          tip_apologetico?: string
+          versiculo_referencia?: string
+          versiculo_texto?: string
+        }
+        Relationships: []
+      }
       debates: {
         Row: {
           completed: boolean | null
@@ -186,6 +234,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      evangelization_logs: {
+        Row: {
+          created_at: string | null
+          descripcion: string
+          fecha: string
+          id: string
+          persona_nombre: string | null
+          resultado: string | null
+          seguimiento_necesario: boolean | null
+          tipo: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          descripcion: string
+          fecha: string
+          id?: string
+          persona_nombre?: string | null
+          resultado?: string | null
+          seguimiento_necesario?: boolean | null
+          tipo: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          descripcion?: string
+          fecha?: string
+          id?: string
+          persona_nombre?: string | null
+          resultado?: string | null
+          seguimiento_necesario?: boolean | null
+          tipo?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       habit_logs: {
         Row: {
@@ -337,6 +421,42 @@ export type Database = {
           },
         ]
       }
+      prayer_journal: {
+        Row: {
+          contenido: string
+          created_at: string | null
+          fecha_respuesta: string | null
+          id: string
+          notas_respuesta: string | null
+          respondida: boolean | null
+          tipo: string
+          user_id: string
+          versiculo_relacionado: string | null
+        }
+        Insert: {
+          contenido: string
+          created_at?: string | null
+          fecha_respuesta?: string | null
+          id?: string
+          notas_respuesta?: string | null
+          respondida?: boolean | null
+          tipo: string
+          user_id: string
+          versiculo_relacionado?: string | null
+        }
+        Update: {
+          contenido?: string
+          created_at?: string | null
+          fecha_respuesta?: string | null
+          id?: string
+          notas_respuesta?: string | null
+          respondida?: boolean | null
+          tipo?: string
+          user_id?: string
+          versiculo_relacionado?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -445,6 +565,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_rituals: {
+        Row: {
+          compartio_fe: boolean | null
+          created_at: string | null
+          diario_personal: string | null
+          examen_conciencia: Json | null
+          fecha: string
+          id: string
+          meta_evangelizacion: string | null
+          notas_evangelizacion: string | null
+          ritual_matutino_completado: boolean | null
+          ritual_nocturno_completado: boolean | null
+          user_id: string
+        }
+        Insert: {
+          compartio_fe?: boolean | null
+          created_at?: string | null
+          diario_personal?: string | null
+          examen_conciencia?: Json | null
+          fecha: string
+          id?: string
+          meta_evangelizacion?: string | null
+          notas_evangelizacion?: string | null
+          ritual_matutino_completado?: boolean | null
+          ritual_nocturno_completado?: boolean | null
+          user_id: string
+        }
+        Update: {
+          compartio_fe?: boolean | null
+          created_at?: string | null
+          diario_personal?: string | null
+          examen_conciencia?: Json | null
+          fecha?: string
+          id?: string
+          meta_evangelizacion?: string | null
+          notas_evangelizacion?: string | null
+          ritual_matutino_completado?: boolean | null
+          ritual_nocturno_completado?: boolean | null
+          user_id?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
