@@ -538,6 +538,95 @@ export type Database = {
         }
         Relationships: []
       }
+      processing_jobs: {
+        Row: {
+          attempts: number
+          completed_at: string | null
+          created_at: string
+          error_message: string | null
+          id: string
+          job_type: string
+          max_attempts: number
+          processing_time_ms: number | null
+          result_data: Json | null
+          started_at: string | null
+          status: string
+          target_id: string
+          target_table: string
+          target_title: string | null
+        }
+        Insert: {
+          attempts?: number
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          job_type: string
+          max_attempts?: number
+          processing_time_ms?: number | null
+          result_data?: Json | null
+          started_at?: string | null
+          status?: string
+          target_id: string
+          target_table: string
+          target_title?: string | null
+        }
+        Update: {
+          attempts?: number
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          job_type?: string
+          max_attempts?: number
+          processing_time_ms?: number | null
+          result_data?: Json | null
+          started_at?: string | null
+          status?: string
+          target_id?: string
+          target_table?: string
+          target_title?: string | null
+        }
+        Relationships: []
+      }
+      processing_logs: {
+        Row: {
+          attempt_number: number
+          created_at: string
+          id: string
+          job_id: string
+          message: string | null
+          metadata: Json | null
+          status: string
+        }
+        Insert: {
+          attempt_number: number
+          created_at?: string
+          id?: string
+          job_id: string
+          message?: string | null
+          metadata?: Json | null
+          status: string
+        }
+        Update: {
+          attempt_number?: number
+          created_at?: string
+          id?: string
+          job_id?: string
+          message?: string | null
+          metadata?: Json | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "processing_logs_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "processing_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -977,6 +1066,19 @@ export type Database = {
     }
     Functions: {
       calculate_level: { Args: { puntos: number }; Returns: number }
+      get_processing_stats: {
+        Args: { p_job_type?: string }
+        Returns: {
+          avg_processing_time_ms: number
+          completed_jobs: number
+          error_jobs: number
+          job_type: string
+          pending_jobs: number
+          processing_jobs: number
+          success_rate: number
+          total_jobs: number
+        }[]
+      }
     }
     Enums: {
       app_role:

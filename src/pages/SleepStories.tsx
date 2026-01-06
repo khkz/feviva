@@ -3,8 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Moon, Loader2, Sparkles, PlusCircle, Expand, Volume2 } from "lucide-react";
 import { useSleepStories, SleepStory } from "@/hooks/useSleepStories";
+import { useProcessingJobs } from "@/hooks/useProcessingJobs";
 import { SleepStoryCard } from "@/components/sleep/SleepStoryCard";
 import { SleepPlayer } from "@/components/sleep/SleepPlayer";
+import { JobProgressPanel } from "@/components/processing/JobProgressPanel";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -12,12 +14,12 @@ import { toast } from "sonner";
 const SleepStories = () => {
   const navigate = useNavigate();
   const { stories, loading, generateAudio, saveProgress, refetch } = useSleepStories();
+  const { queueJobs, stats: jobStats } = useProcessingJobs({ jobType: 'sleep_tts' });
   const [selectedStory, setSelectedStory] = useState<SleepStory | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedAudioUrl, setGeneratedAudioUrl] = useState<string | null>(null);
   const [isCreatingStories, setIsCreatingStories] = useState(false);
   const [isExpandingStories, setIsExpandingStories] = useState(false);
-  const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
 
   const handleStorySelect = (story: SleepStory) => {
     setSelectedStory(story);
@@ -120,54 +122,31 @@ const SleepStories = () => {
     }
   };
 
-  const handleBatchGenerateAudio = async () => {
-    setIsGeneratingAudio(true);
-    let totalGenerated = 0;
+  // Encolar todas las historias sin audio para procesamiento automático
+  const handleQueueAudioGeneration = async () => {
+    const storiesWithoutAudio = stories.filter(s => !s.audio_url);
     
-    try {
-      let hasMore = true;
-      while (hasMore) {
-        toast.loading(`Generando audio TTS...`, { id: 'batch-audio' });
-        
-        const { data, error } = await supabase.functions.invoke('batch-sleep-tts', {
-          body: { limit: 1 }
-        });
-        
-        if (error) throw error;
-        
-        const successCount = data.results?.filter((r: any) => r.status === 'success').length || 0;
-        totalGenerated += successCount;
-        hasMore = data.hasMore;
-        
-        if (successCount > 0) {
-          const lastResult = data.results.find((r: any) => r.status === 'success');
-          toast.loading(`Audio generado: "${lastResult?.titulo}"`, { id: 'batch-audio' });
-        }
-        
-        if (data.results?.some((r: any) => r.status === 'error')) {
-          const errorResult = data.results.find((r: any) => r.status === 'error');
-          console.error('Error in batch:', errorResult.error);
-        }
-        
-        if (!hasMore) break;
-      }
-      
-      toast.success(`✅ Se generó audio para ${totalGenerated} historias`, { id: 'batch-audio' });
-      refetch();
-    } catch (error) {
-      console.error('Error generating audio:', error);
-      toast.error('Error al generar audio', { id: 'batch-audio' });
-    } finally {
-      setIsGeneratingAudio(false);
+    if (storiesWithoutAudio.length === 0) {
+      toast.info("Todas las historias ya tienen audio");
+      return;
     }
+
+    const items = storiesWithoutAudio.map(s => ({
+      id: s.id,
+      title: s.titulo,
+      table: 'sleep_stories'
+    }));
+
+    await queueJobs('sleep_tts', items);
   };
 
   // Count short stories (less than 5 min)
   const shortStoriesCount = stories.filter(s => s.duracion_estimada < 5).length;
   // Count stories without audio
-  const storiesWithoutAudio = stories.filter(s => !s.audio_url).length;
+  const storiesWithoutAudioCount = stories.filter(s => !s.audio_url).length;
   
-  const isAnyProcessRunning = isCreatingStories || isExpandingStories || isGeneratingAudio;
+  const isAnyProcessRunning = isCreatingStories || isExpandingStories;
+  const hasActiveJobs = jobStats.pending > 0 || jobStats.processing > 0;
 
   if (loading) {
     return (
@@ -204,6 +183,14 @@ const SleepStories = () => {
         </p>
       </div>
 
+      {/* Panel de progreso de jobs */}
+      <div className="px-4 mb-4">
+        <JobProgressPanel 
+          jobType="sleep_tts" 
+          title="Generación de Audio" 
+        />
+      </div>
+
       {/* AI Generation buttons */}
       <div className="px-4 mb-4 space-y-2">
         <Button
@@ -238,19 +225,15 @@ const SleepStories = () => {
           </Button>
         )}
 
-        {storiesWithoutAudio > 0 && (
+        {storiesWithoutAudioCount > 0 && !hasActiveJobs && (
           <Button
             variant="outline"
             className="w-full justify-start gap-2"
-            onClick={handleBatchGenerateAudio}
+            onClick={handleQueueAudioGeneration}
             disabled={isAnyProcessRunning}
           >
-            {isGeneratingAudio ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Volume2 className="w-4 h-4 text-primary" />
-            )}
-            <span>Generar audio TTS para {storiesWithoutAudio} historias</span>
+            <Volume2 className="w-4 h-4 text-primary" />
+            <span>Encolar audio TTS para {storiesWithoutAudioCount} historias</span>
             <Sparkles className="w-4 h-4 text-amber-500 ml-auto" />
           </Button>
         )}
