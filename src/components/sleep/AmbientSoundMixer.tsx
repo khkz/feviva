@@ -25,37 +25,43 @@ const AMBIENT_SOUNDS: AmbientSound[] = [
     id: "rain",
     name: "Lluvia",
     icon: <CloudRain className="w-5 h-5" />,
-    url: "https://assets.mixkit.co/active_storage/sfx/212/212-preview.mp3"
+    // Rain sounds from freesound.org (CC0)
+    url: "https://cdn.freesound.org/previews/531/531947_5674468-lq.mp3"
   },
   {
     id: "waves",
     name: "Olas",
     icon: <Waves className="w-5 h-5" />,
-    url: "https://assets.mixkit.co/active_storage/sfx/2167/2167-preview.mp3"
+    // Ocean waves from freesound.org (CC0)
+    url: "https://cdn.freesound.org/previews/398/398632_7555935-lq.mp3"
   },
   {
     id: "fire",
     name: "Fuego",
     icon: <Flame className="w-5 h-5" />,
-    url: "https://assets.mixkit.co/active_storage/sfx/2570/2570-preview.mp3"
+    // Crackling fire from freesound.org (CC0)
+    url: "https://cdn.freesound.org/previews/199/199711_126432-lq.mp3"
   },
   {
     id: "wind",
     name: "Viento",
     icon: <Wind className="w-5 h-5" />,
-    url: "https://assets.mixkit.co/active_storage/sfx/2472/2472-preview.mp3"
+    // Wind sounds from freesound.org (CC0)
+    url: "https://cdn.freesound.org/previews/244/244943_4284968-lq.mp3"
   },
   {
     id: "forest",
     name: "Bosque",
     icon: <TreePine className="w-5 h-5" />,
-    url: "https://assets.mixkit.co/active_storage/sfx/2518/2518-preview.mp3"
+    // Forest ambience from freesound.org (CC0)
+    url: "https://cdn.freesound.org/previews/509/509202_10032966-lq.mp3"
   },
   {
     id: "birds",
     name: "Pájaros",
     icon: <Bird className="w-5 h-5" />,
-    url: "https://assets.mixkit.co/active_storage/sfx/2461/2461-preview.mp3"
+    // Bird sounds from freesound.org (CC0)
+    url: "https://cdn.freesound.org/previews/345/345852_1648170-lq.mp3"
   },
 ];
 
