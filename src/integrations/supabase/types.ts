@@ -517,10 +517,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      calculate_level: {
-        Args: { puntos: number }
-        Returns: number
-      }
+      calculate_level: { Args: { puntos: number }; Returns: number }
     }
     Enums: {
       app_role:
