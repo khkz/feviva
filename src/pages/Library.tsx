@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { BookOpen, CheckCircle2, ArrowLeft, ExternalLink } from "lucide-react";
+import { BookOpen, CheckCircle2, ArrowLeft, ExternalLink, Trophy } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useUserStats } from "@/hooks/useUserStats";
+import { BottomNavigation } from "@/components/layout/BottomNavigation";
 
 interface Lesson {
   id: string;
@@ -27,6 +28,27 @@ interface LessonProgress {
   completado: boolean;
   fecha_completado: string | null;
 }
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.3,
+    },
+  },
+} as const;
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 30, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: "spring" as const, stiffness: 200, damping: 20 },
+  },
+} as const;
 
 const Library = () => {
   const [lessons, setLessons] = useState<Lesson[]>([]);
@@ -113,7 +135,6 @@ const Library = () => {
     } else {
       await fetchProgress();
       
-      // Update user stats when completing a lesson
       if (!isCompleted) {
         await incrementLessons();
       }
@@ -137,150 +158,232 @@ const Library = () => {
 
   const getLevelBadgeColor = (nivel: number) => {
     switch (nivel) {
-      case 1: return "bg-green-500";
-      case 2: return "bg-blue-500";
-      case 3: return "bg-orange-500";
-      case 4: return "bg-red-500";
-      default: return "bg-gray-500";
+      case 1: return "bg-green-500/20 text-green-400 border-green-500/30";
+      case 2: return "bg-blue-500/20 text-blue-400 border-blue-500/30";
+      case 3: return "bg-orange-500/20 text-orange-400 border-orange-500/30";
+      case 4: return "bg-red-500/20 text-red-400 border-red-500/30";
+      default: return "bg-gray-500/20 text-gray-400 border-gray-500/30";
     }
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <Button
-            variant="ghost"
-            onClick={() => navigate("/dashboard")}
-            className="mb-4"
+    <div className="min-h-screen bg-background pb-20">
+      {/* Hero Header */}
+      <motion.div 
+        className="relative overflow-hidden"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-500/20 via-blue-500/10 to-background" />
+        <div className="relative z-10 p-5 pt-8">
+          {/* Back Button & Title */}
+          <motion.div 
+            className="flex items-center gap-4 mb-4"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Volver al Dashboard
-          </Button>
-
-          <div className="flex items-center gap-3 mb-4">
-            <BookOpen className="h-8 w-8 text-primary" />
-            <h1 className="text-4xl font-bold">Biblioteca de Fe</h1>
-          </div>
-          
-          <p className="text-muted-foreground mb-6">
-            Fortalece tu fe con lecciones fundamentales del cristianismo
-          </p>
-
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Tu Progreso</CardTitle>
-              <CardDescription>
-                {completedCount} de {lessons.length} lecciones completadas
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Progress value={progressPercentage} className="h-3" />
-              <p className="text-sm text-muted-foreground mt-2">
-                {progressPercentage.toFixed(0)}% completado
-              </p>
-            </CardContent>
-          </Card>
-
-          <Tabs defaultValue="all" className="mb-6">
-            <TabsList>
-              <TabsTrigger value="all" onClick={() => setSelectedCategory("all")}>
-                Todas
-              </TabsTrigger>
-              {categories.map(cat => (
-                <TabsTrigger
-                  key={cat}
-                  value={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                >
-                  {cat}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
-
-          <div className="flex gap-2 mb-6">
-            <Button
-              variant={selectedLevel === 0 ? "default" : "outline"}
-              onClick={() => setSelectedLevel(0)}
+            <motion.button
+              onClick={() => navigate("/dashboard")}
+              className="glass-button p-2 rounded-full"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
-              Todos los niveles
-            </Button>
-            {[1, 2, 3, 4].map(level => (
-              <Button
-                key={level}
-                variant={selectedLevel === level ? "default" : "outline"}
-                onClick={() => setSelectedLevel(level)}
-              >
-                Nivel {level}
-              </Button>
-            ))}
-          </div>
-        </div>
+              <ArrowLeft className="h-5 w-5" />
+            </motion.button>
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-full bg-primary/20">
+                <BookOpen className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold font-heading">Biblioteca de Fe</h1>
+                <p className="text-muted-foreground text-sm">
+                  Fortalece tu conocimiento
+                </p>
+              </div>
+            </div>
+          </motion.div>
 
-        {loading ? (
-          <div className="text-center py-12">Cargando lecciones...</div>
-        ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredLessons.map(lesson => (
-              <Card
-                key={lesson.id}
-                className="cursor-pointer hover:shadow-lg transition-shadow"
-                onClick={() => setSelectedLesson(lesson)}
+          {/* Progress Card */}
+          <motion.div 
+            className="glass-card rounded-2xl p-4 mt-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Trophy className="h-5 w-5 text-secondary" />
+                <span className="font-medium text-foreground">Tu Progreso</span>
+              </div>
+              <span className="text-sm text-muted-foreground">
+                {completedCount}/{lessons.length} lecciones
+              </span>
+            </div>
+            <Progress value={progressPercentage} className="h-2" />
+            <p className="text-xs text-muted-foreground mt-2 text-center">
+              {progressPercentage.toFixed(0)}% completado
+            </p>
+          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* Filters */}
+      <motion.div 
+        className="px-5 py-4"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.5 }}
+      >
+        {/* Category Tabs */}
+        <Tabs defaultValue="all" className="mb-4">
+          <TabsList className="w-full overflow-x-auto flex justify-start glass-card border-0 h-auto p-1">
+            <TabsTrigger 
+              value="all" 
+              onClick={() => setSelectedCategory("all")}
+              className="whitespace-nowrap"
+            >
+              Todas
+            </TabsTrigger>
+            {categories.map(cat => (
+              <TabsTrigger
+                key={cat}
+                value={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className="whitespace-nowrap"
               >
-                <CardHeader>
-                  <div className="flex justify-between items-start mb-2">
-                    <Badge className={getLevelBadgeColor(lesson.nivel)}>
-                      Nivel {lesson.nivel}
-                    </Badge>
-                    {progress[lesson.id]?.completado && (
-                      <CheckCircle2 className="h-5 w-5 text-green-500" />
-                    )}
-                  </div>
-                  <CardTitle className="text-lg">{lesson.titulo}</CardTitle>
-                  <CardDescription>{lesson.descripcion}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Badge variant="outline">{lesson.categoria}</Badge>
-                </CardContent>
-              </Card>
+                {cat}
+              </TabsTrigger>
             ))}
+          </TabsList>
+        </Tabs>
+
+        {/* Level Filters */}
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          <motion.button
+            onClick={() => setSelectedLevel(0)}
+            className={`glass-button px-3 py-1.5 rounded-full text-sm whitespace-nowrap ${
+              selectedLevel === 0 ? 'bg-primary/20 text-primary' : ''
+            }`}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Todos
+          </motion.button>
+          {[1, 2, 3, 4].map(level => (
+            <motion.button
+              key={level}
+              onClick={() => setSelectedLevel(level)}
+              className={`glass-button px-3 py-1.5 rounded-full text-sm whitespace-nowrap ${
+                selectedLevel === level ? 'bg-primary/20 text-primary' : ''
+              }`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Nivel {level}
+            </motion.button>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Lessons Grid */}
+      <div className="px-5">
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="glass-card rounded-full w-16 h-16 flex items-center justify-center animate-pulse">
+              <BookOpen className="h-8 w-8 text-muted-foreground/50" />
+            </div>
           </div>
+        ) : filteredLessons.length === 0 ? (
+          <motion.div 
+            className="text-center py-12"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+          >
+            <div className="glass-card rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+              <BookOpen className="h-10 w-10 text-muted-foreground/50" />
+            </div>
+            <p className="text-muted-foreground">No hay lecciones disponibles</p>
+          </motion.div>
+        ) : (
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 gap-4"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            {filteredLessons.map(lesson => (
+              <motion.button
+                key={lesson.id}
+                className="glass-card rounded-2xl p-4 text-left w-full"
+                variants={cardVariants}
+                onClick={() => setSelectedLesson(lesson)}
+                whileHover={{ scale: 1.02, y: -2 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <div className="flex justify-between items-start mb-3">
+                  <Badge className={`${getLevelBadgeColor(lesson.nivel)} border`}>
+                    Nivel {lesson.nivel}
+                  </Badge>
+                  {progress[lesson.id]?.completado && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                    >
+                      <CheckCircle2 className="h-5 w-5 text-green-500" />
+                    </motion.div>
+                  )}
+                </div>
+                <h3 className="font-semibold text-foreground mb-1 line-clamp-2">
+                  {lesson.titulo}
+                </h3>
+                <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                  {lesson.descripcion}
+                </p>
+                <Badge variant="outline" className="text-xs">
+                  {lesson.categoria}
+                </Badge>
+              </motion.button>
+            ))}
+          </motion.div>
         )}
       </div>
 
+      {/* Lesson Detail Dialog */}
       <Dialog open={!!selectedLesson} onOpenChange={() => setSelectedLesson(null)}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto glass-card border-border/50">
           <DialogHeader>
             <div className="flex justify-between items-start mb-2">
-              <Badge className={getLevelBadgeColor(selectedLesson?.nivel || 1)}>
+              <Badge className={`${getLevelBadgeColor(selectedLesson?.nivel || 1)} border`}>
                 Nivel {selectedLesson?.nivel}
               </Badge>
               {selectedLesson && progress[selectedLesson.id]?.completado && (
                 <CheckCircle2 className="h-5 w-5 text-green-500" />
               )}
             </div>
-            <DialogTitle className="text-2xl">{selectedLesson?.titulo}</DialogTitle>
+            <DialogTitle className="text-2xl font-heading">{selectedLesson?.titulo}</DialogTitle>
             <DialogDescription>{selectedLesson?.descripcion}</DialogDescription>
           </DialogHeader>
 
           <div className="mt-4">
             <div
-              className="prose prose-sm max-w-none"
+              className="prose prose-sm max-w-none dark:prose-invert"
               dangerouslySetInnerHTML={{ __html: selectedLesson?.contenido || "" }}
             />
 
-            {selectedLesson && selectedLesson.recursos.length > 0 && (
-              <div className="mt-6">
-                <h3 className="font-semibold mb-3">Recursos Adicionales</h3>
+            {selectedLesson && selectedLesson.recursos && selectedLesson.recursos.length > 0 && (
+              <div className="mt-6 glass-card rounded-xl p-4">
+                <h3 className="font-semibold mb-3 text-foreground">Recursos Adicionales</h3>
                 <div className="space-y-2">
-                  {selectedLesson.recursos.map((recurso, idx) => (
+                  {selectedLesson.recursos.map((recurso: any, idx: number) => (
                     <a
                       key={idx}
                       href={recurso.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-primary hover:underline"
+                      className="flex items-center gap-2 text-primary hover:underline text-sm"
                     >
                       <ExternalLink className="h-4 w-4" />
                       {recurso.titulo} ({recurso.tipo})
@@ -293,6 +396,7 @@ const Library = () => {
             <div className="mt-6 flex justify-end">
               <Button
                 onClick={() => selectedLesson && markAsComplete(selectedLesson.id)}
+                className="glass-button"
               >
                 {selectedLesson && progress[selectedLesson.id]?.completado
                   ? "Marcar como no completada"
@@ -302,6 +406,8 @@ const Library = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <BottomNavigation />
     </div>
   );
 };
