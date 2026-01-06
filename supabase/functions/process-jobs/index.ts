@@ -331,14 +331,25 @@ async function generateLessonTTS(targetId: string): Promise<{ audioUrl: string }
   return { audioUrl };
 }
 
-async function generateBibleDay(targetId: string): Promise<{ dia: number }> {
-  console.log(`[bible_day] Generando día bíblico: ${targetId}`);
+async function generateBibleDay(targetId: string, targetTitle: string | null): Promise<{ dia: number }> {
+  console.log(`[bible_day] Generando día bíblico: targetId=${targetId}, targetTitle=${targetTitle}`);
   
-  // targetId es el número del día (1-365)
-  const dia = parseInt(targetId, 10);
+  // Intentar extraer el día del targetTitle (formato "Día X del Plan Bíblico") o del targetId
+  let dia: number;
+  
+  if (targetTitle) {
+    const match = targetTitle.match(/Día\s+(\d+)/i);
+    if (match) {
+      dia = parseInt(match[1], 10);
+    } else {
+      dia = parseInt(targetId, 10);
+    }
+  } else {
+    dia = parseInt(targetId, 10);
+  }
   
   if (isNaN(dia) || dia < 1 || dia > 365) {
-    throw new Error(`Día inválido: ${targetId}`);
+    throw new Error(`Día inválido: targetId=${targetId}, targetTitle=${targetTitle}`);
   }
   
   // Verificar si el día ya existe
@@ -456,7 +467,7 @@ async function generateBibleDay(targetId: string): Promise<{ dia: number }> {
     : `${libroActual} ${capituloEnLibro} - ${libroFinal} ${capituloEnLibroFinal}`;
   
   // Usar Lovable AI para generar contenido
-  const response = await fetch('https://api.lovable.dev/v1/chat/completions', {
+  const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${Deno.env.get('LOVABLE_API_KEY')}`,
@@ -548,7 +559,7 @@ async function processJob(job: ProcessingJob): Promise<void> {
         result = await generateLessonTTS(job.target_id);
         break;
       case 'bible_day':
-        result = await generateBibleDay(job.target_id);
+        result = await generateBibleDay(job.target_id, job.target_title);
         break;
       default:
         throw new Error(`Tipo de job desconocido: ${job.job_type}`);
