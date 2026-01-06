@@ -7,7 +7,45 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const MAX_CHARS = 4000; // OpenAI limit is 4096, leave margin
+const MAX_CHARS = 4000;
+
+// Limpia el texto para mejor pronunciación en español
+function cleanTextForSpanishTTS(text: string): string {
+  let cleaned = text;
+  
+  const replacements: Record<string, string> = {
+    'et al.': 'y otros',
+    'vs.': 'versus',
+    'etc.': 'etcétera',
+    'e.g.': 'por ejemplo',
+    'i.e.': 'es decir',
+    'Jn.': 'Juan',
+    'Mt.': 'Mateo',
+    'Lc.': 'Lucas',
+    'Mc.': 'Marcos',
+    'Gn.': 'Génesis',
+    'Ex.': 'Éxodo',
+    'Sal.': 'Salmos',
+    ' II ': ' segundo ',
+    ' III ': ' tercero ',
+    ' IV ': ' cuarto ',
+  };
+  
+  for (const [key, value] of Object.entries(replacements)) {
+    cleaned = cleaned.replace(new RegExp(key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), value);
+  }
+  
+  cleaned = cleaned
+    .replace(/\*\*/g, '')
+    .replace(/\*/g, '')
+    .replace(/##\s*/g, '')
+    .replace(/#\s*/g, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+  
+  return cleaned;
+}
 
 // Split text into chunks at sentence boundaries
 function splitTextIntoChunks(text: string): string[] {
@@ -20,11 +58,9 @@ function splitTextIntoChunks(text: string): string[] {
       break;
     }
 
-    // Find the last sentence boundary before MAX_CHARS
     let splitIndex = MAX_CHARS;
     const searchArea = remaining.substring(0, MAX_CHARS);
     
-    // Try to split at sentence end (. ! ?)
     const lastPeriod = searchArea.lastIndexOf('. ');
     const lastQuestion = searchArea.lastIndexOf('? ');
     const lastExclamation = searchArea.lastIndexOf('! ');
@@ -33,15 +69,13 @@ function splitTextIntoChunks(text: string): string[] {
     splitIndex = Math.max(lastPeriod, lastQuestion, lastExclamation, lastNewline);
     
     if (splitIndex <= 0) {
-      // No sentence boundary found, split at last space
       splitIndex = searchArea.lastIndexOf(' ');
     }
     
     if (splitIndex <= 0) {
-      // No space found, force split
       splitIndex = MAX_CHARS;
     } else {
-      splitIndex += 1; // Include the punctuation
+      splitIndex += 1;
     }
 
     chunks.push(remaining.substring(0, splitIndex).trim());
@@ -51,7 +85,7 @@ function splitTextIntoChunks(text: string): string[] {
   return chunks;
 }
 
-// Concatenate MP3 buffers (simple approach - works for same bitrate/sample rate)
+// Concatenate MP3 buffers
 function concatenateAudioBuffers(buffers: ArrayBuffer[]): Uint8Array {
   const totalLength = buffers.reduce((acc, buf) => acc + buf.byteLength, 0);
   const result = new Uint8Array(totalLength);
@@ -71,7 +105,7 @@ serve(async (req) => {
   }
 
   try {
-    const { text, filename, voice = 'sage' } = await req.json();
+    const { text, filename, voice = 'nova' } = await req.json();
 
     if (!text) {
       throw new Error('Text is required');
@@ -82,10 +116,12 @@ serve(async (req) => {
       throw new Error('OPENAI_API_KEY is not configured');
     }
 
-    console.log(`Generating TTS for text (${text.length} chars) with voice: ${voice}`);
+    // Clean text for Spanish pronunciation
+    const cleanedText = cleanTextForSpanishTTS(text);
+    console.log(`Generating TTS for text (${cleanedText.length} chars) with voice: ${voice}`);
 
     // Split text into chunks if too long
-    const chunks = splitTextIntoChunks(text);
+    const chunks = splitTextIntoChunks(cleanedText);
     console.log(`Split into ${chunks.length} chunks`);
 
     const audioBuffers: ArrayBuffer[] = [];
