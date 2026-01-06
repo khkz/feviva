@@ -350,7 +350,7 @@ const Library = () => {
 
       {/* Lesson Detail Dialog */}
       <Dialog open={!!selectedLesson} onOpenChange={() => setSelectedLesson(null)}>
-        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto glass-card border-border/50">
+        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto bg-background/95 backdrop-blur-xl border-border/50">
           <DialogHeader>
             <div className="flex justify-between items-start mb-2">
               <Badge className={`${getLevelBadgeColor(selectedLesson?.nivel || 1)} border`}>
