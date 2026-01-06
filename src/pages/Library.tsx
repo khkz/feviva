@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { BookOpen, CheckCircle2, ArrowLeft, ExternalLink, Trophy } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { BookOpen, CheckCircle2, ArrowLeft, Trophy, Sparkles, Headphones } from "lucide-react";
 import { useUserStats } from "@/hooks/useUserStats";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
+import { LessonDetailModal } from "@/components/library/LessonDetailModal";
 
 interface Lesson {
   id: string;
@@ -21,6 +21,9 @@ interface Lesson {
   categoria: string;
   recursos: any;
   orden: number;
+  contenido_enriquecido?: string | null;
+  audio_url?: string | null;
+  duracion_estimada?: number;
 }
 
 interface LessonProgress {
@@ -28,7 +31,6 @@ interface LessonProgress {
   completado: boolean;
   fecha_completado: string | null;
 }
-
 
 const Library = () => {
   const [lessons, setLessons] = useState<Lesson[]>([]);
@@ -135,6 +137,8 @@ const Library = () => {
 
   const completedCount = Object.values(progress).filter(p => p.completado).length;
   const progressPercentage = lessons.length > 0 ? (completedCount / lessons.length) * 100 : 0;
+  const enrichedCount = lessons.filter(l => l.contenido_enriquecido).length;
+  const audioCount = lessons.filter(l => l.audio_url).length;
 
   const getLevelBadgeColor = (nivel: number) => {
     switch (nivel) {
@@ -185,6 +189,30 @@ const Library = () => {
             </div>
           </motion.div>
 
+          {/* Stats Cards */}
+          <motion.div 
+            className="grid grid-cols-3 gap-3 mt-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            <div className="glass-card rounded-xl p-3 text-center">
+              <Trophy className="h-5 w-5 text-secondary mx-auto mb-1" />
+              <p className="text-lg font-bold text-foreground">{completedCount}/{lessons.length}</p>
+              <p className="text-xs text-muted-foreground">Completadas</p>
+            </div>
+            <div className="glass-card rounded-xl p-3 text-center">
+              <Sparkles className="h-5 w-5 text-primary mx-auto mb-1" />
+              <p className="text-lg font-bold text-foreground">{enrichedCount}</p>
+              <p className="text-xs text-muted-foreground">Enriquecidas</p>
+            </div>
+            <div className="glass-card rounded-xl p-3 text-center">
+              <Headphones className="h-5 w-5 text-green-400 mx-auto mb-1" />
+              <p className="text-lg font-bold text-foreground">{audioCount}</p>
+              <p className="text-xs text-muted-foreground">Con Audio</p>
+            </div>
+          </motion.div>
+
           {/* Progress Card */}
           <motion.div 
             className="glass-card rounded-2xl p-4 mt-4"
@@ -193,18 +221,12 @@ const Library = () => {
             transition={{ duration: 0.5, delay: 0.4 }}
           >
             <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <Trophy className="h-5 w-5 text-secondary" />
-                <span className="font-medium text-foreground">Tu Progreso</span>
-              </div>
+              <span className="font-medium text-foreground">Tu Progreso</span>
               <span className="text-sm text-muted-foreground">
-                {completedCount}/{lessons.length} lecciones
+                {progressPercentage.toFixed(0)}%
               </span>
             </div>
             <Progress value={progressPercentage} className="h-2" />
-            <p className="text-xs text-muted-foreground mt-2 text-center">
-              {progressPercentage.toFixed(0)}% completado
-            </p>
           </motion.div>
         </div>
       </motion.div>
@@ -305,7 +327,7 @@ const Library = () => {
             {filteredLessons.map((lesson) => (
               <motion.button
                 key={lesson.id}
-                className="glass-card rounded-2xl p-4 text-left w-full"
+                className="glass-card rounded-2xl p-4 text-left w-full relative overflow-hidden"
                 variants={{
                   hidden: { opacity: 0, y: 30, scale: 0.95 },
                   visible: {
@@ -319,10 +341,23 @@ const Library = () => {
                 whileHover={{ scale: 1.02, y: -2 }}
                 whileTap={{ scale: 0.98 }}
               >
+                {/* Enriched indicator */}
+                {lesson.contenido_enriquecido && (
+                  <div className="absolute top-0 right-0 w-12 h-12">
+                    <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-bl from-secondary/30 to-transparent rounded-bl-full" />
+                    <Sparkles className="absolute top-2 right-2 h-4 w-4 text-secondary" />
+                  </div>
+                )}
+                
                 <div className="flex justify-between items-start mb-3">
-                  <Badge className={`${getLevelBadgeColor(lesson.nivel)} border`}>
-                    Nivel {lesson.nivel}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge className={`${getLevelBadgeColor(lesson.nivel)} border`}>
+                      Nivel {lesson.nivel}
+                    </Badge>
+                    {lesson.audio_url && (
+                      <Headphones className="h-4 w-4 text-green-400" />
+                    )}
+                  </div>
                   {progress[lesson.id]?.completado && (
                     <motion.div
                       initial={{ scale: 0 }}
@@ -339,70 +374,34 @@ const Library = () => {
                 <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
                   {lesson.descripcion}
                 </p>
-                <Badge variant="outline" className="text-xs">
-                  {lesson.categoria}
-                </Badge>
+                <div className="flex items-center justify-between">
+                  <Badge variant="outline" className="text-xs">
+                    {lesson.categoria}
+                  </Badge>
+                  {lesson.duracion_estimada && (
+                    <span className="text-xs text-muted-foreground">
+                      ~{lesson.duracion_estimada} min
+                    </span>
+                  )}
+                </div>
               </motion.button>
             ))}
           </motion.div>
         )}
       </div>
 
-      {/* Lesson Detail Dialog */}
-      <Dialog open={!!selectedLesson} onOpenChange={() => setSelectedLesson(null)}>
-        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto bg-background/95 backdrop-blur-xl border-border/50">
-          <DialogHeader>
-            <div className="flex justify-between items-start mb-2">
-              <Badge className={`${getLevelBadgeColor(selectedLesson?.nivel || 1)} border`}>
-                Nivel {selectedLesson?.nivel}
-              </Badge>
-              {selectedLesson && progress[selectedLesson.id]?.completado && (
-                <CheckCircle2 className="h-5 w-5 text-green-500" />
-              )}
-            </div>
-            <DialogTitle className="text-2xl font-heading">{selectedLesson?.titulo}</DialogTitle>
-            <DialogDescription>{selectedLesson?.descripcion}</DialogDescription>
-          </DialogHeader>
-
-          <div className="mt-4">
-            <div
-              className="prose prose-sm max-w-none dark:prose-invert"
-              dangerouslySetInnerHTML={{ __html: selectedLesson?.contenido || "" }}
-            />
-
-            {selectedLesson && selectedLesson.recursos && selectedLesson.recursos.length > 0 && (
-              <div className="mt-6 glass-card rounded-xl p-4">
-                <h3 className="font-semibold mb-3 text-foreground">Recursos Adicionales</h3>
-                <div className="space-y-2">
-                  {selectedLesson.recursos.map((recurso: any, idx: number) => (
-                    <a
-                      key={idx}
-                      href={recurso.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-primary hover:underline text-sm"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                      {recurso.titulo} ({recurso.tipo})
-                    </a>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="mt-6 flex justify-end">
-              <Button
-                onClick={() => selectedLesson && markAsComplete(selectedLesson.id)}
-                className="glass-button"
-              >
-                {selectedLesson && progress[selectedLesson.id]?.completado
-                  ? "Marcar como no completada"
-                  : "Marcar como completada"}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Lesson Detail Modal */}
+      <AnimatePresence>
+        {selectedLesson && (
+          <LessonDetailModal
+            lesson={selectedLesson}
+            isCompleted={!!progress[selectedLesson.id]?.completado}
+            onClose={() => setSelectedLesson(null)}
+            onMarkComplete={() => markAsComplete(selectedLesson.id)}
+            getLevelBadgeColor={getLevelBadgeColor}
+          />
+        )}
+      </AnimatePresence>
 
       <BottomNavigation />
     </div>
