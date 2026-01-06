@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.batch-enrich-lessons]
 verify_jwt = false
+
+[functions.batch-lesson-tts]
+verify_jwt = false

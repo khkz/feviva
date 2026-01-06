@@ -40,6 +40,7 @@ const Library = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedLevel, setSelectedLevel] = useState<number>(0);
   const [batchEnriching, setBatchEnriching] = useState(false);
+  const [batchGeneratingAudio, setBatchGeneratingAudio] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { incrementLessons } = useUserStats();
@@ -141,6 +142,7 @@ const Library = () => {
   const enrichedCount = lessons.filter(l => l.contenido_enriquecido).length;
   const audioCount = lessons.filter(l => l.audio_url).length;
   const pendingEnrichment = lessons.length - enrichedCount;
+  const pendingAudio = enrichedCount - audioCount;
 
   const handleBatchEnrich = async () => {
     if (pendingEnrichment === 0) {
@@ -185,10 +187,8 @@ const Library = () => {
         hasMore = result.hasMore;
         batchNumber++;
 
-        // Refresh lessons to show progress
         await fetchLessons();
 
-        // Small delay between batches
         if (hasMore) {
           await new Promise(resolve => setTimeout(resolve, 1000));
         }
@@ -205,10 +205,86 @@ const Library = () => {
         description: `Procesadas ${totalProcessed} lecciones antes del error. ${error instanceof Error ? error.message : "Error desconocido"}`,
         variant: "destructive",
       });
-      // Still refresh to show partial progress
       await fetchLessons();
     } finally {
       setBatchEnriching(false);
+    }
+  };
+
+  const handleBatchAudio = async () => {
+    if (pendingAudio <= 0) {
+      toast({
+        title: "Ya está completo",
+        description: "Todas las lecciones enriquecidas ya tienen audio",
+      });
+      return;
+    }
+
+    setBatchGeneratingAudio(true);
+    let totalProcessed = 0;
+    let totalErrors = 0;
+    let hasMore = true;
+    let batchNumber = 1;
+    const batchSize = 1; // TTS is slower, process 1 at a time
+    const totalBatches = Math.ceil(pendingAudio / batchSize);
+
+    toast({
+      title: "Generación de audio iniciada",
+      description: `Procesando ${pendingAudio} lecciones en ${totalBatches} lotes...`,
+    });
+
+    try {
+      while (hasMore) {
+        toast({
+          title: `Generando audio ${batchNumber}/${totalBatches}`,
+          description: `${totalProcessed} audios completados...`,
+        });
+
+        const response = await supabase.functions.invoke('batch-lesson-tts', {
+          body: { limit: batchSize }
+        });
+        
+        if (response.error) {
+          throw new Error(response.error.message);
+        }
+
+        const result = response.data;
+        
+        if (result.needsEnrichmentFirst && result.needsEnrichmentFirst > 0) {
+          toast({
+            title: "Enriquecimiento pendiente",
+            description: `${result.needsEnrichmentFirst} lecciones necesitan ser enriquecidas primero`,
+            variant: "destructive",
+          });
+          break;
+        }
+
+        totalProcessed += result.successCount || 0;
+        totalErrors += result.errorCount || 0;
+        hasMore = result.hasMore;
+        batchNumber++;
+
+        await fetchLessons();
+
+        if (hasMore) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+
+      toast({
+        title: "¡Generación de audio completada!",
+        description: `${totalProcessed} audios generados${totalErrors > 0 ? `, ${totalErrors} errores` : ''}`,
+      });
+    } catch (error) {
+      console.error('Batch audio error:', error);
+      toast({
+        title: "Error en el proceso",
+        description: `Generados ${totalProcessed} audios antes del error. ${error instanceof Error ? error.message : "Error desconocido"}`,
+        variant: "destructive",
+      });
+      await fetchLessons();
+    } finally {
+      setBatchGeneratingAudio(false);
     }
   };
 
@@ -285,17 +361,18 @@ const Library = () => {
             </div>
           </motion.div>
 
-          {/* Batch Enrich Button */}
-          {pendingEnrichment > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.35 }}
-              className="mt-4"
-            >
+          {/* Batch Action Buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.35 }}
+            className="mt-4 space-y-2"
+          >
+            {/* Batch Enrich Button */}
+            {pendingEnrichment > 0 && (
               <Button
                 onClick={handleBatchEnrich}
-                disabled={batchEnriching}
+                disabled={batchEnriching || batchGeneratingAudio}
                 className="w-full glass-button bg-gradient-to-r from-primary/20 to-secondary/20 hover:from-primary/30 hover:to-secondary/30 border border-primary/30"
               >
                 {batchEnriching ? (
@@ -310,8 +387,29 @@ const Library = () => {
                   </>
                 )}
               </Button>
-            </motion.div>
-          )}
+            )}
+
+            {/* Batch Audio Button */}
+            {pendingAudio > 0 && (
+              <Button
+                onClick={handleBatchAudio}
+                disabled={batchEnriching || batchGeneratingAudio}
+                className="w-full glass-button bg-gradient-to-r from-green-500/20 to-emerald-500/20 hover:from-green-500/30 hover:to-emerald-500/30 border border-green-500/30"
+              >
+                {batchGeneratingAudio ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Generando audio {audioCount}/{enrichedCount}...
+                  </>
+                ) : (
+                  <>
+                    <Headphones className="h-4 w-4 mr-2" />
+                    Generar audio para {pendingAudio} lecciones
+                  </>
+                )}
+              </Button>
+            )}
+          </motion.div>
 
           {/* Progress Card */}
           <motion.div 
