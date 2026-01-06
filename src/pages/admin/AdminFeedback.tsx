@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { ThumbsUp, ThumbsDown, MessageSquare, Check, Filter, TrendingUp, TrendingDown, BarChart3, Calendar } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, MessageSquare, Check, Filter, TrendingUp, TrendingDown, BarChart3, Calendar, Bell } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,6 +16,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, PieChart, Pie, Cell, LineChart, Line, ResponsiveContainer, Legend } from 'recharts';
+import { FeedbackAlerts } from '@/components/admin/FeedbackAlerts';
 
 interface FeedbackItem {
   id: string;
@@ -331,6 +332,10 @@ export const AdminFeedback = () => {
           <TabsTrigger value="list">Lista</TabsTrigger>
           <TabsTrigger value="stats">Estadísticas</TabsTrigger>
           <TabsTrigger value="trends">Tendencias</TabsTrigger>
+          <TabsTrigger value="alerts" className="gap-2">
+            <Bell className="h-4 w-4" />
+            Alertas
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="list" className="space-y-4">
@@ -602,6 +607,10 @@ export const AdminFeedback = () => {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="alerts">
+          <FeedbackAlerts />
         </TabsContent>
       </Tabs>
     </div>

@@ -477,6 +477,86 @@ export type Database = {
         }
         Relationships: []
       }
+      feedback_alert_history: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          alert_config_id: string | null
+          content_type: string
+          details: Json | null
+          id: string
+          negative_count: number
+          negative_percentage: number
+          total_count: number
+          triggered_at: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          alert_config_id?: string | null
+          content_type: string
+          details?: Json | null
+          id?: string
+          negative_count: number
+          negative_percentage: number
+          total_count: number
+          triggered_at?: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          alert_config_id?: string | null
+          content_type?: string
+          details?: Json | null
+          id?: string
+          negative_count?: number
+          negative_percentage?: number
+          total_count?: number
+          triggered_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_alert_history_alert_config_id_fkey"
+            columns: ["alert_config_id"]
+            isOneToOne: false
+            referencedRelation: "feedback_alerts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feedback_alerts: {
+        Row: {
+          content_type: string
+          created_at: string
+          enabled: boolean
+          id: string
+          min_feedback_count: number
+          threshold_percentage: number
+          time_window_hours: number
+          updated_at: string
+        }
+        Insert: {
+          content_type: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          min_feedback_count?: number
+          threshold_percentage?: number
+          time_window_hours?: number
+          updated_at?: string
+        }
+        Update: {
+          content_type?: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          min_feedback_count?: number
+          threshold_percentage?: number
+          time_window_hours?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       habit_logs: {
         Row: {
           completado: boolean | null
@@ -1592,6 +1672,17 @@ export type Database = {
     }
     Functions: {
       calculate_level: { Args: { puntos: number }; Returns: number }
+      check_feedback_alerts: {
+        Args: never
+        Returns: {
+          config_id: string
+          content_type: string
+          negative_count: number
+          negative_percentage: number
+          threshold_exceeded: boolean
+          total_count: number
+        }[]
+      }
       get_processing_stats: {
         Args: { p_job_type?: string }
         Returns: {
