@@ -1,18 +1,22 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Moon, Loader2 } from "lucide-react";
+import { ArrowLeft, Moon, Loader2, Sparkles, PlusCircle, Expand } from "lucide-react";
 import { useSleepStories, SleepStory } from "@/hooks/useSleepStories";
 import { SleepStoryCard } from "@/components/sleep/SleepStoryCard";
 import { SleepPlayer } from "@/components/sleep/SleepPlayer";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const SleepStories = () => {
   const navigate = useNavigate();
-  const { stories, loading, generateAudio, saveProgress } = useSleepStories();
+  const { stories, loading, generateAudio, saveProgress, refetch } = useSleepStories();
   const [selectedStory, setSelectedStory] = useState<SleepStory | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedAudioUrl, setGeneratedAudioUrl] = useState<string | null>(null);
+  const [isCreatingStories, setIsCreatingStories] = useState(false);
+  const [isExpandingStories, setIsExpandingStories] = useState(false);
 
   const handleStorySelect = (story: SleepStory) => {
     setSelectedStory(story);
@@ -40,6 +44,83 @@ const SleepStories = () => {
       saveProgress(selectedStory.id, duration, completed);
     }
   };
+
+  const handleCreateNewStories = async () => {
+    setIsCreatingStories(true);
+    let totalCreated = 0;
+    
+    try {
+      let hasMore = true;
+      while (hasMore) {
+        toast.loading(`Generando nuevas historias con IA...`, { id: 'create-stories' });
+        
+        const { data, error } = await supabase.functions.invoke('generate-sleep-stories', {
+          body: { action: 'create_new', limit: 1 }
+        });
+        
+        if (error) throw error;
+        
+        const successCount = data.results?.filter((r: any) => r.status === 'success').length || 0;
+        totalCreated += successCount;
+        hasMore = data.hasMore;
+        
+        if (successCount > 0) {
+          const lastResult = data.results.find((r: any) => r.status === 'success');
+          toast.loading(`Creada: "${lastResult?.titulo}" (${lastResult?.duration} min)`, { id: 'create-stories' });
+        }
+        
+        if (!hasMore) break;
+      }
+      
+      toast.success(`✅ Se crearon ${totalCreated} nuevas historias`, { id: 'create-stories' });
+      refetch();
+    } catch (error) {
+      console.error('Error creating stories:', error);
+      toast.error('Error al crear historias', { id: 'create-stories' });
+    } finally {
+      setIsCreatingStories(false);
+    }
+  };
+
+  const handleExpandStories = async () => {
+    setIsExpandingStories(true);
+    let totalExpanded = 0;
+    
+    try {
+      let hasMore = true;
+      while (hasMore) {
+        toast.loading(`Expandiendo historias cortas con IA...`, { id: 'expand-stories' });
+        
+        const { data, error } = await supabase.functions.invoke('generate-sleep-stories', {
+          body: { action: 'expand_existing', limit: 1 }
+        });
+        
+        if (error) throw error;
+        
+        const successCount = data.results?.filter((r: any) => r.status === 'success').length || 0;
+        totalExpanded += successCount;
+        hasMore = data.hasMore;
+        
+        if (successCount > 0) {
+          const lastResult = data.results.find((r: any) => r.status === 'success');
+          toast.loading(`Expandida: "${lastResult?.titulo}" → ${lastResult?.duration} min`, { id: 'expand-stories' });
+        }
+        
+        if (!hasMore) break;
+      }
+      
+      toast.success(`✅ Se expandieron ${totalExpanded} historias`, { id: 'expand-stories' });
+      refetch();
+    } catch (error) {
+      console.error('Error expanding stories:', error);
+      toast.error('Error al expandir historias', { id: 'expand-stories' });
+    } finally {
+      setIsExpandingStories(false);
+    }
+  };
+
+  // Count short stories (less than 5 min)
+  const shortStoriesCount = stories.filter(s => s.duracion_estimada < 5).length;
 
   if (loading) {
     return (
@@ -74,6 +155,41 @@ const SleepStories = () => {
           Relájate con historias bíblicas narradas lentamente. 
           Configura un timer y déjate llevar al sueño.
         </p>
+      </div>
+
+      {/* AI Generation buttons */}
+      <div className="px-4 mb-4 space-y-2">
+        <Button
+          variant="outline"
+          className="w-full justify-start gap-2"
+          onClick={handleCreateNewStories}
+          disabled={isCreatingStories || isExpandingStories}
+        >
+          {isCreatingStories ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <PlusCircle className="w-4 h-4 text-primary" />
+          )}
+          <span>Crear nuevas historias (Moisés, Ruth, Salmos...)</span>
+          <Sparkles className="w-4 h-4 text-amber-500 ml-auto" />
+        </Button>
+        
+        {shortStoriesCount > 0 && (
+          <Button
+            variant="outline"
+            className="w-full justify-start gap-2"
+            onClick={handleExpandStories}
+            disabled={isCreatingStories || isExpandingStories}
+          >
+            {isExpandingStories ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Expand className="w-4 h-4 text-primary" />
+            )}
+            <span>Expandir {shortStoriesCount} historias cortas a 10-15 min</span>
+            <Sparkles className="w-4 h-4 text-amber-500 ml-auto" />
+          </Button>
+        )}
       </div>
 
       {/* Stories list */}

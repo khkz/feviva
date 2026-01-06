@@ -109,5 +109,6 @@ export const useSleepStories = () => {
     loading,
     generateAudio,
     saveProgress,
+    refetch: fetchStories,
   };
 };
