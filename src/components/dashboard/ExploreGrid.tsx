@@ -1,6 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { MessageCircle, BookOpen, Users, Target } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import coachImage from "@/assets/coach-section.jpg";
+import libraryImage from "@/assets/library-section.jpg";
+import communityImage from "@/assets/community-section.jpg";
+import habitsImage from "@/assets/habits-section.jpg";
 
 interface ExploreItem {
   icon: LucideIcon;
@@ -16,28 +20,28 @@ const exploreItems: ExploreItem[] = [
     label: "Coach IA",
     description: "Practica debates",
     path: "/coach",
-    image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&auto=format&fit=crop&q=80"
+    image: coachImage
   },
   {
     icon: BookOpen,
     label: "Biblioteca",
     description: "Lecciones de fe",
     path: "/library",
-    image: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&auto=format&fit=crop&q=80"
+    image: libraryImage
   },
   {
     icon: Users,
     label: "Comunidad",
     description: "Comparte y ora",
     path: "/community",
-    image: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&auto=format&fit=crop&q=80"
+    image: communityImage
   },
   {
     icon: Target,
     label: "Hábitos",
     description: "Crece cada día",
     path: "/habits",
-    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&auto=format&fit=crop&q=80"
+    image: habitsImage
   },
 ];
 

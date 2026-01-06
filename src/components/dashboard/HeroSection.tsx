@@ -1,4 +1,5 @@
 import { Sparkles } from "lucide-react";
+import heroBackground from "@/assets/hero-background.jpg";
 
 interface HeroSectionProps {
   userName: string;
@@ -14,7 +15,7 @@ export function HeroSection({ userName, verse }: HeroSectionProps) {
       {/* Background Image */}
       <div className="absolute inset-0">
         <img
-          src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&auto=format&fit=crop&q=80"
+          src={heroBackground}
           alt="Contemplative mountain landscape"
           className="w-full h-full object-cover"
         />
