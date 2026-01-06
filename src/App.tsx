@@ -21,6 +21,7 @@ import Mission from "./pages/Mission";
 import Oraciones from "./pages/Oraciones";
 import Rosario from "./pages/Rosario";
 import SleepStories from "./pages/SleepStories";
+import Novenas from "./pages/Novenas";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -50,6 +51,7 @@ const App = () => (
           <Route path="/oraciones" element={<Oraciones />} />
           <Route path="/rosario" element={<Rosario />} />
           <Route path="/sleep" element={<SleepStories />} />
+          <Route path="/novenas" element={<Novenas />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
