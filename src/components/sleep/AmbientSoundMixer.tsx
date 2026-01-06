@@ -20,48 +20,43 @@ interface AmbientSound {
   url: string;
 }
 
+// Using SoundBible and archive.org for reliable playback (public domain/CC0)
 const AMBIENT_SOUNDS: AmbientSound[] = [
   {
     id: "rain",
     name: "Lluvia",
     icon: <CloudRain className="w-5 h-5" />,
-    // Rain sounds from freesound.org (CC0)
-    url: "https://cdn.freesound.org/previews/531/531947_5674468-lq.mp3"
+    url: "https://soundbible.com/mp3/Rain-SoundBible.com-2065722324.mp3"
   },
   {
     id: "waves",
     name: "Olas",
     icon: <Waves className="w-5 h-5" />,
-    // Ocean waves from freesound.org (CC0)
-    url: "https://cdn.freesound.org/previews/398/398632_7555935-lq.mp3"
+    url: "https://soundbible.com/mp3/Ocean_Waves-Mike_Koenig-980635527.mp3"
   },
   {
     id: "fire",
     name: "Fuego",
     icon: <Flame className="w-5 h-5" />,
-    // Crackling fire from freesound.org (CC0)
-    url: "https://cdn.freesound.org/previews/199/199711_126432-lq.mp3"
+    url: "https://soundbible.com/mp3/Campfire-SoundBible.com-1933636465.mp3"
   },
   {
     id: "wind",
     name: "Viento",
     icon: <Wind className="w-5 h-5" />,
-    // Wind sounds from freesound.org (CC0)
-    url: "https://cdn.freesound.org/previews/244/244943_4284968-lq.mp3"
+    url: "https://soundbible.com/mp3/Wind-Mark_DiAngelo-1940285615.mp3"
   },
   {
     id: "forest",
     name: "Bosque",
     icon: <TreePine className="w-5 h-5" />,
-    // Forest ambience from freesound.org (CC0)
-    url: "https://cdn.freesound.org/previews/509/509202_10032966-lq.mp3"
+    url: "https://soundbible.com/mp3/Rainforest_Ambience-GlorySunz-1938133500.mp3"
   },
   {
     id: "birds",
     name: "Pájaros",
     icon: <Bird className="w-5 h-5" />,
-    // Bird sounds from freesound.org (CC0)
-    url: "https://cdn.freesound.org/previews/345/345852_1648170-lq.mp3"
+    url: "https://soundbible.com/mp3/Songbird-SoundBible.com-192809392.mp3"
   },
 ];
 
