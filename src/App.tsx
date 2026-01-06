@@ -23,6 +23,7 @@ import Oraciones from "./pages/Oraciones";
 import Rosario from "./pages/Rosario";
 import SleepStories from "./pages/SleepStories";
 import Novenas from "./pages/Novenas";
+import BiblePlan from "./pages/BiblePlan";
 import NotFound from "./pages/NotFound";
 import { AdminLayout } from "./layouts/AdminLayout";
 import {
@@ -67,6 +68,7 @@ const App = () => (
             <Route path="/rosario" element={<Rosario />} />
             <Route path="/sleep" element={<SleepStories />} />
             <Route path="/novenas" element={<Novenas />} />
+            <Route path="/bible-plan" element={<BiblePlan />} />
             
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminLayout />}>

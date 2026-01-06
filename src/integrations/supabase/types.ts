@@ -170,6 +170,36 @@ export type Database = {
           },
         ]
       }
+      bible_reading_plan: {
+        Row: {
+          created_at: string
+          dia: number
+          id: string
+          pasaje_referencia: string
+          pasaje_texto: string
+          reflexion: string | null
+          titulo: string
+        }
+        Insert: {
+          created_at?: string
+          dia: number
+          id?: string
+          pasaje_referencia: string
+          pasaje_texto: string
+          reflexion?: string | null
+          titulo: string
+        }
+        Update: {
+          created_at?: string
+          dia?: number
+          id?: string
+          pasaje_referencia?: string
+          pasaje_texto?: string
+          reflexion?: string | null
+          titulo?: string
+        }
+        Relationships: []
+      }
       content_feedback: {
         Row: {
           comentario: string | null
@@ -1281,6 +1311,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_bible_progress: {
+        Row: {
+          created_at: string
+          dia_actual: number
+          dias_completados: Json
+          fecha_inicio: string
+          id: string
+          racha_actual: number
+          ultima_lectura: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dia_actual?: number
+          dias_completados?: Json
+          fecha_inicio?: string
+          id?: string
+          racha_actual?: number
+          ultima_lectura?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dia_actual?: number
+          dias_completados?: Json
+          fecha_inicio?: string
+          id?: string
+          racha_actual?: number
+          ultima_lectura?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_content_history: {
         Row: {
