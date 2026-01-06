@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 interface Period {
   name: string;
@@ -33,22 +33,32 @@ export const PeriodProgress = ({ currentDay, completedDays }: PeriodProgressProp
   };
 
   const currentPeriod = getCurrentPeriod();
+  const currentPeriodIndex = PERIODS.findIndex(p => p === currentPeriod);
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center gap-2 text-sm">
-        <span className="text-muted-foreground">Período actual:</span>
-        {currentPeriod && (
+      {/* Current Period Badge */}
+      {currentPeriod && (
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-2"
+        >
+          <span className="text-xs text-muted-foreground">Período:</span>
           <span 
-            className="font-semibold px-2 py-0.5 rounded text-white"
+            className="font-semibold text-sm px-3 py-1 rounded-full text-white shadow-sm"
             style={{ backgroundColor: currentPeriod.color }}
           >
             {currentPeriod.name}
           </span>
-        )}
-      </div>
+          <span className="text-xs text-muted-foreground">
+            (Día {currentDay - currentPeriod.daysRange[0] + 1} de {currentPeriod.daysRange[1] - currentPeriod.daysRange[0] + 1})
+          </span>
+        </motion.div>
+      )}
       
-      <div className="flex gap-0.5 h-3 rounded-full overflow-hidden bg-muted/30">
+      {/* Progress Bar - Larger touch target */}
+      <div className="flex gap-0.5 h-4 rounded-full overflow-hidden glass-card p-0.5">
         {PERIODS.map((period, index) => {
           const totalDays = period.daysRange[1] - period.daysRange[0] + 1;
           const completedInPeriod = completedDays.filter(
@@ -59,59 +69,72 @@ export const PeriodProgress = ({ currentDay, completedDays }: PeriodProgressProp
           const isCurrentPeriod = currentDay >= period.daysRange[0] && currentDay <= period.daysRange[1];
 
           return (
-            <Tooltip key={period.name}>
-              <TooltipTrigger asChild>
-                <div 
-                  className="relative h-full cursor-pointer transition-all hover:opacity-90"
-                  style={{ 
-                    width: `${width}%`,
-                    backgroundColor: `${period.color}33`,
-                  }}
-                >
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${percentComplete}%` }}
-                    transition={{ duration: 0.5, delay: index * 0.05 }}
-                    className="h-full"
-                    style={{ backgroundColor: period.color }}
-                  />
-                  {isCurrentPeriod && (
-                    <motion.div
-                      animate={{ opacity: [1, 0.5, 1] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                      className="absolute inset-0 border-2 rounded-sm"
-                      style={{ borderColor: period.color }}
-                    />
-                  )}
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <div className="text-center">
-                  <p className="font-semibold">{period.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    Días {period.daysRange[0]}-{period.daysRange[1]}
-                  </p>
-                  <p className="text-xs">
-                    {completedInPeriod}/{totalDays} completados
-                  </p>
-                </div>
-              </TooltipContent>
-            </Tooltip>
+            <div 
+              key={period.name}
+              className="relative h-full rounded-sm overflow-hidden transition-all active:scale-95"
+              style={{ 
+                width: `${width}%`,
+                backgroundColor: `${period.color}20`,
+              }}
+            >
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${percentComplete}%` }}
+                transition={{ duration: 0.5, delay: index * 0.03 }}
+                className="h-full rounded-sm"
+                style={{ backgroundColor: period.color }}
+              />
+              {isCurrentPeriod && (
+                <motion.div
+                  animate={{ opacity: [1, 0.4, 1] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                  className="absolute inset-0 border-2 rounded-sm"
+                  style={{ borderColor: period.color }}
+                />
+              )}
+            </div>
           );
         })}
       </div>
 
-      <div className="flex flex-wrap gap-2 text-xs">
-        {PERIODS.map((period) => (
-          <div key={period.name} className="flex items-center gap-1">
-            <div 
-              className="w-2.5 h-2.5 rounded-full"
-              style={{ backgroundColor: period.color }}
-            />
-            <span className="text-muted-foreground hidden sm:inline">{period.name}</span>
-          </div>
-        ))}
-      </div>
+      {/* Scrollable Legend - Mobile optimized */}
+      <ScrollArea className="w-full">
+        <div className="flex gap-3 pb-2">
+          {PERIODS.map((period, index) => {
+            const isCurrentPeriod = index === currentPeriodIndex;
+            const completedInPeriod = completedDays.filter(
+              d => d >= period.daysRange[0] && d <= period.daysRange[1]
+            ).length;
+            const totalDays = period.daysRange[1] - period.daysRange[0] + 1;
+            
+            return (
+              <motion.div 
+                key={period.name} 
+                className={`flex items-center gap-1.5 shrink-0 px-2 py-1 rounded-lg transition-all ${
+                  isCurrentPeriod ? 'glass-card ring-1 ring-primary/30' : ''
+                }`}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.03 }}
+              >
+                <div 
+                  className="w-3 h-3 rounded-full shrink-0"
+                  style={{ backgroundColor: period.color }}
+                />
+                <div className="text-left">
+                  <span className="text-xs font-medium whitespace-nowrap">
+                    {period.name}
+                  </span>
+                  <p className="text-[10px] text-muted-foreground">
+                    {completedInPeriod}/{totalDays}
+                  </p>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+        <ScrollBar orientation="horizontal" className="h-1.5" />
+      </ScrollArea>
     </div>
   );
 };
