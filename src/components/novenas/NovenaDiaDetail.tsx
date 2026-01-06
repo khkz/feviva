@@ -15,6 +15,7 @@ import { Novena, UserNovenaProgress } from "@/hooks/useNovenas";
 import { ShareModal } from "@/components/shared/ShareModal";
 import { ReminderModal } from "@/components/novenas/ReminderModal";
 import { useNotifications } from "@/hooks/useNotifications";
+import { ContentFeedback } from "@/components/feedback/ContentFeedback";
 
 interface NovenaDiaDetailProps {
   novena: Novena;
@@ -178,6 +179,15 @@ export const NovenaDiaDetail = ({
           </Card>
         </div>
       </ScrollArea>
+
+      {/* Feedback */}
+      <div className="py-3 border-t border-border/30">
+        <ContentFeedback 
+          contentType="novena" 
+          contentId={novena.id} 
+          showComment 
+        />
+      </div>
 
       {/* Action Buttons */}
       <div className="space-y-2">
