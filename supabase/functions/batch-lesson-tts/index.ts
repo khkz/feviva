@@ -9,6 +9,54 @@ const corsHeaders = {
 
 const MAX_CHARS = 4000;
 
+// Limpia el texto para mejor pronunciación en español
+function cleanTextForSpanishTTS(text: string): string {
+  let cleaned = text;
+  
+  const replacements: Record<string, string> = {
+    'et al.': 'y otros',
+    'vs.': 'versus',
+    'etc.': 'etcétera',
+    'e.g.': 'por ejemplo',
+    'i.e.': 'es decir',
+    'Jn.': 'Juan',
+    'Mt.': 'Mateo',
+    'Lc.': 'Lucas',
+    'Mc.': 'Marcos',
+    'Gn.': 'Génesis',
+    'Ex.': 'Éxodo',
+    'Dt.': 'Deuteronomio',
+    'Is.': 'Isaías',
+    'Jr.': 'Jeremías',
+    'Sal.': 'Salmos',
+    'Rm.': 'Romanos',
+    'Co.': 'Corintios',
+    'Hb.': 'Hebreos',
+    'Ap.': 'Apocalipsis',
+    ' II ': ' segundo ',
+    ' III ': ' tercero ',
+    ' IV ': ' cuarto ',
+    ' VI ': ' sexto ',
+    ' VII ': ' séptimo ',
+    ' VIII ': ' octavo ',
+  };
+  
+  for (const [key, value] of Object.entries(replacements)) {
+    cleaned = cleaned.replace(new RegExp(key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), value);
+  }
+  
+  cleaned = cleaned
+    .replace(/\*\*/g, '')
+    .replace(/\*/g, '')
+    .replace(/##\s*/g, '')
+    .replace(/#\s*/g, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+  
+  return cleaned;
+}
+
 function splitTextIntoChunks(text: string): string[] {
   const chunks: string[] = [];
   let remaining = text;
@@ -84,11 +132,10 @@ async function generateAndUploadAudio(
     // Use enriched content or original
     const textSource = contenido_enriquecido || contenido;
     
-    // Clean text for TTS (no truncation - we'll chunk it)
-    const audioText = textSource
-      .replace(/<[^>]*>/g, '') // Remove HTML tags
-      .replace(/\*\*/g, '')    // Remove markdown bold
-      .replace(/\n{3,}/g, '\n\n'); // Normalize newlines
+    // Clean text for TTS with Spanish optimization
+    const audioText = cleanTextForSpanishTTS(
+      textSource.replace(/<[^>]*>/g, '') // Remove HTML tags first
+    );
     
     // Split into chunks for long content
     const chunks = splitTextIntoChunks(audioText);
@@ -109,7 +156,7 @@ async function generateAndUploadAudio(
         body: JSON.stringify({
           model: 'tts-1-hd',
           input: chunk,
-          voice: 'sage',
+          voice: 'nova',
           response_format: 'mp3',
           speed: 0.95,
         }),

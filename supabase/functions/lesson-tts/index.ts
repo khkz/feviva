@@ -9,6 +9,59 @@ const corsHeaders = {
 
 const MAX_CHARS = 4000;
 
+// Limpia el texto para mejor pronunciación en español
+function cleanTextForSpanishTTS(text: string): string {
+  let cleaned = text;
+  
+  // Reemplazos para términos que causan problemas de pronunciación
+  const replacements: Record<string, string> = {
+    // Términos latinos
+    'et al.': 'y otros',
+    'vs.': 'versus',
+    'etc.': 'etcétera',
+    'e.g.': 'por ejemplo',
+    'i.e.': 'es decir',
+    // Abreviaturas bíblicas
+    'Jn.': 'Juan',
+    'Mt.': 'Mateo',
+    'Lc.': 'Lucas',
+    'Mc.': 'Marcos',
+    'Gn.': 'Génesis',
+    'Ex.': 'Éxodo',
+    'Dt.': 'Deuteronomio',
+    'Is.': 'Isaías',
+    'Jr.': 'Jeremías',
+    'Sal.': 'Salmos',
+    'Rm.': 'Romanos',
+    'Co.': 'Corintios',
+    'Hb.': 'Hebreos',
+    'Ap.': 'Apocalipsis',
+    // Números romanos comunes (con contexto)
+    ' II ': ' segundo ',
+    ' III ': ' tercero ',
+    ' IV ': ' cuarto ',
+    ' VI ': ' sexto ',
+    ' VII ': ' séptimo ',
+    ' VIII ': ' octavo ',
+  };
+  
+  for (const [key, value] of Object.entries(replacements)) {
+    cleaned = cleaned.replace(new RegExp(key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), value);
+  }
+  
+  // Limpiar markdown y caracteres especiales
+  cleaned = cleaned
+    .replace(/\*\*/g, '')
+    .replace(/\*/g, '')
+    .replace(/##\s*/g, '')
+    .replace(/#\s*/g, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+  
+  return cleaned;
+}
+
 function splitTextIntoChunks(text: string): string[] {
   const chunks: string[] = [];
   let remaining = text;
@@ -65,7 +118,7 @@ serve(async (req) => {
   }
 
   try {
-    const { lessonId, text, titulo, voice = 'sage' } = await req.json();
+    const { lessonId, text, titulo, voice = 'nova' } = await req.json();
 
     if (!text || !lessonId) {
       throw new Error('text and lessonId are required');
@@ -76,9 +129,10 @@ serve(async (req) => {
       throw new Error('OPENAI_API_KEY is not configured');
     }
 
-    // Split text into chunks for long content
-    const chunks = splitTextIntoChunks(text);
-    console.log(`Generating TTS for lesson: ${titulo} (${text.length} chars, ${chunks.length} chunks) with voice: ${voice}`);
+    // Clean and split text into chunks for long content
+    const cleanedText = cleanTextForSpanishTTS(text);
+    const chunks = splitTextIntoChunks(cleanedText);
+    console.log(`Generating TTS for lesson: ${titulo} (${cleanedText.length} chars, ${chunks.length} chunks) with voice: ${voice}`);
 
     const audioBuffers: ArrayBuffer[] = [];
 

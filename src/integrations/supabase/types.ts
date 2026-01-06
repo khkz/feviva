@@ -643,6 +643,7 @@ export type Database = {
           descripcion: string
           duracion_estimada: number | null
           id: string
+          language: string | null
           nivel: number
           orden: number | null
           recursos: Json | null
@@ -657,6 +658,7 @@ export type Database = {
           descripcion: string
           duracion_estimada?: number | null
           id?: string
+          language?: string | null
           nivel: number
           orden?: number | null
           recursos?: Json | null
@@ -671,6 +673,7 @@ export type Database = {
           descripcion?: string
           duracion_estimada?: number | null
           id?: string
+          language?: string | null
           nivel?: number
           orden?: number | null
           recursos?: Json | null
@@ -895,6 +898,7 @@ export type Database = {
           id: string
           imagen_url: string | null
           intencion: string
+          language: string | null
           orden: number | null
           titulo: string
         }
@@ -906,6 +910,7 @@ export type Database = {
           id?: string
           imagen_url?: string | null
           intencion: string
+          language?: string | null
           orden?: number | null
           titulo: string
         }
@@ -917,6 +922,7 @@ export type Database = {
           id?: string
           imagen_url?: string | null
           intencion?: string
+          language?: string | null
           orden?: number | null
           titulo?: string
         }
@@ -929,6 +935,7 @@ export type Database = {
           created_at: string
           historia: string | null
           id: string
+          language: string | null
           nombre: string
           orden: number | null
           subcategoria: string | null
@@ -940,6 +947,7 @@ export type Database = {
           created_at?: string
           historia?: string | null
           id?: string
+          language?: string | null
           nombre: string
           orden?: number | null
           subcategoria?: string | null
@@ -951,6 +959,7 @@ export type Database = {
           created_at?: string
           historia?: string | null
           id?: string
+          language?: string | null
           nombre?: string
           orden?: number | null
           subcategoria?: string | null
@@ -1176,6 +1185,7 @@ export type Database = {
           duracion_estimada: number
           id: string
           imagen_url: string | null
+          language: string | null
           orden: number | null
           titulo: string
         }
@@ -1188,6 +1198,7 @@ export type Database = {
           duracion_estimada?: number
           id?: string
           imagen_url?: string | null
+          language?: string | null
           orden?: number | null
           titulo: string
         }
@@ -1200,6 +1211,7 @@ export type Database = {
           duracion_estimada?: number
           id?: string
           imagen_url?: string | null
+          language?: string | null
           orden?: number | null
           titulo?: string
         }

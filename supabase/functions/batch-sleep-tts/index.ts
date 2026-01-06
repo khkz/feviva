@@ -9,13 +9,47 @@ const corsHeaders = {
 
 const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
 
+// Limpia el texto para mejor pronunciación en español
+function cleanTextForSpanishTTS(text: string): string {
+  let cleaned = text;
+  
+  const replacements: Record<string, string> = {
+    'et al.': 'y otros',
+    'vs.': 'versus',
+    'etc.': 'etcétera',
+    'e.g.': 'por ejemplo',
+    'i.e.': 'es decir',
+    ' II ': ' segundo ',
+    ' III ': ' tercero ',
+    ' IV ': ' cuarto ',
+  };
+  
+  for (const [key, value] of Object.entries(replacements)) {
+    cleaned = cleaned.replace(new RegExp(key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), value);
+  }
+  
+  cleaned = cleaned
+    .replace(/\*\*/g, '')
+    .replace(/\*/g, '')
+    .replace(/##\s*/g, '')
+    .replace(/#\s*/g, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+  
+  return cleaned;
+}
+
 async function generateSpeech(text: string, voice: string = 'nova'): Promise<ArrayBuffer> {
+  // Clean text for Spanish pronunciation
+  const cleanedText = cleanTextForSpanishTTS(text);
+  
   // For very long texts, we need to chunk them (OpenAI TTS has 4096 char limit)
   const maxChunkSize = 4000;
   const chunks: string[] = [];
   
   // Split by paragraphs first, then by sentences if needed
-  const paragraphs = text.split(/\n\n+/);
+  const paragraphs = cleanedText.split(/\n\n+/);
   let currentChunk = '';
   
   for (const para of paragraphs) {
