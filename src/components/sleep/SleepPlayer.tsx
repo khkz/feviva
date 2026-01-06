@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { SleepStory } from "@/hooks/useSleepStories";
 import { AmbientSoundMixer } from "./AmbientSoundMixer";
+import { ContentFeedback } from "@/components/feedback/ContentFeedback";
 
 interface SleepPlayerProps {
   story: SleepStory;
@@ -317,6 +318,16 @@ export const SleepPlayer = ({
                 Generando narración con voz relajante...
               </p>
             )}
+
+            {/* Feedback */}
+            <div className="pt-4 border-t border-border/30">
+              <ContentFeedback 
+                contentType="sleep_story" 
+                contentId={story.id} 
+                showComment 
+                className="justify-center"
+              />
+            </div>
           </div>
         )}
       </div>

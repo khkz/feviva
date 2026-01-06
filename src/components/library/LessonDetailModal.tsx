@@ -12,6 +12,7 @@ import { Slider } from "@/components/ui/slider";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLessonAudio, useLessonEnrichment } from "@/hooks/useLessonEnrichment";
+import { ContentFeedback } from "@/components/feedback/ContentFeedback";
 
 interface Lesson {
   id: string;
@@ -339,6 +340,15 @@ export function LessonDetailModal({
 
         {/* Footer Actions */}
         <div className="p-6 pt-4 border-t border-border/30 flex flex-wrap items-center gap-3">
+          {/* Feedback */}
+          <ContentFeedback 
+            contentType="lesson" 
+            contentId={lesson.id} 
+            showComment 
+          />
+          
+          <div className="flex-1" />
+          
           {!hasEnrichedContent && (
             <Button
               onClick={handleEnrich}
@@ -379,8 +389,6 @@ export function LessonDetailModal({
               )}
             </Button>
           )}
-          
-          <div className="flex-1" />
           
           <Button
             onClick={onMarkComplete}
