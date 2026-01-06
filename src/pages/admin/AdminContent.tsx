@@ -66,18 +66,17 @@ export const AdminContent = () => {
       return;
     }
 
-    const jobs = itemsWithoutAudio.map(item => ({
-      job_type: type,
-      target_table: type === 'sleep_tts' ? 'sleep_stories' : 'library_lessons',
-      target_id: item.id,
-      target_title: item.titulo
+    const jobItems = itemsWithoutAudio.map(item => ({
+      id: item.id,
+      title: item.titulo,
+      table: type === 'sleep_tts' ? 'sleep_stories' : 'library_lessons'
     }));
 
-    await queueJobs(jobs);
+    await queueJobs(type, jobItems);
     await triggerProcessing();
     toast({ 
       title: "Éxito", 
-      description: `${jobs.length} trabajos de audio encolados` 
+      description: `${jobItems.length} trabajos de audio encolados` 
     });
   };
 
@@ -88,18 +87,17 @@ export const AdminContent = () => {
       return;
     }
 
-    const jobs = novenasWithoutImage.map(novena => ({
-      job_type: 'novena_image',
-      target_table: 'novenas',
-      target_id: novena.id,
-      target_title: novena.titulo
+    const jobItems = novenasWithoutImage.map(novena => ({
+      id: novena.id,
+      title: novena.titulo,
+      table: 'novenas'
     }));
 
-    await queueJobs(jobs);
+    await queueJobs('novena_image', jobItems);
     await triggerProcessing();
     toast({ 
       title: "Éxito", 
-      description: `${jobs.length} trabajos de imagen encolados` 
+      description: `${jobItems.length} trabajos de imagen encolados` 
     });
   };
 
