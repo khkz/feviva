@@ -22,7 +22,7 @@ const featuredItems: FeaturedItem[] = [
     subtitle: "Plan de lectura diaria",
     sessions: 365,
     gradient: "from-indigo-600 via-purple-600 to-pink-500",
-    path: "/library",
+    path: "/bible-plan",
     badge: "Nuevo"
   },
   {
