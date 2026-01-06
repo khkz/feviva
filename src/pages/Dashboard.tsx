@@ -14,6 +14,7 @@ import { DailyChallenge } from "@/components/dashboard/DailyChallenge";
 import { FeaturedContent } from "@/components/dashboard/FeaturedContent";
 import { GratitudePrompt } from "@/components/dashboard/GratitudePrompt";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
+import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { Button } from "@/components/ui/button";
 
 interface Profile {
@@ -80,63 +81,105 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Hero Section with Immersive Background */}
-      <HeroSection 
-        userName={profile?.nombre || "Peregrino"} 
-        verse={dailyVerse}
+    <div className="min-h-screen bg-background">
+      {/* Desktop Sidebar */}
+      <DesktopSidebar 
+        userName={profile?.nombre || "Peregrino"}
+        userLevel={stats?.nivel || 1}
+        userStreak={stats?.racha_actual_dias || 0}
       />
 
-      {/* Admin Access Button */}
-      {isAdmin && (
-        <div className="px-5 py-2">
-          <Button 
-            onClick={() => navigate('/admin')}
-            variant="outline"
-            size="sm"
-            className="w-full border-primary/30 text-primary hover:bg-primary/10"
-          >
-            <Shield className="w-4 h-4 mr-2" />
-            Panel de Administración
-          </Button>
-        </div>
-      )}
-
-      {/* Quick Actions */}
-      <QuickActions />
-
-      {/* Daily Challenge - NEW */}
-      <DailyChallenge />
-
-      {/* Gratitude Prompt - NEW */}
-      <GratitudePrompt />
-
-      {/* Progress Card */}
-      {stats && (
-        <ProgressCard
-          nivel={stats.nivel}
-          puntosTotales={stats.puntos_totales}
-          puntosParaSiguiente={getPointsForNextLevel()}
-          progreso={getProgressToNextLevel()}
-          racha={stats.racha_actual_dias}
+      {/* Main Content - with sidebar offset on desktop */}
+      <div className="lg:ml-64 pb-24 lg:pb-8">
+        {/* Hero Section with Immersive Background */}
+        <HeroSection 
+          userName={profile?.nombre || "Peregrino"} 
+          verse={dailyVerse}
+          stats={stats ? {
+            streak: stats.racha_actual_dias,
+            level: stats.nivel,
+            points: stats.puntos_totales
+          } : undefined}
         />
-      )}
 
-      {/* Featured Content - NEW (Hallow style) */}
-      <FeaturedContent />
+        {/* Main Content Container */}
+        <div className="max-w-7xl mx-auto lg:px-8">
+          {/* Admin Access Button */}
+          {isAdmin && (
+            <div className="px-5 py-2 lg:px-0">
+              <Button 
+                onClick={() => navigate('/admin')}
+                variant="outline"
+                size="sm"
+                className="w-full lg:w-auto border-primary/30 text-primary hover:bg-primary/10"
+              >
+                <Shield className="w-4 h-4 mr-2" />
+                Panel de Administración
+              </Button>
+            </div>
+          )}
 
-      {/* Novena Carousel */}
-      <NovenaCarousel
-        novenas={novenas}
-        getProgress={getProgressForNovena}
-        loading={novenasLoading}
-      />
+          {/* Quick Actions */}
+          <QuickActions />
 
-      {/* Explore Grid */}
-      <ExploreGrid />
+          {/* Desktop: Two column layout for main content */}
+          <div className="lg:grid lg:grid-cols-3 lg:gap-6 lg:mt-6">
+            {/* Left Column - Main Content */}
+            <div className="lg:col-span-2">
+              {/* Daily Challenge */}
+              <DailyChallenge />
 
-      {/* Bottom Navigation */}
-      <BottomNavigation />
+              {/* Featured Content */}
+              <FeaturedContent />
+
+              {/* Explore Grid */}
+              <ExploreGrid />
+            </div>
+
+            {/* Right Column - Sidebar Content */}
+            <div className="lg:col-span-1">
+              {/* Gratitude Prompt */}
+              <GratitudePrompt />
+
+              {/* Progress Card - Hidden on desktop (shown in hero) */}
+              <div className="lg:hidden">
+                {stats && (
+                  <ProgressCard
+                    nivel={stats.nivel}
+                    puntosTotales={stats.puntos_totales}
+                    puntosParaSiguiente={getPointsForNextLevel()}
+                    progreso={getProgressToNextLevel()}
+                    racha={stats.racha_actual_dias}
+                  />
+                )}
+              </div>
+
+              {/* Desktop-only Progress Card */}
+              <div className="hidden lg:block">
+                {stats && (
+                  <ProgressCard
+                    nivel={stats.nivel}
+                    puntosTotales={stats.puntos_totales}
+                    puntosParaSiguiente={getPointsForNextLevel()}
+                    progreso={getProgressToNextLevel()}
+                    racha={stats.racha_actual_dias}
+                  />
+                )}
+              </div>
+
+              {/* Novena Carousel */}
+              <NovenaCarousel
+                novenas={novenas}
+                getProgress={getProgressForNovena}
+                loading={novenasLoading}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Navigation - Mobile only */}
+        <BottomNavigation />
+      </div>
     </div>
   );
 };

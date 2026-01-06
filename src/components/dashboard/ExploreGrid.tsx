@@ -72,17 +72,17 @@ export function ExploreGrid() {
 
   return (
     <motion.section 
-      className="px-5 py-4"
+      className="px-5 py-4 lg:px-0"
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 1.4 }}
     >
-      <h2 className="font-heading text-lg font-semibold text-foreground mb-3">
+      <h2 className="font-heading text-lg lg:text-xl font-semibold text-foreground mb-3">
         Explora
       </h2>
 
       <motion.div 
-        className="grid grid-cols-2 gap-3"
+        className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -91,7 +91,7 @@ export function ExploreGrid() {
           <motion.button
             key={item.path}
             onClick={() => navigate(item.path)}
-            className="relative h-32 rounded-2xl overflow-hidden"
+            className="relative h-32 lg:h-44 rounded-2xl overflow-hidden group"
             variants={cardVariants}
             whileHover={{ scale: 1.03, y: -2 }}
             whileTap={{ scale: 0.97 }}
@@ -100,18 +100,24 @@ export function ExploreGrid() {
             <img
               src={item.image}
               alt={item.label}
-              className="absolute inset-0 w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
             />
             {/* Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent group-hover:via-black/50 transition-all" />
             
             {/* Content */}
-            <div className="relative z-10 h-full flex flex-col justify-end p-3">
-              <div className="flex items-center gap-2 mb-1">
-                <item.icon className="w-4 h-4 text-white/90" />
-                <span className="font-semibold text-white text-sm">{item.label}</span>
-              </div>
-              <p className="text-white/70 text-xs">{item.description}</p>
+            <div className="relative z-10 h-full flex flex-col justify-end p-3 lg:p-4">
+              <motion.div 
+                className="flex items-center gap-2 mb-1"
+                initial={{ x: 0 }}
+                whileHover={{ x: 4 }}
+              >
+                <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <item.icon className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
+                </div>
+                <span className="font-semibold text-white text-sm lg:text-base">{item.label}</span>
+              </motion.div>
+              <p className="text-white/70 text-xs lg:text-sm">{item.description}</p>
             </div>
           </motion.button>
         ))}

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Target, CheckCircle2, Flame, Gift, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
+import habitsImage from "@/assets/habits-section.jpg";
 
 interface Challenge {
   id: string;
@@ -46,7 +46,6 @@ export function DailyChallenge() {
   
   const completedCount = challenges.filter(c => c.completed).length;
   const totalPoints = challenges.reduce((acc, c) => acc + (c.completed ? c.points : 0), 0);
-  const maxPoints = challenges.reduce((acc, c) => acc + c.points, 0);
   const progress = (completedCount / challenges.length) * 100;
 
   const toggleChallenge = (id: string) => {
@@ -66,126 +65,141 @@ export function DailyChallenge() {
 
   return (
     <motion.section 
-      className="px-5 py-2"
+      className="px-5 py-2 lg:px-0"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.8 }}
     >
       <motion.div 
-        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary to-primary/80 p-5"
+        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary to-primary/80"
         whileHover={{ scale: 1.01 }}
         transition={{ type: "spring", stiffness: 300 }}
       >
+        {/* Desktop: Background image */}
+        <div className="hidden lg:block absolute inset-0">
+          <img 
+            src={habitsImage} 
+            alt="" 
+            className="w-full h-full object-cover opacity-20"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/90 to-primary/70" />
+        </div>
+
         {/* Decorative elements */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/20 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full blur-2xl" />
         
-        {/* Header */}
-        <div className="relative z-10">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <motion.div 
-                className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center"
-                animate={{ rotate: [0, 5, -5, 0] }}
-                transition={{ duration: 4, repeat: Infinity, repeatDelay: 2 }}
-              >
-                <Target className="w-6 h-6 text-secondary" />
-              </motion.div>
-              <div>
-                <h3 className="font-heading text-lg font-bold text-white">
-                  Desafío Diario
-                </h3>
-                <p className="text-white/70 text-sm">
-                  {completedCount}/{challenges.length} completados
-                </p>
+        {/* Content - Responsive layout */}
+        <div className="relative z-10 p-5 lg:p-8 lg:flex lg:gap-8">
+          {/* Header & Progress */}
+          <div className="lg:flex-1">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <motion.div 
+                  className="w-12 h-12 lg:w-14 lg:h-14 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center"
+                  animate={{ rotate: [0, 5, -5, 0] }}
+                  transition={{ duration: 4, repeat: Infinity, repeatDelay: 2 }}
+                >
+                  <Target className="w-6 h-6 lg:w-7 lg:h-7 text-secondary" />
+                </motion.div>
+                <div>
+                  <h3 className="font-heading text-lg lg:text-2xl font-bold text-white">
+                    Desafío Diario
+                  </h3>
+                  <p className="text-white/70 text-sm lg:text-base">
+                    {completedCount}/{challenges.length} completados
+                  </p>
+                </div>
               </div>
-            </div>
-            
-            <motion.div 
-              className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-3 py-1.5"
-              animate={{ scale: totalPoints > 0 ? [1, 1.1, 1] : 1 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Gift className="w-4 h-4 text-secondary" />
-              <span className="text-white font-semibold text-sm">{totalPoints}</span>
-              <span className="text-white/60 text-xs">pts</span>
-            </motion.div>
-          </div>
-
-          {/* Progress bar */}
-          <div className="mb-4">
-            <div className="h-2 bg-white/20 rounded-full overflow-hidden">
+              
               <motion.div 
-                className="h-full bg-gradient-to-r from-secondary to-secondary-hover rounded-full"
-                initial={{ width: 0 }}
-                animate={{ width: `${progress}%` }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
-              />
+                className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-3 py-1.5 lg:px-4 lg:py-2"
+                animate={{ scale: totalPoints > 0 ? [1, 1.1, 1] : 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Gift className="w-4 h-4 lg:w-5 lg:h-5 text-secondary" />
+                <span className="text-white font-semibold text-sm lg:text-base">{totalPoints}</span>
+                <span className="text-white/60 text-xs lg:text-sm">pts</span>
+              </motion.div>
+            </div>
+
+            {/* Progress bar */}
+            <div className="mb-4 lg:mb-0">
+              <div className="h-2 lg:h-3 bg-white/20 rounded-full overflow-hidden">
+                <motion.div 
+                  className="h-full bg-gradient-to-r from-secondary to-secondary-hover rounded-full"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progress}%` }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                />
+              </div>
             </div>
           </div>
 
           {/* Challenges list */}
-          <AnimatePresence>
-            {(expanded || completedCount < challenges.length) && (
-              <motion.div 
-                className="space-y-2"
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-              >
-                {challenges.slice(0, expanded ? challenges.length : 2).map((challenge, index) => (
-                  <motion.button
-                    key={challenge.id}
-                    onClick={() => toggleChallenge(challenge.id)}
-                    className={`w-full flex items-center gap-3 p-3 rounded-2xl transition-all ${
-                      challenge.completed 
-                        ? "bg-white/20 backdrop-blur-sm" 
-                        : "bg-white/10 backdrop-blur-sm hover:bg-white/15"
-                    }`}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <motion.div 
-                      className={`w-10 h-10 rounded-xl bg-gradient-to-br ${getTypeColor(challenge.type)} flex items-center justify-center flex-shrink-0`}
-                      animate={challenge.completed ? { scale: [1, 1.2, 1] } : {}}
+          <div className="lg:flex-1">
+            <AnimatePresence>
+              {(expanded || completedCount < challenges.length) && (
+                <motion.div 
+                  className="space-y-2 lg:space-y-3"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                >
+                  {challenges.slice(0, expanded ? challenges.length : 2).map((challenge, index) => (
+                    <motion.button
+                      key={challenge.id}
+                      onClick={() => toggleChallenge(challenge.id)}
+                      className={`w-full flex items-center gap-3 p-3 lg:p-4 rounded-2xl transition-all ${
+                        challenge.completed 
+                          ? "bg-white/20 backdrop-blur-sm" 
+                          : "bg-white/10 backdrop-blur-sm hover:bg-white/15"
+                      }`}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      whileTap={{ scale: 0.98 }}
                     >
-                      {challenge.completed ? (
-                        <CheckCircle2 className="w-5 h-5 text-white" />
-                      ) : (
-                        <div className="w-5 h-5 rounded-full border-2 border-white/60" />
-                      )}
-                    </motion.div>
-                    
-                    <div className="flex-1 text-left">
-                      <p className={`font-medium text-sm ${challenge.completed ? "text-white/60 line-through" : "text-white"}`}>
-                        {challenge.title}
-                      </p>
-                      <p className="text-white/50 text-xs">{challenge.description}</p>
-                    </div>
-                    
-                    <div className="flex items-center gap-1 text-secondary">
-                      <Flame className="w-3 h-3" />
-                      <span className="text-xs font-semibold">+{challenge.points}</span>
-                    </div>
-                  </motion.button>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
+                      <motion.div 
+                        className={`w-10 h-10 lg:w-12 lg:h-12 rounded-xl bg-gradient-to-br ${getTypeColor(challenge.type)} flex items-center justify-center flex-shrink-0`}
+                        animate={challenge.completed ? { scale: [1, 1.2, 1] } : {}}
+                      >
+                        {challenge.completed ? (
+                          <CheckCircle2 className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
+                        ) : (
+                          <div className="w-5 h-5 lg:w-6 lg:h-6 rounded-full border-2 border-white/60" />
+                        )}
+                      </motion.div>
+                      
+                      <div className="flex-1 text-left">
+                        <p className={`font-medium text-sm lg:text-base ${challenge.completed ? "text-white/60 line-through" : "text-white"}`}>
+                          {challenge.title}
+                        </p>
+                        <p className="text-white/50 text-xs lg:text-sm">{challenge.description}</p>
+                      </div>
+                      
+                      <div className="flex items-center gap-1 text-secondary">
+                        <Flame className="w-3 h-3 lg:w-4 lg:h-4" />
+                        <span className="text-xs lg:text-sm font-semibold">+{challenge.points}</span>
+                      </div>
+                    </motion.button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-          {/* See all button */}
-          {challenges.length > 2 && (
-            <Button
-              variant="ghost"
-              onClick={() => setExpanded(!expanded)}
-              className="w-full mt-3 text-white/70 hover:text-white hover:bg-white/10"
-            >
-              {expanded ? "Ver menos" : "Ver todos los desafíos"}
-              <ChevronRight className={`w-4 h-4 ml-1 transition-transform ${expanded ? "rotate-90" : ""}`} />
-            </Button>
-          )}
+            {/* See all button */}
+            {challenges.length > 2 && (
+              <Button
+                variant="ghost"
+                onClick={() => setExpanded(!expanded)}
+                className="w-full mt-3 text-white/70 hover:text-white hover:bg-white/10"
+              >
+                {expanded ? "Ver menos" : "Ver todos los desafíos"}
+                <ChevronRight className={`w-4 h-4 ml-1 transition-transform ${expanded ? "rotate-90" : ""}`} />
+              </Button>
+            )}
+          </div>
         </div>
       </motion.div>
     </motion.section>

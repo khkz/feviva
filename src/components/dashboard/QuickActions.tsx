@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Hand, BookOpen, Flame, MessageCircle, Moon, Sparkles } from "lucide-react";
+import { Hand, BookOpen, Flame, MessageCircle, Moon } from "lucide-react";
 import { motion } from "framer-motion";
 
 const actions = [
@@ -65,14 +65,15 @@ export function QuickActions() {
   const navigate = useNavigate();
 
   return (
-    <section className="px-5 -mt-3 relative z-20">
+    <section className="px-5 -mt-3 relative z-20 lg:px-0 lg:mt-0">
+      {/* Mobile: Horizontal scroll */}
       <motion.div 
-        className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide"
+        className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide lg:hidden"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        {actions.map((action, index) => (
+        {actions.map((action) => (
           <motion.button
             key={action.path}
             onClick={() => navigate(action.path)}
@@ -89,6 +90,37 @@ export function QuickActions() {
               <action.icon className="relative w-5 h-5 text-foreground group-hover:text-white transition-colors" />
             </motion.div>
             <span className="text-xs font-medium text-foreground/80 group-hover:text-foreground transition-colors">
+              {action.label}
+            </span>
+          </motion.button>
+        ))}
+      </motion.div>
+
+      {/* Desktop: Full grid */}
+      <motion.div 
+        className="hidden lg:grid grid-cols-5 gap-4"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        {actions.map((action) => (
+          <motion.button
+            key={action.path}
+            onClick={() => navigate(action.path)}
+            className="group flex flex-col items-center gap-3 p-5 rounded-2xl glass-card hover:shadow-medium transition-all"
+            variants={itemVariants}
+            whileHover={{ scale: 1.05, y: -4 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <motion.div 
+              className={`relative p-4 rounded-2xl bg-gradient-to-br ${action.bgGradient}`}
+              whileHover={{ rotate: [0, -5, 5, 0] }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${action.gradient} opacity-0 group-hover:opacity-100 transition-opacity`} />
+              <action.icon className="relative w-7 h-7 text-foreground group-hover:text-white transition-colors" />
+            </motion.div>
+            <span className="text-sm font-semibold text-foreground/80 group-hover:text-foreground transition-colors">
               {action.label}
             </span>
           </motion.button>
