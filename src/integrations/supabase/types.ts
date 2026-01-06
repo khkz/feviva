@@ -538,6 +538,45 @@ export type Database = {
         }
         Relationships: []
       }
+      sleep_stories: {
+        Row: {
+          audio_url: string | null
+          categoria: string
+          contenido: string
+          created_at: string
+          descripcion: string
+          duracion_estimada: number
+          id: string
+          imagen_url: string | null
+          orden: number | null
+          titulo: string
+        }
+        Insert: {
+          audio_url?: string | null
+          categoria?: string
+          contenido: string
+          created_at?: string
+          descripcion: string
+          duracion_estimada?: number
+          id?: string
+          imagen_url?: string | null
+          orden?: number | null
+          titulo: string
+        }
+        Update: {
+          audio_url?: string | null
+          categoria?: string
+          contenido?: string
+          created_at?: string
+          descripcion?: string
+          duracion_estimada?: number
+          id?: string
+          imagen_url?: string | null
+          orden?: number | null
+          titulo?: string
+        }
+        Relationships: []
+      }
       user_achievements: {
         Row: {
           achievement_id: string
@@ -726,6 +765,44 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_sleep_history: {
+        Row: {
+          completado: boolean | null
+          created_at: string
+          duracion_escuchada: number | null
+          fecha: string
+          id: string
+          story_id: string
+          user_id: string
+        }
+        Insert: {
+          completado?: boolean | null
+          created_at?: string
+          duracion_escuchada?: number | null
+          fecha?: string
+          id?: string
+          story_id: string
+          user_id: string
+        }
+        Update: {
+          completado?: boolean | null
+          created_at?: string
+          duracion_escuchada?: number | null
+          fecha?: string
+          id?: string
+          story_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_sleep_history_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "sleep_stories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_stats: {
         Row: {
