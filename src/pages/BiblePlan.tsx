@@ -7,6 +7,10 @@ import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useBiblePlan } from '@/hooks/useBiblePlan';
 import { BottomNavigation } from '@/components/layout/BottomNavigation';
+import { YouTubePlayer } from '@/components/bible/YouTubePlayer';
+import { PeriodProgress } from '@/components/bible/PeriodProgress';
+import { BibleTextViewer } from '@/components/bible/BibleTextViewer';
+import { BibleNotes } from '@/components/bible/BibleNotes';
 
 const BiblePlan = () => {
   const navigate = useNavigate();
@@ -21,6 +25,8 @@ const BiblePlan = () => {
       </div>
     );
   }
+
+  const reading = todayReading as any; // Extended type with new fields
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-950/20 via-background to-background pb-24">
@@ -40,7 +46,7 @@ const BiblePlan = () => {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-white">La Biblia en 365 Días</h1>
-                <p className="text-amber-200/80">Tu viaje espiritual diario</p>
+                <p className="text-amber-200/80">The Great Adventure</p>
               </div>
             </div>
           </motion.div>
@@ -75,67 +81,95 @@ const BiblePlan = () => {
         </div>
       </div>
 
+      {/* Period Progress */}
+      <div className="px-4 py-4">
+        <PeriodProgress 
+          currentDay={userProgress?.dia_actual || 1} 
+          completedDays={userProgress?.dias_completados || []} 
+        />
+      </div>
+
       {/* Today's Reading */}
-      {todayReading && (
+      {reading && (
         <motion.div 
           initial={{ opacity: 0, y: 20 }} 
           animate={{ opacity: 1, y: 0 }} 
           transition={{ delay: 0.2 }}
-          className="px-4 -mt-2"
+          className="px-4 space-y-4"
         >
+          {/* Period Badge & Title */}
           <Card className="bg-gradient-to-br from-amber-500/10 to-orange-600/10 border-amber-500/20 p-5">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-medium text-amber-500 bg-amber-500/10 px-2 py-1 rounded-full">
-                Día {todayReading.dia} de 365
-              </span>
-              {userProgress?.dias_completados.includes(todayReading.dia) && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-amber-500 bg-amber-500/10 px-2 py-1 rounded-full">
+                  Día {reading.dia} de 365
+                </span>
+                {reading.periodo && (
+                  <span 
+                    className="text-xs font-medium px-2 py-1 rounded-full text-white"
+                    style={{ backgroundColor: reading.color_periodo || '#666' }}
+                  >
+                    {reading.periodo}
+                  </span>
+                )}
+              </div>
+              {userProgress?.dias_completados.includes(reading.dia) && (
                 <CheckCircle2 className="w-5 h-5 text-green-500" />
               )}
             </div>
             
-            <h2 className="text-xl font-bold text-foreground mb-1">{todayReading.titulo}</h2>
-            <p className="text-sm text-amber-600 dark:text-amber-400 mb-4">{todayReading.pasaje_referencia}</p>
+            <h2 className="text-xl font-bold text-foreground mb-4">{reading.titulo}</h2>
             
-            <div className="bg-background/50 rounded-xl p-4 mb-4">
-              <p className="text-foreground/90 leading-relaxed text-sm">{todayReading.pasaje_texto}</p>
-            </div>
-            
-            {todayReading.reflexion && (
-              <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-4 mb-4">
-                <p className="text-sm font-medium text-amber-600 dark:text-amber-400 mb-1">💭 Reflexión</p>
-                <p className="text-sm text-foreground/80">{todayReading.reflexion}</p>
-              </div>
-            )}
-            
-            {!userProgress?.dias_completados.includes(todayReading.dia) && (
-              <Button 
-                onClick={() => markAsCompleted(todayReading.dia)}
-                className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
-              >
-                <CheckCircle2 className="w-4 h-4 mr-2" />
-                Marcar como leído
-              </Button>
-            )}
+            {/* YouTube Video */}
+            <YouTubePlayer 
+              videoId={reading.youtube_video_id} 
+              dia={reading.dia} 
+            />
           </Card>
+
+          {/* Bible Readings */}
+          <div className="space-y-2">
+            <h3 className="font-semibold text-sm text-muted-foreground">📖 Lecturas de hoy</h3>
+            {reading.lectura_1 && (
+              <BibleTextViewer reference={reading.lectura_1} label="Lectura principal" />
+            )}
+            {reading.lectura_2 && (
+              <BibleTextViewer reference={reading.lectura_2} label="Salmo/Proverbio" />
+            )}
+          </div>
+
+          {/* Notes */}
+          <BibleNotes dia={reading.dia} />
+
+          {/* Mark as Complete */}
+          {!userProgress?.dias_completados.includes(reading.dia) && (
+            <Button 
+              onClick={() => markAsCompleted(reading.dia)}
+              className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
+              size="lg"
+            >
+              <CheckCircle2 className="w-5 h-5 mr-2" />
+              Marcar día {reading.dia} como completado
+            </Button>
+          )}
         </motion.div>
       )}
 
       {/* Reading Calendar */}
       <div className="px-4 mt-6">
-        <h3 className="text-lg font-semibold mb-3">Plan de Lectura</h3>
-        <ScrollArea className="h-64">
-          <div className="grid grid-cols-7 gap-1">
-            {allReadings.slice(0, 30).map((reading) => {
-              const isCompleted = userProgress?.dias_completados.includes(reading.dia);
-              const isCurrent = reading.dia === userProgress?.dia_actual;
+        <h3 className="text-lg font-semibold mb-3">Calendario de Lectura</h3>
+        <ScrollArea className="h-48">
+          <div className="grid grid-cols-10 gap-1">
+            {allReadings.slice(0, 50).map((r) => {
+              const isCompleted = userProgress?.dias_completados.includes(r.dia);
+              const isCurrent = r.dia === userProgress?.dia_actual;
               
               return (
                 <motion.button
-                  key={reading.dia}
-                  whileHover={{ scale: 1.1 }}
+                  key={r.dia}
                   whileTap={{ scale: 0.95 }}
                   className={`
-                    aspect-square rounded-lg flex items-center justify-center text-xs font-medium transition-colors
+                    aspect-square rounded flex items-center justify-center text-[10px] font-medium transition-colors
                     ${isCompleted 
                       ? 'bg-green-500 text-white' 
                       : isCurrent 
@@ -144,13 +178,13 @@ const BiblePlan = () => {
                     }
                   `}
                 >
-                  {reading.dia}
+                  {r.dia}
                 </motion.button>
               );
             })}
           </div>
           <p className="text-xs text-muted-foreground mt-3 text-center">
-            Mostrando primeros 30 días • {allReadings.length} días disponibles
+            {allReadings.length} días en el plan
           </p>
         </ScrollArea>
       </div>

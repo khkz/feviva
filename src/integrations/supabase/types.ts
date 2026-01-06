@@ -170,33 +170,108 @@ export type Database = {
           },
         ]
       }
-      bible_reading_plan: {
+      bible_plan_notes: {
         Row: {
-          created_at: string
+          created_at: string | null
           dia: number
           id: string
-          pasaje_referencia: string
-          pasaje_texto: string
-          reflexion: string | null
-          titulo: string
+          nota: string
+          updated_at: string | null
+          user_id: string
         }
         Insert: {
-          created_at?: string
+          created_at?: string | null
           dia: number
           id?: string
-          pasaje_referencia: string
-          pasaje_texto: string
-          reflexion?: string | null
-          titulo: string
+          nota: string
+          updated_at?: string | null
+          user_id: string
         }
         Update: {
-          created_at?: string
+          created_at?: string | null
           dia?: number
           id?: string
+          nota?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      bible_reading_plan: {
+        Row: {
+          color_periodo: string | null
+          created_at: string
+          dia: number
+          es_libro_narrativo: boolean | null
+          id: string
+          lectura_1: string | null
+          lectura_2: string | null
+          lectura_3: string | null
+          pasaje_referencia: string
+          pasaje_texto: string
+          periodo: string | null
+          reflexion: string | null
+          titulo: string
+          youtube_video_id: string | null
+        }
+        Insert: {
+          color_periodo?: string | null
+          created_at?: string
+          dia: number
+          es_libro_narrativo?: boolean | null
+          id?: string
+          lectura_1?: string | null
+          lectura_2?: string | null
+          lectura_3?: string | null
+          pasaje_referencia: string
+          pasaje_texto: string
+          periodo?: string | null
+          reflexion?: string | null
+          titulo: string
+          youtube_video_id?: string | null
+        }
+        Update: {
+          color_periodo?: string | null
+          created_at?: string
+          dia?: number
+          es_libro_narrativo?: boolean | null
+          id?: string
+          lectura_1?: string | null
+          lectura_2?: string | null
+          lectura_3?: string | null
           pasaje_referencia?: string
           pasaje_texto?: string
+          periodo?: string | null
           reflexion?: string | null
           titulo?: string
+          youtube_video_id?: string | null
+        }
+        Relationships: []
+      }
+      bible_text_cache: {
+        Row: {
+          capitulo: number
+          created_at: string | null
+          id: string
+          libro: string
+          texto: string
+          traduccion: string | null
+        }
+        Insert: {
+          capitulo: number
+          created_at?: string | null
+          id?: string
+          libro: string
+          texto: string
+          traduccion?: string | null
+        }
+        Update: {
+          capitulo?: number
+          created_at?: string | null
+          id?: string
+          libro?: string
+          texto?: string
+          traduccion?: string | null
         }
         Relationships: []
       }
