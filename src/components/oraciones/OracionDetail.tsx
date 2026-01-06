@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { X, Heart, Play, Pause, Volume2, Info, Loader2 } from "lucide-react";
+import { X, Heart, Play, Pause, Volume2, Info, Loader2, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
 import { useOracionAudio } from "@/hooks/useOracionAudio";
+import { ShareModal } from "@/components/shared/ShareModal";
 import { cn } from "@/lib/utils";
 
 interface OracionDetailProps {
@@ -30,6 +31,7 @@ export function OracionDetail({
   onClose,
 }: OracionDetailProps) {
   const [showHistory, setShowHistory] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   
   const {
     isGenerating,
@@ -54,17 +56,26 @@ export function OracionDetail({
         
         <h1 className="font-heading font-bold text-lg">{nombre}</h1>
         
-        <Button
-          variant="ghost"
-          size="icon"
-          className={cn(isFavorite && "text-destructive")}
-          onClick={onToggleFavorite}
-        >
-          <Heart 
-            className="h-5 w-5" 
-            fill={isFavorite ? "currentColor" : "none"}
-          />
-        </Button>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setShowShareModal(true)}
+          >
+            <Share2 className="h-5 w-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className={cn(isFavorite && "text-destructive")}
+            onClick={onToggleFavorite}
+          >
+            <Heart 
+              className="h-5 w-5" 
+              fill={isFavorite ? "currentColor" : "none"}
+            />
+          </Button>
+        </div>
       </header>
 
       {/* Content */}
@@ -144,6 +155,15 @@ export function OracionDetail({
           </div>
         </div>
       </div>
+
+      {/* Share Modal */}
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        title={nombre}
+        text={texto}
+        reference={categoria}
+      />
     </div>
   );
 }

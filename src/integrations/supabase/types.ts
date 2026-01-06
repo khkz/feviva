@@ -677,6 +677,33 @@ export type Database = {
           },
         ]
       }
+      user_notification_preferences: {
+        Row: {
+          created_at: string
+          hora_preferida: string | null
+          id: string
+          notificaciones_habilitadas: boolean | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          hora_preferida?: string | null
+          id?: string
+          notificaciones_habilitadas?: boolean | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          hora_preferida?: string | null
+          id?: string
+          notificaciones_habilitadas?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_novena_progress: {
         Row: {
           completada: boolean | null
@@ -684,8 +711,10 @@ export type Database = {
           dia_actual: number
           dias_completados: Json
           fecha_inicio: string
+          hora_recordatorio: string | null
           id: string
           novena_id: string
+          recordatorio_activo: boolean | null
           ultima_actividad: string | null
           user_id: string
         }
@@ -695,8 +724,10 @@ export type Database = {
           dia_actual?: number
           dias_completados?: Json
           fecha_inicio?: string
+          hora_recordatorio?: string | null
           id?: string
           novena_id: string
+          recordatorio_activo?: boolean | null
           ultima_actividad?: string | null
           user_id: string
         }
@@ -706,8 +737,10 @@ export type Database = {
           dia_actual?: number
           dias_completados?: Json
           fecha_inicio?: string
+          hora_recordatorio?: string | null
           id?: string
           novena_id?: string
+          recordatorio_activo?: boolean | null
           ultima_actividad?: string | null
           user_id?: string
         }
