@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,13 +7,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { NovenaCard } from "@/components/novenas/NovenaCard";
 import { NovenaDiaDetail } from "@/components/novenas/NovenaDiaDetail";
 import { useNovenas, Novena } from "@/hooks/useNovenas";
+import { useNotifications } from "@/hooks/useNotifications";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 
 const Novenas = () => {
   const navigate = useNavigate();
-  const { novenas, loading, startNovena, completeDia, getProgressForNovena } = useNovenas();
+  const { novenas, loading, startNovena, completeDia, getProgressForNovena, refetch } = useNovenas();
+  const { checkPendingReminders } = useNotifications();
   const [selectedNovena, setSelectedNovena] = useState<Novena | null>(null);
   const [activeTab, setActiveTab] = useState("todas");
+
+  // Check for pending reminders on mount
+  useEffect(() => {
+    checkPendingReminders();
+  }, [checkPendingReminders]);
 
   const handleStartNovena = async (novena: Novena) => {
     const result = await startNovena(novena.id);
@@ -53,6 +60,7 @@ const Novenas = () => {
               progress={progress}
               onComplete={handleCompleteDia}
               onBack={() => setSelectedNovena(null)}
+              onUpdateReminder={() => refetch()}
             />
           </div>
           <BottomNavigation />

@@ -7,19 +7,34 @@ import {
   ArrowRight, 
   CheckCircle, 
   BookOpen,
-  Sparkles 
+  Sparkles,
+  Share2,
+  Bell
 } from "lucide-react";
 import { Novena, UserNovenaProgress } from "@/hooks/useNovenas";
+import { ShareModal } from "@/components/shared/ShareModal";
+import { ReminderModal } from "@/components/novenas/ReminderModal";
+import { useNotifications } from "@/hooks/useNotifications";
 
 interface NovenaDiaDetailProps {
   novena: Novena;
   progress: UserNovenaProgress;
   onComplete: (dia: number) => void;
   onBack: () => void;
+  onUpdateReminder?: (enabled: boolean, hora: string) => void;
 }
 
-export const NovenaDiaDetail = ({ novena, progress, onComplete, onBack }: NovenaDiaDetailProps) => {
+export const NovenaDiaDetail = ({ 
+  novena, 
+  progress, 
+  onComplete, 
+  onBack,
+  onUpdateReminder 
+}: NovenaDiaDetailProps) => {
   const [currentViewDia, setCurrentViewDia] = useState(progress.dia_actual);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [showReminderModal, setShowReminderModal] = useState(false);
+  const { saveReminderPreference } = useNotifications();
   
   const diaData = novena.dias.find(d => d.dia === currentViewDia);
   const isDiaCompleted = progress.dias_completados.includes(currentViewDia);
@@ -37,6 +52,11 @@ export const NovenaDiaDetail = ({ novena, progress, onComplete, onBack }: Novena
     }
   };
 
+  const handleSaveReminder = async (enabled: boolean, hora: string) => {
+    await saveReminderPreference(novena.id, enabled, hora);
+    onUpdateReminder?.(enabled, hora);
+  };
+
   if (!diaData) {
     return (
       <div className="text-center py-8">
@@ -51,7 +71,7 @@ export const NovenaDiaDetail = ({ novena, progress, onComplete, onBack }: Novena
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2">
         <Button variant="ghost" size="icon" onClick={onBack}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
@@ -59,6 +79,12 @@ export const NovenaDiaDetail = ({ novena, progress, onComplete, onBack }: Novena
           <h2 className="font-semibold text-lg">{novena.titulo}</h2>
           <p className="text-sm text-muted-foreground">{diaData.titulo}</p>
         </div>
+        <Button variant="ghost" size="icon" onClick={() => setShowReminderModal(true)}>
+          <Bell className={`h-5 w-5 ${(progress as any).recordatorio_activo ? "text-primary fill-primary" : ""}`} />
+        </Button>
+        <Button variant="ghost" size="icon" onClick={() => setShowShareModal(true)}>
+          <Share2 className="h-5 w-5" />
+        </Button>
       </div>
 
       {/* Day Navigation */}
@@ -101,7 +127,7 @@ export const NovenaDiaDetail = ({ novena, progress, onComplete, onBack }: Novena
       </div>
 
       {/* Content */}
-      <ScrollArea className="h-[calc(100vh-320px)]">
+      <ScrollArea className="h-[calc(100vh-380px)]">
         <div className="space-y-4 pr-4">
           {/* Status Badge */}
           {isDiaCompleted && (
@@ -153,17 +179,48 @@ export const NovenaDiaDetail = ({ novena, progress, onComplete, onBack }: Novena
         </div>
       </ScrollArea>
 
-      {/* Complete Button */}
-      {canComplete && (
+      {/* Action Buttons */}
+      <div className="space-y-2">
+        {canComplete && (
+          <Button 
+            onClick={() => onComplete(currentViewDia)} 
+            className="w-full"
+            size="lg"
+          >
+            <CheckCircle className="h-5 w-5 mr-2" />
+            Completar Día {currentViewDia}
+          </Button>
+        )}
+        
         <Button 
-          onClick={() => onComplete(currentViewDia)} 
+          variant="outline"
+          onClick={() => setShowShareModal(true)} 
           className="w-full"
-          size="lg"
         >
-          <CheckCircle className="h-5 w-5 mr-2" />
-          Completar Día {currentViewDia}
+          <Share2 className="h-4 w-4 mr-2" />
+          Compartir Oración
         </Button>
-      )}
+      </div>
+
+      {/* Share Modal */}
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        title={`${novena.titulo} - ${diaData.titulo}`}
+        text={diaData.oracion}
+        reference={novena.titulo}
+      />
+
+      {/* Reminder Modal */}
+      <ReminderModal
+        isOpen={showReminderModal}
+        onClose={() => setShowReminderModal(false)}
+        novenaId={novena.id}
+        novenaTitulo={novena.titulo}
+        currentEnabled={(progress as any).recordatorio_activo || false}
+        currentHora={(progress as any).hora_recordatorio || "20:00"}
+        onSave={handleSaveReminder}
+      />
     </div>
   );
 };
