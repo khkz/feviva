@@ -383,6 +383,42 @@ export type Database = {
         }
         Relationships: []
       }
+      novenas: {
+        Row: {
+          categoria: string
+          created_at: string
+          descripcion: string
+          dias: Json
+          id: string
+          imagen_url: string | null
+          intencion: string
+          orden: number | null
+          titulo: string
+        }
+        Insert: {
+          categoria?: string
+          created_at?: string
+          descripcion: string
+          dias?: Json
+          id?: string
+          imagen_url?: string | null
+          intencion: string
+          orden?: number | null
+          titulo: string
+        }
+        Update: {
+          categoria?: string
+          created_at?: string
+          descripcion?: string
+          dias?: Json
+          id?: string
+          imagen_url?: string | null
+          intencion?: string
+          orden?: number | null
+          titulo?: string
+        }
+        Relationships: []
+      }
       oraciones: {
         Row: {
           audio_url: string | null
@@ -637,6 +673,50 @@ export type Database = {
             columns: ["lesson_id"]
             isOneToOne: false
             referencedRelation: "library_lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_novena_progress: {
+        Row: {
+          completada: boolean | null
+          created_at: string
+          dia_actual: number
+          dias_completados: Json
+          fecha_inicio: string
+          id: string
+          novena_id: string
+          ultima_actividad: string | null
+          user_id: string
+        }
+        Insert: {
+          completada?: boolean | null
+          created_at?: string
+          dia_actual?: number
+          dias_completados?: Json
+          fecha_inicio?: string
+          id?: string
+          novena_id: string
+          ultima_actividad?: string | null
+          user_id: string
+        }
+        Update: {
+          completada?: boolean | null
+          created_at?: string
+          dia_actual?: number
+          dias_completados?: Json
+          fecha_inicio?: string
+          id?: string
+          novena_id?: string
+          ultima_actividad?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_novena_progress_novena_id_fkey"
+            columns: ["novena_id"]
+            isOneToOne: false
+            referencedRelation: "novenas"
             referencedColumns: ["id"]
           },
         ]
