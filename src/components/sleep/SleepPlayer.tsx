@@ -12,6 +12,7 @@ import {
   Loader2
 } from "lucide-react";
 import { SleepStory } from "@/hooks/useSleepStories";
+import { AmbientSoundMixer } from "./AmbientSoundMixer";
 
 interface SleepPlayerProps {
   story: SleepStory;
@@ -42,9 +43,11 @@ export const SleepPlayer = ({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
+  const [masterVolume, setMasterVolume] = useState(1);
   const [selectedTimer, setSelectedTimer] = useState(15);
   const [timerRemaining, setTimerRemaining] = useState<number | null>(null);
   const [showTimerPicker, setShowTimerPicker] = useState(!audioUrl);
+  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
 
   // Handle timer countdown
   useEffect(() => {
@@ -94,6 +97,19 @@ export const SleepPlayer = ({
     if (audioRef.current) {
       audioRef.current.muted = !isMuted;
       setIsMuted(!isMuted);
+    }
+  };
+
+  const handleMasterVolumeChange = (value: number[]) => {
+    const newVolume = value[0];
+    setMasterVolume(newVolume);
+    if (audioRef.current) {
+      audioRef.current.volume = newVolume;
+    }
+    if (newVolume === 0) {
+      setIsMuted(true);
+    } else if (isMuted) {
+      setIsMuted(false);
     }
   };
 
@@ -237,19 +253,33 @@ export const SleepPlayer = ({
 
             {/* Main controls */}
             <div className="flex items-center justify-center gap-6">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-12 h-12"
-                onClick={toggleMute}
-                disabled={!audioUrl}
-              >
-                {isMuted ? (
-                  <VolumeX className="w-6 h-6" />
-                ) : (
-                  <Volume2 className="w-6 h-6" />
+              <div className="relative">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="w-12 h-12"
+                  onClick={() => setShowVolumeSlider(!showVolumeSlider)}
+                >
+                  {isMuted || masterVolume === 0 ? (
+                    <VolumeX className="w-6 h-6" />
+                  ) : (
+                    <Volume2 className="w-6 h-6" />
+                  )}
+                </Button>
+                
+                {showVolumeSlider && (
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-card border border-border rounded-lg p-3 shadow-lg">
+                    <Slider
+                      value={[masterVolume]}
+                      max={1}
+                      step={0.1}
+                      orientation="vertical"
+                      onValueChange={handleMasterVolumeChange}
+                      className="h-24"
+                    />
+                  </div>
                 )}
-              </Button>
+              </div>
 
               <Button
                 size="icon"
@@ -275,6 +305,12 @@ export const SleepPlayer = ({
                 <Timer className="w-6 h-6" />
               </Button>
             </div>
+
+            {/* Ambient Sound Mixer */}
+            <AmbientSoundMixer 
+              isPlaying={isPlaying} 
+              masterVolume={masterVolume} 
+            />
 
             {isGenerating && (
               <p className="text-center text-sm text-muted-foreground">
