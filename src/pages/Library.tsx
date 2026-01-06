@@ -29,26 +29,6 @@ interface LessonProgress {
   fecha_completado: string | null;
 }
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.08,
-      delayChildren: 0.3,
-    },
-  },
-} as const;
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 30, scale: 0.95 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { type: "spring" as const, stiffness: 200, damping: 20 },
-  },
-} as const;
 
 const Library = () => {
   const [lessons, setLessons] = useState<Lesson[]>([]);
@@ -309,15 +289,32 @@ const Library = () => {
         ) : (
           <motion.div 
             className="grid grid-cols-1 md:grid-cols-2 gap-4"
-            variants={containerVariants}
             initial="hidden"
             animate="visible"
+            variants={{
+              hidden: { opacity: 0 },
+              visible: {
+                opacity: 1,
+                transition: {
+                  staggerChildren: 0.08,
+                  delayChildren: 0.1,
+                },
+              },
+            }}
           >
-            {filteredLessons.map(lesson => (
+            {filteredLessons.map((lesson) => (
               <motion.button
                 key={lesson.id}
                 className="glass-card rounded-2xl p-4 text-left w-full"
-                variants={cardVariants}
+                variants={{
+                  hidden: { opacity: 0, y: 30, scale: 0.95 },
+                  visible: {
+                    opacity: 1,
+                    y: 0,
+                    scale: 1,
+                    transition: { type: "spring", stiffness: 200, damping: 20 },
+                  },
+                }}
                 onClick={() => setSelectedLesson(lesson)}
                 whileHover={{ scale: 1.02, y: -2 }}
                 whileTap={{ scale: 0.98 }}
