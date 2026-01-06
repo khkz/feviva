@@ -557,6 +557,42 @@ export type Database = {
         }
         Relationships: []
       }
+      gratitude_entries: {
+        Row: {
+          created_at: string
+          entrada_1: string
+          entrada_2: string | null
+          entrada_3: string | null
+          fecha: string
+          id: string
+          reflexion_biblica: string | null
+          user_id: string
+          versiculo_sugerido: string | null
+        }
+        Insert: {
+          created_at?: string
+          entrada_1: string
+          entrada_2?: string | null
+          entrada_3?: string | null
+          fecha?: string
+          id?: string
+          reflexion_biblica?: string | null
+          user_id: string
+          versiculo_sugerido?: string | null
+        }
+        Update: {
+          created_at?: string
+          entrada_1?: string
+          entrada_2?: string | null
+          entrada_3?: string | null
+          fecha?: string
+          id?: string
+          reflexion_biblica?: string | null
+          user_id?: string
+          versiculo_sugerido?: string | null
+        }
+        Relationships: []
+      }
       habit_logs: {
         Row: {
           completado: boolean | null
