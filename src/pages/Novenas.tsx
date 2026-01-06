@@ -12,7 +12,7 @@ import { BottomNavigation } from "@/components/layout/BottomNavigation";
 
 const Novenas = () => {
   const navigate = useNavigate();
-  const { novenas, loading, startNovena, completeDia, getProgressForNovena, refetch } = useNovenas();
+  const { novenas, loading, startNovena, completeDia, getProgressForNovena, refetch, refetchNovenas } = useNovenas();
   const { checkPendingReminders } = useNotifications();
   const [selectedNovena, setSelectedNovena] = useState<Novena | null>(null);
   const [activeTab, setActiveTab] = useState("todas");
@@ -125,6 +125,7 @@ const Novenas = () => {
                   progress={getProgressForNovena(novena.id)}
                   onStart={() => handleStartNovena(novena)}
                   onContinue={() => handleContinueNovena(novena)}
+                  onImageGenerated={refetchNovenas}
                 />
               ))
             )}
@@ -143,6 +144,7 @@ const Novenas = () => {
                   progress={getProgressForNovena(novena.id)}
                   onStart={() => handleStartNovena(novena)}
                   onContinue={() => handleContinueNovena(novena)}
+                  onImageGenerated={refetchNovenas}
                 />
               ))
             )}
@@ -161,6 +163,7 @@ const Novenas = () => {
                   progress={getProgressForNovena(novena.id)}
                   onStart={() => handleStartNovena(novena)}
                   onContinue={() => handleContinueNovena(novena)}
+                  onImageGenerated={refetchNovenas}
                 />
               ))
             )}

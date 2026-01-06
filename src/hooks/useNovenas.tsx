@@ -201,5 +201,6 @@ export const useNovenas = () => {
     completeDia,
     getProgressForNovena,
     refetch: fetchUserProgress,
+    refetchNovenas: fetchNovenas,
   };
 };
