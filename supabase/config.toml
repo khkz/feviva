@@ -17,9 +17,3 @@ verify_jwt = false
 
 [functions.batch-enrich-lessons]
 verify_jwt = false
-
-[functions.batch-generate-audio]
-verify_jwt = false
-
-[functions.generate-novena-image]
-verify_jwt = false

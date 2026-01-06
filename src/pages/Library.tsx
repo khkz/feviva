@@ -40,7 +40,6 @@ const Library = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedLevel, setSelectedLevel] = useState<number>(0);
   const [batchEnriching, setBatchEnriching] = useState(false);
-  const [batchGeneratingAudio, setBatchGeneratingAudio] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { incrementLessons } = useUserStats();
@@ -142,7 +141,6 @@ const Library = () => {
   const enrichedCount = lessons.filter(l => l.contenido_enriquecido).length;
   const audioCount = lessons.filter(l => l.audio_url).length;
   const pendingEnrichment = lessons.length - enrichedCount;
-  const pendingAudio = enrichedCount - audioCount; // Only count enriched lessons without audio
 
   const handleBatchEnrich = async () => {
     if (pendingEnrichment === 0) {
@@ -211,73 +209,6 @@ const Library = () => {
       await fetchLessons();
     } finally {
       setBatchEnriching(false);
-    }
-  };
-
-  const handleBatchGenerateAudio = async () => {
-    if (pendingAudio <= 0) {
-      toast({
-        title: "Ya está completo",
-        description: "Todas las lecciones enriquecidas ya tienen audio",
-      });
-      return;
-    }
-
-    setBatchGeneratingAudio(true);
-    let totalProcessed = 0;
-    let totalErrors = 0;
-    let hasMore = true;
-    let batchNumber = 1;
-    const batchSize = 2;
-    const totalBatches = Math.ceil(pendingAudio / batchSize);
-
-    toast({
-      title: "Generación de audio iniciada",
-      description: `Procesando ${pendingAudio} lecciones en ${totalBatches} lotes...`,
-    });
-
-    try {
-      while (hasMore) {
-        toast({
-          title: `Generando audio - Lote ${batchNumber}/${totalBatches}`,
-          description: `${totalProcessed} audios generados...`,
-        });
-
-        const response = await supabase.functions.invoke('batch-generate-audio', {
-          body: { limit: batchSize, onlyEnriched: true }
-        });
-        
-        if (response.error) {
-          throw new Error(response.error.message);
-        }
-
-        const result = response.data;
-        totalProcessed += result.successCount || 0;
-        totalErrors += result.errorCount || 0;
-        hasMore = result.hasMore;
-        batchNumber++;
-
-        await fetchLessons();
-
-        if (hasMore) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        }
-      }
-
-      toast({
-        title: "¡Audio generado!",
-        description: `${totalProcessed} audios creados${totalErrors > 0 ? `, ${totalErrors} errores` : ''}`,
-      });
-    } catch (error) {
-      console.error('Batch audio error:', error);
-      toast({
-        title: "Error en generación de audio",
-        description: `Procesados ${totalProcessed} antes del error. ${error instanceof Error ? error.message : "Error desconocido"}`,
-        variant: "destructive",
-      });
-      await fetchLessons();
-    } finally {
-      setBatchGeneratingAudio(false);
     }
   };
 
@@ -354,53 +285,31 @@ const Library = () => {
             </div>
           </motion.div>
 
-          {/* Batch Action Buttons */}
-          {(pendingEnrichment > 0 || pendingAudio > 0) && (
+          {/* Batch Enrich Button */}
+          {pendingEnrichment > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.35 }}
-              className="mt-4 space-y-2"
+              className="mt-4"
             >
-              {pendingEnrichment > 0 && (
-                <Button
-                  onClick={handleBatchEnrich}
-                  disabled={batchEnriching || batchGeneratingAudio}
-                  className="w-full glass-button bg-gradient-to-r from-primary/20 to-secondary/20 hover:from-primary/30 hover:to-secondary/30 border border-primary/30"
-                >
-                  {batchEnriching ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Enriqueciendo lecciones...
-                    </>
-                  ) : (
-                    <>
-                      <Wand2 className="h-4 w-4 mr-2" />
-                      Enriquecer {pendingEnrichment} lecciones con IA
-                    </>
-                  )}
-                </Button>
-              )}
-              
-              {pendingAudio > 0 && (
-                <Button
-                  onClick={handleBatchGenerateAudio}
-                  disabled={batchEnriching || batchGeneratingAudio}
-                  className="w-full glass-button bg-gradient-to-r from-green-500/20 to-emerald-500/20 hover:from-green-500/30 hover:to-emerald-500/30 border border-green-500/30"
-                >
-                  {batchGeneratingAudio ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Generando audio...
-                    </>
-                  ) : (
-                    <>
-                      <Headphones className="h-4 w-4 mr-2" />
-                      Generar audio para {pendingAudio} lecciones
-                    </>
-                  )}
-                </Button>
-              )}
+              <Button
+                onClick={handleBatchEnrich}
+                disabled={batchEnriching}
+                className="w-full glass-button bg-gradient-to-r from-primary/20 to-secondary/20 hover:from-primary/30 hover:to-secondary/30 border border-primary/30"
+              >
+                {batchEnriching ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Enriqueciendo {pendingEnrichment} lecciones...
+                  </>
+                ) : (
+                  <>
+                    <Wand2 className="h-4 w-4 mr-2" />
+                    Enriquecer {pendingEnrichment} lecciones con IA
+                  </>
+                )}
+              </Button>
             </motion.div>
           )}
 
