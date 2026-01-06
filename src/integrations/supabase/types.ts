@@ -383,6 +383,42 @@ export type Database = {
         }
         Relationships: []
       }
+      oraciones: {
+        Row: {
+          audio_url: string | null
+          categoria: string
+          created_at: string
+          historia: string | null
+          id: string
+          nombre: string
+          orden: number | null
+          subcategoria: string | null
+          texto: string
+        }
+        Insert: {
+          audio_url?: string | null
+          categoria: string
+          created_at?: string
+          historia?: string | null
+          id?: string
+          nombre: string
+          orden?: number | null
+          subcategoria?: string | null
+          texto: string
+        }
+        Update: {
+          audio_url?: string | null
+          categoria?: string
+          created_at?: string
+          historia?: string | null
+          id?: string
+          nombre?: string
+          orden?: number | null
+          subcategoria?: string | null
+          texto?: string
+        }
+        Relationships: []
+      }
       posts: {
         Row: {
           contenido: string
@@ -566,6 +602,35 @@ export type Database = {
           },
         ]
       }
+      user_oraciones_favoritas: {
+        Row: {
+          created_at: string
+          id: string
+          oracion_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          oracion_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          oracion_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_oraciones_favoritas_oracion_id_fkey"
+            columns: ["oracion_id"]
+            isOneToOne: false
+            referencedRelation: "oraciones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_rituals: {
         Row: {
           compartio_fe: boolean | null
@@ -625,6 +690,39 @@ export type Database = {
           created_at?: string | null
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_rosario_progress: {
+        Row: {
+          completado: boolean | null
+          created_at: string
+          decenas_completadas: number | null
+          duracion_minutos: number | null
+          fecha: string
+          id: string
+          misterio_tipo: string
+          user_id: string
+        }
+        Insert: {
+          completado?: boolean | null
+          created_at?: string
+          decenas_completadas?: number | null
+          duracion_minutos?: number | null
+          fecha?: string
+          id?: string
+          misterio_tipo: string
+          user_id: string
+        }
+        Update: {
+          completado?: boolean | null
+          created_at?: string
+          decenas_completadas?: number | null
+          duracion_minutos?: number | null
+          fecha?: string
+          id?: string
+          misterio_tipo?: string
           user_id?: string
         }
         Relationships: []
