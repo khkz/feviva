@@ -2,3 +2,9 @@ project_id = "duggdnqpemwojkojfyei"
 
 [functions.debate-coach]
 verify_jwt = true
+
+[functions.text-to-speech]
+verify_jwt = false
+
+[functions.generate-daily-content]
+verify_jwt = false
