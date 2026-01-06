@@ -8,3 +8,12 @@ verify_jwt = false
 
 [functions.generate-daily-content]
 verify_jwt = false
+
+[functions.enrich-lesson]
+verify_jwt = false
+
+[functions.lesson-tts]
+verify_jwt = false
+
+[functions.batch-enrich-lessons]
+verify_jwt = false
