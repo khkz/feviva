@@ -349,10 +349,13 @@ export type Database = {
       }
       library_lessons: {
         Row: {
+          audio_url: string | null
           categoria: string
           contenido: string
+          contenido_enriquecido: string | null
           created_at: string | null
           descripcion: string
+          duracion_estimada: number | null
           id: string
           nivel: number
           orden: number | null
@@ -360,10 +363,13 @@ export type Database = {
           titulo: string
         }
         Insert: {
+          audio_url?: string | null
           categoria: string
           contenido: string
+          contenido_enriquecido?: string | null
           created_at?: string | null
           descripcion: string
+          duracion_estimada?: number | null
           id?: string
           nivel: number
           orden?: number | null
@@ -371,10 +377,13 @@ export type Database = {
           titulo: string
         }
         Update: {
+          audio_url?: string | null
           categoria?: string
           contenido?: string
+          contenido_enriquecido?: string | null
           created_at?: string | null
           descripcion?: string
+          duracion_estimada?: number | null
           id?: string
           nivel?: number
           orden?: number | null
