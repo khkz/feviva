@@ -51,8 +51,8 @@ export function HeroSection({ userName, verse }: HeroSectionProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
         >
-          <p className="text-muted-foreground text-sm mb-1">Buenos días</p>
-          <h1 className="font-heading text-2xl font-bold text-foreground">
+          <p className="text-white/70 text-sm mb-1">Buenos días</p>
+          <h1 className="font-heading text-2xl font-bold text-white">
             {userName || "Peregrino"}
           </h1>
         </motion.div>
@@ -65,10 +65,10 @@ export function HeroSection({ userName, verse }: HeroSectionProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
           >
-            <p className="text-foreground/90 text-sm italic leading-relaxed">
+            <p className="text-white/90 text-sm italic leading-relaxed">
               "{verse.text}"
             </p>
-            <p className="text-muted-foreground text-xs mt-2">— {verse.reference}</p>
+            <p className="text-white/60 text-xs mt-2">— {verse.reference}</p>
           </motion.div>
         )}
       </div>
