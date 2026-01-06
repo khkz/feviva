@@ -9,54 +9,71 @@ import {
   TreePine,
   Bird,
   Volume2,
-  VolumeX
+  VolumeX,
+  Music
 } from "lucide-react";
 
 interface AmbientSound {
   id: string;
   name: string;
   icon: React.ReactNode;
-  // Using free ambient sound URLs from reliable sources
   url: string;
+  autoPlay?: boolean; // Auto-activate for sleep stories
+  defaultVolume?: number;
 }
 
-// Using SoundBible and archive.org for reliable playback (public domain/CC0)
+// Using free ambient sounds - prioritizing soft music for sleep
 const AMBIENT_SOUNDS: AmbientSound[] = [
+  {
+    id: "soft-piano",
+    name: "Piano suave",
+    icon: <Music className="w-5 h-5" />,
+    // Relaxing piano music from archive.org (public domain)
+    url: "https://ia800500.us.archive.org/7/items/relaxing-piano-music/Relaxing_Piano_Music_Sleep_Music.mp3",
+    autoPlay: true,
+    defaultVolume: 0.25
+  },
   {
     id: "rain",
     name: "Lluvia",
     icon: <CloudRain className="w-5 h-5" />,
-    url: "https://soundbible.com/mp3/Rain-SoundBible.com-2065722324.mp3"
+    url: "https://soundbible.com/mp3/Rain-SoundBible.com-2065722324.mp3",
+    defaultVolume: 0.3
   },
   {
     id: "waves",
     name: "Olas",
     icon: <Waves className="w-5 h-5" />,
-    url: "https://soundbible.com/mp3/Ocean_Waves-Mike_Koenig-980635527.mp3"
+    url: "https://soundbible.com/mp3/Ocean_Waves-Mike_Koenig-980635527.mp3",
+    defaultVolume: 0.3
   },
   {
     id: "fire",
     name: "Fuego",
     icon: <Flame className="w-5 h-5" />,
-    url: "https://soundbible.com/mp3/Campfire-SoundBible.com-1933636465.mp3"
+    url: "https://soundbible.com/mp3/Campfire-SoundBible.com-1933636465.mp3",
+    defaultVolume: 0.4
   },
   {
     id: "wind",
     name: "Viento",
     icon: <Wind className="w-5 h-5" />,
-    url: "https://soundbible.com/mp3/Wind-Mark_DiAngelo-1940285615.mp3"
+    url: "https://soundbible.com/mp3/Wind-Mark_DiAngelo-1940285615.mp3",
+    defaultVolume: 0.3
   },
   {
     id: "forest",
     name: "Bosque",
     icon: <TreePine className="w-5 h-5" />,
-    url: "https://soundbible.com/mp3/Rainforest_Ambience-GlorySunz-1938133500.mp3"
+    url: "https://soundbible.com/mp3/Rainforest_Ambience-GlorySunz-1938133500.mp3",
+    defaultVolume: 0.3
   },
   {
     id: "birds",
     name: "Pájaros",
     icon: <Bird className="w-5 h-5" />,
-    url: "https://soundbible.com/mp3/Songbird-SoundBible.com-192809392.mp3"
+    url: "https://soundbible.com/mp3/Songbird-SoundBible.com-192809392.mp3",
+    defaultVolume: 0.25
   },
 ];
 
@@ -75,7 +92,42 @@ export const AmbientSoundMixer = ({ isPlaying, masterVolume }: AmbientSoundMixer
   const [activeSounds, setActiveSounds] = useState<Map<string, ActiveSound>>(new Map());
   const [soundVolumes, setSoundVolumes] = useState<Map<string, number>>(new Map());
   const [isExpanded, setIsExpanded] = useState(false);
+  const [hasInitialized, setHasInitialized] = useState(false);
   const audioRefs = useRef<Map<string, HTMLAudioElement>>(new Map());
+
+  // Auto-activate soft background music on first play
+  useEffect(() => {
+    if (isPlaying && !hasInitialized) {
+      setHasInitialized(true);
+      
+      // Auto-activate sounds marked with autoPlay
+      const autoPlaySounds = AMBIENT_SOUNDS.filter(s => s.autoPlay);
+      const newActiveSounds = new Map(activeSounds);
+      const newVolumes = new Map(soundVolumes);
+      
+      autoPlaySounds.forEach(soundConfig => {
+        if (!activeSounds.has(soundConfig.id)) {
+          const audio = new Audio(soundConfig.url);
+          audio.loop = true;
+          const volume = soundConfig.defaultVolume || 0.3;
+          audio.volume = volume * masterVolume;
+          audio.play().catch(console.error);
+          
+          newActiveSounds.set(soundConfig.id, {
+            id: soundConfig.id,
+            volume,
+            audio
+          });
+          newVolumes.set(soundConfig.id, volume);
+        }
+      });
+      
+      if (newActiveSounds.size > activeSounds.size) {
+        setActiveSounds(newActiveSounds);
+        setSoundVolumes(newVolumes);
+      }
+    }
+  }, [isPlaying, hasInitialized, masterVolume]);
 
   // Update volumes when master volume changes
   useEffect(() => {
@@ -119,7 +171,8 @@ export const AmbientSoundMixer = ({ isPlaying, masterVolume }: AmbientSoundMixer
       // Add sound
       const audio = new Audio(soundConfig.url);
       audio.loop = true;
-      audio.volume = 0.5 * masterVolume;
+      const defaultVol = soundConfig.defaultVolume || 0.5;
+      audio.volume = defaultVol * masterVolume;
       
       if (isPlaying) {
         audio.play().catch(console.error);
@@ -128,13 +181,13 @@ export const AmbientSoundMixer = ({ isPlaying, masterVolume }: AmbientSoundMixer
       const newActiveSounds = new Map(activeSounds);
       newActiveSounds.set(soundConfig.id, {
         id: soundConfig.id,
-        volume: 0.5,
+        volume: defaultVol,
         audio
       });
       setActiveSounds(newActiveSounds);
       
       const newVolumes = new Map(soundVolumes);
-      newVolumes.set(soundConfig.id, 0.5);
+      newVolumes.set(soundConfig.id, defaultVol);
       setSoundVolumes(newVolumes);
     }
   };
