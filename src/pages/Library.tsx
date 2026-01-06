@@ -152,34 +152,61 @@ const Library = () => {
     }
 
     setBatchEnriching(true);
+    let totalProcessed = 0;
+    let totalErrors = 0;
+    let hasMore = true;
+    let batchNumber = 1;
+    const batchSize = 2;
+    const totalBatches = Math.ceil(pendingEnrichment / batchSize);
+
     toast({
       title: "Enriquecimiento iniciado",
-      description: `Procesando ${pendingEnrichment} lecciones con IA...`,
+      description: `Procesando ${pendingEnrichment} lecciones en ${totalBatches} lotes...`,
     });
 
     try {
-      const response = await supabase.functions.invoke('batch-enrich-lessons');
-      
-      if (response.error) {
-        throw new Error(response.error.message);
+      while (hasMore) {
+        toast({
+          title: `Procesando lote ${batchNumber}/${totalBatches}`,
+          description: `${totalProcessed} lecciones completadas...`,
+        });
+
+        const response = await supabase.functions.invoke('batch-enrich-lessons', {
+          body: { limit: batchSize }
+        });
+        
+        if (response.error) {
+          throw new Error(response.error.message);
+        }
+
+        const result = response.data;
+        totalProcessed += result.successCount || 0;
+        totalErrors += result.errorCount || 0;
+        hasMore = result.hasMore;
+        batchNumber++;
+
+        // Refresh lessons to show progress
+        await fetchLessons();
+
+        // Small delay between batches
+        if (hasMore) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
       }
 
-      const result = response.data;
-      
       toast({
         title: "¡Enriquecimiento completado!",
-        description: `${result.successCount} lecciones enriquecidas, ${result.errorCount} errores`,
+        description: `${totalProcessed} lecciones enriquecidas${totalErrors > 0 ? `, ${totalErrors} errores` : ''}`,
       });
-
-      // Refresh lessons
-      await fetchLessons();
     } catch (error) {
       console.error('Batch enrich error:', error);
       toast({
         title: "Error en el proceso",
-        description: error instanceof Error ? error.message : "Error desconocido",
+        description: `Procesadas ${totalProcessed} lecciones antes del error. ${error instanceof Error ? error.message : "Error desconocido"}`,
         variant: "destructive",
       });
+      // Still refresh to show partial progress
+      await fetchLessons();
     } finally {
       setBatchEnriching(false);
     }

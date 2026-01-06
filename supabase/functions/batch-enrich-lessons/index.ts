@@ -14,6 +14,14 @@ interface EnrichResult {
   duracion_lectura?: number;
 }
 
+function sanitizeJsonString(str: string): string {
+  // Remove control characters
+  let cleaned = str.replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
+  // Remove markdown code blocks
+  cleaned = cleaned.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+  return cleaned.trim();
+}
+
 async function enrichLesson(lesson: any, LOVABLE_API_KEY: string): Promise<EnrichResult> {
   const { id, titulo, descripcion, contenido, categoria } = lesson;
   
@@ -28,7 +36,7 @@ Tu estilo debe ser:
 - Práctico, con aplicaciones para la vida diaria
 - Inspirador, que mueva al corazón y a la acción
 
-IMPORTANTE: Responde SOLO en formato JSON válido sin markdown.`;
+IMPORTANTE: Responde SOLO en formato JSON válido. No uses markdown, no uses comillas simples, asegúrate de escapar correctamente las comillas dobles dentro del texto.`;
 
   const userPrompt = `Enriquece esta lección de la Biblioteca de Fe católica:
 
@@ -46,6 +54,8 @@ Genera un contenido MUCHO más extenso y profundo (mínimo 1500 palabras) que in
 5. **Testimonios de santos** (2-3 párrafos): Ejemplos de santos relacionados con el tema
 6. **Aplicación práctica** (3-4 párrafos): Cómo vivir esto en el día a día
 7. **Oración final**: Una oración relacionada con el tema
+
+IMPORTANTE: El contenido HTML no debe contener comillas dobles sin escapar. Usa comillas simples para atributos HTML o escapa las comillas dobles.
 
 Responde EXACTAMENTE en este formato JSON:
 {
@@ -87,21 +97,24 @@ Responde EXACTAMENTE en este formato JSON:
       return { success: false, lessonId: id, error: 'No content received from AI' };
     }
 
-    // Parse JSON from response
+    // Parse JSON from response with improved sanitization
     let parsedContent;
     try {
-      let cleanJson = rawContent
-        .replace(/```json\n?/g, '')
-        .replace(/```\n?/g, '')
-        .trim();
-      
+      const cleanJson = sanitizeJsonString(rawContent);
       parsedContent = JSON.parse(cleanJson);
     } catch (parseError) {
+      // Try to extract JSON object
       const jsonMatch = rawContent.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
-        parsedContent = JSON.parse(jsonMatch[0]);
+        try {
+          const cleanMatch = sanitizeJsonString(jsonMatch[0]);
+          parsedContent = JSON.parse(cleanMatch);
+        } catch {
+          console.error(`JSON parse error for ${titulo}:`, parseError);
+          return { success: false, lessonId: id, error: 'Could not parse AI response as JSON' };
+        }
       } else {
-        return { success: false, lessonId: id, error: 'Could not parse AI response as JSON' };
+        return { success: false, lessonId: id, error: 'Could not find JSON in AI response' };
       }
     }
 
@@ -127,16 +140,32 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
+    // Get limit from request body (default: 2 to avoid timeout)
+    let limit = 2;
+    try {
+      const body = await req.json();
+      limit = body.limit || 2;
+    } catch {
+      // Use default limit
+    }
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Get all lessons without enriched content
+    // Get count of all pending lessons first
+    const { count: totalPending } = await supabase
+      .from('library_lessons')
+      .select('*', { count: 'exact', head: true })
+      .is('contenido_enriquecido', null);
+
+    // Get limited batch of lessons without enriched content
     const { data: lessons, error: fetchError } = await supabase
       .from('library_lessons')
       .select('*')
       .is('contenido_enriquecido', null)
-      .order('orden');
+      .order('orden')
+      .limit(limit);
 
     if (fetchError) {
       throw new Error(`Failed to fetch lessons: ${fetchError.message}`);
@@ -144,12 +173,18 @@ serve(async (req) => {
 
     if (!lessons || lessons.length === 0) {
       return new Response(
-        JSON.stringify({ success: true, message: 'No lessons to enrich', processed: 0 }),
+        JSON.stringify({ 
+          success: true, 
+          message: 'No lessons to enrich', 
+          processed: 0,
+          remaining: 0,
+          hasMore: false 
+        }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log(`Found ${lessons.length} lessons to enrich`);
+    console.log(`Processing batch of ${lessons.length} lessons (${totalPending} total pending)`);
 
     const results = [];
     let successCount = 0;
@@ -157,7 +192,7 @@ serve(async (req) => {
 
     // Process lessons sequentially to avoid rate limits
     for (const lesson of lessons) {
-      console.log(`Processing lesson ${successCount + errorCount + 1}/${lessons.length}: ${lesson.titulo}`);
+      console.log(`Processing: ${lesson.titulo}`);
       
       const result = await enrichLesson(lesson, LOVABLE_API_KEY);
       
@@ -186,10 +221,13 @@ serve(async (req) => {
       }
 
       // Add delay between requests to avoid rate limits
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      if (lessons.indexOf(lesson) < lessons.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 1500));
+      }
     }
 
-    console.log(`Batch complete. Success: ${successCount}, Errors: ${errorCount}`);
+    const remaining = (totalPending || 0) - successCount;
+    console.log(`Batch complete. Success: ${successCount}, Errors: ${errorCount}, Remaining: ${remaining}`);
 
     return new Response(
       JSON.stringify({
@@ -197,6 +235,9 @@ serve(async (req) => {
         message: `Processed ${lessons.length} lessons`,
         successCount,
         errorCount,
+        processed: successCount,
+        remaining: remaining,
+        hasMore: remaining > 0,
         results,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
