@@ -12,7 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useProcessingJobs } from '@/hooks/useProcessingJobs';
 
-const AdminBiblePlan = () => {
+export const AdminBiblePlan = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [diaInicio, setDiaInicio] = useState(11); // Empezar desde día 11 (ya hay 10)

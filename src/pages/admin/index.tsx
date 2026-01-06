@@ -8,3 +8,4 @@ export { AdminMedia } from './AdminMedia';
 export { AdminCourses } from './AdminCourses';
 export { AdminLiveSessions } from './AdminLiveSessions';
 export { AdminMovies } from './AdminMovies';
+export { AdminBiblePlan } from './AdminBiblePlan';
