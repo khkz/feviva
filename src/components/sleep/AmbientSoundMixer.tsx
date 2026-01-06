@@ -23,13 +23,13 @@ interface AmbientSound {
   defaultVolume?: number;
 }
 
-// Using reliable CDN sources for ambient sounds
+// Using reliable permanent audio sources from archive.org and freesound
 const AMBIENT_SOUNDS: AmbientSound[] = [
   {
     id: "soft-piano",
     name: "Piano",
     icon: <Music className="w-5 h-5" />,
-    url: "https://cdn.pixabay.com/audio/2024/11/10/audio_b86eb827d6.mp3",
+    url: "https://upload.wikimedia.org/wikipedia/commons/4/40/Toreador_song_cleaned.ogg",
     autoPlay: false,
     defaultVolume: 0.4
   },
@@ -37,42 +37,42 @@ const AMBIENT_SOUNDS: AmbientSound[] = [
     id: "rain",
     name: "Lluvia",
     icon: <CloudRain className="w-5 h-5" />,
-    url: "https://cdn.pixabay.com/audio/2022/05/31/audio_e4986c1c9d.mp3",
+    url: "https://upload.wikimedia.org/wikipedia/commons/4/4e/Moderate_rain.ogg",
     defaultVolume: 0.5
   },
   {
     id: "waves",
     name: "Olas",
     icon: <Waves className="w-5 h-5" />,
-    url: "https://cdn.pixabay.com/audio/2024/08/21/audio_d37e16cd10.mp3",
+    url: "https://upload.wikimedia.org/wikipedia/commons/e/e3/Waves_at_Baltic_sea_coast.ogg",
     defaultVolume: 0.5
   },
   {
     id: "fire",
     name: "Fuego",
     icon: <Flame className="w-5 h-5" />,
-    url: "https://cdn.pixabay.com/audio/2022/10/30/audio_db2bbf4f26.mp3",
+    url: "https://upload.wikimedia.org/wikipedia/commons/b/b5/Fireplace-sound.ogg",
     defaultVolume: 0.5
   },
   {
     id: "wind",
     name: "Viento",
     icon: <Wind className="w-5 h-5" />,
-    url: "https://cdn.pixabay.com/audio/2024/02/12/audio_8ea0d38f42.mp3",
+    url: "https://upload.wikimedia.org/wikipedia/commons/6/6e/Wind_sound.ogg",
     defaultVolume: 0.4
   },
   {
     id: "forest",
     name: "Bosque",
     icon: <TreePine className="w-5 h-5" />,
-    url: "https://cdn.pixabay.com/audio/2022/02/07/audio_f6e0e7aa39.mp3",
+    url: "https://upload.wikimedia.org/wikipedia/commons/f/f4/Binaural_Forest_soundscape.ogg",
     defaultVolume: 0.5
   },
   {
     id: "birds",
     name: "Pájaros",
     icon: <Bird className="w-5 h-5" />,
-    url: "https://cdn.pixabay.com/audio/2024/02/20/audio_c72cdfb4f2.mp3",
+    url: "https://upload.wikimedia.org/wikipedia/commons/4/45/A_bird_singing.ogg",
     defaultVolume: 0.4
   },
 ];
@@ -139,18 +139,24 @@ export const AmbientSoundMixer = ({ isPlaying, masterVolume }: AmbientSoundMixer
       
       try {
         const audio = new Audio();
-        audio.crossOrigin = "anonymous";
         audio.loop = true;
+        audio.preload = "auto";
         
         // Wait for the audio to be loaded
         await new Promise<void>((resolve, reject) => {
-          audio.oncanplaythrough = () => resolve();
-          audio.onerror = () => reject(new Error("No se pudo cargar el audio"));
+          const timeoutId = setTimeout(() => reject(new Error("Timeout")), 15000);
+          
+          audio.oncanplaythrough = () => {
+            clearTimeout(timeoutId);
+            resolve();
+          };
+          audio.onerror = (e) => {
+            clearTimeout(timeoutId);
+            console.error("Audio load error:", e);
+            reject(new Error("No se pudo cargar el audio"));
+          };
           audio.src = soundConfig.url;
           audio.load();
-          
-          // Timeout after 10 seconds
-          setTimeout(() => reject(new Error("Timeout")), 10000);
         });
         
         const defaultVol = soundConfig.defaultVolume || 0.5;
