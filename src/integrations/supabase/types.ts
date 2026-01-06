@@ -56,6 +56,39 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_activity_logs: {
+        Row: {
+          action: string
+          admin_id: string
+          created_at: string | null
+          details: Json | null
+          id: string
+          ip_address: string | null
+          target_id: string | null
+          target_type: string
+        }
+        Insert: {
+          action: string
+          admin_id: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: string | null
+          target_id?: string | null
+          target_type: string
+        }
+        Update: {
+          action?: string
+          admin_id?: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: string | null
+          target_id?: string | null
+          target_type?: string
+        }
+        Relationships: []
+      }
       argument_cards: {
         Row: {
           autor_id: string | null
@@ -136,6 +169,179 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      content_feedback: {
+        Row: {
+          comentario: string | null
+          content_id: string
+          content_type: string
+          created_at: string | null
+          id: string
+          leido: boolean | null
+          rating: number
+          user_id: string
+        }
+        Insert: {
+          comentario?: string | null
+          content_id: string
+          content_type: string
+          created_at?: string | null
+          id?: string
+          leido?: boolean | null
+          rating: number
+          user_id: string
+        }
+        Update: {
+          comentario?: string | null
+          content_id?: string
+          content_type?: string
+          created_at?: string | null
+          id?: string
+          leido?: boolean | null
+          rating?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      course_lessons: {
+        Row: {
+          contenido: string | null
+          created_at: string | null
+          duracion_min: number | null
+          id: string
+          media_id: string | null
+          module_id: string | null
+          orden: number | null
+          quiz_data: Json | null
+          tipo: string | null
+          titulo: string
+        }
+        Insert: {
+          contenido?: string | null
+          created_at?: string | null
+          duracion_min?: number | null
+          id?: string
+          media_id?: string | null
+          module_id?: string | null
+          orden?: number | null
+          quiz_data?: Json | null
+          tipo?: string | null
+          titulo: string
+        }
+        Update: {
+          contenido?: string | null
+          created_at?: string | null
+          duracion_min?: number | null
+          id?: string
+          media_id?: string | null
+          module_id?: string | null
+          orden?: number | null
+          quiz_data?: Json | null
+          tipo?: string | null
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_lessons_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "media_library"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_lessons_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "course_modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      course_modules: {
+        Row: {
+          course_id: string | null
+          created_at: string | null
+          descripcion: string | null
+          id: string
+          orden: number | null
+          titulo: string
+        }
+        Insert: {
+          course_id?: string | null
+          created_at?: string | null
+          descripcion?: string | null
+          id?: string
+          orden?: number | null
+          titulo: string
+        }
+        Update: {
+          course_id?: string | null
+          created_at?: string | null
+          descripcion?: string | null
+          id?: string
+          orden?: number | null
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_modules_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      courses: {
+        Row: {
+          categoria: string
+          created_at: string | null
+          descripcion: string | null
+          duracion_total_min: number | null
+          id: string
+          imagen_url: string | null
+          instructor_id: string | null
+          metadata: Json | null
+          nivel: string | null
+          orden: number | null
+          precio: number | null
+          publicado: boolean | null
+          titulo: string
+          updated_at: string | null
+        }
+        Insert: {
+          categoria: string
+          created_at?: string | null
+          descripcion?: string | null
+          duracion_total_min?: number | null
+          id?: string
+          imagen_url?: string | null
+          instructor_id?: string | null
+          metadata?: Json | null
+          nivel?: string | null
+          orden?: number | null
+          precio?: number | null
+          publicado?: boolean | null
+          titulo: string
+          updated_at?: string | null
+        }
+        Update: {
+          categoria?: string
+          created_at?: string | null
+          descripcion?: string | null
+          duracion_total_min?: number | null
+          id?: string
+          imagen_url?: string | null
+          instructor_id?: string | null
+          metadata?: Json | null
+          nivel?: string | null
+          orden?: number | null
+          precio?: number | null
+          publicado?: boolean | null
+          titulo?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       daily_content: {
         Row: {
@@ -391,6 +597,214 @@ export type Database = {
           titulo?: string
         }
         Relationships: []
+      }
+      live_session_registrations: {
+        Row: {
+          asistio: boolean | null
+          id: string
+          registered_at: string | null
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          asistio?: boolean | null
+          id?: string
+          registered_at?: string | null
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          asistio?: boolean | null
+          id?: string
+          registered_at?: string | null
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "live_session_registrations_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "live_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      live_sessions: {
+        Row: {
+          categoria: string | null
+          created_at: string | null
+          descripcion: string | null
+          duracion_estimada_min: number | null
+          estado: string | null
+          id: string
+          imagen_url: string | null
+          instructor_id: string | null
+          max_participants: number | null
+          metadata: Json | null
+          precio: number | null
+          recording_url: string | null
+          scheduled_at: string
+          titulo: string
+        }
+        Insert: {
+          categoria?: string | null
+          created_at?: string | null
+          descripcion?: string | null
+          duracion_estimada_min?: number | null
+          estado?: string | null
+          id?: string
+          imagen_url?: string | null
+          instructor_id?: string | null
+          max_participants?: number | null
+          metadata?: Json | null
+          precio?: number | null
+          recording_url?: string | null
+          scheduled_at: string
+          titulo: string
+        }
+        Update: {
+          categoria?: string | null
+          created_at?: string | null
+          descripcion?: string | null
+          duracion_estimada_min?: number | null
+          estado?: string | null
+          id?: string
+          imagen_url?: string | null
+          instructor_id?: string | null
+          max_participants?: number | null
+          metadata?: Json | null
+          precio?: number | null
+          recording_url?: string | null
+          scheduled_at?: string
+          titulo?: string
+        }
+        Relationships: []
+      }
+      media_library: {
+        Row: {
+          created_at: string | null
+          descripcion: string | null
+          duracion_segundos: number | null
+          estado: Database["public"]["Enums"]["content_estado"] | null
+          formato: string | null
+          id: string
+          metadata: Json | null
+          size_bytes: number | null
+          subido_por: string | null
+          tags: string[] | null
+          thumbnail_url: string | null
+          tipo: string
+          titulo: string
+          updated_at: string | null
+          url: string
+        }
+        Insert: {
+          created_at?: string | null
+          descripcion?: string | null
+          duracion_segundos?: number | null
+          estado?: Database["public"]["Enums"]["content_estado"] | null
+          formato?: string | null
+          id?: string
+          metadata?: Json | null
+          size_bytes?: number | null
+          subido_por?: string | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          tipo: string
+          titulo: string
+          updated_at?: string | null
+          url: string
+        }
+        Update: {
+          created_at?: string | null
+          descripcion?: string | null
+          duracion_segundos?: number | null
+          estado?: Database["public"]["Enums"]["content_estado"] | null
+          formato?: string | null
+          id?: string
+          metadata?: Json | null
+          size_bytes?: number | null
+          subido_por?: string | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          tipo?: string
+          titulo?: string
+          updated_at?: string | null
+          url?: string
+        }
+        Relationships: []
+      }
+      movies: {
+        Row: {
+          anio: number | null
+          categoria: string | null
+          clasificacion: string | null
+          created_at: string | null
+          descripcion: string | null
+          destacada: boolean | null
+          director: string | null
+          duracion_min: number | null
+          id: string
+          imagen_banner: string | null
+          imagen_poster: string | null
+          media_id: string | null
+          metadata: Json | null
+          orden: number | null
+          publicada: boolean | null
+          sinopsis: string | null
+          titulo: string
+          trailer_url: string | null
+        }
+        Insert: {
+          anio?: number | null
+          categoria?: string | null
+          clasificacion?: string | null
+          created_at?: string | null
+          descripcion?: string | null
+          destacada?: boolean | null
+          director?: string | null
+          duracion_min?: number | null
+          id?: string
+          imagen_banner?: string | null
+          imagen_poster?: string | null
+          media_id?: string | null
+          metadata?: Json | null
+          orden?: number | null
+          publicada?: boolean | null
+          sinopsis?: string | null
+          titulo: string
+          trailer_url?: string | null
+        }
+        Update: {
+          anio?: number | null
+          categoria?: string | null
+          clasificacion?: string | null
+          created_at?: string | null
+          descripcion?: string | null
+          destacada?: boolean | null
+          director?: string | null
+          duracion_min?: number | null
+          id?: string
+          imagen_banner?: string | null
+          imagen_poster?: string | null
+          media_id?: string | null
+          metadata?: Json | null
+          orden?: number | null
+          publicada?: boolean | null
+          sinopsis?: string | null
+          titulo?: string
+          trailer_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "movies_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "media_library"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       novenas: {
         Row: {
@@ -740,6 +1154,83 @@ export type Database = {
           },
         ]
       }
+      user_content_history: {
+        Row: {
+          completado: boolean | null
+          content_id: string
+          content_type: string
+          first_accessed: string | null
+          id: string
+          last_accessed: string | null
+          tiempo_total_seg: number | null
+          user_id: string
+          visitas: number | null
+        }
+        Insert: {
+          completado?: boolean | null
+          content_id: string
+          content_type: string
+          first_accessed?: string | null
+          id?: string
+          last_accessed?: string | null
+          tiempo_total_seg?: number | null
+          user_id: string
+          visitas?: number | null
+        }
+        Update: {
+          completado?: boolean | null
+          content_id?: string
+          content_type?: string
+          first_accessed?: string | null
+          id?: string
+          last_accessed?: string | null
+          tiempo_total_seg?: number | null
+          user_id?: string
+          visitas?: number | null
+        }
+        Relationships: []
+      }
+      user_course_progress: {
+        Row: {
+          certificado_emitido: boolean | null
+          course_id: string
+          fecha_completado: string | null
+          fecha_inicio: string | null
+          id: string
+          lessons_completed: string[] | null
+          progreso_porcentaje: number | null
+          user_id: string
+        }
+        Insert: {
+          certificado_emitido?: boolean | null
+          course_id: string
+          fecha_completado?: string | null
+          fecha_inicio?: string | null
+          id?: string
+          lessons_completed?: string[] | null
+          progreso_porcentaje?: number | null
+          user_id: string
+        }
+        Update: {
+          certificado_emitido?: boolean | null
+          course_id?: string
+          fecha_completado?: string | null
+          fecha_inicio?: string | null
+          id?: string
+          lessons_completed?: string[] | null
+          progreso_porcentaje?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_course_progress_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_lesson_progress: {
         Row: {
           completado: boolean | null
@@ -771,6 +1262,41 @@ export type Database = {
             columns: ["lesson_id"]
             isOneToOne: false
             referencedRelation: "library_lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_movie_history: {
+        Row: {
+          completada: boolean | null
+          id: string
+          last_watched: string | null
+          movie_id: string
+          tiempo_visto_seg: number | null
+          user_id: string
+        }
+        Insert: {
+          completada?: boolean | null
+          id?: string
+          last_watched?: string | null
+          movie_id: string
+          tiempo_visto_seg?: number | null
+          user_id: string
+        }
+        Update: {
+          completada?: boolean | null
+          id?: string
+          last_watched?: string | null
+          movie_id?: string
+          tiempo_visto_seg?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_movie_history_movie_id_fkey"
+            columns: ["movie_id"]
+            isOneToOne: false
+            referencedRelation: "movies"
             referencedColumns: ["id"]
           },
         ]
@@ -1078,6 +1604,13 @@ export type Database = {
           success_rate: number
           total_jobs: number
         }[]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
       }
     }
     Enums: {
