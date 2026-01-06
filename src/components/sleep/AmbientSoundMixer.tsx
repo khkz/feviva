@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { 
@@ -9,71 +9,71 @@ import {
   TreePine,
   Bird,
   Volume2,
-  VolumeX,
-  Music
+  Music,
+  Loader2
 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface AmbientSound {
   id: string;
   name: string;
   icon: React.ReactNode;
   url: string;
-  autoPlay?: boolean; // Auto-activate for sleep stories
+  autoPlay?: boolean;
   defaultVolume?: number;
 }
 
-// Using free ambient sounds - prioritizing soft music for sleep
+// Using reliable CDN sources for ambient sounds
 const AMBIENT_SOUNDS: AmbientSound[] = [
   {
     id: "soft-piano",
-    name: "Piano suave",
+    name: "Piano",
     icon: <Music className="w-5 h-5" />,
-    // Relaxing piano music from archive.org (public domain)
-    url: "https://ia800500.us.archive.org/7/items/relaxing-piano-music/Relaxing_Piano_Music_Sleep_Music.mp3",
-    autoPlay: true,
-    defaultVolume: 0.25
+    url: "https://cdn.pixabay.com/audio/2024/11/10/audio_b86eb827d6.mp3",
+    autoPlay: false,
+    defaultVolume: 0.4
   },
   {
     id: "rain",
     name: "Lluvia",
     icon: <CloudRain className="w-5 h-5" />,
-    url: "https://soundbible.com/mp3/Rain-SoundBible.com-2065722324.mp3",
-    defaultVolume: 0.3
+    url: "https://cdn.pixabay.com/audio/2022/05/31/audio_e4986c1c9d.mp3",
+    defaultVolume: 0.5
   },
   {
     id: "waves",
     name: "Olas",
     icon: <Waves className="w-5 h-5" />,
-    url: "https://soundbible.com/mp3/Ocean_Waves-Mike_Koenig-980635527.mp3",
-    defaultVolume: 0.3
+    url: "https://cdn.pixabay.com/audio/2024/08/21/audio_d37e16cd10.mp3",
+    defaultVolume: 0.5
   },
   {
     id: "fire",
     name: "Fuego",
     icon: <Flame className="w-5 h-5" />,
-    url: "https://soundbible.com/mp3/Campfire-SoundBible.com-1933636465.mp3",
-    defaultVolume: 0.4
+    url: "https://cdn.pixabay.com/audio/2022/10/30/audio_db2bbf4f26.mp3",
+    defaultVolume: 0.5
   },
   {
     id: "wind",
     name: "Viento",
     icon: <Wind className="w-5 h-5" />,
-    url: "https://soundbible.com/mp3/Wind-Mark_DiAngelo-1940285615.mp3",
-    defaultVolume: 0.3
+    url: "https://cdn.pixabay.com/audio/2024/02/12/audio_8ea0d38f42.mp3",
+    defaultVolume: 0.4
   },
   {
     id: "forest",
     name: "Bosque",
     icon: <TreePine className="w-5 h-5" />,
-    url: "https://soundbible.com/mp3/Rainforest_Ambience-GlorySunz-1938133500.mp3",
-    defaultVolume: 0.3
+    url: "https://cdn.pixabay.com/audio/2022/02/07/audio_f6e0e7aa39.mp3",
+    defaultVolume: 0.5
   },
   {
     id: "birds",
     name: "Pájaros",
     icon: <Bird className="w-5 h-5" />,
-    url: "https://soundbible.com/mp3/Songbird-SoundBible.com-192809392.mp3",
-    defaultVolume: 0.25
+    url: "https://cdn.pixabay.com/audio/2024/02/20/audio_c72cdfb4f2.mp3",
+    defaultVolume: 0.4
   },
 ];
 
@@ -92,42 +92,8 @@ export const AmbientSoundMixer = ({ isPlaying, masterVolume }: AmbientSoundMixer
   const [activeSounds, setActiveSounds] = useState<Map<string, ActiveSound>>(new Map());
   const [soundVolumes, setSoundVolumes] = useState<Map<string, number>>(new Map());
   const [isExpanded, setIsExpanded] = useState(false);
-  const [hasInitialized, setHasInitialized] = useState(false);
-  const audioRefs = useRef<Map<string, HTMLAudioElement>>(new Map());
-
-  // Auto-activate soft background music on first play
-  useEffect(() => {
-    if (isPlaying && !hasInitialized) {
-      setHasInitialized(true);
-      
-      // Auto-activate sounds marked with autoPlay
-      const autoPlaySounds = AMBIENT_SOUNDS.filter(s => s.autoPlay);
-      const newActiveSounds = new Map(activeSounds);
-      const newVolumes = new Map(soundVolumes);
-      
-      autoPlaySounds.forEach(soundConfig => {
-        if (!activeSounds.has(soundConfig.id)) {
-          const audio = new Audio(soundConfig.url);
-          audio.loop = true;
-          const volume = soundConfig.defaultVolume || 0.3;
-          audio.volume = volume * masterVolume;
-          audio.play().catch(console.error);
-          
-          newActiveSounds.set(soundConfig.id, {
-            id: soundConfig.id,
-            volume,
-            audio
-          });
-          newVolumes.set(soundConfig.id, volume);
-        }
-      });
-      
-      if (newActiveSounds.size > activeSounds.size) {
-        setActiveSounds(newActiveSounds);
-        setSoundVolumes(newVolumes);
-      }
-    }
-  }, [isPlaying, hasInitialized, masterVolume]);
+  const [loadingSounds, setLoadingSounds] = useState<Set<string>>(new Set());
+  const { toast } = useToast();
 
   // Update volumes when master volume changes
   useEffect(() => {
@@ -140,7 +106,7 @@ export const AmbientSoundMixer = ({ isPlaying, masterVolume }: AmbientSoundMixer
   useEffect(() => {
     activeSounds.forEach((sound) => {
       if (isPlaying) {
-        sound.audio.play().catch(console.error);
+        sound.audio.play().catch(() => {});
       } else {
         sound.audio.pause();
       }
@@ -157,7 +123,7 @@ export const AmbientSoundMixer = ({ isPlaying, masterVolume }: AmbientSoundMixer
     };
   }, []);
 
-  const toggleSound = (soundConfig: AmbientSound) => {
+  const toggleSound = async (soundConfig: AmbientSound) => {
     const existing = activeSounds.get(soundConfig.id);
     
     if (existing) {
@@ -168,27 +134,57 @@ export const AmbientSoundMixer = ({ isPlaying, masterVolume }: AmbientSoundMixer
       newActiveSounds.delete(soundConfig.id);
       setActiveSounds(newActiveSounds);
     } else {
-      // Add sound
-      const audio = new Audio(soundConfig.url);
-      audio.loop = true;
-      const defaultVol = soundConfig.defaultVolume || 0.5;
-      audio.volume = defaultVol * masterVolume;
+      // Add sound - show loading state
+      setLoadingSounds(prev => new Set(prev).add(soundConfig.id));
       
-      if (isPlaying) {
-        audio.play().catch(console.error);
+      try {
+        const audio = new Audio();
+        audio.crossOrigin = "anonymous";
+        audio.loop = true;
+        
+        // Wait for the audio to be loaded
+        await new Promise<void>((resolve, reject) => {
+          audio.oncanplaythrough = () => resolve();
+          audio.onerror = () => reject(new Error("No se pudo cargar el audio"));
+          audio.src = soundConfig.url;
+          audio.load();
+          
+          // Timeout after 10 seconds
+          setTimeout(() => reject(new Error("Timeout")), 10000);
+        });
+        
+        const defaultVol = soundConfig.defaultVolume || 0.5;
+        audio.volume = defaultVol * masterVolume;
+        
+        // Always try to play immediately when toggled on
+        await audio.play();
+        
+        const newActiveSounds = new Map(activeSounds);
+        newActiveSounds.set(soundConfig.id, {
+          id: soundConfig.id,
+          volume: defaultVol,
+          audio
+        });
+        setActiveSounds(newActiveSounds);
+        
+        const newVolumes = new Map(soundVolumes);
+        newVolumes.set(soundConfig.id, defaultVol);
+        setSoundVolumes(newVolumes);
+        
+      } catch (error) {
+        console.error("Error loading sound:", error);
+        toast({
+          title: "Error de audio",
+          description: `No se pudo reproducir "${soundConfig.name}". Intenta con otro sonido.`,
+          variant: "destructive"
+        });
+      } finally {
+        setLoadingSounds(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(soundConfig.id);
+          return newSet;
+        });
       }
-      
-      const newActiveSounds = new Map(activeSounds);
-      newActiveSounds.set(soundConfig.id, {
-        id: soundConfig.id,
-        volume: defaultVol,
-        audio
-      });
-      setActiveSounds(newActiveSounds);
-      
-      const newVolumes = new Map(soundVolumes);
-      newVolumes.set(soundConfig.id, defaultVol);
-      setSoundVolumes(newVolumes);
     }
   };
 
@@ -205,7 +201,7 @@ export const AmbientSoundMixer = ({ isPlaying, masterVolume }: AmbientSoundMixer
   const activeCount = activeSounds.size;
 
   return (
-    <div className="w-full max-w-sm space-y-3">
+    <div className="w-full space-y-3">
       {/* Toggle button */}
       <Button
         variant="ghost"
@@ -227,18 +223,24 @@ export const AmbientSoundMixer = ({ isPlaying, masterVolume }: AmbientSoundMixer
       {isExpanded && (
         <div className="bg-card/50 rounded-lg p-4 space-y-4 border border-border/30">
           {/* Sound buttons grid */}
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
             {AMBIENT_SOUNDS.map((sound) => {
               const isActive = activeSounds.has(sound.id);
+              const isLoading = loadingSounds.has(sound.id);
               return (
                 <Button
                   key={sound.id}
                   variant={isActive ? "default" : "outline"}
                   size="sm"
                   onClick={() => toggleSound(sound)}
+                  disabled={isLoading}
                   className="flex flex-col items-center gap-1 h-auto py-3"
                 >
-                  {sound.icon}
+                  {isLoading ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    sound.icon
+                  )}
                   <span className="text-xs">{sound.name}</span>
                 </Button>
               );
