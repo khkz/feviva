@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Search, Heart, ChevronRight, BookOpen, Loader2 } from "lucide-react";
+import { Search, Heart, ChevronRight, BookOpen, Moon, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -81,6 +81,12 @@ export default function Oraciones() {
             <Button variant="secondary" size="sm" className="gap-2 whitespace-nowrap">
               <BookOpen className="h-4 w-4" />
               Santo Rosario
+            </Button>
+          </Link>
+          <Link to="/sleep">
+            <Button variant="secondary" size="sm" className="gap-2 whitespace-nowrap">
+              <Moon className="h-4 w-4" />
+              Sleep Stories
             </Button>
           </Link>
         </div>
