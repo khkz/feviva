@@ -3,8 +3,10 @@ import { X, Heart, Play, Pause, Volume2, Info, Loader2, Share2 } from "lucide-re
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
+import { Slider } from "@/components/ui/slider";
 import { useOracionAudio } from "@/hooks/useOracionAudio";
 import { ShareModal } from "@/components/shared/ShareModal";
+import { AmbientSoundMixer } from "@/components/sleep/AmbientSoundMixer";
 import { cn } from "@/lib/utils";
 
 interface OracionDetailProps {
@@ -32,6 +34,7 @@ export function OracionDetail({
 }: OracionDetailProps) {
   const [showHistory, setShowHistory] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [masterVolume, setMasterVolume] = useState(0.5);
   
   const {
     isGenerating,
@@ -114,6 +117,26 @@ export function OracionDetail({
               )}
             </div>
           )}
+
+          {/* Ambient Sound Mixer */}
+          <div className="mt-8">
+            <AmbientSoundMixer isPlaying={true} masterVolume={masterVolume} />
+            
+            {/* Master Volume Control */}
+            <div className="mt-4 flex items-center gap-3">
+              <Volume2 className="h-4 w-4 text-muted-foreground" />
+              <Slider
+                value={[masterVolume]}
+                max={1}
+                step={0.1}
+                onValueChange={(value) => setMasterVolume(value[0])}
+                className="flex-1"
+              />
+              <span className="text-xs text-muted-foreground w-8 text-right">
+                {Math.round(masterVolume * 100)}%
+              </span>
+            </div>
+          </div>
         </div>
       </ScrollArea>
 
