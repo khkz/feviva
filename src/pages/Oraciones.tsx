@@ -41,6 +41,7 @@ export default function Oraciones() {
   if (selected) {
     return (
       <OracionDetail
+        id={selected.id}
         nombre={selected.nombre}
         texto={selected.texto}
         categoria={selected.categoria}

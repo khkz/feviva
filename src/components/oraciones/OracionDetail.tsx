@@ -1,10 +1,13 @@
-import { useState, useEffect, useRef } from "react";
-import { X, Heart, Play, Pause, Volume2, Info } from "lucide-react";
+import { useState } from "react";
+import { X, Heart, Play, Pause, Volume2, Info, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Progress } from "@/components/ui/progress";
+import { useOracionAudio } from "@/hooks/useOracionAudio";
 import { cn } from "@/lib/utils";
 
 interface OracionDetailProps {
+  id: string;
   nombre: string;
   texto: string;
   categoria: string;
@@ -16,41 +19,30 @@ interface OracionDetailProps {
 }
 
 export function OracionDetail({
+  id,
   nombre,
   texto,
   categoria,
   historia,
-  audioUrl,
+  audioUrl: existingAudioUrl,
   isFavorite = false,
   onToggleFavorite,
   onClose,
 }: OracionDetailProps) {
-  const [isPlaying, setIsPlaying] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  useEffect(() => {
-    if (audioUrl) {
-      audioRef.current = new Audio(audioUrl);
-      audioRef.current.onended = () => setIsPlaying(false);
-    }
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
-    };
-  }, [audioUrl]);
-
-  const handlePlayPause = () => {
-    if (!audioRef.current) return;
-    
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play();
-    }
-    setIsPlaying(!isPlaying);
-  };
+  
+  const {
+    isGenerating,
+    isPlaying,
+    progress,
+    toggle,
+    hasAudio,
+  } = useOracionAudio({
+    oracionId: id,
+    nombre,
+    texto,
+    existingAudioUrl,
+  });
 
   return (
     <div className="fixed inset-0 z-50 bg-background flex flex-col">
@@ -115,15 +107,23 @@ export function OracionDetail({
       </ScrollArea>
 
       {/* Audio Controls */}
-      {audioUrl && (
-        <div className="p-4 border-t border-border bg-card">
-          <div className="max-w-lg mx-auto flex items-center justify-center gap-4">
+      <div className="p-4 border-t border-border bg-card">
+        <div className="max-w-lg mx-auto">
+          {/* Progress bar */}
+          {(isPlaying || progress > 0) && (
+            <Progress value={progress} className="h-1 mb-4" />
+          )}
+          
+          <div className="flex items-center justify-center gap-4">
             <Button
               size="lg"
               className="h-14 w-14 rounded-full"
-              onClick={handlePlayPause}
+              onClick={toggle}
+              disabled={isGenerating}
             >
-              {isPlaying ? (
+              {isGenerating ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : isPlaying ? (
                 <Pause className="h-6 w-6" />
               ) : (
                 <Play className="h-6 w-6 ml-1" />
@@ -131,11 +131,19 @@ export function OracionDetail({
             </Button>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Volume2 className="h-4 w-4" />
-              <span>Escuchar oración</span>
+              <span>
+                {isGenerating 
+                  ? "Generando audio..." 
+                  : isPlaying 
+                    ? "Reproduciendo" 
+                    : hasAudio 
+                      ? "Escuchar oración" 
+                      : "Generar y escuchar"}
+              </span>
             </div>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
