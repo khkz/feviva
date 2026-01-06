@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, BookOpen } from "lucide-react";
+import { ArrowLeft, BookOpen, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -9,13 +9,63 @@ import { NovenaDiaDetail } from "@/components/novenas/NovenaDiaDetail";
 import { useNovenas, Novena } from "@/hooks/useNovenas";
 import { useNotifications } from "@/hooks/useNotifications";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Novenas = () => {
   const navigate = useNavigate();
   const { novenas, loading, startNovena, completeDia, getProgressForNovena, refetch, refetchNovenas } = useNovenas();
   const { checkPendingReminders } = useNotifications();
+  const { toast } = useToast();
   const [selectedNovena, setSelectedNovena] = useState<Novena | null>(null);
   const [activeTab, setActiveTab] = useState("todas");
+  const [isGeneratingAll, setIsGeneratingAll] = useState(false);
+  const [generationProgress, setGenerationProgress] = useState({ current: 0, total: 0 });
+
+  const novenasWithoutImage = novenas.filter(n => !n.imagen_url);
+
+  const generateAllImages = async () => {
+    if (novenasWithoutImage.length === 0) {
+      toast({
+        title: "Todas las novenas tienen imagen",
+        description: "No hay novenas pendientes de generar imagen",
+      });
+      return;
+    }
+
+    setIsGeneratingAll(true);
+    setGenerationProgress({ current: 0, total: novenasWithoutImage.length });
+
+    let successCount = 0;
+    for (let i = 0; i < novenasWithoutImage.length; i++) {
+      const novena = novenasWithoutImage[i];
+      setGenerationProgress({ current: i + 1, total: novenasWithoutImage.length });
+      
+      try {
+        const { error } = await supabase.functions.invoke('generate-novena-image', {
+          body: {
+            novenaId: novena.id,
+            titulo: novena.titulo,
+            descripcion: novena.descripcion
+          }
+        });
+
+        if (!error) {
+          successCount++;
+        }
+      } catch (error) {
+        console.error(`Error generating image for ${novena.titulo}:`, error);
+      }
+    }
+
+    setIsGeneratingAll(false);
+    refetchNovenas();
+    
+    toast({
+      title: "Generación completada",
+      description: `Se generaron ${successCount} de ${novenasWithoutImage.length} imágenes`,
+    });
+  };
 
   // Check for pending reminders on mount
   useEffect(() => {
@@ -73,16 +123,40 @@ const Novenas = () => {
     <div className="min-h-screen bg-background pb-20">
       <div className="container max-w-lg mx-auto p-4 space-y-6">
         {/* Header */}
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/oraciones")}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold">Novenas</h1>
-            <p className="text-muted-foreground text-sm">
-              9 días de oración continua
-            </p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={() => navigate("/oraciones")}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div>
+              <h1 className="text-2xl font-bold">Novenas</h1>
+              <p className="text-muted-foreground text-sm">
+                9 días de oración continua
+              </p>
+            </div>
           </div>
+          
+          {novenasWithoutImage.length > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={generateAllImages}
+              disabled={isGeneratingAll}
+              className="shrink-0"
+            >
+              {isGeneratingAll ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  {generationProgress.current}/{generationProgress.total}
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Generar imágenes ({novenasWithoutImage.length})
+                </>
+              )}
+            </Button>
+          )}
         </div>
 
         {/* Info Card */}
