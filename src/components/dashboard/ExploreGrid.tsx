@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { MessageCircle, BookOpen, Users, Target } from "lucide-react";
+import { motion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 import coachImage from "@/assets/coach-section.jpg";
 import libraryImage from "@/assets/library-section.jpg";
@@ -45,21 +46,55 @@ const exploreItems: ExploreItem[] = [
   },
 ];
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.3,
+    },
+  },
+} as const;
+
+const cardVariants = {
+  hidden: { opacity: 0, scale: 0.8, y: 20 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { type: "spring" as const, stiffness: 200, damping: 20 },
+  },
+} as const;
+
 export function ExploreGrid() {
   const navigate = useNavigate();
 
   return (
-    <section className="px-5 py-4">
+    <motion.section 
+      className="px-5 py-4"
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: 1.4 }}
+    >
       <h2 className="font-heading text-lg font-semibold text-foreground mb-3">
         Explora
       </h2>
 
-      <div className="grid grid-cols-2 gap-3">
+      <motion.div 
+        className="grid grid-cols-2 gap-3"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
         {exploreItems.map((item) => (
-          <button
+          <motion.button
             key={item.path}
             onClick={() => navigate(item.path)}
-            className="relative h-32 rounded-2xl overflow-hidden transition-smooth hover:scale-[1.02] active:scale-[0.98]"
+            className="relative h-32 rounded-2xl overflow-hidden"
+            variants={cardVariants}
+            whileHover={{ scale: 1.03, y: -2 }}
+            whileTap={{ scale: 0.97 }}
           >
             {/* Background Image */}
             <img
@@ -78,9 +113,9 @@ export function ExploreGrid() {
               </div>
               <p className="text-white/70 text-xs">{item.description}</p>
             </div>
-          </button>
+          </motion.button>
         ))}
-      </div>
-    </section>
+      </motion.div>
+    </motion.section>
   );
 }
