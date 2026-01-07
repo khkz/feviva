@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Heart, Play, Pause, BookOpen } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Heart, Play, Pause, ChevronRight, Volume2 } from "lucide-react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -50,44 +50,64 @@ export function OracionCard({
   };
 
   // Get first line preview
-  const preview = texto.split('\n')[0].substring(0, 60) + (texto.length > 60 ? "..." : "");
+  const preview = texto.split('\n')[0].substring(0, 80) + (texto.length > 80 ? "..." : "");
 
   return (
-    <Card 
+    <motion.div 
       className={cn(
-        "cursor-pointer transition-smooth hover:shadow-medium group",
-        "border-border/50 hover:border-primary/30"
+        "relative cursor-pointer overflow-hidden",
+        "rounded-2xl border border-border/50",
+        "bg-gradient-to-br from-card to-card/80",
+        "transition-all duration-300",
+        "hover:shadow-medium hover:border-primary/20",
+        "active:scale-[0.98]",
+        "group"
       )}
       onClick={onSelect}
+      whileHover={{ y: -2 }}
+      whileTap={{ scale: 0.98 }}
     >
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between gap-3">
+      {/* Subtle gradient overlay on hover */}
+      <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+      
+      <div className="relative p-4">
+        <div className="flex items-start gap-3">
+          {/* Content */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="text-xs font-medium text-muted-foreground bg-muted/80 px-2 py-0.5 rounded-full">
                 {subcategoria || categoria}
               </span>
+              {audioUrl && (
+                <span className="text-xs text-primary flex items-center gap-1">
+                  <Volume2 className="h-3 w-3" />
+                  Audio
+                </span>
+              )}
             </div>
-            <h3 className="font-heading font-semibold text-foreground truncate group-hover:text-primary transition-smooth">
+            <h3 className="font-heading font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1">
               {nombre}
             </h3>
-            <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+            <p className="text-sm text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
               {preview}
             </p>
           </div>
           
-          <div className="flex flex-col gap-2">
+          {/* Actions */}
+          <div className="flex flex-col items-center gap-1">
             <Button
               variant="ghost"
               size="icon"
               className={cn(
-                "h-8 w-8",
-                isFavorite && "text-destructive"
+                "h-9 w-9 rounded-full",
+                isFavorite 
+                  ? "text-destructive hover:text-destructive/80" 
+                  : "text-muted-foreground hover:text-destructive"
               )}
               onClick={handleFavorite}
             >
               <Heart 
-                className="h-4 w-4" 
+                className="h-5 w-5 transition-transform group-hover:scale-110" 
                 fill={isFavorite ? "currentColor" : "none"}
               />
             </Button>
@@ -96,19 +116,25 @@ export function OracionCard({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 text-primary"
+                className="h-9 w-9 rounded-full text-primary hover:bg-primary/10"
                 onClick={handlePlayPause}
               >
                 {isPlaying ? (
-                  <Pause className="h-4 w-4" />
+                  <Pause className="h-5 w-5" />
                 ) : (
-                  <Play className="h-4 w-4" />
+                  <Play className="h-5 w-5 ml-0.5" />
                 )}
               </Button>
             )}
           </div>
         </div>
-      </CardContent>
-    </Card>
+        
+        {/* Bottom action hint */}
+        <div className="flex items-center justify-end mt-2 text-xs text-muted-foreground/60 group-hover:text-primary/60 transition-colors">
+          <span className="mr-1">Rezar</span>
+          <ChevronRight className="h-3 w-3" />
+        </div>
+      </div>
+    </motion.div>
   );
 }
