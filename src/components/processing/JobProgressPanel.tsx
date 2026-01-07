@@ -68,40 +68,48 @@ export const JobProgressPanel = ({
 
   // Auto-procesamiento con delay de 30 segundos
   useEffect(() => {
-    if (autoProcess && stats.pending > 0 && stats.processing === 0) {
-      // Iniciar countdown de 30 segundos
-      setCountdown(30);
-      
-      countdownRef.current = setInterval(() => {
-        setCountdown(prev => {
-          if (prev <= 1) {
-            if (countdownRef.current) clearInterval(countdownRef.current);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-
-      timerRef.current = setTimeout(() => {
-        if (stats.pending > 0) {
-          triggerProcessing();
-        }
-      }, 30000);
+    // Limpiar timers anteriores
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
     }
+    if (countdownRef.current) {
+      clearInterval(countdownRef.current);
+      countdownRef.current = null;
+    }
+
+    // Si no está activo o no hay pendientes, salir
+    if (!autoProcess || stats.pending === 0) {
+      setCountdown(0);
+      return;
+    }
+
+    // Si hay algo procesando, esperar
+    if (stats.processing > 0) {
+      setCountdown(0);
+      return;
+    }
+
+    // Iniciar countdown de 30 segundos
+    console.log('Auto-process: iniciando countdown de 30s, pendientes:', stats.pending);
+    setCountdown(30);
+    
+    countdownRef.current = setInterval(() => {
+      setCountdown(prev => Math.max(0, prev - 1));
+    }, 1000);
+
+    timerRef.current = setTimeout(async () => {
+      console.log('Auto-process: ejecutando triggerProcessing');
+      await triggerProcessing();
+      // Refetch para actualizar stats
+      setTimeout(() => refetch(), 2000);
+    }, 30000);
 
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
       if (countdownRef.current) clearInterval(countdownRef.current);
     };
-  }, [autoProcess, stats.pending, stats.processing, triggerProcessing]);
-
-  // Detener auto-proceso cuando no hay más pendientes
-  useEffect(() => {
-    if (autoProcess && stats.pending === 0) {
-      setAutoProcess(false);
-      setCountdown(0);
-    }
-  }, [autoProcess, stats.pending]);
+  }, [autoProcess, stats.pending, stats.processing, triggerProcessing, refetch]);
 
   if (loading) {
     return (
