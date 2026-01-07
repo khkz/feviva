@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Sparkles, ArrowLeft, Send, BookOpen, Heart, Brain, TrendingUp, X } from "lucide-react";
+import { Sparkles, ArrowLeft, Send, BookOpen, Heart, Brain, TrendingUp, X, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useUserStats } from "@/hooks/useUserStats";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -289,28 +289,101 @@ const Coach = () => {
     }
   };
 
+  // Add suggestion example to input
+  const addToInput = (text: string) => {
+    setInput((prev) => prev ? `${prev}\n\n${text}` : text);
+    if (isMobile) {
+      setShowSuggestions(false);
+    }
+    toast({
+      title: "Sugerencia añadida",
+      description: "Revisa y personaliza tu respuesta",
+    });
+  };
+
+  // Add all suggestions to input
+  const addAllSuggestions = () => {
+    if (!suggestion) return;
+    const allExamples = suggestion.sugerencias.map(s => s.ejemplo).join("\n\n");
+    setInput(allExamples);
+    if (isMobile) {
+      setShowSuggestions(false);
+    }
+    toast({
+      title: "Todas las sugerencias añadidas",
+      description: "Revisa y personaliza tu respuesta",
+    });
+  };
+
   // Suggestions content component (reused in Sheet and Card)
   const SuggestionsContent = () => (
     <div className="space-y-4">
       <div className="glass-card p-3 rounded-lg">
-        <h4 className="font-medium text-sm mb-1">Argumento Clave</h4>
-        <p className="text-sm text-muted-foreground">{suggestion?.argumento_clave}</p>
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1">
+            <h4 className="font-medium text-sm mb-1">Argumento Clave</h4>
+            <p className="text-sm text-muted-foreground">{suggestion?.argumento_clave}</p>
+          </div>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-7 px-2 text-xs shrink-0"
+            onClick={() => addToInput(suggestion?.argumento_clave || "")}
+          >
+            <Plus className="w-3 h-3 mr-1" />
+            Usar
+          </Button>
+        </div>
       </div>
 
       <div className="glass-card p-3 rounded-lg">
-        <h4 className="font-medium text-sm mb-1">Versículo Sugerido</h4>
-        <p className="text-sm text-muted-foreground italic">{suggestion?.versiculo_sugerido}</p>
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1">
+            <h4 className="font-medium text-sm mb-1">Versículo Sugerido</h4>
+            <p className="text-sm text-muted-foreground italic">{suggestion?.versiculo_sugerido}</p>
+          </div>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-7 px-2 text-xs shrink-0"
+            onClick={() => addToInput(suggestion?.versiculo_sugerido || "")}
+          >
+            <Plus className="w-3 h-3 mr-1" />
+            Usar
+          </Button>
+        </div>
       </div>
 
       <div className="space-y-3">
-        <h4 className="font-medium text-sm">Mejora tu respuesta:</h4>
+        <div className="flex items-center justify-between">
+          <h4 className="font-medium text-sm">Mejora tu respuesta:</h4>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="h-7 px-2 text-xs"
+            onClick={addAllSuggestions}
+          >
+            <Plus className="w-3 h-3 mr-1" />
+            Usar todas
+          </Button>
+        </div>
         {suggestion?.sugerencias.map((sug, idx) => (
           <div key={idx} className="border-l-2 border-primary pl-3 space-y-1">
-            <div className="flex items-center gap-2">
-              {sug.categoria === "Fe" && <BookOpen className="w-4 h-4 text-secondary" />}
-              {sug.categoria === "Razón" && <Brain className="w-4 h-4 text-primary" />}
-              {sug.categoria === "Amor" && <Heart className="w-4 h-4 text-secondary" />}
-              <span className="font-medium text-sm">{sug.titulo}</span>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                {sug.categoria === "Fe" && <BookOpen className="w-4 h-4 text-secondary" />}
+                {sug.categoria === "Razón" && <Brain className="w-4 h-4 text-primary" />}
+                {sug.categoria === "Amor" && <Heart className="w-4 h-4 text-secondary" />}
+                <span className="font-medium text-sm">{sug.titulo}</span>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-6 px-2 text-xs shrink-0"
+                onClick={() => addToInput(sug.ejemplo)}
+              >
+                <Plus className="w-3 h-3" />
+              </Button>
             </div>
             <p className="text-sm text-muted-foreground">{sug.consejo}</p>
             <p className="text-xs text-muted-foreground italic">💡 {sug.ejemplo}</p>
