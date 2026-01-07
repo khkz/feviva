@@ -117,7 +117,7 @@ Genera contenido en español.`;
         body: JSON.stringify({
           text: `${parsedContent.versiculo_referencia}. ${parsedContent.versiculo_texto}`,
           filename: `verse-${targetDate}`,
-          voice: 'sage'
+          voice: 'nova'
         }),
       });
 
@@ -137,7 +137,7 @@ Genera contenido en español.`;
         body: JSON.stringify({
           text: `${parsedContent.ensenanza_titulo}. ${parsedContent.ensenanza_contenido}`,
           filename: `teaching-${targetDate}`,
-          voice: 'sage'
+          voice: 'nova'
         }),
       });
 
