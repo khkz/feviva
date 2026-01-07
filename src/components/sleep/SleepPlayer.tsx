@@ -9,8 +9,10 @@ import {
   Volume2, 
   VolumeX,
   Timer,
-  Loader2
+  Loader2,
+  Stars
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { SleepStory } from "@/hooks/useSleepStories";
 import { AmbientSoundMixer } from "./AmbientSoundMixer";
 import { ContentFeedback } from "@/components/feedback/ContentFeedback";
@@ -50,7 +52,6 @@ export const SleepPlayer = ({
   const [showTimerPicker, setShowTimerPicker] = useState(!audioUrl);
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
 
-  // Handle timer countdown
   useEffect(() => {
     let interval: NodeJS.Timeout;
     
@@ -58,7 +59,6 @@ export const SleepPlayer = ({
       interval = setInterval(() => {
         setTimerRemaining((prev) => {
           if (prev === null || prev <= 1) {
-            // Timer finished, stop playback
             if (audioRef.current) {
               audioRef.current.pause();
               setIsPlaying(false);
@@ -84,7 +84,6 @@ export const SleepPlayer = ({
       if (isPlaying) {
         audioRef.current.pause();
       } else {
-        // Start timer if not already running
         if (timerRemaining === null && selectedTimer > 0) {
           setTimerRemaining(selectedTimer * 60);
         }
@@ -162,175 +161,300 @@ export const SleepPlayer = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-background/95 backdrop-blur-lg z-50 flex flex-col">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-border/30">
-        <Button variant="ghost" size="icon" onClick={onClose}>
-          <X className="w-5 h-5" />
-        </Button>
-        <div className="flex items-center gap-2 text-primary">
-          <Moon className="w-5 h-5" />
-          <span className="font-medium">Sleep Story</span>
-        </div>
-        <div className="w-10" />
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 flex flex-col items-center justify-center p-6 overflow-auto">
-        {/* Story artwork */}
-        <div className="w-48 h-48 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center mb-8 animate-pulse">
-          <Moon className="w-24 h-24 text-primary/60" />
-        </div>
-
-        {/* Story info */}
-        <h2 className="text-2xl font-bold text-foreground text-center mb-2">
-          {story.titulo}
-        </h2>
-        <p className="text-muted-foreground text-center max-w-md mb-8">
-          {story.descripcion}
-        </p>
-
-        {/* Timer remaining display */}
-        {timerRemaining !== null && timerRemaining > 0 && (
-          <div className="flex items-center gap-2 text-primary mb-6">
-            <Timer className="w-4 h-4" />
-            <span className="text-sm">
-              Timer: {formatTime(timerRemaining)}
-            </span>
-          </div>
+    <AnimatePresence>
+      <motion.div 
+        className="fixed inset-0 z-50 flex flex-col overflow-hidden"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
+        {/* Deep night gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-b from-indigo-950 via-purple-950 to-slate-950" />
+        
+        {/* Blurred background image if available */}
+        {story.imagen_url && (
+          <motion.div 
+            className="absolute inset-0"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.3 }}
+            transition={{ duration: 1 }}
+          >
+            <img 
+              src={story.imagen_url} 
+              alt="" 
+              className="w-full h-full object-cover blur-3xl scale-110"
+            />
+          </motion.div>
         )}
 
-        {/* Timer picker or Audio controls */}
-        {showTimerPicker ? (
-          <div className="w-full max-w-sm space-y-4">
-            <p className="text-center text-muted-foreground mb-4">
-              ¿Cuánto tiempo quieres escuchar?
-            </p>
-            <div className="grid grid-cols-2 gap-3">
-              {TIMER_OPTIONS.map((option) => (
-                <Button
-                  key={option.value}
-                  variant={selectedTimer === option.value ? "default" : "outline"}
-                  className="h-14"
-                  onClick={() => startWithTimer(option.value)}
-                  disabled={isGenerating}
-                >
-                  {isGenerating && selectedTimer === option.value ? (
-                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                  ) : null}
-                  {option.label}
-                </Button>
-              ))}
-            </div>
+        {/* Stars overlay effect */}
+        <div className="absolute inset-0 opacity-50" style={{
+          backgroundImage: `radial-gradient(2px 2px at 20px 30px, white, transparent),
+                           radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+                           radial-gradient(1px 1px at 90px 40px, white, transparent),
+                           radial-gradient(2px 2px at 130px 80px, rgba(255,255,255,0.6), transparent),
+                           radial-gradient(1px 1px at 160px 120px, white, transparent)`,
+          backgroundSize: '200px 200px'
+        }} />
+        
+        {/* Header */}
+        <motion.div 
+          className="relative z-10 flex items-center justify-between p-4"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={onClose}
+            className="text-white/70 hover:text-white hover:bg-white/10"
+          >
+            <X className="w-5 h-5" />
+          </Button>
+          <div className="flex items-center gap-2 text-indigo-300">
+            <Moon className="w-5 h-5" />
+            <span className="font-medium text-sm">Sleep Story</span>
           </div>
-        ) : (
-          <div className="w-full max-w-sm space-y-6">
-            {audioUrl && (
-              <audio
-                ref={audioRef}
-                src={audioUrl}
-                onTimeUpdate={handleTimeUpdate}
-                onLoadedMetadata={handleLoadedMetadata}
-                onEnded={handleEnded}
-              />
-            )}
+          <div className="w-10" />
+        </motion.div>
 
-            {/* Progress slider */}
-            {audioUrl && (
-              <div className="space-y-2">
-                <Slider
-                  value={[currentTime]}
-                  max={duration || 100}
-                  step={1}
-                  onValueChange={handleSeek}
-                  className="cursor-pointer"
+        {/* Content */}
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center p-6 overflow-auto">
+          {/* Story artwork */}
+          <motion.div 
+            className="relative w-52 h-52 rounded-full overflow-hidden mb-8 shadow-2xl shadow-indigo-500/20"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+          >
+            {story.imagen_url ? (
+              <img 
+                src={story.imagen_url} 
+                alt={story.titulo}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-indigo-500/30 via-purple-500/20 to-slate-800/40 flex items-center justify-center">
+                <motion.div
+                  animate={{ 
+                    scale: [1, 1.1, 1],
+                    opacity: [0.6, 0.8, 0.6]
+                  }}
+                  transition={{ 
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                >
+                  <Moon className="w-24 h-24 text-indigo-400/60" />
+                </motion.div>
+              </div>
+            )}
+            {/* Glow ring */}
+            <div className="absolute inset-0 rounded-full ring-2 ring-white/10" />
+          </motion.div>
+
+          {/* Story info */}
+          <motion.h2 
+            className="text-2xl font-bold text-white text-center mb-2"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            {story.titulo}
+          </motion.h2>
+          <motion.p 
+            className="text-indigo-200/70 text-center max-w-md mb-8 text-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+          >
+            {story.descripcion}
+          </motion.p>
+
+          {/* Timer remaining display */}
+          <AnimatePresence>
+            {timerRemaining !== null && timerRemaining > 0 && (
+              <motion.div 
+                className="flex items-center gap-2 text-indigo-300 mb-6 px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+              >
+                <Timer className="w-4 h-4" />
+                <span className="text-sm font-medium">
+                  {formatTime(timerRemaining)}
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Timer picker or Audio controls */}
+          <motion.div
+            className="w-full max-w-sm"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+          >
+            {showTimerPicker ? (
+              <div className="glass-card rounded-3xl p-6 bg-white/5 backdrop-blur-xl border border-white/10">
+                <div className="flex items-center justify-center gap-2 mb-4">
+                  <Stars className="w-5 h-5 text-indigo-300" />
+                  <p className="text-center text-indigo-100">
+                    ¿Cuánto tiempo quieres escuchar?
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {TIMER_OPTIONS.map((option) => (
+                    <Button
+                      key={option.value}
+                      variant={selectedTimer === option.value ? "default" : "outline"}
+                      className={`h-14 rounded-xl font-medium transition-all ${
+                        selectedTimer === option.value 
+                          ? 'bg-indigo-500 hover:bg-indigo-600 text-white' 
+                          : 'bg-white/5 border-white/20 text-white hover:bg-white/10'
+                      }`}
+                      onClick={() => startWithTimer(option.value)}
+                      disabled={isGenerating}
+                    >
+                      {isGenerating && selectedTimer === option.value ? (
+                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                      ) : null}
+                      {option.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {audioUrl && (
+                  <audio
+                    ref={audioRef}
+                    src={audioUrl}
+                    onTimeUpdate={handleTimeUpdate}
+                    onLoadedMetadata={handleLoadedMetadata}
+                    onEnded={handleEnded}
+                  />
+                )}
+
+                {/* Glass card for controls */}
+                <div className="glass-card rounded-3xl p-6 bg-white/5 backdrop-blur-xl border border-white/10">
+                  {/* Progress slider */}
+                  {audioUrl && (
+                    <div className="space-y-2 mb-6">
+                      <Slider
+                        value={[currentTime]}
+                        max={duration || 100}
+                        step={1}
+                        onValueChange={handleSeek}
+                        className="cursor-pointer"
+                      />
+                      <div className="flex justify-between text-xs text-indigo-200/60">
+                        <span>{formatTime(currentTime)}</span>
+                        <span>{formatTime(duration)}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Main controls */}
+                  <div className="flex items-center justify-center gap-6">
+                    <div className="relative">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="w-12 h-12 text-white/70 hover:text-white hover:bg-white/10"
+                        onClick={() => setShowVolumeSlider(!showVolumeSlider)}
+                      >
+                        {isMuted || masterVolume === 0 ? (
+                          <VolumeX className="w-6 h-6" />
+                        ) : (
+                          <Volume2 className="w-6 h-6" />
+                        )}
+                      </Button>
+                      
+                      <AnimatePresence>
+                        {showVolumeSlider && (
+                          <motion.div 
+                            className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-slate-900/90 border border-white/10 rounded-xl p-3 shadow-lg backdrop-blur-xl"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                          >
+                            <Slider
+                              value={[masterVolume]}
+                              max={1}
+                              step={0.1}
+                              orientation="vertical"
+                              onValueChange={handleMasterVolumeChange}
+                              className="h-24"
+                            />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <Button
+                        size="icon"
+                        className="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 shadow-lg shadow-indigo-500/30"
+                        onClick={togglePlay}
+                        disabled={isGenerating}
+                      >
+                        {isGenerating ? (
+                          <Loader2 className="w-10 h-10 animate-spin" />
+                        ) : isPlaying ? (
+                          <Pause className="w-10 h-10" />
+                        ) : (
+                          <Play className="w-10 h-10 ml-1" />
+                        )}
+                      </Button>
+                    </motion.div>
+
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="w-12 h-12 text-white/70 hover:text-white hover:bg-white/10"
+                      onClick={() => setShowTimerPicker(true)}
+                    >
+                      <Timer className="w-6 h-6" />
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Ambient Sound Mixer */}
+                <AmbientSoundMixer 
+                  isPlaying={isPlaying} 
+                  masterVolume={masterVolume} 
                 />
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>{formatTime(currentTime)}</span>
-                  <span>{formatTime(duration)}</span>
+
+                {isGenerating && (
+                  <motion.p 
+                    className="text-center text-sm text-indigo-200/60"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                  >
+                    Generando narración con voz relajante...
+                  </motion.p>
+                )}
+
+                {/* Feedback */}
+                <div className="pt-4 border-t border-white/10">
+                  <ContentFeedback 
+                    contentType="sleep_story" 
+                    contentId={story.id} 
+                    showComment 
+                    className="justify-center"
+                  />
                 </div>
               </div>
             )}
-
-            {/* Main controls */}
-            <div className="flex items-center justify-center gap-6">
-              <div className="relative">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="w-12 h-12"
-                  onClick={() => setShowVolumeSlider(!showVolumeSlider)}
-                >
-                  {isMuted || masterVolume === 0 ? (
-                    <VolumeX className="w-6 h-6" />
-                  ) : (
-                    <Volume2 className="w-6 h-6" />
-                  )}
-                </Button>
-                
-                {showVolumeSlider && (
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-card border border-border rounded-lg p-3 shadow-lg">
-                    <Slider
-                      value={[masterVolume]}
-                      max={1}
-                      step={0.1}
-                      orientation="vertical"
-                      onValueChange={handleMasterVolumeChange}
-                      className="h-24"
-                    />
-                  </div>
-                )}
-              </div>
-
-              <Button
-                size="icon"
-                className="w-20 h-20 rounded-full"
-                onClick={togglePlay}
-                disabled={isGenerating}
-              >
-                {isGenerating ? (
-                  <Loader2 className="w-10 h-10 animate-spin" />
-                ) : isPlaying ? (
-                  <Pause className="w-10 h-10" />
-                ) : (
-                  <Play className="w-10 h-10 ml-1" />
-                )}
-              </Button>
-
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-12 h-12"
-                onClick={() => setShowTimerPicker(true)}
-              >
-                <Timer className="w-6 h-6" />
-              </Button>
-            </div>
-
-            {/* Ambient Sound Mixer */}
-            <AmbientSoundMixer 
-              isPlaying={isPlaying} 
-              masterVolume={masterVolume} 
-            />
-
-            {isGenerating && (
-              <p className="text-center text-sm text-muted-foreground">
-                Generando narración con voz relajante...
-              </p>
-            )}
-
-            {/* Feedback */}
-            <div className="pt-4 border-t border-border/30">
-              <ContentFeedback 
-                contentType="sleep_story" 
-                contentId={story.id} 
-                showComment 
-                className="justify-center"
-              />
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
+          </motion.div>
+        </div>
+      </motion.div>
+    </AnimatePresence>
   );
 };
