@@ -66,11 +66,26 @@ Inicia la conversación planteando una objeción o pregunta desafiante sobre est
 
     // RESPOND action - continue conversation
     if (action === 'respond') {
+      // Build context from previous messages to avoid repetition
+      const previousArguments = messages
+        .filter((m: any) => m.role === 'assistant')
+        .map((m: any) => m.content)
+        .join('\n---\n');
+
       const systemPrompt = `${personaPrompt}
 
 Estamos discutiendo sobre: "${tema}"
 
-Responde al último mensaje del usuario. Mantén un estilo conversacional. Si encuentras un buen argumento, reconócelo, pero sigue siendo fiel a tu personaje. Plantea nuevas preguntas o desafíos. Mantén tu respuesta en 2-4 oraciones.`;
+INSTRUCCIONES IMPORTANTES:
+1. Responde directamente al último mensaje del usuario
+2. Mantén un estilo conversacional natural
+3. Si el usuario da un buen argumento, reconócelo brevemente, pero sigue siendo fiel a tu personaje
+4. Plantea una NUEVA pregunta o desafío diferente a los anteriores
+5. NO repitas argumentos que ya hayas usado antes
+6. Mantén tu respuesta en 2-4 oraciones
+7. Progresa la conversación hacia nuevos aspectos del tema
+
+${previousArguments ? `\nARGUMENTOS QUE YA USASTE (no repitas estos):\n${previousArguments}` : ''}`;
 
       const aiMessages = messages.map((m: any) => ({
         role: m.role === 'user' ? 'user' : 'assistant',
@@ -89,6 +104,7 @@ Responde al último mensaje del usuario. Mantén un estilo conversacional. Si en
             { role: 'system', content: systemPrompt },
             ...aiMessages
           ],
+          temperature: 0.7, // Add some variability to responses
         }),
       });
 
