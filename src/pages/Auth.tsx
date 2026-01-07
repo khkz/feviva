@@ -181,6 +181,20 @@ const Auth = () => {
 
       if (error) throw error;
 
+      // Send welcome email via edge function
+      try {
+        await supabase.functions.invoke('send-auth-email', {
+          body: {
+            type: 'welcome',
+            email: signupEmail,
+            name: signupName,
+          },
+        });
+      } catch (emailError) {
+        console.error("Error sending welcome email:", emailError);
+        // Don't block signup if email fails
+      }
+
       toast({
         title: "¡Cuenta creada!",
         description: "Ya puedes comenzar tu entrenamiento de fe.",
