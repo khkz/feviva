@@ -68,6 +68,7 @@ const App = () => (
             <Route path="/oraciones" element={<Oraciones />} />
             <Route path="/rosario" element={<Rosario />} />
             <Route path="/sleep-stories" element={<SleepStories />} />
+            <Route path="/sleep" element={<SleepStories />} />
             <Route path="/novenas" element={<Novenas />} />
             <Route path="/bible-plan" element={<BiblePlan />} />
             
