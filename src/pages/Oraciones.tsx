@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Search, Heart, ChevronRight, BookOpen, Moon, Loader2, Calendar } from "lucide-react";
-import { motion } from "framer-motion";
+import { Search, Heart, BookOpen, Moon, Loader2, Calendar, Sparkles, Cross } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { OracionCard } from "@/components/oraciones/OracionCard";
 import { OracionDetail } from "@/components/oraciones/OracionDetail";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { useOraciones } from "@/hooks/useOraciones";
+import { cn } from "@/lib/utils";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -31,10 +31,18 @@ const itemVariants = {
   },
 } as const;
 
+// Category icons and colors
+const CATEGORY_CONFIG: Record<string, { icon: typeof Cross; gradient: string }> = {
+  "Oraciones Básicas": { icon: Cross, gradient: "from-primary/20 to-primary/5" },
+  "Oraciones Marianas": { icon: Sparkles, gradient: "from-blue-500/20 to-blue-500/5" },
+  "Oraciones a los Santos": { icon: BookOpen, gradient: "from-amber-500/20 to-amber-500/5" },
+  "Oraciones del Rosario": { icon: Moon, gradient: "from-purple-500/20 to-purple-500/5" },
+};
+
 export default function Oraciones() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedOracion, setSelectedOracion] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState("todas");
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
   
   const { 
     oraciones, 
@@ -59,6 +67,11 @@ export default function Oraciones() {
   // Get favorite prayers
   const favoritasOraciones = oraciones.filter((o) => favoritos.includes(o.id));
 
+  // Get oraciones to display based on active category
+  const displayedOraciones = activeCategory 
+    ? oracionesByCategoria[activeCategory] || []
+    : null;
+
   if (selected) {
     return (
       <OracionDetail
@@ -77,45 +90,54 @@ export default function Oraciones() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      {/* Hero Header */}
+      {/* Immersive Hero Header */}
       <motion.header 
         className="relative overflow-hidden"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6 }}
       >
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/20 via-primary/10 to-background" />
+        {/* Background gradient with animated orb */}
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/15 via-secondary/10 to-background" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-secondary/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
+        
         <div className="relative z-10 p-5 pt-8">
-          <motion.h1 
-            className="font-heading text-3xl font-bold text-foreground mb-2"
+          <motion.div
+            className="flex items-center gap-4 mb-4"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            Libro de Oraciones
-          </motion.h1>
-          <motion.p 
-            className="text-muted-foreground text-sm mb-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-          >
-            Encuentra paz en la oración
-          </motion.p>
+            <div className="p-3 rounded-2xl bg-secondary/20 backdrop-blur-sm">
+              <Cross className="h-7 w-7 text-secondary" />
+            </div>
+            <div>
+              <h1 className="font-heading text-2xl font-bold text-foreground">
+                Libro de Oraciones
+              </h1>
+              <p className="text-muted-foreground text-sm">
+                Encuentra paz en la oración
+              </p>
+            </div>
+          </motion.div>
           
           {/* Search */}
           <motion.div 
             className="relative"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
           >
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
               placeholder="Buscar oraciones..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 glass-card border-0"
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setActiveCategory(null);
+              }}
+              className="pl-12 h-12 glass-card border-0 text-base rounded-2xl"
             />
           </motion.div>
         </div>
@@ -125,43 +147,64 @@ export default function Oraciones() {
           className="flex gap-2 px-5 pb-5 overflow-x-auto scrollbar-hide"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
         >
           <Link to="/rosario">
-            <Button variant="secondary" size="sm" className="gap-2 whitespace-nowrap glass-button border-0">
+            <Button variant="secondary" size="sm" className="gap-2 whitespace-nowrap glass-button border-0 rounded-xl h-10">
               <BookOpen className="h-4 w-4" />
               Santo Rosario
             </Button>
           </Link>
           <Link to="/novenas">
-            <Button variant="secondary" size="sm" className="gap-2 whitespace-nowrap glass-button border-0">
+            <Button variant="secondary" size="sm" className="gap-2 whitespace-nowrap glass-button border-0 rounded-xl h-10">
               <Calendar className="h-4 w-4" />
               Novenas
             </Button>
           </Link>
           <Link to="/sleep">
-            <Button variant="secondary" size="sm" className="gap-2 whitespace-nowrap glass-button border-0">
+            <Button variant="secondary" size="sm" className="gap-2 whitespace-nowrap glass-button border-0 rounded-xl h-10">
               <Moon className="h-4 w-4" />
               Sleep Stories
             </Button>
           </Link>
+          {isAuthenticated && favoritasOraciones.length > 0 && (
+            <Button 
+              variant="secondary" 
+              size="sm" 
+              className={cn(
+                "gap-2 whitespace-nowrap rounded-xl h-10",
+                activeCategory === "favoritas" 
+                  ? "bg-destructive/20 text-destructive border-destructive/30" 
+                  : "glass-button border-0"
+              )}
+              onClick={() => setActiveCategory(activeCategory === "favoritas" ? null : "favoritas")}
+            >
+              <Heart className="h-4 w-4" fill={activeCategory === "favoritas" ? "currentColor" : "none"} />
+              Favoritas ({favoritasOraciones.length})
+            </Button>
+          )}
         </motion.div>
       </motion.header>
 
       {/* Content */}
       {isLoading ? (
-        <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="flex flex-col items-center justify-center h-64 gap-4">
+          <div className="relative">
+            <div className="absolute inset-0 bg-secondary/30 rounded-full blur-xl animate-pulse" />
+            <Loader2 className="h-10 w-10 animate-spin text-primary relative z-10" />
+          </div>
+          <p className="text-muted-foreground text-sm">Cargando oraciones...</p>
         </div>
       ) : searchQuery ? (
+        // Search results
         <motion.div 
           className="p-4 space-y-3"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
-          <p className="text-sm text-muted-foreground">
-            {filteredOraciones.length} resultado{filteredOraciones.length !== 1 && "s"}
+          <p className="text-sm text-muted-foreground px-1">
+            {filteredOraciones.length} resultado{filteredOraciones.length !== 1 && "s"} para "{searchQuery}"
           </p>
           {filteredOraciones.map((oracion) => (
             <motion.div key={oracion.id} variants={itemVariants}>
@@ -179,118 +222,171 @@ export default function Oraciones() {
               />
             </motion.div>
           ))}
+          {filteredOraciones.length === 0 && (
+            <motion.div 
+              className="text-center py-12"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+            >
+              <div className="glass-card rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                <Search className="h-10 w-10 text-muted-foreground/50" />
+              </div>
+              <p className="text-muted-foreground">No se encontraron oraciones</p>
+            </motion.div>
+          )}
+        </motion.div>
+      ) : activeCategory === "favoritas" ? (
+        // Favorites
+        <motion.div 
+          className="p-4 space-y-3"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <Heart className="h-5 w-5 text-destructive" fill="currentColor" />
+            <h2 className="font-heading font-semibold text-lg">Mis Favoritas</h2>
+          </div>
+          {favoritasOraciones.map((oracion) => (
+            <motion.div key={oracion.id} variants={itemVariants}>
+              <OracionCard
+                id={oracion.id}
+                nombre={oracion.nombre}
+                texto={oracion.texto}
+                categoria={oracion.categoria}
+                subcategoria={oracion.subcategoria ?? undefined}
+                historia={oracion.historia ?? undefined}
+                audioUrl={oracion.audio_url ?? undefined}
+                isFavorite={true}
+                onToggleFavorite={toggleFavorite}
+                onSelect={() => setSelectedOracion(oracion.id)}
+              />
+            </motion.div>
+          ))}
+        </motion.div>
+      ) : activeCategory && displayedOraciones ? (
+        // Category view
+        <motion.div 
+          className="p-4"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.div 
+            className="flex items-center gap-3 mb-4"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+          >
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setActiveCategory(null)}
+              className="text-muted-foreground"
+            >
+              ← Volver
+            </Button>
+            <h2 className="font-heading font-semibold text-lg">{activeCategory}</h2>
+          </motion.div>
+          <div className="space-y-3">
+            {displayedOraciones.map((oracion) => (
+              <motion.div key={oracion.id} variants={itemVariants}>
+                <OracionCard
+                  id={oracion.id}
+                  nombre={oracion.nombre}
+                  texto={oracion.texto}
+                  categoria={oracion.categoria}
+                  subcategoria={oracion.subcategoria ?? undefined}
+                  historia={oracion.historia ?? undefined}
+                  audioUrl={oracion.audio_url ?? undefined}
+                  isFavorite={isFavorite(oracion.id)}
+                  onToggleFavorite={toggleFavorite}
+                  onSelect={() => setSelectedOracion(oracion.id)}
+                />
+              </motion.div>
+            ))}
+          </div>
         </motion.div>
       ) : (
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
-          <TabsList className="w-full justify-start px-4 bg-transparent border-b border-border/50 rounded-none h-auto py-0">
-            <TabsTrigger 
-              value="todas" 
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-3"
-            >
-              Todas
-            </TabsTrigger>
-            {isAuthenticated && (
-              <TabsTrigger 
-                value="favoritas"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-3"
-              >
-                <Heart className="h-4 w-4 mr-1" />
-                Favoritas
-              </TabsTrigger>
-            )}
-          </TabsList>
-
-          <TabsContent value="todas" className="mt-0">
-            <ScrollArea className="h-[calc(100vh-280px)]">
-              <motion.div 
-                className="p-4 space-y-6"
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
-              >
-                {categorias.map((categoria, catIdx) => (
-                  <motion.div 
+        // Category grid view (default)
+        <ScrollArea className="h-[calc(100vh-260px)]">
+          <motion.div 
+            className="p-4 space-y-4"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            {/* Category Cards Grid */}
+            <div className="grid grid-cols-2 gap-3">
+              {categorias.map((categoria, idx) => {
+                const config = CATEGORY_CONFIG[categoria] || { icon: BookOpen, gradient: "from-muted to-muted/5" };
+                const Icon = config.icon;
+                const count = oracionesByCategoria[categoria]?.length || 0;
+                
+                return (
+                  <motion.button
                     key={categoria}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: catIdx * 0.1 }}
+                    variants={itemVariants}
+                    className={cn(
+                      "relative p-4 rounded-2xl text-left transition-all duration-300",
+                      "bg-gradient-to-br border border-border/50",
+                      "hover:shadow-medium hover:scale-[1.02] active:scale-[0.98]",
+                      "overflow-hidden group",
+                      config.gradient
+                    )}
+                    onClick={() => setActiveCategory(categoria)}
                   >
-                    <div className="flex items-center justify-between mb-3">
-                      <h2 className="font-heading font-semibold text-lg text-foreground">
+                    <div className="absolute top-2 right-2 opacity-20 group-hover:opacity-30 transition-opacity">
+                      <Icon className="h-12 w-12" />
+                    </div>
+                    <div className="relative z-10">
+                      <div className="p-2 rounded-xl bg-background/50 backdrop-blur-sm w-fit mb-3">
+                        <Icon className="h-5 w-5 text-foreground" />
+                      </div>
+                      <h3 className="font-heading font-semibold text-sm text-foreground line-clamp-2 mb-1">
                         {categoria}
-                      </h2>
-                      <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                      </h3>
+                      <p className="text-xs text-muted-foreground">
+                        {count} {count === 1 ? "oración" : "oraciones"}
+                      </p>
                     </div>
-                    <div className="space-y-2">
-                      {oracionesByCategoria[categoria]?.map((oracion) => (
-                        <OracionCard
-                          key={oracion.id}
-                          id={oracion.id}
-                          nombre={oracion.nombre}
-                          texto={oracion.texto}
-                          categoria={oracion.categoria}
-                          subcategoria={oracion.subcategoria ?? undefined}
-                          historia={oracion.historia ?? undefined}
-                          audioUrl={oracion.audio_url ?? undefined}
-                          isFavorite={isFavorite(oracion.id)}
-                          onToggleFavorite={toggleFavorite}
-                          onSelect={() => setSelectedOracion(oracion.id)}
-                        />
-                      ))}
-                    </div>
-                  </motion.div>
-                ))}
-              </motion.div>
-            </ScrollArea>
-          </TabsContent>
+                  </motion.button>
+                );
+              })}
+            </div>
 
-          <TabsContent value="favoritas" className="mt-0">
-            <ScrollArea className="h-[calc(100vh-280px)]">
-              <motion.div 
-                className="p-4 space-y-3"
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
+            {/* Featured Section - Most Popular */}
+            {oraciones.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="mt-6"
               >
-                {favoritasOraciones.length === 0 ? (
-                  <motion.div 
-                    className="text-center py-12"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <div className="glass-card rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
-                      <Heart className="h-10 w-10 text-muted-foreground/50" />
-                    </div>
-                    <p className="text-muted-foreground">
-                      No tienes oraciones favoritas aún
-                    </p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Toca el corazón en una oración para guardarla aquí
-                    </p>
-                  </motion.div>
-                ) : (
-                  favoritasOraciones.map((oracion) => (
-                    <motion.div key={oracion.id} variants={itemVariants}>
-                      <OracionCard
-                        id={oracion.id}
-                        nombre={oracion.nombre}
-                        texto={oracion.texto}
-                        categoria={oracion.categoria}
-                        subcategoria={oracion.subcategoria ?? undefined}
-                        historia={oracion.historia ?? undefined}
-                        audioUrl={oracion.audio_url ?? undefined}
-                        isFavorite={true}
-                        onToggleFavorite={toggleFavorite}
-                        onSelect={() => setSelectedOracion(oracion.id)}
-                      />
-                    </motion.div>
-                  ))
-                )}
+                <div className="flex items-center gap-2 mb-3">
+                  <Sparkles className="h-5 w-5 text-secondary" />
+                  <h2 className="font-heading font-semibold text-lg">Oraciones Populares</h2>
+                </div>
+                <div className="space-y-2">
+                  {oraciones.slice(0, 4).map((oracion) => (
+                    <OracionCard
+                      key={oracion.id}
+                      id={oracion.id}
+                      nombre={oracion.nombre}
+                      texto={oracion.texto}
+                      categoria={oracion.categoria}
+                      subcategoria={oracion.subcategoria ?? undefined}
+                      historia={oracion.historia ?? undefined}
+                      audioUrl={oracion.audio_url ?? undefined}
+                      isFavorite={isFavorite(oracion.id)}
+                      onToggleFavorite={toggleFavorite}
+                      onSelect={() => setSelectedOracion(oracion.id)}
+                    />
+                  ))}
+                </div>
               </motion.div>
-            </ScrollArea>
-          </TabsContent>
-        </Tabs>
+            )}
+          </motion.div>
+        </ScrollArea>
       )}
 
       <BottomNavigation />
