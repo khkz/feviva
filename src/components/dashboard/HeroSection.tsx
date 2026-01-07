@@ -65,7 +65,7 @@ export function HeroSection({ userName, verse, stats }: HeroSectionProps) {
             >
               <Sparkles className="w-5 h-5 text-secondary" />
             </motion.div>
-            <span className="text-foreground/80 font-heading font-bold text-lg">FeViva</span>
+            <span className="text-foreground/80 font-heading font-bold text-lg">ElRugido</span>
           </motion.div>
 
           {/* Greeting Card */}

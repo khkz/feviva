@@ -75,7 +75,7 @@ export const TestimonialsSection = () => {
             Vidas transformadas
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Miles de personas han encontrado en FeViva el acompañamiento 
+            Miles de personas han encontrado en ElRugido el acompañamiento 
             que necesitaban para fortalecer su fe.
           </p>
         </motion.div>

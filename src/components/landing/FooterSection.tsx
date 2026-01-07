@@ -16,8 +16,8 @@ export const FooterSection = () => {
               <Flame className="w-5 h-5 text-white" />
             </div>
             <div>
-              <span className="font-display font-bold text-xl">FeViva</span>
-              <p className="text-xs text-muted-foreground">Entrena tu fe. Ilumina el mundo.</p>
+              <span className="font-display font-bold text-xl">ElRugido</span>
+              <p className="text-xs text-muted-foreground">Ruge tu fe. Defiende tu esperanza.</p>
             </div>
           </motion.div>
           
@@ -36,7 +36,7 @@ export const FooterSection = () => {
             viewport={{ once: true }}
             className="text-muted-foreground text-sm"
           >
-            © {new Date().getFullYear()} FeViva. Todos los derechos reservados.
+            © {new Date().getFullYear()} ElRugido. Todos los derechos reservados.
           </motion.p>
         </div>
       </div>

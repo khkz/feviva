@@ -80,10 +80,10 @@ export const DailyJourneySection = () => {
             Un acompañamiento completo
           </span>
           <h2 className="text-3xl md:text-5xl font-display font-bold mt-4 mb-6">
-            Tu día con FeViva
+            Tu día con ElRugido
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Desde que despiertas hasta que duermes, FeViva te acompaña 
+            Desde que despiertas hasta que duermes, ElRugido te acompaña 
             con contenido diseñado para cada momento del día.
           </p>
         </motion.div>

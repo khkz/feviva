@@ -65,7 +65,7 @@ export function DesktopSidebar({ userName = "Peregrino", userLevel = 1, userStre
             <Sparkles className="w-5 h-5 text-secondary" />
           </motion.div>
           <span className="font-heading text-xl font-bold text-foreground group-hover:text-primary transition-colors">
-            FeViva
+            ElRugido
           </span>
         </Link>
       </div>

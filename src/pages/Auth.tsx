@@ -212,7 +212,7 @@ const Auth = () => {
             <div className="flex items-center justify-center gap-2 mb-4">
               <Sparkles className="w-10 h-10 text-secondary" />
               <h1 className="font-heading text-4xl font-bold text-white">
-                <span className="text-secondary">Fe</span>Viva
+                ElRugido
               </h1>
             </div>
             <p className="text-white/70">Restablece tu contraseña</p>
@@ -307,12 +307,12 @@ const Auth = () => {
             <div className="flex items-center gap-3 mb-8">
               <Sparkles className="w-12 h-12 text-secondary" />
               <h1 className="font-heading text-5xl font-bold text-white">
-                <span className="text-secondary">Fe</span>Viva
+                ElRugido
               </h1>
             </div>
 
             <h2 className="font-heading text-3xl xl:text-4xl font-bold text-white mb-6 leading-tight">
-              Entrena tu fe.<br />
+              Ruge tu fe.<br />
               Defiende tu esperanza.<br />
               <span className="text-secondary">Ama sin límites.</span>
             </h2>
@@ -360,10 +360,10 @@ const Auth = () => {
             <div className="flex items-center justify-center gap-2 mb-2">
               <Sparkles className="w-8 h-8 text-secondary" />
               <h1 className="font-heading text-3xl font-bold text-primary">
-                <span className="text-secondary">Fe</span>Viva
+                ElRugido
               </h1>
             </div>
-            <p className="text-muted-foreground">Entrena tu fe con verdad y amor</p>
+            <p className="text-muted-foreground">Ruge tu fe con verdad y amor</p>
           </div>
 
           <Tabs defaultValue="login" className="w-full">
@@ -477,7 +477,7 @@ const Auth = () => {
             <TabsContent value="signup">
               <Card className="shadow-xl border-border/50">
                 <CardHeader className="text-center pb-2">
-                  <CardTitle className="text-2xl">Únete a FeViva</CardTitle>
+                  <CardTitle className="text-2xl">Únete a ElRugido</CardTitle>
                   <CardDescription className="text-base">
                     Comienza tu entrenamiento de apologética
                   </CardDescription>
