@@ -43,7 +43,15 @@ Tu estilo es:
 - Usa lenguaje poético pero sencillo
 - Incluye reflexiones espirituales suaves entrelazadas con la historia
 - El ritmo debe ir decreciendo gradualmente hacia el final
-- Termina con una bendición o palabras de paz`;
+- Termina con una bendición o palabras de paz
+
+REGLAS CRÍTICAS PARA AUDIO TTS:
+- NUNCA uses abreviaciones de libros bíblicos (escribe "Génesis" NO "Gn.", "Juan" NO "Jn.", "Mateo" NO "Mt.")
+- Escribe las referencias bíblicas de forma legible para voz: "el Salmo veintitrés" en lugar de "Salmo 23"
+- Cuando cites capítulos y versículos, usa formato hablado: "el capítulo tres del Evangelio de Juan, versículo dieciséis" en lugar de "Juan 3:16"
+- Escribe los números como palabras: "tres" en lugar de "3", "cuarenta" en lugar de "40"
+- Evita símbolos como ":", ";", "&" - usa palabras completas
+- Los números romanos deben escribirse: "segundo" en lugar de "II", "tercero" en lugar de "III"`;
 
   const userPrompt = `Genera una historia para dormir de aproximadamente 2500-3000 palabras (para 12-15 minutos de narración lenta) basada en:
 
@@ -58,6 +66,12 @@ Requisitos específicos:
 5. El ritmo narrativo debe ser muy lento y contemplativo
 6. Incluye momentos de silencio descritos ("...el silencio envolvía todo...")
 7. Termina con palabras de paz y bendición para el sueño
+
+IMPORTANTE PARA AUDIO:
+- Todas las referencias bíblicas deben ser legibles en voz alta
+- Nunca uses abreviaciones (Gn., Ex., Jn., Mt., etc.)
+- Escribe números como palabras (veintitrés, no 23)
+- Si mencionas capítulos/versículos, usa formato hablado natural
 
 Escribe SOLO el contenido de la historia, sin título ni metadatos.`;
 
@@ -88,7 +102,14 @@ Escribe SOLO el contenido de la historia, sin título ni metadatos.`;
 
 async function expandExistingStory(titulo: string, contenidoActual: string): Promise<string> {
   const systemPrompt = `Eres un narrador experto en crear historias bíblicas para dormir.
-Tu tarea es expandir y enriquecer una historia existente para que dure 12-15 minutos de narración.`;
+Tu tarea es expandir y enriquecer una historia existente para que dure 12-15 minutos de narración.
+
+REGLAS CRÍTICAS PARA AUDIO TTS:
+- NUNCA uses abreviaciones de libros bíblicos (escribe "Génesis" NO "Gn.", "Juan" NO "Jn.")
+- Escribe las referencias bíblicas de forma legible: "el Salmo veintitrés" en lugar de "Salmo 23"
+- Formato hablado para citas: "el capítulo tres del Evangelio de Juan" en lugar de "Juan 3:16"
+- Escribe números como palabras: "tres" en lugar de "3"
+- Los números romanos deben escribirse: "segundo" en lugar de "II"`;
 
   const userPrompt = `Expande esta historia para dormir a aproximadamente 2500-3000 palabras:
 
@@ -105,6 +126,11 @@ Mantén la esencia de la historia pero:
 6. El ritmo debe ser muy lento y contemplativo
 7. Comienza con invitación a relajarse
 8. Termina con bendición para el sueño
+
+IMPORTANTE PARA AUDIO:
+- Corrige cualquier abreviación bíblica existente (Gn., Jn., Mt., etc.)
+- Convierte números a palabras donde sea natural
+- Las referencias bíblicas deben ser legibles en voz alta
 
 Escribe SOLO el contenido expandido, sin título ni metadatos.`;
 
