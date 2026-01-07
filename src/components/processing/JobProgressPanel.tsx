@@ -143,14 +143,15 @@ export const JobProgressPanel = ({
 
         {/* Acciones */}
         <div className="flex flex-wrap gap-2">
-          {hasPending && !isProcessing && (
+          {hasPending && (
             <Button
               size="sm"
-              onClick={() => triggerProcessing(1)}
+              onClick={() => triggerProcessing(100)}
+              disabled={isProcessing}
               className="gap-1"
             >
               <Play className="h-3 w-3" />
-              Procesar siguiente
+              {isProcessing ? 'Procesando...' : `Procesar todos (${stats.pending})`}
             </Button>
           )}
           {hasErrors && (

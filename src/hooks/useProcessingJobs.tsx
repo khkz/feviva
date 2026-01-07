@@ -172,8 +172,8 @@ export const useProcessingJobs = (options: UseProcessingJobsOptions = {}) => {
     }
   };
 
-  // Procesar jobs manualmente (trigger de la edge function)
-  const triggerProcessing = async (limit: number = 1): Promise<void> => {
+  // Procesar todos los jobs pendientes (en background)
+  const triggerProcessing = async (limit: number = 100): Promise<void> => {
     try {
       const response = await supabase.functions.invoke('process-jobs', {
         body: { job_type: jobType, limit },
@@ -185,8 +185,8 @@ export const useProcessingJobs = (options: UseProcessingJobsOptions = {}) => {
       
       if (data.processed > 0) {
         toast({
-          title: "Procesamiento iniciado",
-          description: `Procesando ${data.processed} job(s)`,
+          title: "Procesamiento en cola",
+          description: `${data.processed} job(s) se procesarán en segundo plano`,
         });
       } else {
         toast({
@@ -194,8 +194,7 @@ export const useProcessingJobs = (options: UseProcessingJobsOptions = {}) => {
           description: "No hay jobs pendientes para procesar",
         });
       }
-
-      await fetchJobs();
+      // No necesitamos fetchJobs() - realtime lo actualizará automáticamente
     } catch (error) {
       console.error("Error triggering processing:", error);
       toast({
