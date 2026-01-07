@@ -1,6 +1,12 @@
+// deno-lint-ignore-file
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+// Declaración de EdgeRuntime para background tasks
+declare const EdgeRuntime: {
+  waitUntil: (promise: Promise<unknown>) => void;
+};
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -534,15 +540,19 @@ Responde SOLO con JSON válido sin markdown, con esta estructura exacta:
   return { dia };
 }
 
-// ============ PROCESADOR PRINCIPAL ============
+// ============ PROCESADOR DE UN JOB ============
 
 async function processJob(job: ProcessingJob): Promise<void> {
-  console.log(`[process-jobs] Iniciando job: ${job.job_type} - ${job.target_title || job.target_id}`);
+  console.log(`[process-jobs] Procesando job: ${job.job_type} - ${job.target_title || job.target_id}`);
   
   const startTime = Date.now();
   
-  // Marcar como procesando
-  await markJobProcessing(job.id);
+  // Incrementar attempts
+  await supabase
+    .from('processing_jobs')
+    .update({ attempts: job.attempts + 1 })
+    .eq('id', job.id);
+  
   await logJobAttempt(job.id, job.attempts + 1, 'started', `Iniciando procesamiento de ${job.job_type}`);
   
   try {
@@ -571,11 +581,11 @@ async function processJob(job: ProcessingJob): Promise<void> {
     await markJobCompleted(job.id, result, processingTime);
     await logJobAttempt(job.id, job.attempts + 1, 'success', `Completado en ${processingTime}ms`, result);
     
-    console.log(`[process-jobs] Job completado exitosamente en ${processingTime}ms`);
+    console.log(`[process-jobs] Job completado en ${processingTime}ms: ${job.target_title || job.target_id}`);
     
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-    console.error(`[process-jobs] Error en job: ${errorMessage}`);
+    console.error(`[process-jobs] Error en job ${job.id}: ${errorMessage}`);
     
     // Marcar como error o pending para reintento
     await markJobError(job.id, errorMessage, job.attempts + 1, job.max_attempts);
@@ -583,6 +593,22 @@ async function processJob(job: ProcessingJob): Promise<void> {
       stack: error instanceof Error ? error.stack : undefined 
     });
   }
+}
+
+// ============ PROCESAMIENTO EN BACKGROUND ============
+
+async function processJobsInBackground(jobs: ProcessingJob[]): Promise<void> {
+  console.log(`[process-jobs] Iniciando procesamiento en background de ${jobs.length} jobs`);
+  
+  for (const job of jobs) {
+    try {
+      await processJob(job);
+    } catch (error) {
+      console.error(`[process-jobs] Error inesperado en job ${job.id}:`, error);
+    }
+  }
+  
+  console.log(`[process-jobs] Procesamiento en background completado (${jobs.length} jobs)`);
 }
 
 // ============ HANDLER PRINCIPAL ============
@@ -594,11 +620,11 @@ serve(async (req) => {
   }
 
   try {
-    const { job_type, limit = 1 } = await req.json().catch(() => ({}));
+    const { job_type, limit = 100 } = await req.json().catch(() => ({}));
     
     console.log(`[process-jobs] Buscando jobs pendientes (tipo: ${job_type || 'todos'}, límite: ${limit})`);
     
-    // Buscar el siguiente job pendiente
+    // Buscar jobs pendientes
     let query = supabase
       .from('processing_jobs')
       .select('*')
@@ -621,7 +647,8 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           message: 'No hay jobs pendientes',
-          processed: 0 
+          processed: 0,
+          status: 'idle'
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
@@ -629,26 +656,37 @@ serve(async (req) => {
     
     console.log(`[process-jobs] Encontrados ${jobs.length} jobs pendientes`);
     
-    // Procesar cada job
-    const results = [];
-    for (const job of jobs) {
-      await processJob(job as ProcessingJob);
-      results.push({
-        id: job.id,
-        job_type: job.job_type,
-        target_title: job.target_title
-      });
+    // Marcar todos como 'processing' ANTES de responder (lock optimista)
+    const jobIds = jobs.map(j => j.id);
+    const { error: updateError } = await supabase
+      .from('processing_jobs')
+      .update({ 
+        status: 'processing', 
+        started_at: new Date().toISOString() 
+      })
+      .in('id', jobIds)
+      .eq('status', 'pending'); // Solo si aún está pending (evita duplicados)
+    
+    if (updateError) {
+      console.error('[process-jobs] Error marcando jobs como processing:', updateError);
     }
     
-    // Obtener estadísticas actualizadas
-    const { data: stats } = await supabase.rpc('get_processing_stats');
+    // Iniciar procesamiento en BACKGROUND
+    EdgeRuntime.waitUntil(
+      processJobsInBackground(jobs as ProcessingJob[])
+    );
     
+    // Responder INMEDIATAMENTE
     return new Response(
       JSON.stringify({ 
-        message: `Procesados ${results.length} jobs`,
-        processed: results.length,
-        jobs: results,
-        stats
+        message: `${jobs.length} jobs en cola de procesamiento`,
+        processed: jobs.length,
+        status: 'processing',
+        jobs: jobs.map(j => ({ 
+          id: j.id, 
+          type: j.job_type, 
+          title: j.target_title 
+        }))
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
