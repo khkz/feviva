@@ -9,18 +9,23 @@ const corsHeaders = {
 
 const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
+// Temas ya cubiertos por historias existentes (para evitar duplicados temáticos)
+const EXISTING_THEMES = [
+  { keywords: ["buen", "pastor", "salmo"], existing: "El Buen Pastor" },
+  { keywords: ["noé", "arca", "diluvio"], existing: "Noé y el Arca" },
+  { keywords: ["creación", "mundo", "génesis"], existing: "La Creación del Mundo" },
+];
+
 const NEW_STORIES = [
-  // Historias originales
+  // Historias originales (sin duplicados)
   { titulo: "Moisés y el Mar Rojo", tema: "La liberación del pueblo de Israel cruzando el Mar Rojo" },
   { titulo: "Abraham y las Estrellas", tema: "La promesa de Dios a Abraham bajo el cielo estrellado" },
   { titulo: "Ruth y la Cosecha", tema: "La fidelidad de Ruth recogiendo espigas en los campos de Booz" },
-  { titulo: "Salmo 23: El Buen Pastor", tema: "Un viaje meditativo por el Salmo 23, verdes praderas y aguas tranquilas" },
   { titulo: "Salmo 91: Bajo Sus Alas", tema: "Refugio y protección divina, descanso bajo las alas del Altísimo" },
   { titulo: "Elías en el Monte Horeb", tema: "Elías encuentra a Dios en el suave susurro del viento" },
   { titulo: "José y el Manto de Colores", tema: "Los sueños de José y su camino hacia el destino divino" },
   { titulo: "El Jardín de Getsemaní", tema: "Una noche de oración y paz en el huerto de olivos" },
-  // Nuevas historias añadidas
-  { titulo: "Noé y el Arcoíris", tema: "La paz después del diluvio, el arcoíris de promesa y el nuevo comienzo" },
+  // Nuevas historias añadidas (sin Noé duplicado ni Salmo 23 duplicado)
   { titulo: "Jacob y la Escalera al Cielo", tema: "El sueño de Jacob con ángeles subiendo y bajando en la noche estrellada" },
   { titulo: "La Pesca Milagrosa", tema: "Pedro y los discípulos en el lago al amanecer, la bruma sobre las aguas" },
   { titulo: "El Huerto del Cantar de los Cantares", tema: "Imágenes poéticas del amor divino, jardines fragantes y fuentes selladas" },
@@ -31,6 +36,35 @@ const NEW_STORIES = [
   { titulo: "Apocalipsis: El Río de Vida", tema: "La nueva Jerusalén, el río cristalino y el árbol de la vida" },
   { titulo: "Eclesiastés: Todo Tiene su Tiempo", tema: "Meditación serena sobre las estaciones de la vida" },
 ];
+
+// Detecta si una historia nueva es temáticamente similar a una existente
+function isSimilarToExisting(titulo: string, existingTitles: string[]): boolean {
+  const tituloLower = titulo.toLowerCase();
+  const tituloWords = tituloLower.split(/\s+/);
+  
+  // Verificar contra temas conocidos
+  for (const theme of EXISTING_THEMES) {
+    const matchingKeywords = theme.keywords.filter(k => tituloLower.includes(k));
+    if (matchingKeywords.length >= 2) {
+      console.log(`"${titulo}" es similar a tema existente: ${theme.existing}`);
+      return true;
+    }
+  }
+  
+  // Verificar similitud por palabras comunes con títulos existentes
+  for (const existing of existingTitles) {
+    const existingWords = existing.toLowerCase().split(/\s+/);
+    const commonWords = tituloWords.filter(w => 
+      existingWords.includes(w) && w.length > 3
+    );
+    if (commonWords.length >= 2) {
+      console.log(`"${titulo}" comparte palabras con "${existing}": [${commonWords.join(', ')}]`);
+      return true;
+    }
+  }
+  
+  return false;
+}
 
 async function generateStory(titulo: string, tema: string): Promise<string> {
   const systemPrompt = `Eres un narrador experto en crear historias bíblicas para dormir. 
@@ -183,12 +217,25 @@ serve(async (req) => {
         .from('sleep_stories')
         .select('titulo');
       
-      const existingTitles = new Set(existingStories?.map(s => s.titulo) || []);
+      const existingTitlesArray = existingStories?.map(s => s.titulo) || [];
+      const existingTitlesSet = new Set(existingTitlesArray);
       
-      // Filter new stories that don't exist yet
-      const storiesToCreate = NEW_STORIES.filter(s => !existingTitles.has(s.titulo));
+      // Filter new stories that don't exist yet AND aren't similar to existing ones
+      const storiesToCreate = NEW_STORIES.filter(s => {
+        // Check exact match
+        if (existingTitlesSet.has(s.titulo)) {
+          console.log(`Skipping "${s.titulo}" - exact title exists`);
+          return false;
+        }
+        // Check thematic similarity
+        if (isSimilarToExisting(s.titulo, existingTitlesArray)) {
+          console.log(`Skipping "${s.titulo}" - similar theme exists`);
+          return false;
+        }
+        return true;
+      });
       
-      console.log(`Found ${storiesToCreate.length} new stories to create`);
+      console.log(`Found ${storiesToCreate.length} new unique stories to create`);
       
       // Process limited number
       const batch = storiesToCreate.slice(0, limit);
