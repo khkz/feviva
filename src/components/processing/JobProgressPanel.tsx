@@ -1,9 +1,11 @@
+import { useState, useEffect, useRef } from "react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 import { useProcessingJobs, ProcessingJob } from "@/hooks/useProcessingJobs";
-import { Loader2, RefreshCw, Trash2, RotateCcw, Play, CheckCircle, XCircle, Clock, AlertCircle } from "lucide-react";
+import { Loader2, RefreshCw, Trash2, RotateCcw, Play, CheckCircle, XCircle, Clock, AlertCircle, Timer } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface JobProgressPanelProps {
@@ -58,6 +60,48 @@ export const JobProgressPanel = ({
     clearCompleted,
     refetch,
   } = useProcessingJobs({ jobType });
+
+  const [autoProcess, setAutoProcess] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const countdownRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Auto-procesamiento con delay de 30 segundos
+  useEffect(() => {
+    if (autoProcess && stats.pending > 0 && stats.processing === 0) {
+      // Iniciar countdown de 30 segundos
+      setCountdown(30);
+      
+      countdownRef.current = setInterval(() => {
+        setCountdown(prev => {
+          if (prev <= 1) {
+            if (countdownRef.current) clearInterval(countdownRef.current);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      timerRef.current = setTimeout(() => {
+        if (stats.pending > 0) {
+          triggerProcessing();
+        }
+      }, 30000);
+    }
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      if (countdownRef.current) clearInterval(countdownRef.current);
+    };
+  }, [autoProcess, stats.pending, stats.processing, triggerProcessing]);
+
+  // Detener auto-proceso cuando no hay más pendientes
+  useEffect(() => {
+    if (autoProcess && stats.pending === 0) {
+      setAutoProcess(false);
+      setCountdown(0);
+    }
+  }, [autoProcess, stats.pending]);
 
   if (loading) {
     return (
@@ -142,9 +186,36 @@ export const JobProgressPanel = ({
           )}
         </div>
 
+        {/* Auto-procesamiento toggle */}
+        {hasPending && (
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border">
+            <Switch
+              checked={autoProcess}
+              onCheckedChange={setAutoProcess}
+              disabled={isProcessing}
+            />
+            <div className="flex-1">
+              <p className="text-sm font-medium">Auto-procesar</p>
+              <p className="text-xs text-muted-foreground">
+                {autoProcess 
+                  ? countdown > 0 
+                    ? `Siguiente en ${countdown}s...` 
+                    : 'Procesando...'
+                  : 'Procesa cada 30 segundos automáticamente'}
+              </p>
+            </div>
+            {autoProcess && countdown > 0 && (
+              <Badge variant="secondary" className="gap-1">
+                <Timer className="h-3 w-3" />
+                {countdown}s
+              </Badge>
+            )}
+          </div>
+        )}
+
         {/* Acciones */}
         <div className="flex flex-wrap gap-2">
-          {hasPending && (
+          {hasPending && !autoProcess && (
             <Button
               size="sm"
               onClick={() => triggerProcessing()}
