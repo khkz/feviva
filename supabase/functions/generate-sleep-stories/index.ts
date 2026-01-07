@@ -10,6 +10,7 @@ const corsHeaders = {
 const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
 const NEW_STORIES = [
+  // Historias originales
   { titulo: "Moisés y el Mar Rojo", tema: "La liberación del pueblo de Israel cruzando el Mar Rojo" },
   { titulo: "Abraham y las Estrellas", tema: "La promesa de Dios a Abraham bajo el cielo estrellado" },
   { titulo: "Ruth y la Cosecha", tema: "La fidelidad de Ruth recogiendo espigas en los campos de Booz" },
@@ -18,6 +19,17 @@ const NEW_STORIES = [
   { titulo: "Elías en el Monte Horeb", tema: "Elías encuentra a Dios en el suave susurro del viento" },
   { titulo: "José y el Manto de Colores", tema: "Los sueños de José y su camino hacia el destino divino" },
   { titulo: "El Jardín de Getsemaní", tema: "Una noche de oración y paz en el huerto de olivos" },
+  // Nuevas historias añadidas
+  { titulo: "Noé y el Arcoíris", tema: "La paz después del diluvio, el arcoíris de promesa y el nuevo comienzo" },
+  { titulo: "Jacob y la Escalera al Cielo", tema: "El sueño de Jacob con ángeles subiendo y bajando en la noche estrellada" },
+  { titulo: "La Pesca Milagrosa", tema: "Pedro y los discípulos en el lago al amanecer, la bruma sobre las aguas" },
+  { titulo: "El Huerto del Cantar de los Cantares", tema: "Imágenes poéticas del amor divino, jardines fragantes y fuentes selladas" },
+  { titulo: "Isaías y la Paz del Reino", tema: "El lobo con el cordero, la paz mesiánica del reino venidero" },
+  { titulo: "María en Nazaret", tema: "La visitación del ángel Gabriel y el sí silencioso de María" },
+  { titulo: "Los Pastores de Belén", tema: "La noche estrellada del nacimiento, el canto de los ángeles" },
+  { titulo: "El Camino a Emaús", tema: "Caminando con el Resucitado al atardecer por caminos polvorientos" },
+  { titulo: "Apocalipsis: El Río de Vida", tema: "La nueva Jerusalén, el río cristalino y el árbol de la vida" },
+  { titulo: "Eclesiastés: Todo Tiene su Tiempo", tema: "Meditación serena sobre las estaciones de la vida" },
 ];
 
 async function generateStory(titulo: string, tema: string): Promise<string> {
