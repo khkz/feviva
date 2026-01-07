@@ -3,6 +3,13 @@ import { LucideIcon, Heart, Moon, BookOpen, MessageCircle, Sparkles } from "luci
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
+// Import feature images
+import featurePrayer from "@/assets/feature-prayer.jpg";
+import featureSleep from "@/assets/feature-sleep.jpg";
+import featureBible from "@/assets/feature-bible.jpg";
+import featureDebate from "@/assets/feature-debate.jpg";
+import featureDevotional from "@/assets/feature-devotional.jpg";
+
 interface FeatureShowcaseProps {
   icon: LucideIcon;
   title: string;
@@ -13,6 +20,7 @@ interface FeatureShowcaseProps {
   ctaLink: string;
   gradient: string;
   reverse?: boolean;
+  image?: string;
 }
 
 const FeatureShowcaseItem = ({ 
@@ -24,7 +32,8 @@ const FeatureShowcaseItem = ({
   ctaText, 
   ctaLink,
   gradient,
-  reverse 
+  reverse,
+  image
 }: FeatureShowcaseProps) => {
   const navigate = useNavigate();
   
@@ -81,15 +90,23 @@ const FeatureShowcaseItem = ({
       
       {/* Visual */}
       <div className="flex-1 w-full max-w-md">
-        <div className={`relative aspect-[4/3] rounded-3xl bg-gradient-to-br ${gradient} p-1`}>
-          <div className="absolute inset-1 rounded-[22px] bg-background/95 backdrop-blur flex items-center justify-center">
-            <div className="text-center p-8">
-              <Icon className="w-20 h-20 mx-auto mb-4 text-primary/60" />
-              <p className="text-muted-foreground text-sm">
-                Vista previa de {title}
-              </p>
+        <div className={`relative aspect-[4/3] rounded-3xl bg-gradient-to-br ${gradient} p-1 overflow-hidden`}>
+          {image ? (
+            <img 
+              src={image} 
+              alt={title}
+              className="absolute inset-1 rounded-[22px] w-[calc(100%-8px)] h-[calc(100%-8px)] object-cover"
+            />
+          ) : (
+            <div className="absolute inset-1 rounded-[22px] bg-background/95 backdrop-blur flex items-center justify-center">
+              <div className="text-center p-8">
+                <Icon className="w-20 h-20 mx-auto mb-4 text-primary/60" />
+                <p className="text-muted-foreground text-sm">
+                  Vista previa de {title}
+                </p>
+              </div>
             </div>
-          </div>
+          )}
           {/* Decorative elements */}
           <div className="absolute -top-4 -right-4 w-24 h-24 bg-primary/20 rounded-full blur-2xl" />
           <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-secondary/20 rounded-full blur-2xl" />
@@ -113,7 +130,8 @@ const showcaseData: FeatureShowcaseProps[] = [
     ],
     ctaText: "Empieza tu primer ritual",
     ctaLink: "/auth",
-    gradient: "from-rose-500 to-pink-500"
+    gradient: "from-rose-500 to-pink-500",
+    image: featurePrayer
   },
   {
     icon: Moon,
@@ -128,7 +146,8 @@ const showcaseData: FeatureShowcaseProps[] = [
     ],
     ctaText: "Duerme en paz",
     ctaLink: "/auth",
-    gradient: "from-indigo-500 to-purple-500"
+    gradient: "from-indigo-500 to-purple-500",
+    image: featureSleep
   },
   {
     icon: BookOpen,
@@ -143,7 +162,8 @@ const showcaseData: FeatureShowcaseProps[] = [
     ],
     ctaText: "Comienza tu plan bíblico",
     ctaLink: "/auth",
-    gradient: "from-amber-500 to-orange-500"
+    gradient: "from-amber-500 to-orange-500",
+    image: featureBible
   },
   {
     icon: MessageCircle,
@@ -158,7 +178,8 @@ const showcaseData: FeatureShowcaseProps[] = [
     ],
     ctaText: "Practica con el coach",
     ctaLink: "/auth",
-    gradient: "from-emerald-500 to-teal-500"
+    gradient: "from-emerald-500 to-teal-500",
+    image: featureDebate
   },
   {
     icon: Sparkles,
@@ -173,7 +194,8 @@ const showcaseData: FeatureShowcaseProps[] = [
     ],
     ctaText: "Explora los devocionales",
     ctaLink: "/auth",
-    gradient: "from-violet-500 to-fuchsia-500"
+    gradient: "from-violet-500 to-fuchsia-500",
+    image: featureDevotional
   }
 ];
 
