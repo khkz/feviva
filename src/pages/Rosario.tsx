@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Check, ChevronDown, Play, Pause, RotateCcw, Volume2, VolumeX, Sparkles, Moon } from "lucide-react";
+import { ArrowLeft, Check, ChevronDown, Play, Pause, RotateCcw, Volume2, VolumeX, Sparkles, Moon, HelpCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { RosarioMisterio } from "@/components/rosario/RosarioMisterio";
 import { RosarioDecena } from "@/components/rosario/RosarioDecena";
+import { RosarioWhyModal } from "@/components/rosario/RosarioWhyModal";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { AmbientSoundMixer } from "@/components/sleep/AmbientSoundMixer";
 import { useRosarioExperience } from "@/hooks/useRosarioExperience";
@@ -105,6 +106,7 @@ export default function Rosario() {
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [masterVolume, setMasterVolume] = useState(0.5);
   const [showSettings, setShowSettings] = useState(false);
+  const [showWhyModal, setShowWhyModal] = useState(false);
   
   const {
     isAudioEnabled,
@@ -298,13 +300,25 @@ export default function Rosario() {
                 <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-secondary/30 to-primary/20 flex items-center justify-center">
                   <Sparkles className="h-10 w-10 text-secondary" />
                 </div>
-                <h2 className="text-xl font-heading font-bold text-foreground mb-2">
-                  Prepárate para orar
-                </h2>
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <h2 className="text-xl font-heading font-bold text-foreground">
+                    Prepárate para orar
+                  </h2>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-secondary hover:text-secondary/80 hover:bg-secondary/10"
+                    onClick={() => setShowWhyModal(true)}
+                  >
+                    <HelpCircle className="w-5 h-5" />
+                  </Button>
+                </div>
                 <p className="text-muted-foreground text-sm">
                   El Rosario activa automáticamente el modo oscuro para una experiencia más recogida
                 </p>
               </motion.div>
+
+              <RosarioWhyModal open={showWhyModal} onOpenChange={setShowWhyModal} />
 
               {/* Mystery selector */}
               <motion.div
