@@ -48,7 +48,7 @@ const AMBIENT_SOUNDS: AmbientSound[] = [
     name: "Lluvia",
     icon: <CloudRain className="w-5 h-5" />,
     filename: "rain.mp3",
-    fallbackUrl: "https://upload.wikimedia.org/wikipedia/commons/4/4e/Moderate_rain.ogg",
+    fallbackUrl: "https://cdn.pixabay.com/audio/2022/05/13/audio_257112ce99.mp3",
     defaultVolume: 0.5
   },
   {
@@ -56,7 +56,7 @@ const AMBIENT_SOUNDS: AmbientSound[] = [
     name: "Olas",
     icon: <Waves className="w-5 h-5" />,
     filename: "waves.mp3",
-    fallbackUrl: "https://upload.wikimedia.org/wikipedia/commons/e/e3/Waves_at_Baltic_sea_coast.ogg",
+    fallbackUrl: "https://cdn.pixabay.com/audio/2022/06/07/audio_b9bd4170e4.mp3",
     defaultVolume: 0.5
   },
   {
@@ -64,7 +64,7 @@ const AMBIENT_SOUNDS: AmbientSound[] = [
     name: "Fuego",
     icon: <Flame className="w-5 h-5" />,
     filename: "fire.mp3",
-    fallbackUrl: "https://upload.wikimedia.org/wikipedia/commons/b/b5/Fireplace-sound.ogg",
+    fallbackUrl: "https://cdn.pixabay.com/audio/2022/10/30/audio_e8786c8882.mp3",
     defaultVolume: 0.5
   },
   {
@@ -72,7 +72,7 @@ const AMBIENT_SOUNDS: AmbientSound[] = [
     name: "Viento",
     icon: <Wind className="w-5 h-5" />,
     filename: "wind.mp3",
-    fallbackUrl: "https://upload.wikimedia.org/wikipedia/commons/6/6e/Wind_sound.ogg",
+    fallbackUrl: "https://cdn.pixabay.com/audio/2022/03/10/audio_4dedf5bf94.mp3",
     defaultVolume: 0.4
   },
   {
@@ -80,7 +80,7 @@ const AMBIENT_SOUNDS: AmbientSound[] = [
     name: "Bosque",
     icon: <TreePine className="w-5 h-5" />,
     filename: "forest.mp3",
-    fallbackUrl: "https://upload.wikimedia.org/wikipedia/commons/f/f4/Binaural_Forest_soundscape.ogg",
+    fallbackUrl: "https://cdn.pixabay.com/audio/2022/08/02/audio_884fe92c21.mp3",
     defaultVolume: 0.5
   },
   {
@@ -88,7 +88,7 @@ const AMBIENT_SOUNDS: AmbientSound[] = [
     name: "Pájaros",
     icon: <Bird className="w-5 h-5" />,
     filename: "birds.mp3",
-    fallbackUrl: "https://upload.wikimedia.org/wikipedia/commons/4/45/A_bird_singing.ogg",
+    fallbackUrl: "https://cdn.pixabay.com/audio/2021/08/09/audio_5765af6243.mp3",
     defaultVolume: 0.4
   },
 ];
