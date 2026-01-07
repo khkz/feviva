@@ -80,10 +80,10 @@ async function uploadToStorage(supabase: any, base64Image: string, storyId: stri
       bytes[i] = binaryString.charCodeAt(i);
     }
 
-    const fileName = `sleep-stories/${storyId}-${Date.now()}.png`;
+    const fileName = `${storyId}-${Date.now()}.png`;
     
     const { data, error } = await supabase.storage
-      .from('media')
+      .from('sleep-images')
       .upload(fileName, bytes, {
         contentType: 'image/png',
         upsert: true
@@ -95,7 +95,7 @@ async function uploadToStorage(supabase: any, base64Image: string, storyId: stri
     }
 
     const { data: urlData } = supabase.storage
-      .from('media')
+      .from('sleep-images')
       .getPublicUrl(fileName);
 
     return urlData.publicUrl;
