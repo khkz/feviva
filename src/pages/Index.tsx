@@ -70,11 +70,11 @@ const Index = () => {
 
             {/* Main Heading */}
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold mb-6">
-              <span className="text-gradient-gold">FeViva</span>
+              <span className="text-gradient-gold">ElRugido</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-muted-foreground font-medium mb-4">
-              Entrena tu fe. Ilumina el mundo.
+              Ruge tu fe. Defiende tu esperanza.
             </p>
             
             {/* Empathetic Subtitle */}
