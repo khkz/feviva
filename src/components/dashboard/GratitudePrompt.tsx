@@ -1,15 +1,17 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Heart, Sparkles, Send, Check, BookOpen, History, ChevronRight, Calendar } from "lucide-react";
+import { Heart, Sparkles, Send, Check, BookOpen, History, ChevronRight, Calendar, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useGratitudeJournal } from "@/hooks/useGratitudeJournal";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { GratitudeWhyModal } from "./GratitudeWhyModal";
 
 export function GratitudePrompt() {
   const [isOpen, setIsOpen] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [showWhyModal, setShowWhyModal] = useState(false);
   const [gratitudes, setGratitudes] = useState<string[]>(["", "", ""]);
   const [submitted, setSubmitted] = useState(false);
   const [reflection, setReflection] = useState<{ text: string; verse: string } | null>(null);
@@ -262,7 +264,7 @@ export function GratitudePrompt() {
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 via-rose-500 to-purple-600 flex items-center justify-center">
                 <Heart className="w-5 h-5 text-white" />
               </div>
-              <div>
+              <div className="flex-1">
                 <h3 className="font-heading font-bold text-foreground">
                   Diario de Gratitud
                 </h3>
@@ -270,7 +272,17 @@ export function GratitudePrompt() {
                   Escribe 3 cosas por las que agradeces a Dios
                 </p>
               </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-amber-500 hover:text-amber-600 hover:bg-amber-100 dark:hover:bg-amber-900/30"
+                onClick={() => setShowWhyModal(true)}
+              >
+                <HelpCircle className="w-5 h-5" />
+              </Button>
             </div>
+
+            <GratitudeWhyModal open={showWhyModal} onOpenChange={setShowWhyModal} />
 
             <div className="space-y-3 mb-4">
               {gratitudes.map((gratitude, index) => (
