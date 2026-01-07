@@ -10,6 +10,10 @@ const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
+async function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function generateImage(titulo: string, descripcion: string): Promise<string | null> {
   if (!LOVABLE_API_KEY) {
     console.error('LOVABLE_API_KEY not configured');
@@ -26,46 +30,71 @@ Ultra high resolution, 16:9 aspect ratio.`;
 
   console.log('Generating image with prompt:', prompt.substring(0, 200) + '...');
 
-  try {
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash-image-preview",
-        messages: [
-          {
-            role: "user",
-            content: prompt
-          }
-        ],
-        modalities: ["image", "text"]
-      }),
-    });
+  const maxRetries = 3;
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`Attempt ${attempt}/${maxRetries}`);
+      
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash-image-preview",
+          messages: [
+            {
+              role: "user",
+              content: prompt
+            }
+          ],
+          modalities: ["image", "text"]
+        }),
+      });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Image generation failed:', response.status, errorText);
+      if (response.status === 503 || response.status === 502 || response.status === 429) {
+        const waitTime = Math.pow(2, attempt) * 2000; // 4s, 8s, 16s
+        console.log(`Service unavailable (${response.status}), retrying in ${waitTime/1000}s...`);
+        if (attempt < maxRetries) {
+          await sleep(waitTime);
+          continue;
+        }
+      }
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Image generation failed:', response.status, errorText);
+        if (attempt < maxRetries) {
+          await sleep(2000);
+          continue;
+        }
+        return null;
+      }
+
+      const data = await response.json();
+      console.log('Image generation response received');
+
+      const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+      
+      if (!imageUrl) {
+        console.error('No image URL in response');
+        return null;
+      }
+
+      return imageUrl;
+    } catch (error) {
+      console.error(`Attempt ${attempt} error:`, error);
+      if (attempt < maxRetries) {
+        await sleep(2000 * attempt);
+        continue;
+      }
       return null;
     }
-
-    const data = await response.json();
-    console.log('Image generation response received');
-
-    const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-    
-    if (!imageUrl) {
-      console.error('No image URL in response');
-      return null;
-    }
-
-    return imageUrl;
-  } catch (error) {
-    console.error('Error generating image:', error);
-    return null;
   }
+  
+  return null;
 }
 
 async function uploadToStorage(supabase: any, base64Image: string, storyId: string): Promise<string | null> {
