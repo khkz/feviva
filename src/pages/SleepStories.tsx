@@ -191,6 +191,13 @@ const SleepStories = () => {
         />
       </div>
 
+      {/* Stats counter */}
+      <div className="px-4 mb-2">
+        <p className="text-xs text-muted-foreground text-center">
+          {stories.length} historias • {shortStoriesCount > 0 ? `${shortStoriesCount} cortas` : 'todas expandidas'} • {storiesWithoutAudioCount > 0 ? `${storiesWithoutAudioCount} sin audio` : 'todas con audio'}
+        </p>
+      </div>
+
       {/* AI Generation buttons */}
       <div className="px-4 mb-4 space-y-2">
         <Button
@@ -204,7 +211,7 @@ const SleepStories = () => {
           ) : (
             <PlusCircle className="w-4 h-4 text-primary" />
           )}
-          <span>Crear nuevas historias (Moisés, Ruth, Salmos...)</span>
+          <span>Crear nuevas historias bíblicas con IA</span>
           <Sparkles className="w-4 h-4 text-amber-500 ml-auto" />
         </Button>
         
