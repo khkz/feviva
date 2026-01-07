@@ -172,34 +172,72 @@ export const useProcessingJobs = (options: UseProcessingJobsOptions = {}) => {
     }
   };
 
-  // Procesar todos los jobs pendientes (en background)
-  const triggerProcessing = async (limit: number = 100): Promise<void> => {
+  // Procesar UN job pendiente (síncrono)
+  const triggerProcessing = async (): Promise<void> => {
     try {
       const response = await supabase.functions.invoke('process-jobs', {
-        body: { job_type: jobType, limit },
+        body: { job_type: jobType },
       });
 
-      if (response.error) throw response.error;
-
-      const data = response.data;
-      
-      if (data.processed > 0) {
+      if (response.error) {
         toast({
-          title: "Procesamiento en cola",
-          description: `${data.processed} job(s) se procesarán en segundo plano`,
+          title: "Error al procesar",
+          description: response.error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (response.data?.remaining > 0) {
+        toast({
+          title: "Job completado",
+          description: `${response.data.message}. Quedan ${response.data.remaining} pendientes.`,
         });
       } else {
         toast({
-          title: "Sin jobs pendientes",
-          description: "No hay jobs pendientes para procesar",
+          title: "Procesamiento completado",
+          description: response.data?.message || "No hay más jobs pendientes",
         });
       }
-      // No necesitamos fetchJobs() - realtime lo actualizará automáticamente
+      
+      fetchJobs();
     } catch (error) {
-      console.error("Error triggering processing:", error);
+      console.error('Error triggering processing:', error);
       toast({
         title: "Error",
-        description: "No se pudo iniciar el procesamiento",
+        description: "No se pudo procesar el job",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Resetear jobs atascados (más de 10 min en processing)
+  const resetStalledJobs = async (): Promise<void> => {
+    try {
+      const response = await supabase.functions.invoke('process-jobs', {
+        body: { action: 'reset-stalled' },
+      });
+
+      if (response.error) {
+        toast({
+          title: "Error",
+          description: response.error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Jobs reseteados",
+        description: response.data?.message || "Jobs atascados reseteados",
+      });
+      
+      fetchJobs();
+    } catch (error) {
+      console.error('Error resetting stalled jobs:', error);
+      toast({
+        title: "Error",
+        description: "No se pudo resetear los jobs",
         variant: "destructive",
       });
     }
@@ -285,6 +323,7 @@ export const useProcessingJobs = (options: UseProcessingJobsOptions = {}) => {
     queueJobs,
     retryFailed,
     triggerProcessing,
+    resetStalledJobs,
     clearCompleted,
     refetch: fetchJobs,
   };
