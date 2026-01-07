@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Search, Heart, BookOpen, Moon, Loader2, Calendar, Sparkles, Cross } from "lucide-react";
+import { Search, Heart, BookOpen, Moon, Loader2, Calendar, Sparkles, Cross, Home } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { OracionCard } from "@/components/oraciones/OracionCard";
 import { OracionDetail } from "@/components/oraciones/OracionDetail";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
+import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { useOraciones } from "@/hooks/useOraciones";
 import { cn } from "@/lib/utils";
 
@@ -89,8 +90,23 @@ export default function Oraciones() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      {/* Immersive Hero Header */}
+    <div className="min-h-screen bg-background flex">
+      {/* Desktop Sidebar */}
+      <DesktopSidebar userName="" userLevel={1} userStreak={0} />
+      
+      {/* Main Content */}
+      <div className="flex-1 lg:ml-64 pb-20">
+        {/* Back to Home button - Mobile */}
+        <div className="lg:hidden p-4 pb-0">
+          <Link to="/dashboard">
+            <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground">
+              <Home className="h-4 w-4" />
+              Inicio
+            </Button>
+          </Link>
+        </div>
+        
+        {/* Immersive Hero Header */}
       <motion.header 
         className="relative overflow-hidden"
         initial={{ opacity: 0 }}
@@ -387,9 +403,10 @@ export default function Oraciones() {
             )}
           </motion.div>
         </ScrollArea>
-      )}
+        )}
 
-      <BottomNavigation />
+        <BottomNavigation />
+      </div>
     </div>
   );
 }
