@@ -1,7 +1,18 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Moon, Loader2, Sparkles, PlusCircle, Expand, Volume2 } from "lucide-react";
+import { 
+  ArrowLeft, 
+  Moon, 
+  Loader2, 
+  Sparkles, 
+  PlusCircle, 
+  Expand, 
+  Volume2,
+  Stars,
+  ImagePlus
+} from "lucide-react";
+import { motion } from "framer-motion";
 import { useSleepStories, SleepStory } from "@/hooks/useSleepStories";
 import { useProcessingJobs } from "@/hooks/useProcessingJobs";
 import { SleepStoryCard } from "@/components/sleep/SleepStoryCard";
@@ -10,6 +21,24 @@ import { JobProgressPanel } from "@/components/processing/JobProgressPanel";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08, delayChildren: 0.2 }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 30, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: "spring" as const, stiffness: 200, damping: 20 }
+  }
+};
 
 const SleepStories = () => {
   const navigate = useNavigate();
@@ -20,6 +49,7 @@ const SleepStories = () => {
   const [generatedAudioUrl, setGeneratedAudioUrl] = useState<string | null>(null);
   const [isCreatingStories, setIsCreatingStories] = useState(false);
   const [isExpandingStories, setIsExpandingStories] = useState(false);
+  const [isGeneratingImages, setIsGeneratingImages] = useState(false);
 
   const handleStorySelect = (story: SleepStory) => {
     setSelectedStory(story);
@@ -122,7 +152,36 @@ const SleepStories = () => {
     }
   };
 
-  // Encolar todas las historias sin audio para procesamiento automático
+  const handleGenerateAllImages = async () => {
+    const storiesWithoutImage = stories.filter(s => !s.imagen_url);
+    if (storiesWithoutImage.length === 0) {
+      toast.info("Todas las historias ya tienen imagen");
+      return;
+    }
+
+    setIsGeneratingImages(true);
+    let generated = 0;
+
+    for (const story of storiesWithoutImage) {
+      try {
+        toast.loading(`Generando imagen ${generated + 1}/${storiesWithoutImage.length}: "${story.titulo}"`, { id: 'generate-images' });
+        
+        const { error } = await supabase.functions.invoke('generate-sleep-image', {
+          body: { storyId: story.id }
+        });
+
+        if (error) throw error;
+        generated++;
+      } catch (error) {
+        console.error(`Error generating image for ${story.titulo}:`, error);
+      }
+    }
+
+    toast.success(`✅ Se generaron ${generated} imágenes`, { id: 'generate-images' });
+    refetch();
+    setIsGeneratingImages(false);
+  };
+
   const handleQueueAudioGeneration = async () => {
     const storiesWithoutAudio = stories.filter(s => !s.audio_url);
     
@@ -140,12 +199,11 @@ const SleepStories = () => {
     await queueJobs('sleep_tts', items);
   };
 
-  // Count short stories (less than 5 min)
   const shortStoriesCount = stories.filter(s => s.duracion_estimada < 5).length;
-  // Count stories without audio
   const storiesWithoutAudioCount = stories.filter(s => !s.audio_url).length;
+  const storiesWithoutImageCount = stories.filter(s => !s.imagen_url).length;
   
-  const isAnyProcessRunning = isCreatingStories || isExpandingStories;
+  const isAnyProcessRunning = isCreatingStories || isExpandingStories || isGeneratingImages;
   const hasActiveJobs = jobStats.pending > 0 || jobStats.processing > 0;
 
   if (loading) {
@@ -157,31 +215,74 @@ const SleepStories = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
-      <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-lg border-b border-border/50">
-        <div className="flex items-center gap-4 p-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div className="flex items-center gap-2">
-            <Moon className="w-5 h-5 text-primary" />
-            <h1 className="text-lg font-semibold">Sleep Stories</h1>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-background pb-24">
+      {/* Hero Header */}
+      <motion.header 
+        className="relative overflow-hidden"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+      >
+        {/* Background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/20 via-purple-500/10 to-background" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-400/10 via-transparent to-transparent" />
+        
+        <div className="relative z-10 p-5 pt-8">
+          {/* Navigation */}
+          <motion.div 
+            className="flex items-center gap-4 mb-6"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <motion.button
+              onClick={() => navigate(-1)}
+              className="glass-button p-2.5 rounded-full"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </motion.button>
+            <div>
+              <motion.h1 
+                className="text-2xl font-bold"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                Historias para Dormir
+              </motion.h1>
+              <motion.p 
+                className="text-sm text-muted-foreground"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+              >
+                Narraciones bíblicas para un descanso reparador
+              </motion.p>
+            </div>
+          </motion.div>
 
-      {/* Intro section */}
-      <div className="p-6 text-center">
-        <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center mb-4">
-          <Moon className="w-10 h-10 text-primary" />
+          {/* Info Card */}
+          <motion.div
+            className="glass-card rounded-2xl p-4 flex items-start gap-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+          >
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500/30 to-purple-500/20 flex items-center justify-center shrink-0">
+              <Stars className="w-6 h-6 text-indigo-400" />
+            </div>
+            <div>
+              <h3 className="font-medium text-sm mb-1">Dulces sueños con la Palabra</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Historias bíblicas narradas con voz suave para ayudarte a conciliar el sueño. 
+                Configura un timer y déjate llevar por la paz de la Escritura.
+              </p>
+            </div>
+          </motion.div>
         </div>
-        <h2 className="text-xl font-bold mb-2">Historias para Dormir</h2>
-        <p className="text-muted-foreground text-sm max-w-sm mx-auto">
-          Relájate con historias bíblicas narradas lentamente. 
-          Configura un timer y déjate llevar al sueño.
-        </p>
-      </div>
+      </motion.header>
 
       {/* Panel de progreso de jobs */}
       <div className="px-4 mb-4">
@@ -192,24 +293,41 @@ const SleepStories = () => {
       </div>
 
       {/* Stats counter */}
-      <div className="px-4 mb-2">
-        <p className="text-xs text-muted-foreground text-center">
-          {stories.length} historias • {shortStoriesCount > 0 ? `${shortStoriesCount} cortas` : 'todas expandidas'} • {storiesWithoutAudioCount > 0 ? `${storiesWithoutAudioCount} sin audio` : 'todas con audio'}
-        </p>
-      </div>
+      <motion.div 
+        className="px-4 mb-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.6 }}
+      >
+        <div className="glass-card rounded-xl p-3 flex items-center justify-center gap-4 text-xs text-muted-foreground">
+          <span className="flex items-center gap-1.5">
+            <Moon className="w-3.5 h-3.5 text-indigo-400" />
+            {stories.length} historias
+          </span>
+          <span className="w-px h-3 bg-border" />
+          <span>{shortStoriesCount > 0 ? `${shortStoriesCount} cortas` : '✓ expandidas'}</span>
+          <span className="w-px h-3 bg-border" />
+          <span>{storiesWithoutAudioCount > 0 ? `${storiesWithoutAudioCount} sin audio` : '✓ audio'}</span>
+        </div>
+      </motion.div>
 
       {/* AI Generation buttons */}
-      <div className="px-4 mb-4 space-y-2">
+      <motion.div 
+        className="px-4 mb-6 space-y-2"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.7 }}
+      >
         <Button
           variant="outline"
-          className="w-full justify-start gap-2"
+          className="w-full justify-start gap-2 glass-button border-border/30 h-12"
           onClick={handleCreateNewStories}
           disabled={isAnyProcessRunning}
         >
           {isCreatingStories ? (
             <Loader2 className="w-4 h-4 animate-spin" />
           ) : (
-            <PlusCircle className="w-4 h-4 text-primary" />
+            <PlusCircle className="w-4 h-4 text-indigo-400" />
           )}
           <span>Crear nuevas historias bíblicas con IA</span>
           <Sparkles className="w-4 h-4 text-amber-500 ml-auto" />
@@ -218,16 +336,33 @@ const SleepStories = () => {
         {shortStoriesCount > 0 && (
           <Button
             variant="outline"
-            className="w-full justify-start gap-2"
+            className="w-full justify-start gap-2 glass-button border-border/30 h-12"
             onClick={handleExpandStories}
             disabled={isAnyProcessRunning}
           >
             {isExpandingStories ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
-              <Expand className="w-4 h-4 text-primary" />
+              <Expand className="w-4 h-4 text-purple-400" />
             )}
-            <span>Expandir {shortStoriesCount} historias cortas a 10-15 min</span>
+            <span>Expandir {shortStoriesCount} historias cortas</span>
+            <Sparkles className="w-4 h-4 text-amber-500 ml-auto" />
+          </Button>
+        )}
+
+        {storiesWithoutImageCount > 0 && (
+          <Button
+            variant="outline"
+            className="w-full justify-start gap-2 glass-button border-border/30 h-12"
+            onClick={handleGenerateAllImages}
+            disabled={isAnyProcessRunning}
+          >
+            {isGeneratingImages ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <ImagePlus className="w-4 h-4 text-cyan-400" />
+            )}
+            <span>Generar {storiesWithoutImageCount} imágenes con IA</span>
             <Sparkles className="w-4 h-4 text-amber-500 ml-auto" />
           </Button>
         )}
@@ -235,27 +370,45 @@ const SleepStories = () => {
         {storiesWithoutAudioCount > 0 && !hasActiveJobs && (
           <Button
             variant="outline"
-            className="w-full justify-start gap-2"
+            className="w-full justify-start gap-2 glass-button border-border/30 h-12"
             onClick={handleQueueAudioGeneration}
             disabled={isAnyProcessRunning}
           >
-            <Volume2 className="w-4 h-4 text-primary" />
+            <Volume2 className="w-4 h-4 text-green-400" />
             <span>Encolar audio TTS para {storiesWithoutAudioCount} historias</span>
             <Sparkles className="w-4 h-4 text-amber-500 ml-auto" />
           </Button>
         )}
-      </div>
+      </motion.div>
 
-      {/* Stories list */}
-      <div className="px-4 space-y-3">
+      {/* Stories grid */}
+      <motion.div 
+        className="px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
         {stories.map((story) => (
-          <SleepStoryCard
-            key={story.id}
-            story={story}
-            onClick={() => handleStorySelect(story)}
-          />
+          <motion.div key={story.id} variants={itemVariants}>
+            <SleepStoryCard
+              story={story}
+              onClick={() => handleStorySelect(story)}
+              onGenerateImage={async () => {
+                try {
+                  toast.loading(`Generando imagen...`, { id: `image-${story.id}` });
+                  await supabase.functions.invoke('generate-sleep-image', {
+                    body: { storyId: story.id }
+                  });
+                  toast.success('Imagen generada', { id: `image-${story.id}` });
+                  refetch();
+                } catch (error) {
+                  toast.error('Error al generar imagen', { id: `image-${story.id}` });
+                }
+              }}
+            />
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       {/* Player modal */}
       {selectedStory && (
