@@ -63,53 +63,63 @@ export const JobProgressPanel = ({
 
   const [autoProcess, setAutoProcess] = useState(false);
   const [countdown, setCountdown] = useState(0);
+  const [isWaiting, setIsWaiting] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Auto-procesamiento con delay de 30 segundos
+  // Iniciar countdown cuando se activa auto-process o termina un job
   useEffect(() => {
-    // Limpiar timers anteriores
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
-    if (countdownRef.current) {
-      clearInterval(countdownRef.current);
-      countdownRef.current = null;
-    }
-
-    // Si no está activo o no hay pendientes, salir
-    if (!autoProcess || stats.pending === 0) {
+    // Si no está activo, limpiar todo
+    if (!autoProcess) {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      if (countdownRef.current) clearInterval(countdownRef.current);
       setCountdown(0);
+      setIsWaiting(false);
       return;
     }
 
-    // Si hay algo procesando, esperar
+    // Si no hay pendientes, desactivar
+    if (stats.pending === 0) {
+      setAutoProcess(false);
+      return;
+    }
+
+    // Si hay algo procesando, solo esperar
     if (stats.processing > 0) {
+      setIsWaiting(false);
       setCountdown(0);
       return;
     }
 
-    // Iniciar countdown de 30 segundos
-    console.log('Auto-process: iniciando countdown de 30s, pendientes:', stats.pending);
+    // Si ya estamos esperando, no reiniciar
+    if (isWaiting) return;
+
+    // Iniciar countdown
+    console.log('Auto-process: iniciando countdown');
+    setIsWaiting(true);
     setCountdown(30);
     
     countdownRef.current = setInterval(() => {
-      setCountdown(prev => Math.max(0, prev - 1));
+      setCountdown(prev => {
+        if (prev <= 1) {
+          if (countdownRef.current) clearInterval(countdownRef.current);
+          return 0;
+        }
+        return prev - 1;
+      });
     }, 1000);
 
     timerRef.current = setTimeout(async () => {
       console.log('Auto-process: ejecutando triggerProcessing');
+      setIsWaiting(false);
       await triggerProcessing();
-      // Refetch para actualizar stats
-      setTimeout(() => refetch(), 2000);
     }, 30000);
 
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
       if (countdownRef.current) clearInterval(countdownRef.current);
     };
-  }, [autoProcess, stats.pending, stats.processing, triggerProcessing, refetch]);
+  }, [autoProcess, stats.pending, stats.processing, isWaiting, triggerProcessing]);
 
   if (loading) {
     return (
