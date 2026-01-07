@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, BookOpen, Sparkles, Loader2 } from "lucide-react";
+import { ArrowLeft, BookOpen, Sparkles, Loader2, HelpCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { NovenaCard } from "@/components/novenas/NovenaCard";
 import { NovenaDiaDetail } from "@/components/novenas/NovenaDiaDetail";
+import { NovenasWhyModal } from "@/components/novenas/NovenasWhyModal";
 import { useNovenas, Novena } from "@/hooks/useNovenas";
 import { useNotifications } from "@/hooks/useNotifications";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
@@ -43,6 +44,7 @@ const Novenas = () => {
   const [activeTab, setActiveTab] = useState("todas");
   const [isGeneratingAll, setIsGeneratingAll] = useState(false);
   const [generationProgress, setGenerationProgress] = useState({ current: 0, total: 0 });
+  const [showWhyModal, setShowWhyModal] = useState(false);
 
   const novenasWithoutImage = novenas.filter(n => !n.imagen_url);
 
@@ -216,15 +218,25 @@ const Novenas = () => {
             <div className="p-2 rounded-full bg-primary/20">
               <BookOpen className="h-5 w-5 text-primary" />
             </div>
-            <div className="text-sm">
+            <div className="flex-1 text-sm">
               <p className="font-medium text-foreground">¿Qué es una novena?</p>
               <p className="text-muted-foreground mt-1">
                 Una práctica de oración durante nueve días consecutivos, 
                 pidiendo una intención especial.
               </p>
             </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-primary hover:text-primary/80 hover:bg-primary/10 shrink-0"
+              onClick={() => setShowWhyModal(true)}
+            >
+              <HelpCircle className="w-5 h-5" />
+            </Button>
           </div>
         </motion.div>
+
+        <NovenasWhyModal open={showWhyModal} onOpenChange={setShowWhyModal} />
       </motion.div>
 
       {/* Tabs */}
