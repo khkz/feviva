@@ -63,63 +63,73 @@ export const JobProgressPanel = ({
 
   const [autoProcess, setAutoProcess] = useState(false);
   const [countdown, setCountdown] = useState(0);
-  const [isWaiting, setIsWaiting] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
+  const isRunningRef = useRef(false);
 
-  // Iniciar countdown cuando se activa auto-process o termina un job
+  // Auto-procesamiento
   useEffect(() => {
-    // Si no está activo, limpiar todo
-    if (!autoProcess) {
+    const cleanup = () => {
       if (timerRef.current) clearTimeout(timerRef.current);
       if (countdownRef.current) clearInterval(countdownRef.current);
+      timerRef.current = null;
+      countdownRef.current = null;
+    };
+
+    if (!autoProcess) {
+      cleanup();
       setCountdown(0);
-      setIsWaiting(false);
+      isRunningRef.current = false;
       return;
     }
 
-    // Si no hay pendientes, desactivar
     if (stats.pending === 0) {
       setAutoProcess(false);
       return;
     }
 
-    // Si hay algo procesando, solo esperar
+    // Si hay algo procesando, esperar y hacer polling
     if (stats.processing > 0) {
-      setIsWaiting(false);
+      cleanup();
       setCountdown(0);
-      return;
+      isRunningRef.current = false;
+      // Poll cada 5 segundos hasta que termine
+      timerRef.current = setTimeout(() => refetch(), 5000);
+      return () => cleanup();
     }
 
-    // Si ya estamos esperando, no reiniciar
-    if (isWaiting) return;
+    // Si ya hay un countdown corriendo, no reiniciar
+    if (isRunningRef.current) return;
 
-    // Iniciar countdown
-    console.log('Auto-process: iniciando countdown');
-    setIsWaiting(true);
-    setCountdown(30);
-    
+    // Iniciar countdown de 10 segundos
+    console.log('Auto-process: iniciando countdown de 10s');
+    isRunningRef.current = true;
+    setCountdown(10);
+
+    let count = 10;
     countdownRef.current = setInterval(() => {
-      setCountdown(prev => {
-        if (prev <= 1) {
-          if (countdownRef.current) clearInterval(countdownRef.current);
-          return 0;
-        }
-        return prev - 1;
-      });
+      count--;
+      setCountdown(count);
+      if (count <= 0 && countdownRef.current) {
+        clearInterval(countdownRef.current);
+        countdownRef.current = null;
+      }
     }, 1000);
 
     timerRef.current = setTimeout(async () => {
       console.log('Auto-process: ejecutando triggerProcessing');
-      setIsWaiting(false);
-      await triggerProcessing();
-    }, 30000);
+      isRunningRef.current = false;
+      try {
+        await triggerProcessing();
+      } catch (e) {
+        console.error('Auto-process error:', e);
+      }
+      // Refetch después de procesar
+      setTimeout(() => refetch(), 3000);
+    }, 10000);
 
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-      if (countdownRef.current) clearInterval(countdownRef.current);
-    };
-  }, [autoProcess, stats.pending, stats.processing, isWaiting, triggerProcessing]);
+    return () => cleanup();
+  }, [autoProcess, stats.pending, stats.processing, triggerProcessing, refetch]);
 
   if (loading) {
     return (
@@ -218,8 +228,8 @@ export const JobProgressPanel = ({
                 {autoProcess 
                   ? countdown > 0 
                     ? `Siguiente en ${countdown}s...` 
-                    : 'Procesando...'
-                  : 'Procesa cada 30 segundos automáticamente'}
+                    : stats.processing > 0 ? 'Esperando...' : 'Procesando...'
+                  : 'Procesa cada 10 segundos automáticamente'}
               </p>
             </div>
             {autoProcess && countdown > 0 && (
