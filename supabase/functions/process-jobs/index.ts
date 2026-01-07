@@ -4,10 +4,6 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 // Declaración de EdgeRuntime para background tasks
-declare const EdgeRuntime: {
-  waitUntil: (promise: Promise<unknown>) => void;
-};
-
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -595,22 +591,6 @@ async function processJob(job: ProcessingJob): Promise<void> {
   }
 }
 
-// ============ PROCESAMIENTO EN BACKGROUND ============
-
-async function processJobsInBackground(jobs: ProcessingJob[]): Promise<void> {
-  console.log(`[process-jobs] Iniciando procesamiento en background de ${jobs.length} jobs`);
-  
-  for (const job of jobs) {
-    try {
-      await processJob(job);
-    } catch (error) {
-      console.error(`[process-jobs] Error inesperado en job ${job.id}:`, error);
-    }
-  }
-  
-  console.log(`[process-jobs] Procesamiento en background completado (${jobs.length} jobs)`);
-}
-
 // ============ HANDLER PRINCIPAL ============
 
 serve(async (req) => {
@@ -620,87 +600,96 @@ serve(async (req) => {
   }
 
   try {
-    const { job_type, limit = 100 } = await req.json().catch(() => ({}));
+    const { job_type, action } = await req.json().catch(() => ({}));
     
-    console.log(`[process-jobs] Buscando jobs pendientes (tipo: ${job_type || 'todos'}, límite: ${limit})`);
+    // Reset stalled jobs action
+    if (action === 'reset-stalled') {
+      const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+      const { data, error } = await supabase
+        .from('processing_jobs')
+        .update({ status: 'pending', started_at: null, attempts: 0 })
+        .eq('status', 'processing')
+        .lt('started_at', tenMinutesAgo)
+        .select();
+      
+      if (error) {
+        return new Response(
+          JSON.stringify({ error: 'Error resetting jobs', details: error.message }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      return new Response(
+        JSON.stringify({ message: `Reseteados ${data?.length || 0} jobs atascados`, reset: data?.length || 0 }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
     
-    // Buscar jobs pendientes
+    console.log(`[process-jobs] Procesando 1 job de tipo: ${job_type || 'todos'}`);
+
+    // Buscar SOLO 1 job pendiente
     let query = supabase
       .from('processing_jobs')
       .select('*')
       .eq('status', 'pending')
       .order('created_at', { ascending: true })
-      .limit(limit);
+      .limit(1);
     
     if (job_type) {
       query = query.eq('job_type', job_type);
     }
-    
-    const { data: jobs, error: queryError } = await query;
-    
-    if (queryError) {
-      throw new Error(`Error buscando jobs: ${queryError.message}`);
+
+    const { data: jobs, error: fetchError } = await query;
+
+    if (fetchError) {
+      console.error('[process-jobs] Error fetching jobs:', fetchError);
+      return new Response(
+        JSON.stringify({ error: 'Error fetching jobs', details: fetchError.message }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
-    
+
     if (!jobs || jobs.length === 0) {
       console.log('[process-jobs] No hay jobs pendientes');
       return new Response(
-        JSON.stringify({ 
-          message: 'No hay jobs pendientes',
-          processed: 0,
-          status: 'idle'
-        }),
+        JSON.stringify({ message: 'No hay jobs pendientes', processed: 0, remaining: 0 }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-    
-    console.log(`[process-jobs] Encontrados ${jobs.length} jobs pendientes`);
-    
-    // Marcar todos como 'processing' ANTES de responder (lock optimista)
-    const jobIds = jobs.map(j => j.id);
-    const { error: updateError } = await supabase
+
+    const job = jobs[0] as ProcessingJob;
+    console.log(`[process-jobs] Procesando job: ${job.id} - ${job.target_title}`);
+
+    // Procesar el job SÍNCRONAMENTE (sin background)
+    await markJobProcessing(job.id);
+    await processJob(job);
+
+    // Contar cuántos jobs quedan pendientes
+    let countQuery = supabase
       .from('processing_jobs')
-      .update({ 
-        status: 'processing', 
-        started_at: new Date().toISOString() 
-      })
-      .in('id', jobIds)
-      .eq('status', 'pending'); // Solo si aún está pending (evita duplicados)
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'pending');
     
-    if (updateError) {
-      console.error('[process-jobs] Error marcando jobs como processing:', updateError);
+    if (job_type) {
+      countQuery = countQuery.eq('job_type', job_type);
     }
     
-    // Iniciar procesamiento en BACKGROUND
-    EdgeRuntime.waitUntil(
-      processJobsInBackground(jobs as ProcessingJob[])
-    );
-    
-    // Responder INMEDIATAMENTE
+    const { count } = await countQuery;
+
     return new Response(
       JSON.stringify({ 
-        message: `${jobs.length} jobs en cola de procesamiento`,
-        processed: jobs.length,
-        status: 'processing',
-        jobs: jobs.map(j => ({ 
-          id: j.id, 
-          type: j.job_type, 
-          title: j.target_title 
-        }))
+        message: `Completado: ${job.target_title || job.job_type}`,
+        processed: 1,
+        remaining: count || 0
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-    
+
   } catch (error) {
     console.error('[process-jobs] Error:', error);
     return new Response(
-      JSON.stringify({ 
-        error: error instanceof Error ? error.message : 'Error desconocido' 
-      }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
+      JSON.stringify({ error: 'Unexpected error', details: String(error) }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });

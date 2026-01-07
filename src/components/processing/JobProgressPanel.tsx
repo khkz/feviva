@@ -54,6 +54,7 @@ export const JobProgressPanel = ({
     loading,
     triggerProcessing,
     retryFailed,
+    resetStalledJobs,
     clearCompleted,
     refetch,
   } = useProcessingJobs({ jobType });
@@ -146,12 +147,23 @@ export const JobProgressPanel = ({
           {hasPending && (
             <Button
               size="sm"
-              onClick={() => triggerProcessing(100)}
+              onClick={() => triggerProcessing()}
               disabled={isProcessing}
               className="gap-1"
             >
               <Play className="h-3 w-3" />
-              {isProcessing ? 'Procesando...' : `Procesar todos (${stats.pending})`}
+              {isProcessing ? 'Procesando...' : 'Procesar siguiente'}
+            </Button>
+          )}
+          {isProcessing && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => resetStalledJobs()}
+              className="gap-1"
+            >
+              <RefreshCw className="h-3 w-3" />
+              Resetear atascados ({stats.processing})
             </Button>
           )}
           {hasErrors && (

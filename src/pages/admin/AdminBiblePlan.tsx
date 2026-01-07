@@ -129,13 +129,13 @@ export const AdminBiblePlan = () => {
     await queueDays();
   };
 
-  // Procesar siguiente lote
-  const processNext = async (count: number = 5) => {
+  // Procesar siguiente job
+  const processNext = async () => {
     try {
-      await triggerProcessing(count);
+      await triggerProcessing();
       toast({
         title: 'Procesando',
-        description: `Procesando ${count} días...`
+        description: 'Procesando siguiente día...'
       });
     } catch (error) {
       toast({
@@ -304,17 +304,9 @@ export const AdminBiblePlan = () => {
                   </div>
 
                   <div className="flex flex-wrap gap-2">
-                    <Button onClick={() => processNext(1)} disabled={stats.pending === 0}>
+                    <Button onClick={() => processNext()} disabled={stats.pending === 0}>
                       <Play className="h-4 w-4 mr-2" />
-                      Procesar 1
-                    </Button>
-                    <Button onClick={() => processNext(5)} disabled={stats.pending === 0}>
-                      <Play className="h-4 w-4 mr-2" />
-                      Procesar 5
-                    </Button>
-                    <Button onClick={() => processNext(10)} disabled={stats.pending === 0}>
-                      <Play className="h-4 w-4 mr-2" />
-                      Procesar 10
+                      Procesar siguiente
                     </Button>
                     <Button 
                       variant="outline" 
