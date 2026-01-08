@@ -58,7 +58,7 @@ export function GratitudePrompt() {
   if (submitted && todayEntry?.reflexion_biblica) {
     return (
       <motion.section 
-        className="px-5 py-2"
+        className="px-5 py-2 lg:px-0"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
@@ -102,7 +102,7 @@ export function GratitudePrompt() {
   if (showHistory) {
     return (
       <motion.section 
-        className="px-5 py-2"
+        className="px-5 py-2 lg:px-0"
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
       >
@@ -179,10 +179,10 @@ export function GratitudePrompt() {
 
   return (
     <motion.section 
-      className="px-5 py-2"
-      initial={{ opacity: 0, y: 20 }}
+      className="px-5 py-2 lg:px-0"
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.9 }}
+      transition={{ duration: 0.3, delay: 0.1 }}
     >
       <AnimatePresence mode="wait">
         {!isOpen ? (
@@ -201,16 +201,9 @@ export function GratitudePrompt() {
             >
               <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500/10 via-rose-500/10 to-purple-500/10 border border-amber-200/30 dark:border-amber-800/30 p-5">
                 {/* Decorative elements */}
-                <motion.div 
-                  className="absolute top-3 right-3"
-                  animate={{ 
-                    rotate: [0, 15, -15, 0],
-                    scale: [1, 1.1, 1]
-                  }}
-                  transition={{ duration: 3, repeat: Infinity }}
-                >
+                <div className="absolute top-3 right-3">
                   <Sparkles className="w-5 h-5 text-amber-400" />
-                </motion.div>
+                </div>
                 
                 <div className="flex items-center gap-4">
                   <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 via-rose-500 to-purple-600 flex items-center justify-center shadow-lg">
