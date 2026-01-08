@@ -98,7 +98,7 @@ export function HeroSection({ userName, verse, stats }: HeroSectionProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6 }}
             >
-              <p className="text-white/90 text-sm italic leading-relaxed line-clamp-2">
+              <p className="text-white/90 text-sm italic leading-relaxed">
                 "{verse.text}"
               </p>
               <p className="text-white/60 text-xs mt-1.5 font-medium">— {verse.reference}</p>
