@@ -61,11 +61,12 @@ const ApostlePath = () => {
         navigate('/mission');
         break;
       case 'reflexion':
-        // Trigger AI reflection
+        // Trigger AI reflection and scroll to AI section
         getAIReflection(stage.numero, 'reflexion');
+        document.getElementById('ai-reflection-section')?.scrollIntoView({ behavior: 'smooth' });
         break;
       case 'gratitud':
-        navigate('/dashboard');
+        navigate('/morning');
         break;
     }
   };
@@ -107,7 +108,7 @@ const ApostlePath = () => {
       <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-lg border-b">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')}>
+            <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')} className="lg:hidden">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Volver
             </Button>
@@ -270,12 +271,14 @@ const ApostlePath = () => {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* AI Guidance */}
+            <div id="ai-reflection-section">
             <AIReflection
               reflection={aiReflection}
               loading={aiLoading}
               currentStage={progress?.etapa_actual || 1}
               onGetReflection={(tipo) => getAIReflection(progress?.etapa_actual || 1, tipo)}
             />
+            </div>
 
             {/* Achievements */}
             <PathAchievements

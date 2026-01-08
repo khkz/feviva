@@ -22,6 +22,8 @@ import {
   Flame,
   UserPlus
 } from "lucide-react";
+import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
+import { BottomNavigation } from "@/components/layout/BottomNavigation";
 
 interface EvangelizationLog {
   id: string;
@@ -189,11 +191,13 @@ const Mission = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex w-full bg-background">
+      <DesktopSidebar />
+      <div className="flex-1 lg:ml-64 pb-20 md:pb-8">
       {/* Header */}
       <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-          <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')}>
+          <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')} className="lg:hidden">
             <ArrowLeft className="h-4 w-4 mr-1" />
             Volver
           </Button>
@@ -433,6 +437,8 @@ const Mission = () => {
           </CardContent>
         </Card>
       </main>
+      <BottomNavigation />
+      </div>
     </div>
   );
 };
