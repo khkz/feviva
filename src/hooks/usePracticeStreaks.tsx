@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface PracticeStreak {
   practice: string;
@@ -11,9 +12,45 @@ interface PracticeStreak {
   todayCompleted: boolean;
 }
 
+interface StreakAchievement {
+  id: string;
+  codigo: string;
+  nombre: string;
+  icono: string;
+  racha_requerida: number;
+  categoria: string;
+}
+
+interface StreakMedal {
+  practice: string;
+  practiceLabel: string;
+  practiceIcon: string;
+  currentStreak: number;
+  maxStreak: number;
+  medals: {
+    days: number;
+    name: string;
+    icon: string;
+    unlocked: boolean;
+    unlockedAt?: string;
+  }[];
+}
+
 export const usePracticeStreaks = () => {
   const [streaks, setStreaks] = useState<PracticeStreak[]>([]);
+  const [medals, setMedals] = useState<StreakMedal[]>([]);
+  const [totalUnlocked, setTotalUnlocked] = useState(0);
+  const [totalMedals, setTotalMedals] = useState(0);
+  const { toast } = useToast();
   const [loading, setLoading] = useState(true);
+
+  const practiceCategories: Record<string, { label: string; icon: string; achievementCategory: string }> = {
+    rosario: { label: "Rosario", icon: "🙏", achievementCategory: "racha_rosario" },
+    examen: { label: "Examen", icon: "🌙", achievementCategory: "racha_examen" },
+    laudes: { label: "Laudes", icon: "☀️", achievementCategory: "racha_laudes" },
+    biblia: { label: "Biblia", icon: "📖", achievementCategory: "racha_biblia" },
+    gratitud: { label: "Gratitud", icon: "❤️", achievementCategory: "racha_gratitud" },
+  };
 
   const calculateStreak = (dates: string[]): { current: number; max: number } => {
     if (!dates || dates.length === 0) return { current: 0, max: 0 };
@@ -61,6 +98,115 @@ export const usePracticeStreaks = () => {
     
     return { current: currentStreak, max: maxStreak };
   };
+
+  const fetchMedals = useCallback(async (practiceData: PracticeStreak[]) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // Fetch streak achievements
+    const { data: achievements } = await supabase
+      .from("achievements")
+      .select("*")
+      .like("categoria", "racha_%");
+
+    // Fetch user's unlocked achievements
+    const { data: userAchievements } = await supabase
+      .from("user_achievements")
+      .select("achievement_id, desbloqueado_en")
+      .eq("user_id", user.id);
+
+    const unlockedMap = new Map(
+      userAchievements?.map(ua => [ua.achievement_id, ua.desbloqueado_en]) || []
+    );
+
+    const medalsData: StreakMedal[] = [];
+    let unlocked = 0;
+    let total = 0;
+
+    for (const [practice, config] of Object.entries(practiceCategories)) {
+      const practiceStreak = practiceData.find(p => p.practice === practice);
+      const practiceAchievements = achievements?.filter(
+        a => a.categoria === config.achievementCategory
+      ) || [];
+
+      const practiceMedals = practiceAchievements.map(a => {
+        const isUnlocked = unlockedMap.has(a.id);
+        if (isUnlocked) unlocked++;
+        total++;
+
+        return {
+          days: a.racha_requerida || 0,
+          name: a.nombre,
+          icon: a.icono,
+          unlocked: isUnlocked,
+          unlockedAt: isUnlocked ? unlockedMap.get(a.id) : undefined,
+        };
+      }).sort((a, b) => a.days - b.days);
+
+      medalsData.push({
+        practice,
+        practiceLabel: config.label,
+        practiceIcon: config.icon,
+        currentStreak: practiceStreak?.currentStreak || 0,
+        maxStreak: practiceStreak?.maxStreak || 0,
+        medals: practiceMedals,
+      });
+    }
+
+    setMedals(medalsData);
+    setTotalUnlocked(unlocked);
+    setTotalMedals(total);
+  }, []);
+
+  const checkAndUnlockMedals = useCallback(async (practiceData: PracticeStreak[]) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // Fetch streak achievements
+    const { data: achievements } = await supabase
+      .from("achievements")
+      .select("*")
+      .like("categoria", "racha_%");
+
+    // Fetch user's unlocked achievements
+    const { data: userAchievements } = await supabase
+      .from("user_achievements")
+      .select("achievement_id")
+      .eq("user_id", user.id);
+
+    const unlockedIds = new Set(userAchievements?.map(ua => ua.achievement_id) || []);
+
+    for (const practice of practiceData) {
+      const config = practiceCategories[practice.practice];
+      if (!config) continue;
+
+      const practiceAchievements = achievements?.filter(
+        a => a.categoria === config.achievementCategory
+      ) || [];
+
+      for (const achievement of practiceAchievements) {
+        if (unlockedIds.has(achievement.id)) continue;
+
+        // Check if user qualifies (use maxStreak for unlocking)
+        if (practice.maxStreak >= (achievement.racha_requerida || 0)) {
+          const { error } = await supabase
+            .from("user_achievements")
+            .insert({
+              user_id: user.id,
+              achievement_id: achievement.id,
+            });
+
+          if (!error) {
+            toast({
+              title: `🏅 ¡Medalla desbloqueada!`,
+              description: `${achievement.icono} ${achievement.nombre}: ${achievement.descripcion}`,
+            });
+            unlockedIds.add(achievement.id);
+          }
+        }
+      }
+    }
+  }, [toast]);
 
   const fetchStreaks = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -169,8 +315,15 @@ export const usePracticeStreaks = () => {
     });
 
     setStreaks(practiceData);
+    
+    // Check and unlock any new medals
+    await checkAndUnlockMedals(practiceData);
+    
+    // Fetch medals data
+    await fetchMedals(practiceData);
+    
     setLoading(false);
-  }, []);
+  }, [fetchMedals, checkAndUnlockMedals]);
 
   useEffect(() => {
     fetchStreaks();
@@ -186,6 +339,9 @@ export const usePracticeStreaks = () => {
 
   return {
     streaks,
+    medals,
+    totalUnlocked,
+    totalMedals,
     loading,
     refreshStreaks: fetchStreaks,
     getPendingPractices,
