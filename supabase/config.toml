@@ -47,3 +47,6 @@ verify_jwt = false
 
 [functions.generate-gratitude-reflection]
 verify_jwt = false
+
+[functions.regenerate-daily-audio]
+verify_jwt = false
