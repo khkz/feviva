@@ -15,6 +15,7 @@ import { es } from "date-fns/locale";
 import { motion } from "framer-motion";
 import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
+import { CommentSection } from "@/components/community/CommentSection";
 
 interface Post {
   id: string;
@@ -50,6 +51,7 @@ const Community = () => {
   const [newPostContent, setNewPostContent] = useState("");
   const [newPostType, setNewPostType] = useState("testimonio");
   const [showNewPost, setShowNewPost] = useState(false);
+  const [openComments, setOpenComments] = useState<string | null>(null);
 
   useEffect(() => {
     checkAuth();
@@ -348,6 +350,13 @@ const Community = () => {
                         </div>
                       )}
                     </div>
+
+                    {/* Comments Section */}
+                    <CommentSection
+                      postId={post.id}
+                      isOpen={openComments === post.id}
+                      onToggle={() => setOpenComments(openComments === post.id ? null : post.id)}
+                    />
                   </CardContent>
                 </Card>
               </motion.div>

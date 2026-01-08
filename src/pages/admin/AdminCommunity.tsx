@@ -9,11 +9,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { MessageSquare, Heart, Users, Eye, Trash2, CheckCircle, Clock, Search, Filter } from 'lucide-react';
+import { MessageSquare, Heart, Users, Eye, Trash2, CheckCircle, Clock, Search, Filter, MessageCircle, XCircle } from 'lucide-react';
 import { StatCard } from '@/components/admin/StatCard';
+import { useCommentModeration } from '@/hooks/useCommentModeration';
 
 type PostType = 'testimonio' | 'peticion_oracion' | 'reflexion';
 type PostEstado = 'borrador' | 'revisado' | 'publicado';
@@ -63,6 +65,10 @@ export default function AdminCommunity() {
   const [filterEstado, setFilterEstado] = useState<string>('all');
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [postToDelete, setPostToDelete] = useState<Post | null>(null);
+  const [activeTab, setActiveTab] = useState('posts');
+  const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
+  
+  const { comments, isLoading: loadingComments, updateStatus: updateCommentStatus, deleteComment } = useCommentModeration();
 
   const { data: posts = [], isLoading } = useQuery({
     queryKey: ['admin-posts'],
@@ -137,14 +143,23 @@ export default function AdminCommunity() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <StatCard title="Total" value={stats.total} icon={MessageSquare} />
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+        <StatCard title="Total Posts" value={stats.total} icon={MessageSquare} />
         <StatCard title="Publicados" value={stats.publicados} icon={CheckCircle} />
         <StatCard title="Pendientes" value={stats.pendientes} icon={Clock} />
         <StatCard title="Testimonios" value={stats.testimonios} icon={Heart} />
         <StatCard title="Peticiones" value={stats.peticiones} icon={Users} />
         <StatCard title="Reflexiones" value={stats.reflexiones} icon={MessageSquare} />
+        <StatCard title="Comentarios" value={comments.length} icon={MessageCircle} />
       </div>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList>
+          <TabsTrigger value="posts">Posts</TabsTrigger>
+          <TabsTrigger value="comments">Comentarios</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="posts" className="space-y-4 mt-4">
 
       {/* Filters */}
       <Card>
@@ -274,7 +289,99 @@ export default function AdminCommunity() {
             </TableBody>
           </Table>
         </CardContent>
-      </Card>
+        </Card>
+        </TabsContent>
+
+        <TabsContent value="comments" className="space-y-4 mt-4">
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Usuario</TableHead>
+                    <TableHead>Comentario</TableHead>
+                    <TableHead className="hidden md:table-cell">Post</TableHead>
+                    <TableHead>Estado</TableHead>
+                    <TableHead className="hidden md:table-cell">Fecha</TableHead>
+                    <TableHead className="text-right">Acciones</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {loadingComments ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                        Cargando comentarios...
+                      </TableCell>
+                    </TableRow>
+                  ) : comments.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                        No hay comentarios
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    comments.map((comment) => (
+                      <TableRow key={comment.id}>
+                        <TableCell className="font-medium">
+                          {comment.profiles?.nombre || 'Usuario'}
+                        </TableCell>
+                        <TableCell className="max-w-xs truncate">
+                          {comment.contenido.substring(0, 50)}...
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">
+                          <Badge className={tipoColors[comment.posts?.tipo as PostType] || ''} variant="secondary">
+                            {tipoLabels[comment.posts?.tipo as PostType] || 'Post'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge className={estadoColors[comment.estado]} variant="secondary">
+                            {estadoLabels[comment.estado]}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">
+                          {format(new Date(comment.created_at), 'dd MMM yyyy', { locale: es })}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-1">
+                            {comment.estado !== 'publicado' && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => updateCommentStatus.mutate({ id: comment.id, estado: 'publicado' })}
+                                title="Publicar"
+                              >
+                                <CheckCircle className="h-4 w-4 text-green-600" />
+                              </Button>
+                            )}
+                            {comment.estado === 'publicado' && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => updateCommentStatus.mutate({ id: comment.id, estado: 'revisado' })}
+                                title="Ocultar"
+                              >
+                                <XCircle className="h-4 w-4 text-orange-600" />
+                              </Button>
+                            )}
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => setCommentToDelete(comment.id)}
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
       {/* View Post Dialog */}
       <Dialog open={!!selectedPost} onOpenChange={() => setSelectedPost(null)}>
@@ -334,7 +441,7 @@ export default function AdminCommunity() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation */}
+      {/* Delete Post Confirmation */}
       <AlertDialog open={!!postToDelete} onOpenChange={() => setPostToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -347,6 +454,32 @@ export default function AdminCommunity() {
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => postToDelete && deleteMutation.mutate(postToDelete.id)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Comment Confirmation */}
+      <AlertDialog open={!!commentToDelete} onOpenChange={() => setCommentToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar este comentario?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. El comentario será eliminado permanentemente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (commentToDelete) {
+                  deleteComment.mutate(commentToDelete);
+                  setCommentToDelete(null);
+                }
+              }}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Eliminar
