@@ -96,6 +96,8 @@ export const NovenaCard = ({ novena, progress, onStart, onContinue, onImageGener
           <img 
             src={novena.imagen_url} 
             alt={novena.titulo}
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover"
           />
         ) : (

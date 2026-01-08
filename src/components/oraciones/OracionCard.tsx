@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { Heart, Play, Pause, ChevronRight, Volume2 } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Heart, Play, Pause, ChevronRight, Volume2, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useAudioCache } from "@/hooks/useAudioCache";
 
 interface OracionCardProps {
   id: string;
@@ -30,18 +31,65 @@ export function OracionCard({
   onSelect,
 }: OracionCardProps) {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [audio] = useState(() => audioUrl ? new Audio(audioUrl) : null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [cachedUrl, setCachedUrl] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { getAudioWithCache } = useAudioCache();
 
-  const handlePlayPause = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!audio) return;
-    
-    if (isPlaying) {
-      audio.pause();
-    } else {
-      audio.play();
+  // Pre-cache audio if URL exists
+  useEffect(() => {
+    if (audioUrl) {
+      getAudioWithCache(audioUrl).then(cached => {
+        if (cached) setCachedUrl(cached);
+      });
     }
-    setIsPlaying(!isPlaying);
+  }, [audioUrl, getAudioWithCache]);
+
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  const handlePlayPause = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!audioUrl) return;
+    
+    if (isPlaying && audioRef.current) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+      return;
+    }
+
+    // Get cached or original URL
+    const urlToPlay = cachedUrl || audioUrl;
+    
+    try {
+      setIsLoading(true);
+      
+      if (!audioRef.current || audioRef.current.src !== urlToPlay) {
+        if (audioRef.current) {
+          audioRef.current.pause();
+        }
+        audioRef.current = new Audio(urlToPlay);
+        audioRef.current.onended = () => setIsPlaying(false);
+        audioRef.current.onerror = () => {
+          setIsPlaying(false);
+          setIsLoading(false);
+        };
+      }
+      
+      await audioRef.current.play();
+      setIsPlaying(true);
+    } catch (error) {
+      console.error('Error playing audio:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleFavorite = (e: React.MouseEvent) => {
@@ -118,8 +166,11 @@ export function OracionCard({
                 size="icon"
                 className="h-9 w-9 rounded-full text-primary hover:bg-primary/10"
                 onClick={handlePlayPause}
+                disabled={isLoading}
               >
-                {isPlaying ? (
+                {isLoading ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : isPlaying ? (
                   <Pause className="h-5 w-5" />
                 ) : (
                   <Play className="h-5 w-5 ml-0.5" />

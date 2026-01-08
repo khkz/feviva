@@ -73,12 +73,13 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const fileName = `novena-${novenaId}-${Date.now()}.png`;
+    // Use WebP format for better compression (smaller file size, faster loading)
+    const fileName = `novena-${novenaId}-${Date.now()}.webp`;
     
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('novena-images')
       .upload(fileName, imageBytes, {
-        contentType: 'image/png',
+        contentType: 'image/webp',
         upsert: true
       });
 
