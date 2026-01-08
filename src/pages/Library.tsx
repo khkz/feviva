@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { BookOpen, CheckCircle2, ArrowLeft, Trophy, Sparkles, Headphones, Wand2, Loader2 } from "lucide-react";
 import { useUserStats } from "@/hooks/useUserStats";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
+import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { LessonDetailModal } from "@/components/library/LessonDetailModal";
 
 interface Lesson {
@@ -302,7 +303,9 @@ const Library = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen flex w-full">
+      <DesktopSidebar />
+      <div className="flex-1 lg:ml-64 pb-20">
       {/* Hero Header */}
       <motion.div 
         className="relative overflow-hidden"
@@ -605,6 +608,7 @@ const Library = () => {
       </AnimatePresence>
 
       <BottomNavigation />
+      </div>
     </div>
   );
 };

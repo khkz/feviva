@@ -7,6 +7,8 @@ import { useUserStats } from "@/hooks/useUserStats";
 import { LevelDisplay } from "@/components/gamification/LevelDisplay";
 import { AchievementsDisplay } from "@/components/gamification/AchievementsDisplay";
 import { StatsOverview } from "@/components/gamification/StatsOverview";
+import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
+import { BottomNavigation } from "@/components/layout/BottomNavigation";
 
 const Gamification = () => {
   const navigate = useNavigate();
@@ -39,7 +41,9 @@ const Gamification = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex w-full">
+      <DesktopSidebar />
+      <div className="flex-1 lg:ml-64 pb-20 md:pb-8">
       <div className="container mx-auto px-4 py-8">
         <Button
           variant="ghost"
@@ -72,6 +76,8 @@ const Gamification = () => {
             userAchievements={userAchievements}
           />
         </div>
+      </div>
+      <BottomNavigation />
       </div>
     </div>
   );

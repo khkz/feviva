@@ -13,6 +13,8 @@ import { useToast } from "@/hooks/use-toast";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import { motion } from "framer-motion";
+import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
+import { BottomNavigation } from "@/components/layout/BottomNavigation";
 
 interface Post {
   id: string;
@@ -177,7 +179,9 @@ const Community = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex w-full">
+      <DesktopSidebar />
+      <div className="flex-1 lg:ml-64 pb-20 md:pb-8">
       {/* Hero Header */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-secondary/60" />
@@ -351,6 +355,8 @@ const Community = () => {
           </motion.div>
         )}
       </main>
+      <BottomNavigation />
+      </div>
     </div>
   );
 };
