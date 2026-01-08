@@ -29,10 +29,13 @@ import {
   Share2
 } from "lucide-react";
 import { ShareModal } from "@/components/shared/ShareModal";
+import { GospelCard } from "@/components/gospel/GospelCard";
+import { useDailyGospel } from "@/hooks/useDailyGospel";
 
 const STEPS = [
   { id: 'saludo', title: 'Buenos días', icon: Sun },
   { id: 'versiculo', title: 'Versículo del día', icon: BookOpen },
+  { id: 'evangelio', title: 'Evangelio del día', icon: BookOpen },
   { id: 'reflexion', title: 'Reflexión', icon: Sparkles },
   { id: 'laudes', title: 'Oración de Laudes', icon: Heart },
   { id: 'meta', title: 'Meta de evangelización', icon: Target },
@@ -44,6 +47,7 @@ const Morning = () => {
   const { toast } = useToast();
   const { content, ritual, loading, generating, completeMorningRitual } = useDailyContent();
   const { stats, addPoints } = useUserStats();
+  const { todayGospel } = useDailyGospel();
   
   const [currentStep, setCurrentStep] = useState(0);
   const [metaEvangelizacion, setMetaEvangelizacion] = useState('');
@@ -232,6 +236,15 @@ const Morning = () => {
             referencia={content.versiculo_referencia}
             texto={content.versiculo_texto}
             audioUrl={content.audio_versiculo_url}
+          />
+        );
+      
+      case 'evangelio':
+        return (
+          <GospelCard 
+            gospel={todayGospel}
+            title="Evangelio de Hoy"
+            subtitle="Reflexión del Padre Luis Zazano"
           />
         );
       

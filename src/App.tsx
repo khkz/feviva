@@ -28,6 +28,7 @@ import NotFound from "./pages/NotFound";
 import ApostlePath from "./pages/ApostlePath";
 import ApologeticsIntro from "./pages/ApologeticsIntro";
 import Gratitude from "./pages/Gratitude";
+import DailyGospel from "./pages/DailyGospel";
 import { AdminLayout } from "./layouts/AdminLayout";
 import {
   AdminDashboard,
@@ -80,6 +81,8 @@ const App = () => (
             <Route path="/apostle-path" element={<ApostlePath />} />
             <Route path="/apologetics-intro" element={<ApologeticsIntro />} />
             <Route path="/gratitude" element={<Gratitude />} />
+            <Route path="/evangelio" element={<DailyGospel />} />
+            <Route path="/evangelio/:fecha" element={<DailyGospel />} />
             
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminLayout />}>
