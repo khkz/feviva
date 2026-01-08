@@ -12,7 +12,9 @@ import {
   Target,
   Trophy,
   ChevronRight,
-  Route
+  Route,
+  Flower2,
+  GraduationCap
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import logoElRugido from "@/assets/logo-elrugido.svg";
@@ -28,14 +30,14 @@ const mainNavItems: NavItem[] = [
   { path: "/apostle-path", icon: Route, label: "Ruta del Apóstol" },
   { path: "/bible-plan", icon: BookOpen, label: "Biblia 365" },
   { path: "/oraciones", icon: Hand, label: "Oraciones" },
-  { path: "/rosario", icon: BookOpen, label: "Rosario" },
+  { path: "/rosario", icon: Flower2, label: "Rosario" },
   { path: "/novenas", icon: Flame, label: "Novenas" },
   { path: "/sleep-stories", icon: Moon, label: "Dormir" },
 ];
 
 const secondaryNavItems: NavItem[] = [
   { path: "/coach", icon: MessageCircle, label: "Coach de Fe" },
-  { path: "/library", icon: BookOpen, label: "Biblioteca" },
+  { path: "/library", icon: GraduationCap, label: "Biblioteca" },
   { path: "/habits", icon: Target, label: "Hábitos" },
   { path: "/community", icon: Users, label: "Comunidad" },
   { path: "/gamification", icon: Trophy, label: "Logros" },

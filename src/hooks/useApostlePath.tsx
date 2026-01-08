@@ -53,7 +53,7 @@ const LESSON_TITLE_MAP: Record<string, string> = {
   'existe-dios': '¿Existe Dios?',
   'biblia-confiable': 'La Confiabilidad de la Biblia',
   'jesus-historico': 'Jesús Histórico',
-  'resurreccion': 'La Resurrección',
+  'resurreccion': 'La Resurrección de Jesús',
   'fe-ciencia': 'Fe y Ciencia',
   'salvacion': 'Salvación por Gracia',
   'problema-mal': 'El Problema del Mal',
