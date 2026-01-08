@@ -791,6 +791,36 @@ export type Database = {
         }
         Relationships: []
       }
+      gratitude_sessions: {
+        Row: {
+          audio_url: string | null
+          created_at: string | null
+          descripcion: string
+          duracion_min: number | null
+          id: string
+          numero: number
+          titulo: string
+        }
+        Insert: {
+          audio_url?: string | null
+          created_at?: string | null
+          descripcion: string
+          duracion_min?: number | null
+          id?: string
+          numero: number
+          titulo: string
+        }
+        Update: {
+          audio_url?: string | null
+          created_at?: string | null
+          descripcion?: string
+          duracion_min?: number | null
+          id?: string
+          numero?: number
+          titulo?: string
+        }
+        Relationships: []
+      }
       habit_logs: {
         Row: {
           completado: boolean | null
@@ -1592,6 +1622,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_gratitude_progress: {
+        Row: {
+          created_at: string | null
+          id: string
+          sesion_actual: number | null
+          sesiones_completadas: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          sesion_actual?: number | null
+          sesiones_completadas?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          sesion_actual?: number | null
+          sesiones_completadas?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       user_lesson_progress: {
         Row: {
