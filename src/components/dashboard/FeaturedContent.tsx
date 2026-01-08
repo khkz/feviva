@@ -2,6 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Play, BookOpen, Heart, Moon, Sun, Clock } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import libraryImage from "@/assets/library-section.jpg";
 import communityImage from "@/assets/community-section.jpg";
 import habitsImage from "@/assets/habits-section.jpg";
@@ -12,7 +14,7 @@ interface FeaturedItem {
   icon: LucideIcon;
   title: string;
   subtitle: string;
-  sessions: number;
+  sessionKey: "bible" | "gratitude" | "homily" | "sleep";
   gradient: string;
   path: string;
   badge?: string;
@@ -25,7 +27,7 @@ const featuredItems: FeaturedItem[] = [
     icon: BookOpen,
     title: "La Biblia en 365 días",
     subtitle: "Plan de lectura diaria",
-    sessions: 365,
+    sessionKey: "bible",
     gradient: "from-indigo-600 via-purple-600 to-pink-500",
     path: "/bible-plan",
     badge: "Nuevo",
@@ -36,7 +38,7 @@ const featuredItems: FeaturedItem[] = [
     icon: Heart,
     title: "Diario de Gratitud",
     subtitle: "Inicia tu día bien",
-    sessions: 254,
+    sessionKey: "gratitude",
     gradient: "from-rose-500 via-pink-500 to-orange-400",
     path: "/gratitude",
     image: communityImage
@@ -46,7 +48,7 @@ const featuredItems: FeaturedItem[] = [
     icon: Sun,
     title: "Homilía del Día",
     subtitle: "Reflexión diaria",
-    sessions: 1094,
+    sessionKey: "homily",
     gradient: "from-amber-500 via-orange-500 to-red-500",
     path: "/morning",
     image: libraryImage
@@ -56,12 +58,33 @@ const featuredItems: FeaturedItem[] = [
     icon: Moon,
     title: "Historias para Dormir",
     subtitle: "Descansa en paz",
-    sessions: 48,
+    sessionKey: "sleep",
     gradient: "from-slate-700 via-indigo-800 to-purple-900",
     path: "/sleep-stories",
     image: habitsImage
   },
 ];
+
+function useSessionCounts() {
+  return useQuery({
+    queryKey: ['featured-session-counts'],
+    queryFn: async () => {
+      const [gratitudeRes, homiliesRes, sleepRes] = await Promise.all([
+        supabase.from('gratitude_sessions').select('id', { count: 'exact', head: true }),
+        supabase.from('daily_content').select('id', { count: 'exact', head: true }),
+        supabase.from('sleep_stories').select('id', { count: 'exact', head: true }),
+      ]);
+
+      return {
+        bible: 365,
+        gratitude: gratitudeRes.count ?? 0,
+        homily: homiliesRes.count ?? 0,
+        sleep: sleepRes.count ?? 0,
+      };
+    },
+    staleTime: 1000 * 60 * 60, // 1 hour
+  });
+}
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -85,6 +108,7 @@ const itemVariants = {
 
 export function FeaturedContent() {
   const navigate = useNavigate();
+  const { data: sessionCounts } = useSessionCounts();
 
   return (
     <motion.section 
@@ -134,7 +158,7 @@ export function FeaturedContent() {
                 <p className="text-sm text-muted-foreground">{item.subtitle}</p>
                 <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
                   <Clock className="w-3 h-3" />
-                  <span>{item.sessions} sesiones</span>
+                  <span>{sessionCounts?.[item.sessionKey] ?? '...'} sesiones</span>
                 </div>
               </div>
               <motion.div 
@@ -204,7 +228,7 @@ export function FeaturedContent() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1 text-white/70 text-xs">
                   <Clock className="w-3.5 h-3.5" />
-                  <span>{item.sessions} sesiones</span>
+                  <span>{sessionCounts?.[item.sessionKey] ?? '...'} sesiones</span>
                 </div>
                 
                 <motion.div 
