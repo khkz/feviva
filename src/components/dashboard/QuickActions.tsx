@@ -105,7 +105,7 @@ export function QuickActions() {
 
       {/* Desktop: Full grid */}
       <motion.div 
-        className="hidden lg:grid grid-cols-5 gap-4"
+        className="hidden lg:grid grid-cols-6 gap-4"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
