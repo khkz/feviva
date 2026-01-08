@@ -8,6 +8,8 @@ import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { HeroSection } from "@/components/dashboard/HeroSection";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 import { ProgressCard } from "@/components/dashboard/ProgressCard";
+import { PracticeStreaksCard } from "@/components/dashboard/PracticeStreaksCard";
+import { PracticeRemindersCard } from "@/components/dashboard/PracticeRemindersCard";
 import { NovenaCarousel } from "@/components/dashboard/NovenaCarousel";
 import { ExploreGrid } from "@/components/dashboard/ExploreGrid";
 import { DailyChallenge } from "@/components/dashboard/DailyChallenge";
@@ -140,6 +142,12 @@ const Dashboard = () => {
             <div className="lg:col-span-1">
               {/* Gratitude Prompt */}
               <GratitudePrompt />
+
+              {/* Practice Streaks */}
+              <PracticeStreaksCard />
+
+              {/* Practice Reminders */}
+              <PracticeRemindersCard />
 
               {/* Progress Card - Hidden on desktop (shown in hero) */}
               <div className="lg:hidden">
