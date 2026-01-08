@@ -125,6 +125,15 @@ function extractDayFromTitle(title: string): number | null {
   return null;
 }
 
+function cleanTitle(title: string): string {
+  // Remove prefixes like "Día 1:", "Día 1 -", "Day 1:", etc.
+  return title
+    .replace(/^D[íi]a\s*\d+\s*[-:]\s*/i, '')
+    .replace(/^Day\s*\d+\s*[-:]\s*/i, '')
+    .replace(/^\d+\s*[-:]\s*/, '')
+    .trim();
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -165,9 +174,14 @@ serve(async (req) => {
     let errors: string[] = [];
     
     for (const video of videosWithDays) {
+      const cleanedTitle = cleanTitle(video.title);
+      
       const { error } = await supabase
         .from('bible_reading_plan')
-        .update({ youtube_video_id: video.videoId })
+        .update({ 
+          youtube_video_id: video.videoId,
+          titulo: cleanedTitle
+        })
         .eq('dia', video.dayNumber);
       
       if (error) {
@@ -175,6 +189,7 @@ serve(async (req) => {
         console.error(`Error updating day ${video.dayNumber}:`, error);
       } else {
         updatedCount++;
+        console.log(`Updated day ${video.dayNumber}: "${cleanedTitle}"`);
       }
     }
     
