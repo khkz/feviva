@@ -11,7 +11,8 @@ import {
   User, 
   Target,
   Trophy,
-  ChevronRight
+  ChevronRight,
+  Route
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import logoElRugido from "@/assets/logo-elrugido.svg";
@@ -24,6 +25,7 @@ interface NavItem {
 
 const mainNavItems: NavItem[] = [
   { path: "/dashboard", icon: Home, label: "Inicio" },
+  { path: "/apostle-path", icon: Route, label: "Ruta del Apóstol" },
   { path: "/bible-plan", icon: BookOpen, label: "Biblia 365" },
   { path: "/oraciones", icon: Hand, label: "Oraciones" },
   { path: "/rosario", icon: BookOpen, label: "Rosario" },

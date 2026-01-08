@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { MessageCircle, BookOpen, Users, Target, Route } from "lucide-react";
+import { MessageCircle, BookOpen, Users, Target, Route, Shield } from "lucide-react";
 import { motion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 import coachImage from "@/assets/coach-section.jpg";
@@ -24,6 +24,13 @@ const exploreItems: ExploreItem[] = [
     path: "/apostle-path",
     image: coachImage,
     featured: true
+  },
+  {
+    icon: Shield,
+    label: "Apologética 101",
+    description: "Fundamentos de la fe",
+    path: "/apologetics-intro",
+    image: libraryImage
   },
   {
     icon: MessageCircle,
