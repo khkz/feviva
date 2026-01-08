@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Star, Flame, BookOpen, Swords, Trophy } from 'lucide-react';
+import { ArrowLeft, Star, Flame, BookOpen, Swords, Trophy, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -119,6 +119,31 @@ const ApostlePath = () => {
       </div>
 
       <div className="container mx-auto px-4 py-6 space-y-8">
+        {/* Banner Apologética Intro */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <Card className="bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/20">
+            <CardContent className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center">
+                  <Shield className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">¿Nuevo en la apologética?</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Descubre qué es y los fundamentos básicos
+                  </p>
+                </div>
+              </div>
+              <Button variant="outline" onClick={() => navigate('/apologetics-intro')} className="shrink-0">
+                Ver Introducción
+              </Button>
+            </CardContent>
+          </Card>
+        </motion.div>
+
         {/* Hero Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
