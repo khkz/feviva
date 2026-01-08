@@ -66,9 +66,9 @@ export function DailyChallenge() {
   return (
     <motion.section 
       className="px-5 py-2 lg:px-0"
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.8 }}
+      transition={{ duration: 0.3, delay: 0.1 }}
     >
       <motion.div 
         className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary to-primary/80"
@@ -95,13 +95,9 @@ export function DailyChallenge() {
           <div className="lg:flex-1">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <motion.div 
-                  className="w-12 h-12 lg:w-14 lg:h-14 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center"
-                  animate={{ rotate: [0, 5, -5, 0] }}
-                  transition={{ duration: 4, repeat: Infinity, repeatDelay: 2 }}
-                >
+                <div className="w-12 h-12 lg:w-14 lg:h-14 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
                   <Target className="w-6 h-6 lg:w-7 lg:h-7 text-secondary" />
-                </motion.div>
+                </div>
                 <div>
                   <h3 className="font-heading text-lg lg:text-2xl font-bold text-white">
                     Desafío Diario

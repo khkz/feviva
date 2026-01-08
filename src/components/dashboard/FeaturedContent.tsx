@@ -68,8 +68,8 @@ const containerVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.2,
+      staggerChildren: 0.06,
+      delayChildren: 0.1,
     },
   },
 };
@@ -89,9 +89,9 @@ export function FeaturedContent() {
   return (
     <motion.section 
       className="px-5 py-4 lg:px-0"
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 1.0 }}
+      transition={{ duration: 0.3, delay: 0.15 }}
     >
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-heading text-xl font-bold text-foreground">

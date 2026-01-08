@@ -67,8 +67,8 @@ const containerVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.3,
+      staggerChildren: 0.05,
+      delayChildren: 0.1,
     },
   },
 } as const;
@@ -89,9 +89,9 @@ export function ExploreGrid() {
   return (
     <motion.section 
       className="px-5 py-4 lg:px-0"
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: 1.4 }}
+      transition={{ duration: 0.3, delay: 0.2 }}
     >
       <h2 className="font-heading text-lg lg:text-xl font-semibold text-foreground mb-3">
         Explora

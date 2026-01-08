@@ -28,9 +28,9 @@ export function ProgressCard({
   return (
     <motion.section 
       className="px-5 py-3 lg:px-0"
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: 1.0 }}
+      transition={{ duration: 0.3, delay: 0.15 }}
     >
       {/* Mobile Layout */}
       <div className="lg:hidden relative overflow-hidden rounded-2xl bg-card border border-border/50 p-4">

@@ -76,13 +76,9 @@ export function HeroSection({ userName, verse, stats }: HeroSectionProps) {
             transition={{ duration: 0.6, delay: 0.4 }}
           >
             <div className="flex items-center gap-3 mb-1">
-              <motion.div 
-                className={`w-8 h-8 rounded-full bg-gradient-to-br ${greeting.gradient} flex items-center justify-center`}
-                animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.05, 1] }}
-                transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
-              >
+              <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${greeting.gradient} flex items-center justify-center`}>
                 <GreetingIcon className="w-4 h-4 text-white" />
-              </motion.div>
+              </div>
               <p className="text-white/80 text-sm font-medium">{greeting.text}</p>
             </div>
             <h1 className="font-heading text-2xl font-bold text-white">
@@ -117,13 +113,9 @@ export function HeroSection({ userName, verse, stats }: HeroSectionProps) {
               transition={{ duration: 0.6, delay: 0.3 }}
             >
               <div className="flex items-center gap-3 mb-4">
-                <motion.div 
-                  className={`w-12 h-12 rounded-xl bg-gradient-to-br ${greeting.gradient} flex items-center justify-center shadow-lg`}
-                  animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.05, 1] }}
-                  transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
-                >
-                  <GreetingIcon className="w-6 h-6 text-white" />
-                </motion.div>
+              <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${greeting.gradient} flex items-center justify-center shadow-lg`}>
+                <GreetingIcon className="w-6 h-6 text-white" />
+              </div>
                 <div>
                   <p className="text-white/70 text-sm font-medium">{greeting.text}</p>
                   <h1 className="font-heading text-4xl font-bold text-white">
@@ -160,12 +152,7 @@ export function HeroSection({ userName, verse, stats }: HeroSectionProps) {
                   className="glass-card rounded-2xl p-5 min-w-[140px] text-center"
                   whileHover={{ scale: 1.02, y: -2 }}
                 >
-                  <motion.div
-                    animate={{ scale: [1, 1.2, 1] }}
-                    transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
-                  >
-                    <Flame className="w-8 h-8 text-orange-500 mx-auto mb-2" />
-                  </motion.div>
+                  <Flame className="w-8 h-8 text-orange-500 mx-auto mb-2" />
                   <p className="text-3xl font-bold text-white">{stats.streak}</p>
                   <p className="text-white/60 text-sm">días de racha</p>
                 </motion.div>

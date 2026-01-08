@@ -10,6 +10,7 @@ import { QuickActions } from "@/components/dashboard/QuickActions";
 import { ProgressCard } from "@/components/dashboard/ProgressCard";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
+import { GospelCard } from "@/components/gospel/GospelCard";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -28,9 +29,9 @@ interface Profile {
   edad_segmento: string;
 }
 
-const CardSkeleton = () => (
-  <div className="px-5 lg:px-0 mb-4">
-    <Skeleton className="h-40 w-full rounded-xl" />
+const CardSkeleton = ({ height = "h-40" }: { height?: string }) => (
+  <div className="mb-4">
+    <Skeleton className={`${height} w-full rounded-xl`} />
   </div>
 );
 
@@ -141,37 +142,47 @@ const Dashboard = () => {
           {/* Desktop: Two column layout for main content */}
           <div className="lg:grid lg:grid-cols-3 lg:gap-6 lg:mt-6">
             {/* Left Column - Main Content */}
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-2 space-y-4">
               {/* Daily Challenge */}
-              <Suspense fallback={<CardSkeleton />}>
+              <Suspense fallback={<CardSkeleton height="h-48" />}>
                 <DailyChallenge />
               </Suspense>
 
               {/* Featured Content */}
-              <Suspense fallback={<CardSkeleton />}>
+              <Suspense fallback={<CardSkeleton height="h-64" />}>
                 <FeaturedContent />
               </Suspense>
 
               {/* Explore Grid */}
-              <Suspense fallback={<CardSkeleton />}>
+              <Suspense fallback={<CardSkeleton height="h-48" />}>
                 <ExploreGrid />
               </Suspense>
             </div>
 
             {/* Right Column - Sidebar Content */}
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-1 space-y-4">
+              {/* Gospel Card - Desktop only, prominent position */}
+              <div className="hidden lg:block">
+                <GospelCard />
+              </div>
+
+              {/* Gospel Card - Mobile compact version */}
+              <div className="lg:hidden px-5">
+                <GospelCard compact />
+              </div>
+
               {/* Gratitude Prompt */}
-              <Suspense fallback={<CardSkeleton />}>
+              <Suspense fallback={<CardSkeleton height="h-24" />}>
                 <GratitudePrompt />
               </Suspense>
 
               {/* Practice Streaks */}
-              <Suspense fallback={<CardSkeleton />}>
+              <Suspense fallback={<CardSkeleton height="h-32" />}>
                 <PracticeStreaksCard />
               </Suspense>
 
               {/* Practice Reminders */}
-              <Suspense fallback={<CardSkeleton />}>
+              <Suspense fallback={<CardSkeleton height="h-32" />}>
                 <PracticeRemindersCard />
               </Suspense>
 
@@ -187,7 +198,7 @@ const Dashboard = () => {
               )}
 
               {/* Novena Carousel */}
-              <Suspense fallback={<CardSkeleton />}>
+              <Suspense fallback={<CardSkeleton height="h-48" />}>
                 <NovenaCarousel
                   novenas={novenas}
                   getProgress={getProgressForNovena}
