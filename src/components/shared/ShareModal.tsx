@@ -15,6 +15,7 @@ import {
   Share2,
   X
 } from "lucide-react";
+import logoElRugido from "@/assets/logo-elrugido.svg";
 
 interface ShareModalProps {
   isOpen: boolean;
@@ -28,8 +29,10 @@ export const ShareModal = ({ isOpen, onClose, title, text, reference }: ShareMod
   const { toast } = useToast();
   const [copying, setCopying] = useState(false);
 
-  const shareText = reference ? `"${text}" - ${reference}` : text;
-  const shareUrl = window.location.href;
+  const shareText = reference 
+    ? `"${text}" - ${reference}\n\nvía elrugido.com` 
+    : `${text}\n\nvía elrugido.com`;
+  const shareUrl = "https://elrugido.com";
 
   const shareOptions = [
     {
@@ -137,6 +140,11 @@ export const ShareModal = ({ isOpen, onClose, title, text, reference }: ShareMod
         <div className="relative rounded-xl overflow-hidden bg-gradient-to-br from-amber-900 to-stone-900 p-4">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDQwIDQwIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iLjAzIiBkPSJNMjAgMGMxMS4wNDYgMCAyMCA4Ljk1NCAyMCAyMHMtOC45NTQgMjAtMjAgMjBTMCAzMS4wNDYgMCAyMCA4Ljk1NCAwIDIwIDB6Ii8+PC9nPjwvc3ZnPg==')] opacity-50" />
           
+          {/* Logo ElRugido */}
+          <div className="flex justify-center mb-3">
+            <img src={logoElRugido} alt="ElRugido" className="h-8 brightness-0 invert opacity-80" />
+          </div>
+          
           <div className="relative bg-white rounded-lg p-4 shadow-xl mx-auto max-w-[200px]">
             <p className="text-gray-800 text-sm font-serif italic text-center leading-relaxed">
               "{text.length > 100 ? text.substring(0, 100) + "..." : text}"
@@ -155,6 +163,7 @@ export const ShareModal = ({ isOpen, onClose, title, text, reference }: ShareMod
             {reference && (
               <p className="text-white/70 text-xs mt-1">{reference}</p>
             )}
+            <p className="text-white/50 text-xs mt-2">elrugido.com</p>
           </div>
         </div>
 
