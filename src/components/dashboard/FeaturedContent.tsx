@@ -38,7 +38,7 @@ const featuredItems: FeaturedItem[] = [
     subtitle: "Inicia tu día bien",
     sessions: 254,
     gradient: "from-rose-500 via-pink-500 to-orange-400",
-    path: "/morning",
+    path: "/gratitude",
     image: communityImage
   },
   {
