@@ -7,17 +7,19 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Sparkles, ArrowLeft, Send, BookOpen, Heart, Brain, TrendingUp, X, Plus } from "lucide-react";
+import { Sparkles, ArrowLeft, Send, BookOpen, Heart, Brain, TrendingUp, X, Plus, Star, GraduationCap, Zap, Trophy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useUserStats } from "@/hooks/useUserStats";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
+  score?: number;
+  feedbackHint?: string;
 }
 
 interface Evaluation {
@@ -45,6 +47,12 @@ const personas = [
   { value: "relativista", label: "Relativista Moral", description: "No cree en verdad absoluta" },
 ];
 
+const dificultades = [
+  { value: "aprendiz", label: "Aprendiz", description: "Personaje receptivo, da pistas", icon: GraduationCap, color: "text-green-500" },
+  { value: "intermedio", label: "Intermedio", description: "Balance desafío/aprendizaje", icon: Zap, color: "text-yellow-500" },
+  { value: "avanzado", label: "Avanzado", description: "Debate intenso", icon: Trophy, color: "text-red-500" },
+];
+
 const temas = [
   "¿Existe Dios?",
   "El problema del mal y el sufrimiento",
@@ -52,6 +60,13 @@ const temas = [
   "Ciencia y Fe",
   "Jesús histórico",
   "Moral objetiva",
+];
+
+const motivationalMessages = [
+  "¡Excelente argumento! 🌟",
+  "¡Muy bien pensado! 💪",
+  "¡Buen punto! 👏",
+  "¡Sigue así! ⭐",
 ];
 
 const Coach = () => {
@@ -63,12 +78,16 @@ const Coach = () => {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectedPersona, setSelectedPersona] = useState("ateo_cientifico");
+  const [selectedDificultad, setSelectedDificultad] = useState("aprendiz");
   const [selectedTema, setSelectedTema] = useState(temas[0]);
   const [debateStarted, setDebateStarted] = useState(false);
   const [evaluation, setEvaluation] = useState<Evaluation | null>(null);
   const [debateId, setDebateId] = useState<string | null>(null);
   const [suggestion, setSuggestion] = useState<Suggestion | null>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [totalPoints, setTotalPoints] = useState(0);
+  const [showPointAnimation, setShowPointAnimation] = useState(false);
+  const [lastScore, setLastScore] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -93,6 +112,7 @@ const Coach = () => {
   const startDebate = async () => {
     setDebateStarted(true);
     setLoading(true);
+    setTotalPoints(0);
 
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
@@ -128,6 +148,7 @@ const Coach = () => {
         body: {
           persona: selectedPersona,
           tema: selectedTema,
+          dificultad: selectedDificultad,
           messages: [],
           action: "start",
         },
@@ -170,6 +191,7 @@ const Coach = () => {
         body: {
           persona: selectedPersona,
           tema: selectedTema,
+          dificultad: selectedDificultad,
           messages: [...messages, userMessage],
           action: "respond",
         },
@@ -177,9 +199,40 @@ const Coach = () => {
 
       if (response.error) throw response.error;
 
+      const { message, userScore, feedbackHint } = response.data;
+
+      // Update user message with score
+      setMessages((prev) => {
+        const updated = [...prev];
+        const lastUserIdx = updated.length - 1;
+        if (updated[lastUserIdx]?.role === 'user') {
+          updated[lastUserIdx] = {
+            ...updated[lastUserIdx],
+            score: userScore,
+            feedbackHint: feedbackHint
+          };
+        }
+        return updated;
+      });
+
+      // Show point animation for good scores
+      if (userScore >= 2) {
+        setLastScore(userScore);
+        setTotalPoints(prev => prev + userScore);
+        setShowPointAnimation(true);
+        setTimeout(() => setShowPointAnimation(false), 2000);
+        
+        if (userScore === 3) {
+          toast({
+            title: motivationalMessages[Math.floor(Math.random() * motivationalMessages.length)],
+            description: feedbackHint,
+          });
+        }
+      }
+
       const aiMessage: Message = {
         role: "assistant",
-        content: response.data.message,
+        content: message,
       };
 
       setMessages((prev) => [...prev, aiMessage]);
@@ -214,6 +267,7 @@ const Coach = () => {
         body: {
           persona: selectedPersona,
           tema: selectedTema,
+          dificultad: selectedDificultad,
           messages,
           action: "suggest",
         },
@@ -248,6 +302,7 @@ const Coach = () => {
         body: {
           persona: selectedPersona,
           tema: selectedTema,
+          dificultad: selectedDificultad,
           messages,
           action: "evaluate",
         },
@@ -313,6 +368,21 @@ const Coach = () => {
       title: "Todas las sugerencias añadidas",
       description: "Revisa y personaliza tu respuesta",
     });
+  };
+
+  // Render score stars
+  const renderScoreStars = (score: number) => {
+    if (score === 0) return null;
+    return (
+      <div className="flex items-center gap-0.5 mt-1">
+        {[...Array(score)].map((_, i) => (
+          <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+        ))}
+        {[...Array(3 - score)].map((_, i) => (
+          <Star key={i + score} className="w-3 h-3 text-muted-foreground/30" />
+        ))}
+      </div>
+    );
   };
 
   // Suggestions content component (reused in Sheet and Card)
@@ -440,10 +510,38 @@ const Coach = () => {
                 <CardHeader>
                   <CardTitle>Configura tu Entrenamiento</CardTitle>
                   <CardDescription>
-                    Elige el tipo de persona con quien dialogar y el tema a tratar
+                    Elige el nivel de dificultad, personaje y tema para practicar
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
+                  {/* Difficulty Selector */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Nivel de Dificultad</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {dificultades.map((dif) => {
+                        const Icon = dif.icon;
+                        const isSelected = selectedDificultad === dif.value;
+                        return (
+                          <button
+                            key={dif.value}
+                            onClick={() => setSelectedDificultad(dif.value)}
+                            className={`p-3 rounded-lg border-2 transition-all text-left ${
+                              isSelected 
+                                ? 'border-primary bg-primary/10' 
+                                : 'border-border/50 hover:border-primary/50 bg-background/50'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 mb-1">
+                              <Icon className={`w-4 h-4 ${dif.color}`} />
+                              <span className="font-medium text-sm">{dif.label}</span>
+                            </div>
+                            <p className="text-xs text-muted-foreground">{dif.description}</p>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Personaje</label>
                     <Select value={selectedPersona} onValueChange={setSelectedPersona}>
@@ -526,12 +624,36 @@ const Coach = () => {
                   <p className="text-xs lg:text-sm text-white/70 truncate max-w-[150px] lg:max-w-none">{selectedTema}</p>
                 </div>
               </div>
-              <Badge className="glass-button bg-secondary/20 text-white border-secondary/30 text-xs">
-                {personas.find((p) => p.value === selectedPersona)?.label}
-              </Badge>
+              <div className="flex items-center gap-2">
+                {/* Points counter */}
+                <div className="glass-button bg-yellow-500/20 text-white border-yellow-500/30 px-2 py-1 rounded-md flex items-center gap-1">
+                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                  <span className="font-bold text-sm">{totalPoints}</span>
+                </div>
+                <Badge className="glass-button bg-secondary/20 text-white border-secondary/30 text-xs">
+                  {dificultades.find((d) => d.value === selectedDificultad)?.label}
+                </Badge>
+              </div>
             </div>
           </motion.header>
         </div>
+
+        {/* Point animation */}
+        <AnimatePresence>
+          {showPointAnimation && (
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.8 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none"
+            >
+              <div className="bg-primary text-primary-foreground px-6 py-3 rounded-full shadow-lg flex items-center gap-2">
+                <Star className="w-6 h-6 fill-yellow-400 text-yellow-400" />
+                <span className="font-bold text-xl">+{lastScore}</span>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <main className="flex-1 container mx-auto px-4 py-4 lg:py-6 flex flex-col lg:flex-row gap-4 max-w-7xl overflow-hidden">
           {!evaluation ? (
@@ -552,17 +674,30 @@ const Coach = () => {
                       transition={{ duration: 0.3 }}
                       className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                     >
-                      <Card
-                        className={`max-w-[85%] lg:max-w-[80%] ${
-                          message.role === "user"
-                            ? "bg-primary text-primary-foreground"
-                            : "glass-card border-border/50"
-                        }`}
-                      >
-                        <CardContent className="p-3 lg:p-4">
-                          <p className="whitespace-pre-wrap text-sm lg:text-base">{message.content}</p>
-                        </CardContent>
-                      </Card>
+                      <div className={`max-w-[85%] lg:max-w-[80%]`}>
+                        <Card
+                          className={`${
+                            message.role === "user"
+                              ? "bg-primary text-primary-foreground"
+                              : "glass-card border-border/50"
+                          }`}
+                        >
+                          <CardContent className="p-3 lg:p-4">
+                            <p className="whitespace-pre-wrap text-sm lg:text-base">{message.content}</p>
+                          </CardContent>
+                        </Card>
+                        {/* Score indicator for user messages */}
+                        {message.role === "user" && message.score !== undefined && message.score > 0 && (
+                          <div className="flex items-center gap-2 mt-1 justify-end">
+                            {renderScoreStars(message.score)}
+                            {message.feedbackHint && (
+                              <span className="text-xs text-muted-foreground max-w-[200px] truncate">
+                                {message.feedbackHint}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </motion.div>
                   ))}
                   <div ref={messagesEndRef} />
@@ -692,7 +827,13 @@ const Coach = () => {
             >
               <Card className="glass-card border-border/50">
                 <CardHeader>
-                  <CardTitle>Evaluación del Debate</CardTitle>
+                  <CardTitle className="flex items-center justify-between">
+                    <span>Evaluación del Debate</span>
+                    <div className="flex items-center gap-1 text-yellow-500">
+                      <Star className="w-5 h-5 fill-yellow-400" />
+                      <span className="font-bold">{totalPoints} pts</span>
+                    </div>
+                  </CardTitle>
                   <CardDescription>Tu desempeño en este entrenamiento</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -737,6 +878,7 @@ const Coach = () => {
                         setMessages([]);
                         setEvaluation(null);
                         setDebateId(null);
+                        setTotalPoints(0);
                       }}
                       className="flex-1 shadow-glow"
                     >

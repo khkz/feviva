@@ -12,13 +12,40 @@ const personaPrompts = {
   relativista: "Eres un relativista moral que cree que la verdad es subjetiva y personal. Cuestionas la idea de verdades absolutas y prefieres que cada quien tenga su propia verdad."
 };
 
+const dificultadPrompts = {
+  aprendiz: `NIVEL APRENDIZ - Modo enseñanza:
+- Sé RECEPTIVO a los argumentos del usuario
+- Si dan un punto válido, RECONÓCELO claramente con frases como "Hmm, ese es un buen punto...", "Interesante perspectiva...", "Eso me hace pensar..."
+- Haz preguntas que guíen hacia buenas respuestas, no solo objeciones agresivas
+- Si el usuario responde bien, muestra que te hicieron reflexionar
+- Puedes "ceder terreno" fácilmente si el argumento es razonable
+- Mantén un tono de conversación amigable y curioso, no hostil
+- Tu objetivo es que el usuario APRENDA y gane confianza
+- Sé como un sparring partner amable que ayuda a practicar`,
+
+  intermedio: `NIVEL INTERMEDIO - Modo entrenamiento:
+- Presenta objeciones moderadas pero justas
+- Reconoce buenos argumentos brevemente antes de contraargumentar ("Tienes razón en eso, pero...")
+- Si el usuario da 2-3 buenos puntos seguidos, muestra que te convencieron parcialmente
+- Equilibra el desafío con retroalimentación positiva
+- No seas demasiado fácil ni demasiado difícil
+- Tu objetivo es que el usuario practique sin frustrarse`,
+
+  avanzado: `NIVEL AVANZADO - Modo debate intenso:
+- Presenta objeciones fuertes y bien articuladas
+- Solo cede terreno ante argumentos muy sólidos y bien fundamentados
+- Mantente fiel a tu personaje y sus convicciones
+- Este nivel es para usuarios experimentados que quieren un reto real
+- Tu objetivo es preparar para debates reales y difíciles`
+};
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { persona, tema, messages, action } = await req.json();
+    const { persona, tema, messages, action, dificultad = 'aprendiz' } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     
     if (!LOVABLE_API_KEY) {
@@ -26,14 +53,17 @@ serve(async (req) => {
     }
 
     const personaPrompt = personaPrompts[persona as keyof typeof personaPrompts] || personaPrompts.ateo_cientifico;
+    const dificultadPrompt = dificultadPrompts[dificultad as keyof typeof dificultadPrompts] || dificultadPrompts.aprendiz;
 
     // START action - initiate conversation
     if (action === 'start') {
       const systemPrompt = `${personaPrompt}
 
+${dificultadPrompt}
+
 Estamos discutiendo sobre: "${tema}"
 
-Inicia la conversación planteando una objeción o pregunta desafiante sobre este tema. Hazlo en un tono conversacional, como si estuvieras hablando con alguien en un café. Mantén tu primera intervención en 2-3 oraciones.`;
+Inicia la conversación planteando una objeción o pregunta sobre este tema. Hazlo en un tono conversacional, como si estuvieras hablando con alguien en un café. Mantén tu primera intervención en 2-3 oraciones. Ajusta la intensidad según el nivel de dificultad.`;
 
       const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
         method: 'POST',
@@ -42,7 +72,7 @@ Inicia la conversación planteando una objeción o pregunta desafiante sobre est
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'google/gemini-2.5-flash',
+          model: 'google/gemini-3-pro-preview',
           messages: [
             { role: 'system', content: systemPrompt },
             { role: 'user', content: 'Comienza la conversación.' }
@@ -64,9 +94,8 @@ Inicia la conversación planteando una objeción o pregunta desafiante sobre est
       });
     }
 
-    // RESPOND action - continue conversation
+    // RESPOND action - continue conversation with scoring
     if (action === 'respond') {
-      // Build context from previous messages to avoid repetition
       const previousArguments = messages
         .filter((m: any) => m.role === 'assistant')
         .map((m: any) => m.content)
@@ -74,12 +103,14 @@ Inicia la conversación planteando una objeción o pregunta desafiante sobre est
 
       const systemPrompt = `${personaPrompt}
 
+${dificultadPrompt}
+
 Estamos discutiendo sobre: "${tema}"
 
 INSTRUCCIONES IMPORTANTES:
 1. Responde directamente al último mensaje del usuario
 2. Mantén un estilo conversacional natural
-3. Si el usuario da un buen argumento, reconócelo brevemente, pero sigue siendo fiel a tu personaje
+3. Si el usuario da un buen argumento, reconócelo según el nivel de dificultad
 4. Plantea una NUEVA pregunta o desafío diferente a los anteriores
 5. NO repitas argumentos que ya hayas usado antes
 6. Mantén tu respuesta en 2-4 oraciones
@@ -92,6 +123,7 @@ ${previousArguments ? `\nARGUMENTOS QUE YA USASTE (no repitas estos):\n${previou
         content: m.content
       }));
 
+      // Use tool calling for structured response with scoring
       const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -99,12 +131,38 @@ ${previousArguments ? `\nARGUMENTOS QUE YA USASTE (no repitas estos):\n${previou
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'google/gemini-2.5-flash',
+          model: 'google/gemini-3-pro-preview',
           messages: [
             { role: 'system', content: systemPrompt },
             ...aiMessages
           ],
-          temperature: 0.7, // Add some variability to responses
+          tools: [{
+            type: "function",
+            function: {
+              name: "respond_with_feedback",
+              description: "Responde al usuario y evalúa la calidad de su argumento",
+              parameters: {
+                type: "object",
+                properties: {
+                  response: { 
+                    type: "string", 
+                    description: "Tu respuesta conversacional al usuario (2-4 oraciones)" 
+                  },
+                  user_score: { 
+                    type: "number", 
+                    description: "Puntuación del argumento del usuario: 0=malo/irrelevante, 1=básico, 2=bueno, 3=excelente" 
+                  },
+                  feedback_hint: { 
+                    type: "string",
+                    description: "Breve nota interna sobre qué hizo bien o mal el usuario (para mostrarle después)"
+                  }
+                },
+                required: ["response", "user_score", "feedback_hint"],
+                additionalProperties: false
+              }
+            }
+          }],
+          tool_choice: { type: "function", function: { name: "respond_with_feedback" } }
         }),
       });
 
@@ -115,9 +173,33 @@ ${previousArguments ? `\nARGUMENTOS QUE YA USASTE (no repitas estos):\n${previou
       }
 
       const data = await response.json();
-      const message = data.choices[0].message.content;
+      
+      // Parse tool call response
+      let message = '';
+      let userScore = 0;
+      let feedbackHint = '';
+      
+      try {
+        const toolCall = data.choices[0].message.tool_calls?.[0];
+        if (toolCall && toolCall.function.arguments) {
+          const args = JSON.parse(toolCall.function.arguments);
+          message = args.response || '';
+          userScore = args.user_score || 0;
+          feedbackHint = args.feedback_hint || '';
+        } else {
+          // Fallback if no tool call
+          message = data.choices[0].message.content || '';
+        }
+      } catch (parseError) {
+        console.error('Error parsing tool call:', parseError);
+        message = data.choices[0].message.content || '';
+      }
 
-      return new Response(JSON.stringify({ message }), {
+      return new Response(JSON.stringify({ 
+        message, 
+        userScore, 
+        feedbackHint 
+      }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
@@ -163,7 +245,7 @@ Proporciona 3 sugerencias prácticas y específicas para mejorar esta respuesta 
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'google/gemini-2.5-flash',
+          model: 'google/gemini-3-pro-preview',
           messages: [
             { role: 'user', content: suggestionPrompt }
           ],
@@ -223,7 +305,7 @@ Responde SOLO en formato JSON con esta estructura exacta:
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'google/gemini-2.5-flash',
+          model: 'google/gemini-3-pro-preview',
           messages: [
             { role: 'user', content: evaluationPrompt }
           ],
