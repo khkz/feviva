@@ -48,6 +48,18 @@ export interface Stage {
   badge_codigo: string;
 }
 
+// Mapping from stage requirement IDs to library_lessons titles
+const LESSON_TITLE_MAP: Record<string, string> = {
+  'existe-dios': '¿Existe Dios?',
+  'biblia-confiable': 'La Confiabilidad de la Biblia',
+  'jesus-historico': 'Jesús Histórico',
+  'resurreccion': 'La Resurrección',
+  'fe-ciencia': 'Fe y Ciencia',
+  'salvacion': 'Salvación por Gracia',
+  'problema-mal': 'El Problema del Mal',
+  'trinidad': 'La Trinidad',
+};
+
 export const STAGES: Stage[] = [
   {
     numero: 1,
@@ -133,9 +145,21 @@ export const STAGES: Stage[] = [
   },
 ];
 
+interface LessonProgress {
+  lesson_id: string;
+  completado: boolean;
+}
+
+interface LibraryLesson {
+  id: string;
+  titulo: string;
+}
+
 export const useApostlePath = () => {
   const [progress, setProgress] = useState<PathProgress | null>(null);
   const [activities, setActivities] = useState<PathActivity[]>([]);
+  const [lessonProgress, setLessonProgress] = useState<Record<string, boolean>>({});
+  const [libraryLessons, setLibraryLessons] = useState<LibraryLesson[]>([]);
   const [loading, setLoading] = useState(true);
   const [aiReflection, setAiReflection] = useState<string>('');
   const [aiLoading, setAiLoading] = useState(false);
@@ -166,7 +190,7 @@ export const useApostlePath = () => {
 
       setProgress(progressData);
 
-      // Get activities
+      // Get activities from apostle path
       const { data: activitiesData } = await supabase
         .from('apostle_path_activities')
         .select('*')
@@ -174,6 +198,32 @@ export const useApostlePath = () => {
         .order('completado_en', { ascending: false });
 
       setActivities(activitiesData || []);
+
+      // Get lesson progress from library
+      const { data: lessonProgressData } = await supabase
+        .from('user_lesson_progress')
+        .select('lesson_id, completado')
+        .eq('user_id', user.id)
+        .eq('completado', true);
+
+      // Get library lessons to map titles
+      const { data: lessonsData } = await supabase
+        .from('library_lessons')
+        .select('id, titulo');
+
+      setLibraryLessons(lessonsData || []);
+
+      // Create a map of lesson titles to completion status
+      const progressMap: Record<string, boolean> = {};
+      if (lessonProgressData && lessonsData) {
+        lessonProgressData.forEach((p: LessonProgress) => {
+          const lesson = lessonsData.find((l: LibraryLesson) => l.id === p.lesson_id);
+          if (lesson) {
+            progressMap[lesson.titulo] = p.completado;
+          }
+        });
+      }
+      setLessonProgress(progressMap);
     } catch (error) {
       console.error('Error fetching path progress:', error);
     } finally {
@@ -234,7 +284,23 @@ export const useApostlePath = () => {
     return activities.filter(a => a.etapa === etapa);
   };
 
+  const isLessonCompleted = (lessonId: string): boolean => {
+    // Check if lesson is completed in library by matching the title
+    const lessonTitle = LESSON_TITLE_MAP[lessonId];
+    if (lessonTitle && lessonProgress[lessonTitle]) {
+      return true;
+    }
+    return false;
+  };
+
   const isActivityCompleted = (etapa: number, tipo: string, actividadId: string) => {
+    // For lessons, also check the library progress
+    if (tipo === 'leccion') {
+      if (isLessonCompleted(actividadId)) {
+        return true;
+      }
+    }
+    
     return activities.some(
       a => a.etapa === etapa && a.actividad_tipo === tipo && a.actividad_id === actividadId
     );
@@ -244,11 +310,15 @@ export const useApostlePath = () => {
     const stage = STAGES.find(s => s.numero === etapa);
     if (!stage) return 0;
 
-    const stageActivities = getStageActivities(etapa);
-    const completedCount = stageActivities.length;
-    const totalCount = stage.requisitos.length;
+    let completedCount = 0;
+    for (const req of stage.requisitos) {
+      const activityId = req.id || req.titulo.toLowerCase().replace(/\s+/g, '-');
+      if (isActivityCompleted(etapa, req.tipo, activityId)) {
+        completedCount++;
+      }
+    }
 
-    return Math.round((completedCount / totalCount) * 100);
+    return Math.round((completedCount / stage.requisitos.length) * 100);
   };
 
   const isStageCompleted = (etapa: number): boolean => {
@@ -370,6 +440,20 @@ export const useApostlePath = () => {
     return null;
   };
 
+  const getCompletedActivityIds = (etapa: number): string[] => {
+    const stage = STAGES.find(s => s.numero === etapa);
+    if (!stage) return [];
+
+    const completedIds: string[] = [];
+    for (const req of stage.requisitos) {
+      const activityId = req.id || req.titulo.toLowerCase().replace(/\s+/g, '-');
+      if (isActivityCompleted(etapa, req.tipo, activityId)) {
+        completedIds.push(activityId);
+      }
+    }
+    return completedIds;
+  };
+
   return {
     progress,
     activities,
@@ -388,5 +472,7 @@ export const useApostlePath = () => {
     getAIReflection,
     getCurrentStage,
     getNextActivity,
+    getCompletedActivityIds,
+    lessonProgress,
   };
 };
