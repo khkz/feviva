@@ -50,12 +50,21 @@ export const ShareModal = ({ isOpen, onClose, title, text, reference }: ShareMod
       name: "Facebook",
       icon: <Facebook className="h-6 w-6" />,
       color: "bg-[#1877F2]",
-      action: () => {
-        window.open(
-          `https://www.facebook.com/sharer/sharer.php?quote=${encodeURIComponent(shareText)}&u=${encodeURIComponent(shareUrl)}`,
-          "_blank",
-          "width=600,height=400"
-        );
+      action: async () => {
+        try {
+          await navigator.clipboard.writeText(shareText);
+          window.open('https://www.facebook.com', '_blank', 'noopener,noreferrer');
+          toast({
+            title: "Texto copiado",
+            description: "Pega el texto en tu publicación de Facebook",
+          });
+        } catch (error) {
+          toast({
+            title: "Error",
+            description: "No se pudo copiar el texto",
+            variant: "destructive",
+          });
+        }
       },
     },
     {
