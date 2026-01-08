@@ -52,7 +52,12 @@ const ApostlePath = () => {
     // Navigate to the appropriate activity
     switch (requirement.tipo) {
       case 'leccion':
-        navigate('/library');
+        // Navigate with lesson ID to open directly
+        if (requirement.id) {
+          navigate(`/library?lesson=${requirement.id}`);
+        } else {
+          navigate('/library');
+        }
         break;
       case 'debate':
         navigate('/coach');

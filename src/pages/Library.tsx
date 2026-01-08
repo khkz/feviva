@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -44,13 +44,29 @@ const Library = () => {
   const [batchGeneratingAudio, setBatchGeneratingAudio] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { incrementLessons } = useUserStats();
+
+  // Check for lesson query parameter to open directly
+  const lessonParam = searchParams.get('lesson');
 
   useEffect(() => {
     checkAuth();
     fetchLessons();
     fetchProgress();
   }, []);
+
+  // Auto-open lesson from URL parameter
+  useEffect(() => {
+    if (lessonParam && lessons.length > 0 && !selectedLesson) {
+      const targetLesson = lessons.find(l => 
+        l.titulo.toLowerCase().includes(lessonParam.replace(/-/g, ' '))
+      );
+      if (targetLesson) {
+        setSelectedLesson(targetLesson);
+      }
+    }
+  }, [lessonParam, lessons]);
 
   const checkAuth = async () => {
     const { data: { session } } = await supabase.auth.getSession();
