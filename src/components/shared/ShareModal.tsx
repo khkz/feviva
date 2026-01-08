@@ -33,6 +33,8 @@ export const ShareModal = ({ isOpen, onClose, title, text, reference }: ShareMod
     : `${text}\n\nvía elrugido.com`;
   const shareUrl = "https://elrugido.com";
 
+  const isInIframe = typeof window !== 'undefined' && window !== window.parent;
+
   const shareOptions = [
     {
       name: "WhatsApp",
@@ -42,8 +44,24 @@ export const ShareModal = ({ isOpen, onClose, title, text, reference }: ShareMod
         </svg>
       ),
       color: "bg-[#25D366]",
-      action: () => {
-        window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, "_blank");
+      action: async () => {
+        if (isInIframe) {
+          try {
+            await navigator.clipboard.writeText(shareText);
+            toast({
+              title: "Texto copiado",
+              description: "Abre WhatsApp y pega el texto en tu chat",
+            });
+          } catch (error) {
+            toast({
+              title: "Error",
+              description: "No se pudo copiar el texto",
+              variant: "destructive",
+            });
+          }
+        } else {
+          window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, "_blank");
+        }
       },
     },
     {
@@ -53,10 +71,14 @@ export const ShareModal = ({ isOpen, onClose, title, text, reference }: ShareMod
       action: async () => {
         try {
           await navigator.clipboard.writeText(shareText);
-          window.open('https://www.facebook.com', '_blank', 'noopener,noreferrer');
+          if (!isInIframe) {
+            window.open('https://www.facebook.com', '_blank', 'noopener,noreferrer');
+          }
           toast({
             title: "Texto copiado",
-            description: "Pega el texto en tu publicación de Facebook",
+            description: isInIframe 
+              ? "Abre Facebook y pega el texto en tu publicación" 
+              : "Pega el texto en tu publicación de Facebook",
           });
         } catch (error) {
           toast({
@@ -75,12 +97,28 @@ export const ShareModal = ({ isOpen, onClose, title, text, reference }: ShareMod
         </svg>
       ),
       color: "bg-black",
-      action: () => {
-        window.open(
-          `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`,
-          "_blank",
-          "width=600,height=400"
-        );
+      action: async () => {
+        if (isInIframe) {
+          try {
+            await navigator.clipboard.writeText(shareText);
+            toast({
+              title: "Texto copiado",
+              description: "Abre X (Twitter) y pega el texto en tu tweet",
+            });
+          } catch (error) {
+            toast({
+              title: "Error",
+              description: "No se pudo copiar el texto",
+              variant: "destructive",
+            });
+          }
+        } else {
+          window.open(
+            `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`,
+            "_blank",
+            "width=600,height=400"
+          );
+        }
       },
     },
     {
