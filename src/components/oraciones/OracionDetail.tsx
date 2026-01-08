@@ -323,7 +323,7 @@ export function OracionDetail({
                       : "Generar y escuchar"}
               </span>
               <span className="text-xs text-muted-foreground">
-                Audio narrado con IA
+                Audio narrado
               </span>
             </div>
           </div>

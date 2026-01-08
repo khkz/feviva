@@ -86,7 +86,7 @@ const SleepStories = () => {
     try {
       let hasMore = true;
       while (hasMore) {
-        toast.loading(`Generando nuevas historias con IA...`, { id: 'create-stories' });
+        toast.loading(`Generando nuevas historias...`, { id: 'create-stories' });
         
         const { data, error } = await supabase.functions.invoke('generate-sleep-stories', {
           body: { action: 'create_new', limit: 1 }
@@ -123,7 +123,7 @@ const SleepStories = () => {
     try {
       let hasMore = true;
       while (hasMore) {
-        toast.loading(`Expandiendo historias cortas con IA...`, { id: 'expand-stories' });
+        toast.loading(`Expandiendo historias cortas...`, { id: 'expand-stories' });
         
         const { data, error } = await supabase.functions.invoke('generate-sleep-stories', {
           body: { action: 'expand_existing', limit: 1 }
@@ -332,7 +332,7 @@ const SleepStories = () => {
           ) : (
             <PlusCircle className="w-4 h-4 text-indigo-400" />
           )}
-          <span>Crear nuevas historias bíblicas con IA</span>
+          <span>Crear nuevas historias bíblicas</span>
           <Sparkles className="w-4 h-4 text-amber-500 ml-auto" />
         </Button>
         
@@ -365,7 +365,7 @@ const SleepStories = () => {
             ) : (
               <ImagePlus className="w-4 h-4 text-cyan-400" />
             )}
-            <span>Generar {storiesWithoutImageCount} imágenes con IA</span>
+            <span>Generar {storiesWithoutImageCount} imágenes</span>
             <Sparkles className="w-4 h-4 text-amber-500 ml-auto" />
           </Button>
         )}
