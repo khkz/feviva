@@ -40,7 +40,7 @@ export const GratitudeReflexion = ({
       </CardHeader>
       <CardContent className="space-y-4">
         {audioUrl && (
-          <AudioPlayer audioUrl={audioUrl} title={titulo} />
+          <AudioPlayer src={audioUrl} title={titulo} />
         )}
         
         <ScrollArea className="h-[280px] pr-4">
