@@ -15,6 +15,7 @@ import {
   Share2,
   X
 } from "lucide-react";
+import logo from "@/assets/logo.svg";
 
 interface ShareModalProps {
   isOpen: boolean;
@@ -148,13 +149,9 @@ export const ShareModal = ({ isOpen, onClose, title, text, reference }: ShareMod
             )}
           </div>
 
-          <div className="text-center mt-4">
-            <p className="text-white/90 text-sm font-medium line-clamp-2">
-              {text.length > 60 ? text.substring(0, 60) + "..." : text}
-            </p>
-            {reference && (
-              <p className="text-white/70 text-xs mt-1">{reference}</p>
-            )}
+          <div className="flex items-center justify-center gap-2 mt-4">
+            <img src={logo} alt="ElRugido" className="w-6 h-6 object-contain" />
+            <span className="text-white/90 text-sm font-medium">elrugido.com</span>
           </div>
         </div>
 
