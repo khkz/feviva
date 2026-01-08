@@ -24,6 +24,102 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    const systemPrompt = `Eres un guía espiritual católico sabio, cercano y profundamente conocedor de las Sagradas Escrituras. 
+Tu tarea es escribir reflexiones bíblicas para sesiones de gratitud diarias.
+
+Características de tus reflexiones:
+- 3-4 párrafos cortos y cálidos (entre 400-600 caracteres total, NO más)
+- Incluir al menos 1 cita bíblica relevante con referencia completa (libro capítulo:versículo)
+- Tono personal y cercano (tutea al lector)
+- Variedad de libros bíblicos: Salmos, Proverbios, Evangelios, Cartas de Pablo, Profetas, etc.
+- Conectar el tema con la gratitud y situaciones cotidianas
+- Terminar con una breve invitación a la reflexión o acción concreta
+
+NO uses listas con viñetas. Escribe en párrafos fluidos y naturales.
+NO repitas frases como "Que Dios te bendiga" que se agregarán después.`;
+
+    // Helper function to call AI with retries
+    async function callAIWithRetry(
+      userPrompt: string,
+      sessionNumero: number,
+      maxRetries = 3
+    ): Promise<string | null> {
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        console.log(`Session ${sessionNumero}: Attempt ${attempt}/${maxRetries}`);
+        
+        const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-3-pro-preview",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+            max_tokens: 800,
+            temperature: 0.7,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`Session ${sessionNumero}: Attempt ${attempt} failed - Status ${response.status}: ${errorText}`);
+          if (response.status === 429) {
+            return null; // Rate limit - don't retry
+          }
+          if (attempt < maxRetries) {
+            await new Promise((r) => setTimeout(r, 2000 * attempt));
+            continue;
+          }
+          return null;
+        }
+
+        const aiData = await response.json();
+        
+        // DETAILED LOGGING
+        console.log(`=== AI Response for session ${sessionNumero} (attempt ${attempt}) ===`);
+        console.log(`Response keys:`, Object.keys(aiData));
+        if (aiData.choices) {
+          console.log(`Choices length:`, aiData.choices.length);
+          console.log(`First choice:`, JSON.stringify(aiData.choices[0], null, 2));
+        }
+
+        // Try multiple response structures
+        let content = aiData.choices?.[0]?.message?.content?.trim();
+        
+        if (!content && aiData.choices?.[0]?.message?.text) {
+          content = aiData.choices[0].message.text.trim();
+          console.log(`Session ${sessionNumero}: Used fallback: message.text`);
+        }
+        
+        if (!content && aiData.choices?.[0]?.text) {
+          content = aiData.choices[0].text.trim();
+          console.log(`Session ${sessionNumero}: Used fallback: choices.text`);
+        }
+        
+        if (!content && aiData.candidates?.[0]?.content?.parts?.[0]?.text) {
+          content = aiData.candidates[0].content.parts[0].text.trim();
+          console.log(`Session ${sessionNumero}: Used fallback: Gemini native format`);
+        }
+
+        if (content && content.length > 50) {
+          console.log(`Session ${sessionNumero}: ✅ Got content (${content.length} chars)`);
+          return content;
+        }
+
+        console.log(`Session ${sessionNumero}: Attempt ${attempt} returned empty/short content, retrying...`);
+        if (attempt < maxRetries) {
+          await new Promise((r) => setTimeout(r, 1500));
+        }
+      }
+
+      console.error(`Session ${sessionNumero}: ❌ No valid content after ${maxRetries} attempts`);
+      return null;
+    }
+
     // Get sessions that haven't been regenerated yet
     const { data: sessions, error: fetchError } = await supabase
       .from("gratitude_sessions")
@@ -37,7 +133,6 @@ serve(async (req) => {
     }
 
     if (!sessions || sessions.length === 0) {
-      // Count total and regenerated
       const { count: total } = await supabase
         .from("gratitude_sessions")
         .select("*", { count: "exact", head: true });
@@ -69,20 +164,6 @@ serve(async (req) => {
       error?: string;
     }> = [];
 
-    const systemPrompt = `Eres un guía espiritual católico sabio, cercano y profundamente conocedor de las Sagradas Escrituras. 
-Tu tarea es escribir reflexiones bíblicas para sesiones de gratitud diarias.
-
-Características de tus reflexiones:
-- 3-4 párrafos cortos y cálidos (entre 400-600 caracteres total, NO más)
-- Incluir al menos 1 cita bíblica relevante con referencia completa (libro capítulo:versículo)
-- Tono personal y cercano (tutea al lector)
-- Variedad de libros bíblicos: Salmos, Proverbios, Evangelios, Cartas de Pablo, Profetas, etc.
-- Conectar el tema con la gratitud y situaciones cotidianas
-- Terminar con una breve invitación a la reflexión o acción concreta
-
-NO uses listas con viñetas. Escribe en párrafos fluidos y naturales.
-NO repitas frases como "Que Dios te bendiga" que se agregarán después.`;
-
     for (const session of sessions) {
       try {
         const userPrompt = `Escribe una reflexión de gratitud para la sesión número ${session.numero} titulada: "${session.titulo}"
@@ -95,55 +176,14 @@ La reflexión debe:
 
 Recuerda: máximo 600 caracteres, párrafos fluidos, sin listas.`;
 
-        const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${LOVABLE_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: "google/gemini-3-pro-preview",
-            messages: [
-              { role: "system", content: systemPrompt },
-              { role: "user", content: userPrompt },
-            ],
-            max_tokens: 800,
-            temperature: 0.7,
-          }),
-        });
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error(`AI gateway error for session ${session.numero}:`, response.status, errorText);
-          
-          if (response.status === 429) {
-            results.push({
-              numero: session.numero,
-              titulo: session.titulo,
-              status: "error",
-              error: "Rate limit alcanzado. Intenta de nuevo en unos segundos.",
-            });
-            break; // Stop processing on rate limit
-          }
-          
-          results.push({
-            numero: session.numero,
-            titulo: session.titulo,
-            status: "error",
-            error: `Error del gateway: ${response.status}`,
-          });
-          continue;
-        }
-
-        const aiData = await response.json();
-        const newDescription = aiData.choices?.[0]?.message?.content?.trim();
+        const newDescription = await callAIWithRetry(userPrompt, session.numero);
 
         if (!newDescription) {
           results.push({
             numero: session.numero,
             titulo: session.titulo,
             status: "error",
-            error: "La IA no generó contenido",
+            error: "La IA no generó contenido después de varios intentos",
           });
           continue;
         }
