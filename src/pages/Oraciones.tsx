@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Search, Heart, BookOpen, Moon, Loader2, Calendar, Sparkles, Cross, Home } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -10,6 +10,7 @@ import { OracionDetail } from "@/components/oraciones/OracionDetail";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { useOraciones } from "@/hooks/useOraciones";
+import { useAudioCache } from "@/hooks/useAudioCache";
 import { cn } from "@/lib/utils";
 
 const containerVariants = {
@@ -55,6 +56,22 @@ export default function Oraciones() {
     favoritos,
     isAuthenticated,
   } = useOraciones();
+
+  const { cacheAudio } = useAudioCache();
+
+  // Pre-cache all existing audio URLs on page load
+  useEffect(() => {
+    if (oraciones.length > 0) {
+      const audioUrls = oraciones
+        .map(o => o.audio_url)
+        .filter((url): url is string => !!url);
+      
+      // Pre-cache in background (first 10 for performance)
+      audioUrls.slice(0, 10).forEach(url => {
+        cacheAudio(url).catch(console.error);
+      });
+    }
+  }, [oraciones, cacheAudio]);
 
   // Filter by search
   const filteredOraciones = oraciones.filter((o) =>
