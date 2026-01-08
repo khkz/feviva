@@ -103,12 +103,15 @@ const Library = () => {
 
     const { error } = await supabase
       .from("user_lesson_progress")
-      .upsert({
-        user_id: user.id,
-        lesson_id: lessonId,
-        completado: !isCompleted,
-        fecha_completado: !isCompleted ? new Date().toISOString() : null,
-      });
+      .upsert(
+        {
+          user_id: user.id,
+          lesson_id: lessonId,
+          completado: !isCompleted,
+          fecha_completado: !isCompleted ? new Date().toISOString() : null,
+        },
+        { onConflict: 'user_id,lesson_id' }
+      );
 
     if (error) {
       toast({
