@@ -12,6 +12,7 @@ import { StageCard } from '@/components/apostle-path/StageCard';
 import { AIReflection } from '@/components/apostle-path/AIReflection';
 import { PathAchievements } from '@/components/apostle-path/PathAchievements';
 import { BottomNavigation } from '@/components/layout/BottomNavigation';
+import { DesktopSidebar } from '@/components/layout/DesktopSidebar';
 import { Loader2 } from 'lucide-react';
 
 const ApostlePath = () => {
@@ -99,7 +100,9 @@ const ApostlePath = () => {
   const currentStage = getCurrentStage();
 
   return (
-    <div className="min-h-screen bg-background pb-20 md:pb-8">
+    <div className="min-h-screen flex w-full">
+      <DesktopSidebar />
+      <div className="flex-1 lg:ml-64 pb-20 md:pb-8">
       {/* Header */}
       <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-lg border-b">
         <div className="container mx-auto px-4 py-4">
@@ -284,6 +287,7 @@ const ApostlePath = () => {
       </div>
 
       <BottomNavigation />
+      </div>
     </div>
   );
 };

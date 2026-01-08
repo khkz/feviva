@@ -11,6 +11,8 @@ import { ArrowLeft, Save, User, Palette } from "lucide-react";
 import { z } from "zod";
 import { ThemeSelector } from "@/components/ui/theme-toggle";
 import { motion } from "framer-motion";
+import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
+import { BottomNavigation } from "@/components/layout/BottomNavigation";
 
 const profileSchema = z.object({
   nombre: z.string().min(1, "El nombre es requerido").max(100, "Máximo 100 caracteres"),
@@ -125,7 +127,9 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex w-full">
+      <DesktopSidebar />
+      <div className="flex-1 lg:ml-64 pb-20 md:pb-8">
       {/* Hero Header */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-secondary/60" />
@@ -294,6 +298,8 @@ const Profile = () => {
           </Card>
         </motion.div>
       </main>
+      <BottomNavigation />
+      </div>
     </div>
   );
 };

@@ -10,6 +10,8 @@ import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, MessageSquare, TrendingUp, Award, Calendar } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
+import { BottomNavigation } from "@/components/layout/BottomNavigation";
 
 interface Debate {
   id: string;
@@ -120,7 +122,9 @@ const DebateHistory = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex w-full">
+      <DesktopSidebar />
+      <div className="flex-1 lg:ml-64 pb-20 md:pb-8">
       <div className="container mx-auto px-4 py-8">
         <Button
           variant="ghost"
@@ -374,6 +378,8 @@ const DebateHistory = () => {
           </div>
         </DialogContent>
       </Dialog>
+      <BottomNavigation />
+      </div>
     </div>
   );
 };
