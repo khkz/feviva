@@ -10,3 +10,4 @@ export { AdminLiveSessions } from './AdminLiveSessions';
 export { AdminMovies } from './AdminMovies';
 export { AdminBiblePlan } from './AdminBiblePlan';
 export { AdminDailyContent } from './AdminDailyContent';
+export { default as AdminCommunity } from './AdminCommunity';
