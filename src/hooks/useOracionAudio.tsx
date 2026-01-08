@@ -42,7 +42,9 @@ export function useOracionAudio({ oracionId, nombre, texto, existingAudioUrl }: 
         body: { 
           text: texto, 
           filename,
-          voice: 'coral' // Natural Spanish-friendly voice from gpt-4o-mini-tts
+          voice: 'shimmer', // Calm, gentle voice for prayers
+          targetTable: 'oraciones', // Save audio URL directly from edge function
+          targetId: oracionId
         },
       });
 
@@ -50,13 +52,7 @@ export function useOracionAudio({ oracionId, nombre, texto, existingAudioUrl }: 
       
       if (data?.audioUrl) {
         setAudioUrl(data.audioUrl);
-        
-        // Update the prayer record with the audio URL
-        await supabase
-          .from('oraciones')
-          .update({ audio_url: data.audioUrl })
-          .eq('id', oracionId);
-        
+        console.log('Audio generated and saved:', data.audioUrl);
         return data.audioUrl;
       }
     } catch (error) {
