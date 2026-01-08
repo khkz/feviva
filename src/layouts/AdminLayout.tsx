@@ -12,7 +12,8 @@ import {
   Radio,
   ArrowLeft,
   Loader2,
-  Library
+  Library,
+  Sunrise
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -23,6 +24,7 @@ const navItems = [
   { path: '/admin', icon: LayoutDashboard, label: 'Dashboard', exact: true },
   { path: '/admin/users', icon: Users, label: 'Usuarios' },
   { path: '/admin/content', icon: FileText, label: 'Contenido' },
+  { path: '/admin/daily-content', icon: Sunrise, label: 'Contenido Diario' },
   { path: '/admin/courses', icon: GraduationCap, label: 'Cursos' },
   { path: '/admin/movies', icon: Film, label: 'Películas' },
   { path: '/admin/live', icon: Radio, label: 'En Vivo' },
