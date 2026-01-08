@@ -34,7 +34,7 @@ const mainNavItems: NavItem[] = [
 ];
 
 const secondaryNavItems: NavItem[] = [
-  { path: "/coach", icon: MessageCircle, label: "Coach IA" },
+  { path: "/coach", icon: MessageCircle, label: "Coach de Fe" },
   { path: "/library", icon: BookOpen, label: "Biblioteca" },
   { path: "/habits", icon: Target, label: "Hábitos" },
   { path: "/community", icon: Users, label: "Comunidad" },
