@@ -104,7 +104,7 @@ serve(async (req) => {
   }
 
   try {
-    const { text, filename, voice = 'nova' } = await req.json();
+    const { text, filename, voice = 'shimmer', targetTable, targetId } = await req.json();
 
     if (!text) {
       throw new Error('Text is required');
@@ -189,6 +189,20 @@ serve(async (req) => {
       .getPublicUrl(filePath);
 
     console.log(`Audio uploaded successfully: ${urlData.publicUrl}`);
+
+    // Update the target table with the audio URL if specified
+    if (targetTable && targetId) {
+      const { error: updateError } = await supabase
+        .from(targetTable)
+        .update({ audio_url: urlData.publicUrl })
+        .eq('id', targetId);
+      
+      if (updateError) {
+        console.error(`Error updating ${targetTable}:`, updateError);
+      } else {
+        console.log(`Updated ${targetTable} record ${targetId} with audio URL`);
+      }
+    }
 
     return new Response(
       JSON.stringify({ audioUrl: urlData.publicUrl }),
