@@ -1,6 +1,7 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAudioCache } from "@/hooks/useAudioCache";
 
 interface UseOracionAudioProps {
   oracionId: string;
@@ -11,11 +12,22 @@ interface UseOracionAudioProps {
 
 export function useOracionAudio({ oracionId, nombre, texto, existingAudioUrl }: UseOracionAudioProps) {
   const { toast } = useToast();
+  const { getAudioWithCache } = useAudioCache();
   const [audioUrl, setAudioUrl] = useState<string | null>(existingAudioUrl || null);
+  const [cachedUrl, setCachedUrl] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Pre-cache audio if URL exists
+  useEffect(() => {
+    if (existingAudioUrl) {
+      getAudioWithCache(existingAudioUrl).then(url => {
+        if (url) setCachedUrl(url);
+      });
+    }
+  }, [existingAudioUrl, getAudioWithCache]);
 
   const generateAudio = useCallback(async () => {
     if (audioUrl || isGenerating) return audioUrl;
@@ -62,12 +74,18 @@ export function useOracionAudio({ oracionId, nombre, texto, existingAudioUrl }: 
   }, [oracionId, nombre, texto, audioUrl, isGenerating, toast]);
 
   const play = useCallback(async () => {
-    let url = audioUrl;
+    let url = cachedUrl || audioUrl;
     
     // Generate audio if not available
     if (!url) {
       url = await generateAudio();
       if (!url) return;
+      // Cache the newly generated audio
+      const cached = await getAudioWithCache(url);
+      if (cached) {
+        setCachedUrl(cached);
+        url = cached;
+      }
     }
 
     // Create or reuse audio element

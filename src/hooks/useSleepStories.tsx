@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAudioCache } from "@/hooks/useAudioCache";
 
 export interface SleepStory {
   id: string;
@@ -18,6 +19,15 @@ export const useSleepStories = () => {
   const [stories, setStories] = useState<SleepStory[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { getAudioWithCache } = useAudioCache();
+
+  /**
+   * Get cached audio URL for a story
+   */
+  const getCachedAudioUrl = useCallback(async (audioUrl: string | null): Promise<string | null> => {
+    if (!audioUrl) return null;
+    return getAudioWithCache(audioUrl);
+  }, [getAudioWithCache]);
 
   useEffect(() => {
     fetchStories();
@@ -110,5 +120,6 @@ export const useSleepStories = () => {
     generateAudio,
     saveProgress,
     refetch: fetchStories,
+    getCachedAudioUrl,
   };
 };

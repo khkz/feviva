@@ -262,7 +262,7 @@ export function LessonDetailModal({
               
               {isGeneratingAudio && (
                 <p className="text-xs text-muted-foreground mt-2 text-center">
-                  Generando audio con IA... Esto puede tomar unos segundos
+                  Generando audio... Esto puede tomar unos segundos
                 </p>
               )}
             </motion.div>
@@ -363,7 +363,7 @@ export function LessonDetailModal({
               ) : (
                 <>
                   <Sparkles className="h-4 w-4" />
-                  Enriquecer con IA
+                  Enriquecer contenido
                 </>
               )}
             </Button>

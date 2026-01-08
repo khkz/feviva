@@ -72,7 +72,7 @@ export const NovenaCard = ({ novena, progress, onStart, onContinue, onImageGener
 
       toast({
         title: "Imagen generada",
-        description: "La imagen de la novena ha sido creada con IA",
+        description: "La imagen de la novena ha sido creada",
       });
       
       onImageGenerated?.();
@@ -116,7 +116,7 @@ export const NovenaCard = ({ novena, progress, onStart, onContinue, onImageGener
               ) : (
                 <>
                   <Sparkles className="h-4 w-4 mr-2" />
-                  Generar con IA
+                  Generar imagen
                 </>
               )}
             </Button>

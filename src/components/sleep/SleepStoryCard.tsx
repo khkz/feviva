@@ -81,7 +81,7 @@ export const SleepStoryCard = ({ story, onClick, onGenerateImage }: SleepStoryCa
                   ) : (
                     <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                   )}
-                  Generar con IA
+                  Generar imagen
                 </Button>
               )}
             </div>

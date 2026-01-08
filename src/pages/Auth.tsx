@@ -342,7 +342,7 @@ const Auth = () => {
             {/* Features */}
             <div className="space-y-4">
               {[
-                { icon: <Cross className="w-5 h-5" />, text: "Coach de debate con IA" },
+                { icon: <Cross className="w-5 h-5" />, text: "Coach de debate" },
                 { icon: <Shield className="w-5 h-5" />, text: "Tarjetas de argumentos" },
                 { icon: <Star className="w-5 h-5" />, text: "Comunidad de apoyo" }
               ].map((feature, index) => (

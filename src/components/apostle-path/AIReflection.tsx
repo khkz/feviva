@@ -37,7 +37,7 @@ export const AIReflection = ({
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-lg">
           <Sparkles className="w-5 h-5 text-primary" />
-          Guía con IA
+          Guía Espiritual
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
