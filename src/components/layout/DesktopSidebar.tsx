@@ -10,11 +10,11 @@ import {
   Users, 
   User, 
   Target,
+  Sparkles,
   Trophy,
   ChevronRight
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import logo from "@/assets/logo.svg";
 
 interface NavItem {
   path: string;
@@ -58,18 +58,15 @@ export function DesktopSidebar({ userName = "Peregrino", userLevel = 1, userStre
       {/* Logo */}
       <div className="p-6 border-b border-border/20">
         <Link to="/dashboard" className="flex items-center gap-3 group">
-          <motion.img 
-            src={logo}
-            alt="ElRugido"
-            className="w-10 h-10 object-contain"
+          <motion.div 
+            className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center shadow-medium"
             whileHover={{ scale: 1.05, rotate: 5 }}
-          />
-          <div className="flex flex-col">
-            <span className="font-heading text-xl font-bold text-foreground group-hover:text-primary transition-colors">
-              ElRugido
-            </span>
-            <span className="text-xs text-muted-foreground">elrugido.com</span>
-          </div>
+          >
+            <Sparkles className="w-5 h-5 text-secondary" />
+          </motion.div>
+          <span className="font-heading text-xl font-bold text-foreground group-hover:text-primary transition-colors">
+            ElRugido
+          </span>
         </Link>
       </div>
 
