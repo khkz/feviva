@@ -116,6 +116,10 @@ INSTRUCCIONES IMPORTANTES:
 6. Mantén tu respuesta en 2-4 oraciones
 7. Progresa la conversación hacia nuevos aspectos del tema
 
+IMPORTANTE: Al final de tu respuesta, añade una línea separada con el formato:
+[SCORE: X] donde X es 0-3 según la calidad del argumento del usuario (0=malo, 1=básico, 2=bueno, 3=excelente)
+[HINT: breve nota sobre qué hizo bien o mal]
+
 ${previousArguments ? `\nARGUMENTOS QUE YA USASTE (no repitas estos):\n${previousArguments}` : ''}`;
 
       const aiMessages = messages.map((m: any) => ({
@@ -123,7 +127,6 @@ ${previousArguments ? `\nARGUMENTOS QUE YA USASTE (no repitas estos):\n${previou
         content: m.content
       }));
 
-      // Use tool calling for structured response with scoring
       const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -136,33 +139,6 @@ ${previousArguments ? `\nARGUMENTOS QUE YA USASTE (no repitas estos):\n${previou
             { role: 'system', content: systemPrompt },
             ...aiMessages
           ],
-          tools: [{
-            type: "function",
-            function: {
-              name: "respond_with_feedback",
-              description: "Responde al usuario y evalúa la calidad de su argumento",
-              parameters: {
-                type: "object",
-                properties: {
-                  response: { 
-                    type: "string", 
-                    description: "Tu respuesta conversacional al usuario (2-4 oraciones)" 
-                  },
-                  user_score: { 
-                    type: "number", 
-                    description: "Puntuación del argumento del usuario: 0=malo/irrelevante, 1=básico, 2=bueno, 3=excelente" 
-                  },
-                  feedback_hint: { 
-                    type: "string",
-                    description: "Breve nota interna sobre qué hizo bien o mal el usuario (para mostrarle después)"
-                  }
-                },
-                required: ["response", "user_score", "feedback_hint"],
-                additionalProperties: false
-              }
-            }
-          }],
-          tool_choice: { type: "function", function: { name: "respond_with_feedback" } }
         }),
       });
 
@@ -173,27 +149,29 @@ ${previousArguments ? `\nARGUMENTOS QUE YA USASTE (no repitas estos):\n${previou
       }
 
       const data = await response.json();
+      const fullContent = data.choices?.[0]?.message?.content || '';
       
-      // Parse tool call response
-      let message = '';
-      let userScore = 0;
+      // Parse score and hint from response
+      let message = fullContent;
+      let userScore = 1;
       let feedbackHint = '';
       
-      try {
-        const toolCall = data.choices[0].message.tool_calls?.[0];
-        if (toolCall && toolCall.function.arguments) {
-          const args = JSON.parse(toolCall.function.arguments);
-          message = args.response || '';
-          userScore = args.user_score || 0;
-          feedbackHint = args.feedback_hint || '';
-        } else {
-          // Fallback if no tool call
-          message = data.choices[0].message.content || '';
-        }
-      } catch (parseError) {
-        console.error('Error parsing tool call:', parseError);
-        message = data.choices[0].message.content || '';
+      // Extract score
+      const scoreMatch = fullContent.match(/\[SCORE:\s*(\d)\]/i);
+      if (scoreMatch) {
+        userScore = parseInt(scoreMatch[1], 10);
+        message = message.replace(/\[SCORE:\s*\d\]/i, '').trim();
       }
+      
+      // Extract hint
+      const hintMatch = fullContent.match(/\[HINT:\s*([^\]]+)\]/i);
+      if (hintMatch) {
+        feedbackHint = hintMatch[1].trim();
+        message = message.replace(/\[HINT:\s*[^\]]+\]/i, '').trim();
+      }
+      
+      // Clean up any trailing newlines
+      message = message.replace(/\n+$/, '').trim();
 
       return new Response(JSON.stringify({ 
         message, 
