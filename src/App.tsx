@@ -41,6 +41,7 @@ import {
   AdminLiveSessions,
   AdminMovies,
   AdminDailyContent,
+  AdminCommunity,
 } from "./pages/admin";
 import AdminBiblePlan from "./pages/admin/AdminBiblePlan";
 
@@ -83,6 +84,7 @@ const App = () => (
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
               <Route path="users" element={<AdminUsers />} />
+              <Route path="community" element={<AdminCommunity />} />
               <Route path="content" element={<AdminContent />} />
               <Route path="daily-content" element={<AdminDailyContent />} />
               <Route path="feedback" element={<AdminFeedback />} />
