@@ -5,6 +5,7 @@ import { Sparkles, Shield } from "lucide-react";
 import { useUserStats } from "@/hooks/useUserStats";
 import { useNovenas } from "@/hooks/useNovenas";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { useDailyVerse } from "@/hooks/useDailyVerse";
 import { HeroSection } from "@/components/dashboard/HeroSection";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 import { ProgressCard } from "@/components/dashboard/ProgressCard";
@@ -48,6 +49,7 @@ const Dashboard = () => {
   
   const { novenas, loading: novenasLoading, getProgressForNovena } = useNovenas();
   const { isAdmin } = useAdminAuth();
+  const dailyVerse = useDailyVerse();
 
   useEffect(() => {
     checkAuth();
@@ -92,10 +94,6 @@ const Dashboard = () => {
     );
   }
 
-  const dailyVerse = {
-    text: "Estén siempre preparados para responder a todo el que les pida razón de la esperanza que hay en ustedes.",
-    reference: "1 Pedro 3:15"
-  };
 
   return (
     <div className="min-h-screen bg-background">
