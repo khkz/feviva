@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -31,63 +31,54 @@ export interface UserNovenaProgress {
   completada: boolean;
 }
 
+const fetchNovenas = async (): Promise<Novena[]> => {
+  const { data, error } = await supabase
+    .from("novenas")
+    .select("*")
+    .order("orden", { ascending: true });
+
+  if (error) throw error;
+  
+  return (data || []).map(novena => ({
+    ...novena,
+    dias: Array.isArray(novena.dias) ? novena.dias : JSON.parse(novena.dias as string)
+  })) as Novena[];
+};
+
+const fetchUserProgress = async (): Promise<UserNovenaProgress[]> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data, error } = await supabase
+    .from("user_novena_progress")
+    .select("*")
+    .eq("user_id", user.id);
+
+  if (error) throw error;
+  
+  return (data || []).map(progress => ({
+    ...progress,
+    dias_completados: Array.isArray(progress.dias_completados) 
+      ? progress.dias_completados 
+      : JSON.parse(progress.dias_completados as string)
+  })) as UserNovenaProgress[];
+};
+
 export const useNovenas = () => {
-  const [novenas, setNovenas] = useState<Novena[]>([]);
-  const [userProgress, setUserProgress] = useState<UserNovenaProgress[]>([]);
-  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    fetchNovenas();
-    fetchUserProgress();
-  }, []);
+  const { data: novenas = [], isLoading: novenasLoading } = useQuery({
+    queryKey: ['novenas'],
+    queryFn: fetchNovenas,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+  });
 
-  const fetchNovenas = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("novenas")
-        .select("*")
-        .order("orden", { ascending: true });
-
-      if (error) throw error;
-      
-      const formattedNovenas = (data || []).map(novena => ({
-        ...novena,
-        dias: Array.isArray(novena.dias) ? novena.dias : JSON.parse(novena.dias as string)
-      })) as Novena[];
-      
-      setNovenas(formattedNovenas);
-    } catch (error) {
-      console.error("Error fetching novenas:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchUserProgress = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data, error } = await supabase
-        .from("user_novena_progress")
-        .select("*")
-        .eq("user_id", user.id);
-
-      if (error) throw error;
-      
-      const formattedProgress = (data || []).map(progress => ({
-        ...progress,
-        dias_completados: Array.isArray(progress.dias_completados) 
-          ? progress.dias_completados 
-          : JSON.parse(progress.dias_completados as string)
-      })) as UserNovenaProgress[];
-      
-      setUserProgress(formattedProgress);
-    } catch (error) {
-      console.error("Error fetching user progress:", error);
-    }
-  };
+  const { data: userProgress = [], isLoading: progressLoading } = useQuery({
+    queryKey: ['novena-progress'],
+    queryFn: fetchUserProgress,
+    staleTime: 5 * 60 * 1000,
+  });
 
   const startNovena = async (novenaId: string) => {
     try {
@@ -119,7 +110,7 @@ export const useNovenas = () => {
 
       if (error) throw error;
 
-      await fetchUserProgress();
+      queryClient.invalidateQueries({ queryKey: ['novena-progress'] });
       
       toast({
         title: "¡Novena iniciada!",
@@ -166,7 +157,7 @@ export const useNovenas = () => {
 
       if (error) throw error;
 
-      await fetchUserProgress();
+      queryClient.invalidateQueries({ queryKey: ['novena-progress'] });
 
       if (completada) {
         toast({
@@ -196,11 +187,11 @@ export const useNovenas = () => {
   return {
     novenas,
     userProgress,
-    loading,
+    loading: novenasLoading || progressLoading,
     startNovena,
     completeDia,
     getProgressForNovena,
-    refetch: fetchUserProgress,
-    refetchNovenas: fetchNovenas,
+    refetch: () => queryClient.invalidateQueries({ queryKey: ['novena-progress'] }),
+    refetchNovenas: () => queryClient.invalidateQueries({ queryKey: ['novenas'] }),
   };
 };
