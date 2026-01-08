@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, ChevronDown, Star, Users, Flame } from "lucide-react";
+import { ArrowRight, ChevronDown, Star, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { UserNeedsSection } from "@/components/landing/UserNeedsSection";
 import { DailyJourneySection } from "@/components/landing/DailyJourneySection";
@@ -10,6 +10,7 @@ import { TechFeaturesSection } from "@/components/landing/TechFeaturesSection";
 import { FinalCTASection } from "@/components/landing/FinalCTASection";
 import { FooterSection } from "@/components/landing/FooterSection";
 import heroBackground from "@/assets/hero-background.jpg";
+import logoElRugido from "@/assets/logo-elrugido.svg";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -57,21 +58,20 @@ const Index = () => {
             transition={{ duration: 0.8 }}
             className="max-w-4xl mx-auto"
           >
-            {/* Badge */}
+            {/* Logo */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8"
+              className="flex flex-col items-center mb-8"
             >
-              <Flame className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-primary">App de formación católica #1</span>
+              <img 
+                src={logoElRugido} 
+                alt="ElRugido" 
+                className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 mb-4"
+              />
+              <span className="text-sm md:text-base font-medium text-primary tracking-wider">elrugido.com</span>
             </motion.div>
-
-            {/* Main Heading */}
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold mb-6">
-              <span className="text-gradient-gold">ElRugido</span>
-            </h1>
             
             <p className="text-xl md:text-2xl text-muted-foreground font-medium mb-4">
               Ruge tu fe. Defiende tu esperanza.
