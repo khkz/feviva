@@ -98,13 +98,35 @@ async function getRecentVideos(playlistId: string, maxVideos: number = 50): Prom
         const videoId = item.snippet.resourceId.videoId;
         const publishedAt = item.snippet.publishedAt;
         
+        // Skip "Para pensar" videos
+        if (title.toLowerCase().startsWith('para pensar')) {
+          continue;
+        }
+        
         // Log first 10 titles for debugging
         if (videosFetched < 10) {
           console.log(`Title ${videosFetched + 1}: ${title}`);
         }
         
-        const fecha = extractDateFromTitle(title, publishedAt);
-        const referencia = extractReference(title) || 'Evangelio del Día';
+        // Check if title starts with biblical reference (Mc, Mt, Lc, Jn, etc.)
+        const hasBiblicalRef = /^(Mc|Mt|Lc|Jn|Gn|Ex|Hch|Rom|1\s?Cor|2\s?Cor)\.?\s*\d/i.test(title.trim());
+        
+        let fecha: string | null;
+        let referencia: string;
+        
+        if (hasBiblicalRef) {
+          // Use published date for videos with biblical ref at start
+          const pubDate = new Date(publishedAt);
+          const year = pubDate.getFullYear();
+          const month = String(pubDate.getMonth() + 1).padStart(2, '0');
+          const day = String(pubDate.getDate()).padStart(2, '0');
+          fecha = `${year}-${month}-${day}`;
+          referencia = extractReference(title) || 'Evangelio del Día';
+          console.log(`Biblical ref video: ${title} -> ${fecha} | ${referencia}`);
+        } else {
+          fecha = extractDateFromTitle(title, publishedAt);
+          referencia = extractReference(title) || 'Evangelio del Día';
+        }
         
         videos.push({ videoId, title, publishedAt, fecha, referencia });
         videosFetched++;
@@ -288,15 +310,38 @@ serve(async (req) => {
     let updatedCount = 0;
     const errors: string[] = [];
     
+    // Group videos by date and prioritize those with biblical references
+    const videosByDate = new Map<string, YouTubeVideo>();
     for (const video of videosWithDates) {
       if (!video.fecha) continue;
       
-      // Try to upsert (insert or update)
+      const existing = videosByDate.get(video.fecha);
+      const newHasRef = video.referencia !== 'Evangelio del Día';
+      const existingHasRef = existing?.referencia !== 'Evangelio del Día';
+      
+      // Keep video with biblical reference, or first one if neither has ref
+      if (!existing || (newHasRef && !existingHasRef)) {
+        videosByDate.set(video.fecha, video);
+      }
+    }
+    
+    console.log(`Unique dates: ${videosByDate.size}`);
+    
+    for (const [fecha, video] of videosByDate) {
+      // Check existing record
       const { data: existing } = await supabase
         .from('daily_gospel')
-        .select('id')
-        .eq('fecha', video.fecha)
-        .single();
+        .select('id, referencia')
+        .eq('fecha', fecha)
+        .maybeSingle();
+      
+      const existingHasRef = existing?.referencia && existing.referencia !== 'Evangelio del Día';
+      const newHasRef = video.referencia !== 'Evangelio del Día';
+      
+      // Skip if existing has reference and new doesn't
+      if (existing && existingHasRef && !newHasRef) {
+        continue;
+      }
       
       if (existing) {
         // Update existing
@@ -309,12 +354,13 @@ serve(async (req) => {
             published_at: video.publishedAt,
             updated_at: new Date().toISOString()
           })
-          .eq('fecha', video.fecha);
+          .eq('fecha', fecha);
         
         if (error) {
-          errors.push(`Update ${video.fecha}: ${error.message}`);
+          errors.push(`Update ${fecha}: ${error.message}`);
         } else {
           updatedCount++;
+          console.log(`Updated ${fecha}: ${video.referencia}`);
         }
       } else {
         // Insert new
@@ -329,9 +375,10 @@ serve(async (req) => {
           });
         
         if (error) {
-          errors.push(`Insert ${video.fecha}: ${error.message}`);
+          errors.push(`Insert ${fecha}: ${error.message}`);
         } else {
           insertedCount++;
+          console.log(`Inserted ${fecha}: ${video.referencia}`);
         }
       }
     }
