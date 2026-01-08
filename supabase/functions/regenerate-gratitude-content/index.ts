@@ -13,7 +13,7 @@ serve(async (req) => {
 
   try {
     const { batchSize = 5 } = await req.json().catch(() => ({}));
-    const effectiveBatchSize = Math.min(Math.max(1, batchSize), 10);
+    const effectiveBatchSize = Math.min(Math.max(1, batchSize), 25);
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {

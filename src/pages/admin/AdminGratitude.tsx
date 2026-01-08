@@ -134,39 +134,21 @@ export const AdminGratitude = () => {
 
   const regenerateContent = async () => {
     setRegeneratingContent(true);
-    setContentResults([]);
-    setCurrentContentBatch(0);
-
-    let hasMore = true;
-    let batchNum = 0;
-    const allResults: ContentResult[] = [];
 
     try {
-      while (hasMore) {
-        batchNum++;
-        setCurrentContentBatch(batchNum);
+      const { data, error } = await supabase.functions.invoke('regenerate-gratitude-content', {
+        body: { batchSize: 20 }
+      });
 
-        const { data, error } = await supabase.functions.invoke('regenerate-gratitude-content', {
-          body: { batchSize: 5 }
-        });
+      if (error) throw error;
 
-        if (error) throw error;
-
-        if (data.results) {
-          allResults.push(...data.results);
-          setContentResults([...allResults]);
-        }
-
-        hasMore = data.hasMore;
-
-        if (hasMore) {
-          // Longer delay to avoid rate limits with Gemini
-          await new Promise(resolve => setTimeout(resolve, 2000));
-        }
+      if (data.results) {
+        // Append results instead of replacing
+        setContentResults(prev => [...prev, ...data.results]);
       }
 
-      const successCount = allResults.filter(r => r.status === 'success').length;
-      toast.success(`${successCount} reflexiones regeneradas con Gemini 3 Pro`);
+      const successCount = data.results?.filter((r: ContentResult) => r.status === 'success').length || 0;
+      toast.success(`${successCount} reflexiones regeneradas. Quedan ${data.remaining} pendientes.`);
       await fetchStats();
     } catch (err) {
       console.error('Error regenerating content:', err);
@@ -174,6 +156,10 @@ export const AdminGratitude = () => {
     } finally {
       setRegeneratingContent(false);
     }
+  };
+
+  const clearContentResults = () => {
+    setContentResults([]);
   };
 
   const audioProgressPercent = totalSessions > 0 ? (withAudio / totalSessions) * 100 : 0;
@@ -287,12 +273,12 @@ export const AdminGratitude = () => {
                   {regeneratingContent ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Regenerando lote {currentContentBatch}...
+                      Procesando grupo de 20...
                     </>
                   ) : (
                     <>
                       <Sparkles className="h-4 w-4 mr-2" />
-                      Regenerar {originalContent} Reflexiones
+                      Regenerar próximas 20 ({originalContent} pendientes)
                     </>
                   )}
                 </Button>
@@ -310,12 +296,17 @@ export const AdminGratitude = () => {
           {/* Content Results */}
           {contentResults.length > 0 && (
             <Card>
-              <CardHeader>
-                <CardTitle>Resultados de Regeneración</CardTitle>
-                <CardDescription>
-                  {contentResults.filter(r => r.status === 'success').length} éxitos, 
-                  {' '}{contentResults.filter(r => r.status === 'error').length} errores
-                </CardDescription>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Resultados de Regeneración</CardTitle>
+                  <CardDescription>
+                    {contentResults.filter(r => r.status === 'success').length} éxitos, 
+                    {' '}{contentResults.filter(r => r.status === 'error').length} errores
+                  </CardDescription>
+                </div>
+                <Button variant="outline" size="sm" onClick={clearContentResults}>
+                  Limpiar
+                </Button>
               </CardHeader>
               <CardContent>
                 <div className="max-h-96 overflow-y-auto space-y-2">
