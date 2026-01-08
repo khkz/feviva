@@ -56,12 +56,26 @@ const Library = () => {
     fetchProgress();
   }, []);
 
+  // Mapping from URL param to exact lesson title
+  const LESSON_PARAM_MAP: Record<string, string> = {
+    'existe-dios': '¿Existe Dios?',
+    'biblia-confiable': 'La Confiabilidad de la Biblia',
+    'jesus-historico': 'Jesús Histórico',
+    'resurreccion': 'La Resurrección de Jesús',
+    'fe-ciencia': 'Fe y Ciencia',
+    'salvacion': 'Salvación por Gracia',
+    'problema-mal': 'El Problema del Mal',
+    'trinidad': 'La Trinidad',
+  };
+
   // Auto-open lesson from URL parameter
   useEffect(() => {
     if (lessonParam && lessons.length > 0 && !selectedLesson) {
-      const targetLesson = lessons.find(l => 
-        l.titulo.toLowerCase().includes(lessonParam.replace(/-/g, ' '))
-      );
+      const exactTitle = LESSON_PARAM_MAP[lessonParam];
+      const targetLesson = exactTitle 
+        ? lessons.find(l => l.titulo === exactTitle)
+        : lessons.find(l => l.titulo.toLowerCase().includes(lessonParam.replace(/-/g, ' ')));
+      
       if (targetLesson) {
         setSelectedLesson(targetLesson);
       }
