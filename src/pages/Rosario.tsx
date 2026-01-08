@@ -19,6 +19,7 @@ import { RosarioMisterio } from "@/components/rosario/RosarioMisterio";
 import { RosarioDecena } from "@/components/rosario/RosarioDecena";
 import { RosarioWhyModal } from "@/components/rosario/RosarioWhyModal";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
+import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { AmbientSoundMixer } from "@/components/sleep/AmbientSoundMixer";
 import { useRosarioExperience } from "@/hooks/useRosarioExperience";
 import { 
@@ -197,8 +198,10 @@ export default function Rosario() {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      {/* Ambient background for prayer mode */}
+    <div className="min-h-screen flex w-full">
+      <DesktopSidebar />
+      <div className="flex-1 min-h-screen bg-background pb-20 lg:ml-64">
+        {/* Ambient background for prayer mode */}
       {step !== "inicio" && step !== "final" && (
         <div className="fixed inset-0 pointer-events-none overflow-hidden">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-gradient-radial from-secondary/5 via-transparent to-transparent rounded-full blur-3xl" />
@@ -607,7 +610,8 @@ export default function Rosario() {
         </AnimatePresence>
       </div>
 
-      <BottomNavigation />
+        <BottomNavigation />
+      </div>
     </div>
   );
 }

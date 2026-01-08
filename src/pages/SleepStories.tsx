@@ -19,6 +19,7 @@ import { SleepStoryCard } from "@/components/sleep/SleepStoryCard";
 import { SleepPlayer } from "@/components/sleep/SleepPlayer";
 import { JobProgressPanel } from "@/components/processing/JobProgressPanel";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
+import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -215,8 +216,10 @@ const SleepStories = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Hero Header */}
+    <div className="min-h-screen flex w-full">
+      <DesktopSidebar />
+      <div className="flex-1 min-h-screen bg-background pb-24 lg:ml-64">
+        {/* Hero Header */}
       <motion.header 
         className="relative overflow-hidden"
         initial={{ opacity: 0 }}
@@ -422,7 +425,8 @@ const SleepStories = () => {
         />
       )}
 
-      <BottomNavigation />
+        <BottomNavigation />
+      </div>
     </div>
   );
 };
