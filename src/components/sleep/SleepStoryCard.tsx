@@ -54,6 +54,8 @@ export const SleepStoryCard = ({ story, onClick, onGenerateImage }: SleepStoryCa
               <img 
                 src={story.imagen_url} 
                 alt={story.titulo}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />

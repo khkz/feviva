@@ -95,6 +95,8 @@ const FeatureShowcaseItem = ({
             <img 
               src={image} 
               alt={title}
+              loading="lazy"
+              decoding="async"
               className="absolute inset-1 rounded-[22px] w-[calc(100%-8px)] h-[calc(100%-8px)] object-cover"
             />
           ) : (

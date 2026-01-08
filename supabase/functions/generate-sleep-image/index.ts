@@ -109,12 +109,13 @@ async function uploadToStorage(supabase: any, base64Image: string, storyId: stri
       bytes[i] = binaryString.charCodeAt(i);
     }
 
-    const fileName = `${storyId}-${Date.now()}.png`;
+    // Use WebP format for better compression (smaller file size, faster loading)
+    const fileName = `${storyId}-${Date.now()}.webp`;
     
     const { data, error } = await supabase.storage
       .from('sleep-images')
       .upload(fileName, bytes, {
-        contentType: 'image/png',
+        contentType: 'image/webp',
         upsert: true
       });
 

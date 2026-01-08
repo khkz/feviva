@@ -68,7 +68,7 @@ export const useSleepStories = () => {
           body: JSON.stringify({
             text: story.contenido,
             filename: `sleep-story-${story.id}`,
-            voice: "nova", // Calm, soothing voice for sleep
+            voice: "shimmer", // Calm, soothing voice for sleep
           }),
         }
       );
