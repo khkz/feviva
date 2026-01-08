@@ -2,9 +2,10 @@ import { Flame, Trophy, CheckCircle2, Circle } from "lucide-react";
 import { motion } from "framer-motion";
 import { usePracticeStreaks } from "@/hooks/usePracticeStreaks";
 import { Skeleton } from "@/components/ui/skeleton";
+import { StreakMedals } from "@/components/gamification/StreakMedals";
 
 export function PracticeStreaksCard() {
-  const { streaks, loading } = usePracticeStreaks();
+  const { streaks, medals, totalUnlocked, totalMedals, loading } = usePracticeStreaks();
 
   if (loading) {
     return (
@@ -32,9 +33,18 @@ export function PracticeStreaksCard() {
         <div className="absolute -top-10 -right-10 w-32 h-32 bg-orange-500/10 rounded-full blur-2xl" />
         
         <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-4">
-            <Flame className="w-5 h-5 text-orange-500" />
-            <h3 className="font-semibold text-foreground">Rachas de Prácticas</h3>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Flame className="w-5 h-5 text-orange-500" />
+              <h3 className="font-semibold text-foreground">Rachas de Prácticas</h3>
+            </div>
+            {totalMedals > 0 && (
+              <StreakMedals 
+                medals={medals} 
+                totalUnlocked={totalUnlocked} 
+                totalMedals={totalMedals} 
+              />
+            )}
           </div>
 
           <div className="grid grid-cols-5 gap-2">
