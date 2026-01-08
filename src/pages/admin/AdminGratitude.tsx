@@ -4,6 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { supabase } from '@/integrations/supabase/client';
 import { 
   Heart, 
@@ -14,7 +19,9 @@ import {
   XCircle,
   Loader2,
   Sparkles,
-  FileText
+  FileText,
+  Edit,
+  ChevronDown
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -31,6 +38,16 @@ interface ContentResult {
   titulo: string;
   status: 'success' | 'error';
   error?: string;
+}
+
+interface GratitudeSession {
+  id: string;
+  numero: number;
+  titulo: string;
+  descripcion: string;
+  descripcion_original: string | null;
+  regenerated_at: string | null;
+  audio_url: string | null;
 }
 
 export const AdminGratitude = () => {
@@ -54,6 +71,13 @@ export const AdminGratitude = () => {
   const [regeneratingContent, setRegeneratingContent] = useState(false);
   const [currentContentBatch, setCurrentContentBatch] = useState(0);
   const [contentResults, setContentResults] = useState<ContentResult[]>([]);
+  
+  // Sessions list state
+  const [sessions, setSessions] = useState<GratitudeSession[]>([]);
+  const [loadingSessions, setLoadingSessions] = useState(false);
+  const [editingSession, setEditingSession] = useState<GratitudeSession | null>(null);
+  const [editedDescription, setEditedDescription] = useState('');
+  const [saving, setSaving] = useState(false);
 
   const fetchStats = async () => {
     setLoading(true);
@@ -162,6 +186,55 @@ export const AdminGratitude = () => {
     setContentResults([]);
   };
 
+  const fetchSessions = async () => {
+    setLoadingSessions(true);
+    try {
+      const { data, error } = await supabase
+        .from('gratitude_sessions')
+        .select('id, numero, titulo, descripcion, descripcion_original, regenerated_at, audio_url')
+        .order('numero', { ascending: true });
+      
+      if (error) throw error;
+      setSessions(data || []);
+    } catch (err) {
+      console.error('Error fetching sessions:', err);
+      toast.error('Error al cargar sesiones');
+    } finally {
+      setLoadingSessions(false);
+    }
+  };
+
+  const saveSession = async () => {
+    if (!editingSession) return;
+    setSaving(true);
+    
+    try {
+      const { error } = await supabase
+        .from('gratitude_sessions')
+        .update({ 
+          descripcion: editedDescription,
+          regenerated_at: new Date().toISOString() 
+        })
+        .eq('id', editingSession.id);
+      
+      if (error) throw error;
+      
+      setSessions(prev => prev.map(s => 
+        s.id === editingSession.id 
+          ? { ...s, descripcion: editedDescription, regenerated_at: new Date().toISOString() }
+          : s
+      ));
+      
+      setEditingSession(null);
+      toast.success('Sesión actualizada');
+    } catch (err) {
+      console.error('Error saving session:', err);
+      toast.error('Error al guardar');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const audioProgressPercent = totalSessions > 0 ? (withAudio / totalSessions) * 100 : 0;
   const contentProgressPercent = totalSessions > 0 ? (regeneratedContent / totalSessions) * 100 : 0;
 
@@ -232,17 +305,96 @@ export const AdminGratitude = () => {
       </div>
 
       {/* Tabs for Audio and Content */}
-      <Tabs defaultValue="content" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-2">
+      <Tabs defaultValue="list" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="list" className="flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            Ver Contenido
+          </TabsTrigger>
           <TabsTrigger value="content" className="flex items-center gap-2">
             <Sparkles className="h-4 w-4" />
-            Regenerar Contenido
+            Regenerar
           </TabsTrigger>
           <TabsTrigger value="audio" className="flex items-center gap-2">
             <Volume2 className="h-4 w-4" />
-            Generar Audio
+            Audio
           </TabsTrigger>
         </TabsList>
+
+        {/* List Sessions Tab */}
+        <TabsContent value="list" className="space-y-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  Contenido de Sesiones
+                </CardTitle>
+                <CardDescription>
+                  {sessions.length > 0 
+                    ? `${sessions.length} sesiones | ${sessions.filter(s => s.regenerated_at).length} regeneradas con IA`
+                    : 'Click en Cargar para ver las sesiones'}
+                </CardDescription>
+              </div>
+              <Button onClick={fetchSessions} variant="outline" size="sm" disabled={loadingSessions}>
+                <RefreshCw className={`h-4 w-4 mr-2 ${loadingSessions ? 'animate-spin' : ''}`} />
+                {sessions.length > 0 ? 'Actualizar' : 'Cargar'}
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {sessions.length === 0 && !loadingSessions ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  Presiona "Cargar" para ver las sesiones de gratitud
+                </div>
+              ) : (
+                <ScrollArea className="h-[600px] pr-4">
+                  <div className="space-y-3">
+                    {sessions.map(session => (
+                      <div 
+                        key={session.id} 
+                        className="border rounded-lg p-4 hover:bg-muted/50 transition-colors"
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline">{session.numero}</Badge>
+                            <span className="font-semibold">{session.titulo}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {session.regenerated_at && (
+                              <Badge variant="secondary" className="bg-purple-100 text-purple-700">
+                                <Sparkles className="h-3 w-3 mr-1" />
+                                IA
+                              </Badge>
+                            )}
+                            {session.audio_url && (
+                              <Badge variant="secondary" className="bg-green-100 text-green-700">
+                                <Volume2 className="h-3 w-3 mr-1" />
+                                Audio
+                              </Badge>
+                            )}
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => {
+                                setEditingSession(session);
+                                setEditedDescription(session.descripcion);
+                              }}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                        <p className="text-sm text-muted-foreground line-clamp-3">
+                          {session.descripcion}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         {/* Content Regeneration Tab */}
         <TabsContent value="content" className="space-y-4">
@@ -436,6 +588,60 @@ export const AdminGratitude = () => {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Edit Session Dialog */}
+      <Dialog open={!!editingSession} onOpenChange={() => setEditingSession(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Badge variant="outline">{editingSession?.numero}</Badge>
+              {editingSession?.titulo}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Descripción / Reflexión</Label>
+              <Textarea 
+                value={editedDescription}
+                onChange={(e) => setEditedDescription(e.target.value)}
+                rows={12}
+                className="font-mono text-sm"
+              />
+            </div>
+            
+            {editingSession?.descripcion_original && (
+              <Collapsible>
+                <CollapsibleTrigger className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <ChevronDown className="h-4 w-4" />
+                  Ver descripción original
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <p className="text-sm bg-muted p-3 rounded mt-2 whitespace-pre-wrap">
+                    {editingSession.descripcion_original}
+                  </p>
+                </CollapsibleContent>
+              </Collapsible>
+            )}
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingSession(null)}>
+              Cancelar
+            </Button>
+            <Button onClick={saveSession} disabled={saving}>
+              {saving ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Guardando...
+                </>
+              ) : (
+                'Guardar'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
