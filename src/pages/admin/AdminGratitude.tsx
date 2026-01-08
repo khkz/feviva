@@ -78,6 +78,7 @@ export const AdminGratitude = () => {
   const [editingSession, setEditingSession] = useState<GratitudeSession | null>(null);
   const [editedDescription, setEditedDescription] = useState('');
   const [saving, setSaving] = useState(false);
+  const [regeneratingIndividual, setRegeneratingIndividual] = useState(false);
 
   const fetchStats = async () => {
     setLoading(true);
@@ -232,6 +233,50 @@ export const AdminGratitude = () => {
       toast.error('Error al guardar');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const regenerateIndividualSession = async () => {
+    if (!editingSession) return;
+    setRegeneratingIndividual(true);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('regenerate-gratitude-content', {
+        body: { sessionId: editingSession.id }
+      });
+
+      if (error) throw error;
+      
+      if (data.results?.[0]?.status === 'success') {
+        // Get updated content
+        const { data: updated } = await supabase
+          .from('gratitude_sessions')
+          .select('descripcion, regenerated_at')
+          .eq('id', editingSession.id)
+          .single();
+        
+        if (updated) {
+          setEditedDescription(updated.descripcion);
+          setEditingSession({
+            ...editingSession,
+            descripcion: updated.descripcion,
+            regenerated_at: updated.regenerated_at
+          });
+          setSessions(prev => prev.map(s => 
+            s.id === editingSession.id 
+              ? { ...s, descripcion: updated.descripcion, regenerated_at: updated.regenerated_at }
+              : s
+          ));
+        }
+        toast.success('Contenido regenerado exitosamente');
+      } else {
+        toast.error(data.results?.[0]?.error || 'Error al regenerar');
+      }
+    } catch (err) {
+      console.error('Error:', err);
+      toast.error('Error al regenerar contenido');
+    } finally {
+      setRegeneratingIndividual(false);
     }
   };
 
@@ -625,20 +670,40 @@ export const AdminGratitude = () => {
             )}
           </div>
           
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditingSession(null)}>
-              Cancelar
-            </Button>
-            <Button onClick={saveSession} disabled={saving}>
-              {saving ? (
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button 
+              variant="secondary" 
+              onClick={regenerateIndividualSession} 
+              disabled={regeneratingIndividual || saving}
+              className="bg-purple-100 hover:bg-purple-200 text-purple-700"
+            >
+              {regeneratingIndividual ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Guardando...
+                  Regenerando...
                 </>
               ) : (
-                'Guardar'
+                <>
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Regenerar con IA
+                </>
               )}
             </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setEditingSession(null)}>
+                Cancelar
+              </Button>
+              <Button onClick={saveSession} disabled={saving || regeneratingIndividual}>
+                {saving ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Guardando...
+                  </>
+                ) : (
+                  'Guardar'
+                )}
+              </Button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>

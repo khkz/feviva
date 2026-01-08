@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { batchSize = 5 } = await req.json().catch(() => ({}));
+    const { batchSize = 5, sessionId = null } = await req.json().catch(() => ({}));
     const effectiveBatchSize = Math.min(Math.max(1, batchSize), 25);
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -120,13 +120,25 @@ NO repitas frases como "Que Dios te bendiga" que se agregarán después.`;
       return null;
     }
 
-    // Get sessions that haven't been regenerated yet
-    const { data: sessions, error: fetchError } = await supabase
-      .from("gratitude_sessions")
-      .select("id, numero, titulo, descripcion")
-      .is("regenerated_at", null)
-      .order("numero", { ascending: true })
-      .limit(effectiveBatchSize);
+    // Get sessions - either specific one or batch of unregenerated
+    let sessionsQuery;
+    if (sessionId) {
+      // Regenerate specific session
+      sessionsQuery = supabase
+        .from("gratitude_sessions")
+        .select("id, numero, titulo, descripcion")
+        .eq("id", sessionId);
+    } else {
+      // Get sessions that haven't been regenerated yet
+      sessionsQuery = supabase
+        .from("gratitude_sessions")
+        .select("id, numero, titulo, descripcion")
+        .is("regenerated_at", null)
+        .order("numero", { ascending: true })
+        .limit(effectiveBatchSize);
+    }
+
+    const { data: sessions, error: fetchError } = await sessionsQuery;
 
     if (fetchError) {
       throw new Error(`Error fetching sessions: ${fetchError.message}`);
