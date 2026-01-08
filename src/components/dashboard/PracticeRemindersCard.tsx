@@ -26,11 +26,12 @@ export function PracticeRemindersCard() {
   const [editHour, setEditHour] = useState("");
 
   const handleToggle = async (practice: string, currentEnabled: boolean) => {
-    if (permission !== "granted") {
-      const granted = await requestPermission();
-      if (!granted) return;
+    // Request permission but don't block if denied
+    if (permission !== "granted" && !currentEnabled) {
+      await requestPermission();
     }
 
+    // Always allow saving the reminder preference
     const reminder = practiceReminders.find(r => r.practice === practice);
     if (reminder) {
       savePracticeReminder(practice, !currentEnabled, reminder.hour);
