@@ -796,27 +796,33 @@ export type Database = {
           audio_url: string | null
           created_at: string | null
           descripcion: string
+          descripcion_original: string | null
           duracion_min: number | null
           id: string
           numero: number
+          regenerated_at: string | null
           titulo: string
         }
         Insert: {
           audio_url?: string | null
           created_at?: string | null
           descripcion: string
+          descripcion_original?: string | null
           duracion_min?: number | null
           id?: string
           numero: number
+          regenerated_at?: string | null
           titulo: string
         }
         Update: {
           audio_url?: string | null
           created_at?: string | null
           descripcion?: string
+          descripcion_original?: string | null
           duracion_min?: number | null
           id?: string
           numero?: number
+          regenerated_at?: string | null
           titulo?: string
         }
         Relationships: []
