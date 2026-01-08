@@ -42,7 +42,7 @@ export function useOracionAudio({ oracionId, nombre, texto, existingAudioUrl }: 
         body: { 
           text: texto, 
           filename,
-          voice: 'nova' // Spanish-friendly voice
+          voice: 'coral' // Natural Spanish-friendly voice from gpt-4o-mini-tts
         },
       });
 

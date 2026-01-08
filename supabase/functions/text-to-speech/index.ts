@@ -137,10 +137,10 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'tts-1',
+          model: 'gpt-4o-mini-tts',
           input: chunk,
           voice: voice,
-          response_format: 'mp3',
+          response_format: 'opus', // Compressed format for faster loading
         }),
       });
 
@@ -169,12 +169,12 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const filePath = `${filename}.mp3`;
+    const filePath = `${filename}.opus`;
     
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('teachings-audio')
       .upload(filePath, finalAudio, {
-        contentType: 'audio/mpeg',
+        contentType: 'audio/opus',
         upsert: true
       });
 
