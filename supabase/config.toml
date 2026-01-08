@@ -53,3 +53,6 @@ verify_jwt = false
 
 [functions.apostle-path-ai]
 verify_jwt = true
+
+[functions.batch-gratitude-tts]
+verify_jwt = false
