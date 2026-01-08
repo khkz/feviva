@@ -450,7 +450,11 @@ export type Database = {
       }
       daily_content: {
         Row: {
+          audio_completas_url: string | null
           audio_ensenanza_url: string | null
+          audio_laudes_url: string | null
+          audio_reflexion_url: string | null
+          audio_tip_url: string | null
           audio_versiculo_url: string | null
           created_at: string | null
           ensenanza_contenido: string | null
@@ -465,7 +469,11 @@ export type Database = {
           versiculo_texto: string
         }
         Insert: {
+          audio_completas_url?: string | null
           audio_ensenanza_url?: string | null
+          audio_laudes_url?: string | null
+          audio_reflexion_url?: string | null
+          audio_tip_url?: string | null
           audio_versiculo_url?: string | null
           created_at?: string | null
           ensenanza_contenido?: string | null
@@ -480,7 +488,11 @@ export type Database = {
           versiculo_texto: string
         }
         Update: {
+          audio_completas_url?: string | null
           audio_ensenanza_url?: string | null
+          audio_laudes_url?: string | null
+          audio_reflexion_url?: string | null
+          audio_tip_url?: string | null
           audio_versiculo_url?: string | null
           created_at?: string | null
           ensenanza_contenido?: string | null

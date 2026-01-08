@@ -9,6 +9,8 @@ import { useDailyContent } from "@/hooks/useDailyContent";
 import { useUserStats } from "@/hooks/useUserStats";
 import { DailyVerse } from "@/components/rituals/DailyVerse";
 import { LaudesOracion } from "@/components/rituals/LaudesOracion";
+import { ReflexionCard } from "@/components/rituals/ReflexionCard";
+import { TipApologeticoCard } from "@/components/rituals/TipApologeticoCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -232,35 +234,20 @@ const Morning = () => {
       
       case 'reflexion':
         return (
-          <Card className="glass-card border-0">
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-                  <Sparkles className="h-5 w-5 text-primary" />
-                </div>
-                <span>Reflexión del día</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="prose prose-sm dark:prose-invert max-w-none">
-                {content.reflexion_ia.split('\n').filter(p => p.trim()).map((paragraph, index) => (
-                  <motion.p 
-                    key={index}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="text-foreground leading-relaxed mb-4 last:mb-0"
-                  >
-                    {paragraph}
-                  </motion.p>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <ReflexionCard
+            contenido={content.reflexion_ia}
+            audioUrl={content.audio_reflexion_url}
+          />
         );
       
       case 'laudes':
-        return <LaudesOracion contenido={content.oracion_laudes} />;
+        return (
+          <LaudesOracion 
+            contenido={content.oracion_laudes} 
+            audioUrl={content.audio_laudes_url}
+            tipo="laudes"
+          />
+        );
       
       case 'meta':
         return (
@@ -310,30 +297,10 @@ const Morning = () => {
       
       case 'tip':
         return (
-          <Card className="glass-card border-0">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-transparent rounded-xl" />
-            <CardHeader className="relative pb-4">
-              <CardTitle className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-500/5 flex items-center justify-center">
-                  <Shield className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                </div>
-                <span className="text-blue-700 dark:text-blue-400">Tip apologético</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="relative space-y-4">
-              <p className="text-foreground leading-relaxed">
-                {content.tip_apologetico}
-              </p>
-              <Button 
-                variant="outline" 
-                className="w-full border-blue-200/50 dark:border-blue-800/30 hover:bg-blue-500/10"
-                onClick={() => navigate('/coach')}
-              >
-                <Shield className="h-4 w-4 mr-2" />
-                Practicar con el Coach de Debate
-              </Button>
-            </CardContent>
-          </Card>
+          <TipApologeticoCard
+            contenido={content.tip_apologetico}
+            audioUrl={content.audio_tip_url}
+          />
         );
       
       default:

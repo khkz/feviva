@@ -6,6 +6,33 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+async function generateAudio(supabaseUrl: string, supabaseServiceKey: string, text: string, filename: string): Promise<string | null> {
+  try {
+    const response = await fetch(`${supabaseUrl}/functions/v1/text-to-speech`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${supabaseServiceKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        text,
+        filename,
+        voice: 'nova'
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data.audioUrl;
+    }
+    console.error('Audio generation failed:', await response.text());
+    return null;
+  } catch (error) {
+    console.error('Error generating audio:', error);
+    return null;
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -36,6 +63,58 @@ serve(async (req) => {
       );
     }
 
+    // Check for content from the same day last year (annual reuse)
+    const lastYearDate = new Date(targetDate);
+    lastYearDate.setFullYear(lastYearDate.getFullYear() - 1);
+    const lastYearDateStr = lastYearDate.toISOString().split('T')[0];
+
+    console.log(`Checking for last year's content: ${lastYearDateStr}`);
+
+    const { data: lastYearContent } = await supabase
+      .from('daily_content')
+      .select('*')
+      .eq('fecha', lastYearDateStr)
+      .single();
+
+    if (lastYearContent) {
+      console.log('Found content from last year, cloning...');
+      
+      // Clone the content with new date
+      const { data: clonedContent, error: cloneError } = await supabase
+        .from('daily_content')
+        .insert({
+          fecha: targetDate,
+          versiculo_referencia: lastYearContent.versiculo_referencia,
+          versiculo_texto: lastYearContent.versiculo_texto,
+          reflexion_ia: lastYearContent.reflexion_ia,
+          tip_apologetico: lastYearContent.tip_apologetico,
+          oracion_laudes: lastYearContent.oracion_laudes,
+          oracion_completas: lastYearContent.oracion_completas,
+          ensenanza_titulo: lastYearContent.ensenanza_titulo,
+          ensenanza_contenido: lastYearContent.ensenanza_contenido,
+          audio_versiculo_url: lastYearContent.audio_versiculo_url,
+          audio_ensenanza_url: lastYearContent.audio_ensenanza_url,
+          audio_reflexion_url: lastYearContent.audio_reflexion_url,
+          audio_laudes_url: lastYearContent.audio_laudes_url,
+          audio_completas_url: lastYearContent.audio_completas_url,
+          audio_tip_url: lastYearContent.audio_tip_url,
+        })
+        .select()
+        .single();
+
+      if (cloneError) {
+        console.error('Error cloning content:', cloneError);
+        throw new Error(`Failed to clone content: ${cloneError.message}`);
+      }
+
+      console.log('Content cloned successfully from last year');
+      return new Response(
+        JSON.stringify({ content: clonedContent, cached: false, clonedFromLastYear: true }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // No existing content - generate new with AI
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY is not configured');
@@ -94,7 +173,6 @@ Genera contenido en español.`;
     // Parse the JSON response
     let parsedContent;
     try {
-      // Remove any markdown code blocks if present
       const cleanedContent = contentText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
       parsedContent = JSON.parse(cleanedContent);
     } catch (parseError) {
@@ -102,54 +180,45 @@ Genera contenido en español.`;
       throw new Error('Failed to parse AI response as JSON');
     }
 
-    // Generate audio for verse and teaching
-    let audioVersiculoUrl = null;
-    let audioEnsenanzaUrl = null;
+    // Generate audio for all content sections
+    console.log('Generating audio for all content sections...');
 
-    try {
-      // Generate verse audio
-      const verseAudioResponse = await fetch(`${supabaseUrl}/functions/v1/text-to-speech`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${supabaseServiceKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          text: `${parsedContent.versiculo_referencia}. ${parsedContent.versiculo_texto}`,
-          filename: `verse-${targetDate}`,
-          voice: 'nova'
-        }),
-      });
+    const [
+      audioVersiculoUrl,
+      audioEnsenanzaUrl,
+      audioReflexionUrl,
+      audioLaudesUrl,
+      audioCompletasUrl,
+      audioTipUrl
+    ] = await Promise.all([
+      generateAudio(supabaseUrl, supabaseServiceKey, 
+        `${parsedContent.versiculo_referencia}. ${parsedContent.versiculo_texto}`, 
+        `verse-${targetDate}`),
+      generateAudio(supabaseUrl, supabaseServiceKey, 
+        `${parsedContent.ensenanza_titulo}. ${parsedContent.ensenanza_contenido}`, 
+        `teaching-${targetDate}`),
+      generateAudio(supabaseUrl, supabaseServiceKey, 
+        parsedContent.reflexion_ia, 
+        `reflexion-${targetDate}`),
+      generateAudio(supabaseUrl, supabaseServiceKey, 
+        parsedContent.oracion_laudes, 
+        `laudes-${targetDate}`),
+      generateAudio(supabaseUrl, supabaseServiceKey, 
+        parsedContent.oracion_completas, 
+        `completas-${targetDate}`),
+      generateAudio(supabaseUrl, supabaseServiceKey, 
+        parsedContent.tip_apologetico, 
+        `tip-${targetDate}`),
+    ]);
 
-      if (verseAudioResponse.ok) {
-        const verseAudioData = await verseAudioResponse.json();
-        audioVersiculoUrl = verseAudioData.audioUrl;
-        console.log('Verse audio generated:', audioVersiculoUrl);
-      }
-
-      // Generate teaching audio
-      const teachingAudioResponse = await fetch(`${supabaseUrl}/functions/v1/text-to-speech`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${supabaseServiceKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          text: `${parsedContent.ensenanza_titulo}. ${parsedContent.ensenanza_contenido}`,
-          filename: `teaching-${targetDate}`,
-          voice: 'nova'
-        }),
-      });
-
-      if (teachingAudioResponse.ok) {
-        const teachingAudioData = await teachingAudioResponse.json();
-        audioEnsenanzaUrl = teachingAudioData.audioUrl;
-        console.log('Teaching audio generated:', audioEnsenanzaUrl);
-      }
-    } catch (audioError) {
-      console.error('Error generating audio:', audioError);
-      // Continue without audio - it's optional
-    }
+    console.log('Audio generation completed:', {
+      audioVersiculoUrl: !!audioVersiculoUrl,
+      audioEnsenanzaUrl: !!audioEnsenanzaUrl,
+      audioReflexionUrl: !!audioReflexionUrl,
+      audioLaudesUrl: !!audioLaudesUrl,
+      audioCompletasUrl: !!audioCompletasUrl,
+      audioTipUrl: !!audioTipUrl,
+    });
 
     // Save to database
     const { data: savedContent, error: saveError } = await supabase
@@ -166,6 +235,10 @@ Genera contenido en español.`;
         ensenanza_contenido: parsedContent.ensenanza_contenido,
         audio_versiculo_url: audioVersiculoUrl,
         audio_ensenanza_url: audioEnsenanzaUrl,
+        audio_reflexion_url: audioReflexionUrl,
+        audio_laudes_url: audioLaudesUrl,
+        audio_completas_url: audioCompletasUrl,
+        audio_tip_url: audioTipUrl,
       })
       .select()
       .single();
