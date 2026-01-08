@@ -122,11 +122,12 @@ const ProfileReminders = () => {
   const StepIcon = currentStepData.icon;
 
   const handleToggle = async (practice: string, enabled: boolean) => {
+    // Request permission but don't block if denied
     if (enabled && permission !== 'granted') {
-      const granted = await requestPermission();
-      if (!granted) return;
+      await requestPermission();
     }
     
+    // Always allow saving the reminder preference
     setLocalReminders(prev => ({
       ...prev,
       [practice]: { ...prev[practice], enabled }
@@ -225,13 +226,23 @@ const ProfileReminders = () => {
                 </motion.div>
               )}
               
-              {permission === 'denied' && (
+              {permission !== 'granted' && isSupported && (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="bg-amber-500/10 text-amber-600 p-3 rounded-lg text-sm"
+                  className="bg-amber-500/10 text-amber-600 p-4 rounded-lg text-sm space-y-2"
                 >
-                  Has bloqueado las notificaciones. Actívalas en la configuración del navegador.
+                  <p className="font-medium">
+                    {permission === 'denied' 
+                      ? 'Las notificaciones están bloqueadas' 
+                      : 'Notificaciones no habilitadas'}
+                  </p>
+                  <p>Puedes configurar tus recordatorios. Para recibirlos, habilita notificaciones:</p>
+                  <ul className="text-xs space-y-1 ml-3">
+                    <li>• <strong>Chrome:</strong> Clic en el candado 🔒 → Notificaciones → Permitir</li>
+                    <li>• <strong>Safari:</strong> Safari → Preferencias → Sitios web → Notificaciones</li>
+                    <li>• <strong>Firefox:</strong> Clic en el candado 🔒 → Permisos → Notificaciones</li>
+                  </ul>
                 </motion.div>
               )}
             </CardContent>

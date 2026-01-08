@@ -50,9 +50,8 @@ export const useNotifications = () => {
         return true;
       } else {
         toast({
-          title: "Permiso denegado",
-          description: "No podrás recibir recordatorios",
-          variant: "destructive",
+          title: "Notificaciones no habilitadas",
+          description: "Tus recordatorios están guardados. Activa las notificaciones en tu navegador para recibirlos.",
         });
         return false;
       }
