@@ -14,6 +14,10 @@ interface DailyContent {
   ensenanza_contenido: string | null;
   audio_versiculo_url: string | null;
   audio_ensenanza_url: string | null;
+  audio_reflexion_url: string | null;
+  audio_laudes_url: string | null;
+  audio_completas_url: string | null;
+  audio_tip_url: string | null;
 }
 
 interface UserRitual {
