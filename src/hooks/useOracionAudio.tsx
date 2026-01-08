@@ -19,6 +19,7 @@ export function useOracionAudio({ oracionId, nombre, texto, existingAudioUrl }: 
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const isGeneratingRef = useRef(false);
 
   // Pre-cache audio if URL exists
   useEffect(() => {
@@ -30,7 +31,10 @@ export function useOracionAudio({ oracionId, nombre, texto, existingAudioUrl }: 
   }, [existingAudioUrl, getAudioWithCache]);
 
   const generateAudio = useCallback(async () => {
-    if (audioUrl || isGenerating) return audioUrl;
+    // Use ref to prevent race conditions from multiple rapid clicks
+    if (audioUrl || isGeneratingRef.current) return audioUrl;
+    
+    isGeneratingRef.current = true;
     
     setIsGenerating(true);
     
@@ -63,11 +67,12 @@ export function useOracionAudio({ oracionId, nombre, texto, existingAudioUrl }: 
         variant: "destructive",
       });
     } finally {
+      isGeneratingRef.current = false;
       setIsGenerating(false);
     }
     
     return null;
-  }, [oracionId, nombre, texto, audioUrl, isGenerating, toast]);
+  }, [oracionId, nombre, texto, audioUrl, toast]);
 
   const play = useCallback(async () => {
     let url = cachedUrl || audioUrl;
@@ -76,37 +81,47 @@ export function useOracionAudio({ oracionId, nombre, texto, existingAudioUrl }: 
     if (!url) {
       url = await generateAudio();
       if (!url) return;
-      // Cache the newly generated audio
-      const cached = await getAudioWithCache(url);
-      if (cached) {
-        setCachedUrl(cached);
-        url = cached;
-      }
     }
 
-    // Create or reuse audio element
-    if (!audioRef.current || audioRef.current.src !== url) {
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
-      audioRef.current = new Audio(url);
-      
-      audioRef.current.onended = () => {
-        setIsPlaying(false);
-        setProgress(0);
-      };
-      
-      audioRef.current.ontimeupdate = () => {
+    try {
+      // Create or reuse audio element
+      if (!audioRef.current || audioRef.current.src !== url) {
         if (audioRef.current) {
-          const pct = (audioRef.current.currentTime / audioRef.current.duration) * 100;
-          setProgress(pct);
+          audioRef.current.pause();
         }
-      };
-    }
+        audioRef.current = new Audio(url);
+        
+        audioRef.current.onended = () => {
+          setIsPlaying(false);
+          setProgress(0);
+        };
+        
+        audioRef.current.ontimeupdate = () => {
+          if (audioRef.current) {
+            const pct = (audioRef.current.currentTime / audioRef.current.duration) * 100;
+            setProgress(pct);
+          }
+        };
+      }
 
-    await audioRef.current.play();
-    setIsPlaying(true);
-  }, [audioUrl, generateAudio]);
+      await audioRef.current.play();
+      setIsPlaying(true);
+      
+      // Cache in background (non-blocking)
+      if (!cachedUrl && url) {
+        getAudioWithCache(url).then(cached => {
+          if (cached) setCachedUrl(cached);
+        });
+      }
+    } catch (playError) {
+      console.error('Error playing audio:', playError);
+      toast({
+        title: "Error al reproducir",
+        description: "No se pudo reproducir el audio.",
+        variant: "destructive",
+      });
+    }
+  }, [audioUrl, cachedUrl, generateAudio, getAudioWithCache, toast]);
 
   const pause = useCallback(() => {
     if (audioRef.current) {
