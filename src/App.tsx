@@ -13,6 +13,7 @@ import Habits from "./pages/Habits";
 import Community from "./pages/Community";
 import Library from "./pages/Library";
 import Profile from "./pages/Profile";
+import ProfileReminders from "./pages/ProfileReminders";
 import DebateHistory from "./pages/DebateHistory";
 import Gamification from "./pages/Gamification";
 import Morning from "./pages/Morning";
@@ -66,6 +67,7 @@ const App = () => (
             <Route path="/community" element={<Community />} />
             <Route path="/library" element={<Library />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/profile/reminders" element={<ProfileReminders />} />
             <Route path="/debate-history" element={<DebateHistory />} />
             <Route path="/gamification" element={<Gamification />} />
             <Route path="/morning" element={<Morning />} />

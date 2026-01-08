@@ -7,12 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Save, User, Palette } from "lucide-react";
+import { ArrowLeft, Save, User, Palette, Bell, ChevronRight } from "lucide-react";
 import { z } from "zod";
 import { ThemeSelector } from "@/components/ui/theme-toggle";
 import { motion } from "framer-motion";
 import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
+import { useNotifications } from "@/hooks/useNotifications";
 
 const profileSchema = z.object({
   nombre: z.string().min(1, "El nombre es requerido").max(100, "Máximo 100 caracteres"),
@@ -27,6 +28,7 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 const Profile = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { practiceReminders } = useNotifications();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<ProfileFormData>({
@@ -37,6 +39,8 @@ const Profile = () => {
     edad_segmento: undefined,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  
+  const enabledRemindersCount = practiceReminders.filter(r => r.enabled).length;
 
   useEffect(() => {
     checkAuth();
@@ -184,6 +188,36 @@ const Profile = () => {
             </CardHeader>
             <CardContent>
               <ThemeSelector />
+            </CardContent>
+          </Card>
+
+          {/* Reminders Card */}
+          <Card className="mb-6 glass-card border-border/50">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Bell className="h-5 w-5 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <CardTitle className="text-xl">Recordatorios</CardTitle>
+                  <CardDescription>
+                    {enabledRemindersCount > 0 
+                      ? `${enabledRemindersCount} práctica${enabledRemindersCount > 1 ? 's' : ''} configurada${enabledRemindersCount > 1 ? 's' : ''}`
+                      : "Configura tus recordatorios diarios"
+                    }
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <Button 
+                variant="outline" 
+                className="w-full justify-between"
+                onClick={() => navigate('/profile/reminders')}
+              >
+                <span>Configurar recordatorios</span>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
             </CardContent>
           </Card>
         </motion.div>

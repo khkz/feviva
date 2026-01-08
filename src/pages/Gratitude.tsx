@@ -11,6 +11,7 @@ import { GratitudeDiario } from "@/components/gratitude/GratitudeDiario";
 import { GratitudeCierre } from "@/components/gratitude/GratitudeCierre";
 import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
+import { ReminderButton } from "@/components/shared/ReminderButton";
 import { supabase } from "@/integrations/supabase/client";
 
 const STEPS = [
@@ -200,7 +201,7 @@ const Gratitude = () => {
                 <Heart className="h-5 w-5 text-rose-500" />
                 <h1 className="font-semibold">Diario de Gratitud</h1>
               </div>
-              <div className="w-16 lg:hidden" /> {/* Spacer for centering */}
+              <ReminderButton practice="gratitud" />
             </div>
 
             {/* Progress Bar */}

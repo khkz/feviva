@@ -27,6 +27,7 @@ import {
   Calendar
 } from "lucide-react";
 import { GospelCard } from "@/components/gospel/GospelCard";
+import { ReminderButton } from "@/components/shared/ReminderButton";
 import { useDailyGospel } from "@/hooks/useDailyGospel";
 
 const STEPS = [
@@ -340,7 +341,7 @@ const Evening = () => {
             <Moon className="h-5 w-5" />
             <span className="font-medium">Ritual Nocturno</span>
           </div>
-          <div className="w-20" />
+          <ReminderButton practice="examen" />
         </div>
         
         {/* Progress bar */}

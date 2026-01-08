@@ -12,6 +12,7 @@ import { PeriodProgress } from '@/components/bible/PeriodProgress';
 import { BibleTextViewer } from '@/components/bible/BibleTextViewer';
 import { BibleNotes } from '@/components/bible/BibleNotes';
 import { ReadingCalendar } from '@/components/bible/ReadingCalendar';
+import { ReminderButton } from '@/components/shared/ReminderButton';
 
 const BiblePlan = () => {
   const navigate = useNavigate();
@@ -73,14 +74,17 @@ const BiblePlan = () => {
               </button>
               
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2.5 lg:p-2 rounded-xl bg-amber-500/20 backdrop-blur-md border border-white/10">
-                    <Book className="w-6 h-6 lg:w-5 lg:h-5 text-amber-300" />
+                <div className="flex items-center justify-between gap-3 mb-2">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 lg:p-2 rounded-xl bg-amber-500/20 backdrop-blur-md border border-white/10">
+                      <Book className="w-6 h-6 lg:w-5 lg:h-5 text-amber-300" />
+                    </div>
+                    <div>
+                      <h1 className="text-lg lg:text-xl font-bold text-white">La Biblia en 365 Días</h1>
+                      <p className="text-amber-200/80 text-xs lg:text-sm">The Great Adventure</p>
+                    </div>
                   </div>
-                  <div>
-                    <h1 className="text-lg lg:text-xl font-bold text-white">La Biblia en 365 Días</h1>
-                    <p className="text-amber-200/80 text-xs lg:text-sm">The Great Adventure</p>
-                  </div>
+                  <ReminderButton practice="biblia" className="text-white hover:bg-white/10" />
                 </div>
               </motion.div>
 

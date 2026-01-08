@@ -29,6 +29,7 @@ import {
   Share2
 } from "lucide-react";
 import { ShareModal } from "@/components/shared/ShareModal";
+import { ReminderButton } from "@/components/shared/ReminderButton";
 import { GospelCard } from "@/components/gospel/GospelCard";
 import { useDailyGospel } from "@/hooks/useDailyGospel";
 
@@ -354,7 +355,7 @@ const Morning = () => {
             <span className="font-semibold text-foreground">Ritual Matutino</span>
           </div>
           
-          <div className="w-16 sm:w-20" />
+          <ReminderButton practice="laudes" />
         </div>
         
         {/* Progress bar */}
