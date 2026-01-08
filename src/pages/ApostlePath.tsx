@@ -31,6 +31,8 @@ const ApostlePath = () => {
     getAIReflection,
     getCurrentStage,
     completeActivity,
+    getCompletedActivityIds,
+    isActivityCompleted,
   } = useApostlePath();
 
   useEffect(() => {
@@ -68,26 +70,17 @@ const ApostlePath = () => {
   };
 
   const handleContinue = () => {
-    const currentStage = getCurrentStage();
-    if (!currentStage) return;
+    const currentStageData = getCurrentStage();
+    if (!currentStageData) return;
 
-    // Find next incomplete activity
-    for (const req of currentStage.requisitos) {
+    // Find next incomplete activity using the hook's method
+    for (const req of currentStageData.requisitos) {
       const activityId = req.id || req.titulo.toLowerCase().replace(/\s+/g, '-');
-      const isCompleted = activities.some(
-        a => a.etapa === currentStage.numero && a.actividad_id === activityId
-      );
-      if (!isCompleted) {
-        handleActivityClick(currentStage, req);
+      if (!isActivityCompleted(currentStageData.numero, req.tipo, activityId)) {
+        handleActivityClick(currentStageData, req);
         return;
       }
     }
-  };
-
-  const getCompletedActivityIds = (etapa: number) => {
-    return activities
-      .filter(a => a.etapa === etapa)
-      .map(a => a.actividad_id);
   };
 
   // Calculate overall progress
