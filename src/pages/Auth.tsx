@@ -8,7 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Sparkles, ArrowLeft, Mail, Lock, User, Eye, EyeOff, Shield, Star, Cross } from "lucide-react";
+import { ArrowLeft, Mail, Lock, User, Eye, EyeOff, Shield, Star, Cross } from "lucide-react";
+import logoElRugido from "@/assets/logo-elrugido.svg";
 import { motion } from "framer-motion";
 
 const Auth = () => {
@@ -223,11 +224,12 @@ const Auth = () => {
           className="w-full max-w-md"
         >
           <div className="text-center mb-8">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Sparkles className="w-10 h-10 text-secondary" />
+            <div className="flex flex-col items-center justify-center gap-2 mb-4">
+              <img src={logoElRugido} alt="ElRugido" className="w-20 h-20" />
               <h1 className="font-heading text-4xl font-bold text-white">
                 ElRugido
               </h1>
+              <span className="text-sm text-white/60">elrugido.com</span>
             </div>
             <p className="text-white/70">Restablece tu contraseña</p>
           </div>
@@ -318,11 +320,12 @@ const Auth = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <div className="flex items-center gap-3 mb-8">
-              <Sparkles className="w-12 h-12 text-secondary" />
+            <div className="flex flex-col items-start gap-3 mb-8">
+              <img src={logoElRugido} alt="ElRugido" className="w-24 h-24" />
               <h1 className="font-heading text-5xl font-bold text-white">
                 ElRugido
               </h1>
+              <span className="text-sm text-white/60">elrugido.com</span>
             </div>
 
             <h2 className="font-heading text-3xl xl:text-4xl font-bold text-white mb-6 leading-tight">
@@ -371,11 +374,12 @@ const Auth = () => {
         >
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <Sparkles className="w-8 h-8 text-secondary" />
+            <div className="flex flex-col items-center justify-center gap-2 mb-2">
+              <img src={logoElRugido} alt="ElRugido" className="w-16 h-16" />
               <h1 className="font-heading text-3xl font-bold text-primary">
                 ElRugido
               </h1>
+              <span className="text-xs text-muted-foreground">elrugido.com</span>
             </div>
             <p className="text-muted-foreground">Ruge tu fe con verdad y amor</p>
           </div>
