@@ -100,7 +100,7 @@ function cleanTextForSpanishTTS(text: string): string {
   return cleaned;
 }
 
-async function generateSpeech(text: string, voice: string = 'nova'): Promise<ArrayBuffer> {
+async function generateSpeech(text: string, voice: string = 'onyx'): Promise<ArrayBuffer> {
   const cleanedText = cleanTextForSpanishTTS(text);
   
   const maxChunkSize = 4000;
@@ -217,7 +217,7 @@ ${session.descripcion}
 Hoy tienes motivos para estar agradecido. Que Dios te bendiga.`;
         
         // Generate speech
-        const audioBuffer = await generateSpeech(fullText, 'nova');
+        const audioBuffer = await generateSpeech(fullText, 'onyx');
         
         // Upload to storage
         const fileName = `gratitude-session-${session.numero}.mp3`;
