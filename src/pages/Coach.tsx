@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Sparkles, ArrowLeft, Send, BookOpen, Heart, Brain, TrendingUp, X, Plus, Star, GraduationCap, Zap, Trophy } from "lucide-react";
+import { Sparkles, ArrowLeft, Send, BookOpen, Heart, Brain, TrendingUp, X, Plus, Star, GraduationCap, Zap, Trophy, HelpCircle, Lightbulb, ChevronRight, CheckCircle2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useUserStats } from "@/hooks/useUserStats";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -40,6 +40,13 @@ interface Suggestion {
   argumento_clave: string;
 }
 
+interface TutorialStep {
+  title: string;
+  description: string;
+  tip: string;
+  example?: string;
+}
+
 const personas = [
   { value: "ateo_cientifico", label: "Ateo Científico", description: "Busca evidencia empírica" },
   { value: "agnostico", label: "Agnóstico Curioso", description: "Abierto pero escéptico" },
@@ -48,7 +55,8 @@ const personas = [
 ];
 
 const dificultades = [
-  { value: "aprendiz", label: "Aprendiz", description: "Personaje receptivo, da pistas", icon: GraduationCap, color: "text-green-500" },
+  { value: "tutorial", label: "Tutorial", description: "Guía paso a paso", icon: HelpCircle, color: "text-blue-500" },
+  { value: "aprendiz", label: "Aprendiz", description: "Personaje receptivo", icon: GraduationCap, color: "text-green-500" },
   { value: "intermedio", label: "Intermedio", description: "Balance desafío/aprendizaje", icon: Zap, color: "text-yellow-500" },
   { value: "avanzado", label: "Avanzado", description: "Debate intenso", icon: Trophy, color: "text-red-500" },
 ];
@@ -61,6 +69,166 @@ const temas = [
   "Jesús histórico",
   "Moral objetiva",
 ];
+
+// Tutorial tips for each topic
+const tutorialTipsByTopic: Record<string, TutorialStep[]> = {
+  "¿Existe Dios?": [
+    {
+      title: "Escucha primero",
+      description: "Antes de responder, asegúrate de entender qué está preguntando realmente.",
+      tip: "Repite su objeción con tus palabras para confirmar que entendiste.",
+      example: "Si entiendo bien, tu pregunta es sobre..."
+    },
+    {
+      title: "Argumento cosmológico",
+      description: "Todo lo que comienza a existir tiene una causa. El universo comenzó (Big Bang), por lo tanto tiene una causa.",
+      tip: "Usa evidencia científica a tu favor: el Big Bang muestra un inicio.",
+      example: "La ciencia misma muestra que el universo tuvo un principio..."
+    },
+    {
+      title: "Argumento del diseño",
+      description: "El ajuste fino del universo sugiere un diseñador inteligente.",
+      tip: "Menciona las constantes físicas precisas para la vida.",
+      example: "Las constantes del universo están ajustadas con precisión increíble..."
+    },
+    {
+      title: "Argumento moral",
+      description: "La existencia de valores morales objetivos apunta a un legislador moral.",
+      tip: "Pregunta: ¿De dónde vienen los derechos humanos si no hay Dios?",
+      example: "Si no hay Dios, ¿por qué el asesinato sería objetivamente malo?"
+    },
+  ],
+  "El problema del mal y el sufrimiento": [
+    {
+      title: "Reconoce el dolor",
+      description: "El sufrimiento es real y merece compasión, no solo argumentos.",
+      tip: "Empatiza primero, argumenta después.",
+      example: "Entiendo que el sufrimiento es algo muy difícil de enfrentar..."
+    },
+    {
+      title: "Libre albedrío",
+      description: "Dios permite el mal moral porque nos dio libertad genuina.",
+      tip: "Un mundo con amor verdadero requiere libertad real.",
+      example: "El amor forzado no es amor. Dios quiso seres libres..."
+    },
+    {
+      title: "Bien mayor",
+      description: "Dios puede permitir sufrimiento temporal para un bien mayor.",
+      tip: "Como un médico que permite dolor temporal para sanar.",
+      example: "A veces el sufrimiento nos forma y nos acerca a lo que importa..."
+    },
+    {
+      title: "La respuesta de Jesús",
+      description: "Dios no está ausente del sufrimiento; en Cristo, lo experimentó.",
+      tip: "Dios no solo observa; entró al sufrimiento con nosotros.",
+      example: "En la cruz, Dios mismo experimentó el peor sufrimiento..."
+    },
+  ],
+  "¿Es confiable la Biblia?": [
+    {
+      title: "Evidencia manuscrita",
+      description: "Tenemos más manuscritos antiguos de la Biblia que de cualquier otro texto antiguo.",
+      tip: "Compara con otros textos antiguos que aceptamos.",
+      example: "Tenemos más de 5,000 manuscritos griegos del Nuevo Testamento..."
+    },
+    {
+      title: "Testigos oculares",
+      description: "Los evangelios fueron escritos por testigos o basados en testimonios directos.",
+      tip: "Menciona la cercanía temporal a los eventos.",
+      example: "Pablo escribió 1 Corintios apenas 20 años después de la crucifixión..."
+    },
+    {
+      title: "Arqueología",
+      description: "La arqueología ha confirmado muchos detalles bíblicos.",
+      tip: "Usa ejemplos concretos de descubrimientos.",
+      example: "El Cilindro de Ciro, la inscripción de Pilato..."
+    },
+    {
+      title: "Coherencia interna",
+      description: "A pesar de 40 autores en 1500 años, hay un mensaje coherente.",
+      tip: "Esta unidad es evidencia de inspiración divina.",
+      example: "Desde Génesis hasta Apocalipsis, hay un hilo redentor..."
+    },
+  ],
+  "Ciencia y Fe": [
+    {
+      title: "No son enemigas",
+      description: "La ciencia responde al 'cómo', la fe al 'por qué' y 'para qué'.",
+      tip: "Son complementarias, no contradictorias.",
+      example: "La ciencia explica el mecanismo, la fe explica el propósito..."
+    },
+    {
+      title: "Científicos creyentes",
+      description: "Muchos grandes científicos han sido creyentes.",
+      tip: "Menciona a Galileo, Newton, Faraday, Collins, Lennox.",
+      example: "Francis Collins, director del Proyecto Genoma Humano, es cristiano..."
+    },
+    {
+      title: "Origen de la ciencia",
+      description: "La ciencia moderna nació en un contexto cristiano.",
+      tip: "La fe en un Dios racional hizo posible la ciencia.",
+      example: "Los primeros científicos creían en leyes naturales porque creían en un Legislador..."
+    },
+    {
+      title: "Límites de la ciencia",
+      description: "La ciencia no puede responder preguntas de significado y propósito.",
+      tip: "La ciencia describe, no prescribe valores.",
+      example: "La ciencia puede decir cómo hacer una bomba, no si debemos usarla..."
+    },
+  ],
+  "Jesús histórico": [
+    {
+      title: "Fuentes no cristianas",
+      description: "Historiadores romanos y judíos mencionan a Jesús.",
+      tip: "Tácito, Josefo, Plinio el Joven confirman su existencia.",
+      example: "Tácito, historiador romano, menciona a Cristo y su ejecución..."
+    },
+    {
+      title: "Criterio del martirio",
+      description: "Los apóstoles murieron por lo que vieron, no por lo que creían.",
+      tip: "La gente muere por lo que cree verdad, no por mentiras conocidas.",
+      example: "Los discípulos pudieron verificar la resurrección; murieron afirmándola..."
+    },
+    {
+      title: "Tumba vacía",
+      description: "Tanto cristianos como oponentes reconocían la tumba vacía.",
+      tip: "Los oponentes inventaron explicaciones, no negaron el hecho.",
+      example: "Los judíos dijeron que robaron el cuerpo, admitiendo la tumba vacía..."
+    },
+    {
+      title: "Transformación de los discípulos",
+      description: "De cobardes escondidos a mártires valientes.",
+      tip: "¿Qué explica este cambio dramático?",
+      example: "Pedro negó a Jesús tres veces; semanas después, predicaba en Jerusalén..."
+    },
+  ],
+  "Moral objetiva": [
+    {
+      title: "Intuiciones morales",
+      description: "Todos reconocemos que algunas cosas son objetivamente malas.",
+      tip: "Usa ejemplos claros: tortura de inocentes, genocidio.",
+      example: "¿El Holocausto fue objetivamente malo o solo una preferencia cultural?"
+    },
+    {
+      title: "Fundamento necesario",
+      description: "Los valores objetivos necesitan un fundamento trascendente.",
+      tip: "Sin Dios, la moral es solo preferencia subjetiva.",
+      example: "Si solo somos átomos reorganizados, ¿de dónde vienen los derechos?"
+    },
+    {
+      title: "Argumento de Lewis",
+      description: "La existencia de una Ley Moral apunta a un Legislador Moral.",
+      tip: "Todos apelamos a un estándar de justicia más allá de nosotros.",
+      example: "Cuando decimos 'eso es injusto', apelamos a un estándar objetivo..."
+    },
+    {
+      title: "Dilema de Euthyphro resuelto",
+      description: "La moral no es arbitraria ni independiente de Dios.",
+      tip: "La moral fluye de la naturaleza de Dios, que es buena.",
+      example: "Dios no decide qué es bueno; Él ES la bondad misma..."
+    },
+  ],
+};
 
 const motivationalMessages = [
   "¡Excelente argumento! 🌟",
@@ -78,7 +246,7 @@ const Coach = () => {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectedPersona, setSelectedPersona] = useState("ateo_cientifico");
-  const [selectedDificultad, setSelectedDificultad] = useState("aprendiz");
+  const [selectedDificultad, setSelectedDificultad] = useState("tutorial");
   const [selectedTema, setSelectedTema] = useState(temas[0]);
   const [debateStarted, setDebateStarted] = useState(false);
   const [evaluation, setEvaluation] = useState<Evaluation | null>(null);
@@ -88,7 +256,14 @@ const Coach = () => {
   const [totalPoints, setTotalPoints] = useState(0);
   const [showPointAnimation, setShowPointAnimation] = useState(false);
   const [lastScore, setLastScore] = useState(0);
+  const [tutorialStep, setTutorialStep] = useState(0);
+  const [showTutorialPanel, setShowTutorialPanel] = useState(true);
+  const [completedTutorialSteps, setCompletedTutorialSteps] = useState<number[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const isTutorialMode = selectedDificultad === "tutorial";
+  const currentTutorialTips = tutorialTipsByTopic[selectedTema] || [];
+  const currentTip = currentTutorialTips[tutorialStep];
 
   useEffect(() => {
     checkAuth();
@@ -113,6 +288,9 @@ const Coach = () => {
     setDebateStarted(true);
     setLoading(true);
     setTotalPoints(0);
+    setTutorialStep(0);
+    setCompletedTutorialSteps([]);
+    setShowTutorialPanel(true);
 
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
@@ -142,13 +320,16 @@ const Coach = () => {
 
     setDebateId(data.id);
 
+    // For tutorial mode, use aprendiz difficulty in backend
+    const backendDificultad = isTutorialMode ? "aprendiz" : selectedDificultad;
+
     // Get initial message from AI
     try {
       const response = await supabase.functions.invoke("debate-coach", {
         body: {
           persona: selectedPersona,
           tema: selectedTema,
-          dificultad: selectedDificultad,
+          dificultad: backendDificultad,
           messages: [],
           action: "start",
         },
@@ -186,12 +367,19 @@ const Coach = () => {
     setInput("");
     setLoading(true);
 
+    // Mark current tutorial step as completed
+    if (isTutorialMode && !completedTutorialSteps.includes(tutorialStep)) {
+      setCompletedTutorialSteps(prev => [...prev, tutorialStep]);
+    }
+
+    const backendDificultad = isTutorialMode ? "aprendiz" : selectedDificultad;
+
     try {
       const response = await supabase.functions.invoke("debate-coach", {
         body: {
           persona: selectedPersona,
           tema: selectedTema,
-          dificultad: selectedDificultad,
+          dificultad: backendDificultad,
           messages: [...messages, userMessage],
           action: "respond",
         },
@@ -205,7 +393,7 @@ const Coach = () => {
       setMessages((prev) => {
         const updated = [...prev];
         const lastUserIdx = updated.length - 1;
-        if (updated[lastUserIdx]?.role === 'user') {
+        if (updated[lastUserIdx]?.role === "user") {
           updated[lastUserIdx] = {
             ...updated[lastUserIdx],
             score: userScore,
@@ -228,6 +416,11 @@ const Coach = () => {
             description: feedbackHint,
           });
         }
+      }
+
+      // Advance tutorial step after each exchange
+      if (isTutorialMode && tutorialStep < currentTutorialTips.length - 1) {
+        setTutorialStep(prev => prev + 1);
       }
 
       const aiMessage: Message = {
@@ -262,12 +455,14 @@ const Coach = () => {
     setLoading(true);
     setShowSuggestions(true);
 
+    const backendDificultad = isTutorialMode ? "aprendiz" : selectedDificultad;
+
     try {
       const response = await supabase.functions.invoke("debate-coach", {
         body: {
           persona: selectedPersona,
           tema: selectedTema,
-          dificultad: selectedDificultad,
+          dificultad: backendDificultad,
           messages,
           action: "suggest",
         },
@@ -297,12 +492,14 @@ const Coach = () => {
 
     setLoading(true);
 
+    const backendDificultad = isTutorialMode ? "aprendiz" : selectedDificultad;
+
     try {
       const response = await supabase.functions.invoke("debate-coach", {
         body: {
           persona: selectedPersona,
           tema: selectedTema,
-          dificultad: selectedDificultad,
+          dificultad: backendDificultad,
           messages,
           action: "evaluate",
         },
@@ -370,6 +567,17 @@ const Coach = () => {
     });
   };
 
+  // Use tutorial example
+  const useTutorialExample = () => {
+    if (currentTip?.example) {
+      setInput(currentTip.example);
+      toast({
+        title: "Ejemplo añadido",
+        description: "Personalízalo con tus propias palabras",
+      });
+    }
+  };
+
   // Render score stars
   const renderScoreStars = (score: number) => {
     if (score === 0) return null;
@@ -384,6 +592,102 @@ const Coach = () => {
       </div>
     );
   };
+
+  // Tutorial Panel Component
+  const TutorialPanel = () => (
+    <Card className="glass-card border-blue-500/30 bg-blue-500/5">
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Lightbulb className="w-4 h-4 text-blue-500" />
+            Guía Tutorial
+          </CardTitle>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-6 w-6" 
+            onClick={() => setShowTutorialPanel(false)}
+          >
+            <X className="w-3 h-3" />
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {/* Progress indicator */}
+        <div className="flex items-center gap-1">
+          {currentTutorialTips.map((_, idx) => (
+            <div 
+              key={idx} 
+              className={`flex-1 h-1.5 rounded-full transition-colors ${
+                completedTutorialSteps.includes(idx) 
+                  ? "bg-green-500" 
+                  : idx === tutorialStep 
+                    ? "bg-blue-500" 
+                    : "bg-muted"
+              }`}
+            />
+          ))}
+        </div>
+        
+        {/* Current tip */}
+        {currentTip && (
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-xs border-blue-500/50 text-blue-600">
+                Paso {tutorialStep + 1} de {currentTutorialTips.length}
+              </Badge>
+              {completedTutorialSteps.includes(tutorialStep) && (
+                <CheckCircle2 className="w-4 h-4 text-green-500" />
+              )}
+            </div>
+            
+            <h4 className="font-semibold text-sm">{currentTip.title}</h4>
+            <p className="text-sm text-muted-foreground">{currentTip.description}</p>
+            
+            <div className="bg-blue-500/10 rounded-lg p-2 border border-blue-500/20">
+              <p className="text-xs font-medium text-blue-600 mb-1">💡 Consejo:</p>
+              <p className="text-xs text-muted-foreground">{currentTip.tip}</p>
+            </div>
+            
+            {currentTip.example && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full text-xs border-blue-500/30 hover:bg-blue-500/10"
+                onClick={useTutorialExample}
+              >
+                <Plus className="w-3 h-3 mr-1" />
+                Usar ejemplo: "{currentTip.example.slice(0, 30)}..."
+              </Button>
+            )}
+          </div>
+        )}
+        
+        {/* Navigation */}
+        <div className="flex gap-2">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="flex-1 text-xs"
+            disabled={tutorialStep === 0}
+            onClick={() => setTutorialStep(prev => prev - 1)}
+          >
+            Anterior
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="flex-1 text-xs"
+            disabled={tutorialStep >= currentTutorialTips.length - 1}
+            onClick={() => setTutorialStep(prev => prev + 1)}
+          >
+            Siguiente
+            <ChevronRight className="w-3 h-3 ml-1" />
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
 
   // Suggestions content component (reused in Sheet and Card)
   const SuggestionsContent = () => (
@@ -517,18 +821,21 @@ const Coach = () => {
                   {/* Difficulty Selector */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Nivel de Dificultad</label>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
                       {dificultades.map((dif) => {
                         const Icon = dif.icon;
                         const isSelected = selectedDificultad === dif.value;
+                        const isTutorial = dif.value === "tutorial";
                         return (
                           <button
                             key={dif.value}
                             onClick={() => setSelectedDificultad(dif.value)}
                             className={`p-3 rounded-lg border-2 transition-all text-left ${
                               isSelected 
-                                ? 'border-primary bg-primary/10' 
-                                : 'border-border/50 hover:border-primary/50 bg-background/50'
+                                ? isTutorial 
+                                  ? "border-blue-500 bg-blue-500/10" 
+                                  : "border-primary bg-primary/10"
+                                : "border-border/50 hover:border-primary/50 bg-background/50"
                             }`}
                           >
                             <div className="flex items-center gap-2 mb-1">
@@ -536,11 +843,37 @@ const Coach = () => {
                               <span className="font-medium text-sm">{dif.label}</span>
                             </div>
                             <p className="text-xs text-muted-foreground">{dif.description}</p>
+                            {isTutorial && (
+                              <Badge className="mt-2 text-[10px] bg-blue-500/20 text-blue-600 border-blue-500/30">
+                                Recomendado para empezar
+                              </Badge>
+                            )}
                           </button>
                         );
                       })}
                     </div>
                   </div>
+
+                  {/* Tutorial mode info */}
+                  {selectedDificultad === "tutorial" && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      className="bg-blue-500/10 rounded-lg p-4 border border-blue-500/20"
+                    >
+                      <div className="flex items-start gap-3">
+                        <Lightbulb className="w-5 h-5 text-blue-500 mt-0.5" />
+                        <div>
+                          <h4 className="font-medium text-sm mb-1">Modo Tutorial</h4>
+                          <p className="text-xs text-muted-foreground">
+                            Recibirás guía paso a paso con argumentos clave, ejemplos y consejos 
+                            específicos para el tema que elijas. Perfecto para aprender las bases 
+                            de la apologética.
+                          </p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
 
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Personaje</label>
@@ -577,8 +910,28 @@ const Coach = () => {
                     </Select>
                   </div>
 
+                  {/* Preview of tutorial tips */}
+                  {selectedDificultad === "tutorial" && tutorialTipsByTopic[selectedTema] && (
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-muted-foreground">
+                        En este tutorial aprenderás:
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {tutorialTipsByTopic[selectedTema].slice(0, 4).map((tip, idx) => (
+                          <div 
+                            key={idx}
+                            className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/30 rounded-lg p-2"
+                          >
+                            <CheckCircle2 className="w-3 h-3 text-green-500 shrink-0" />
+                            <span className="truncate">{tip.title}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   <Button onClick={startDebate} className="w-full shadow-glow" disabled={loading}>
-                    {loading ? "Preparando..." : "Comenzar Entrenamiento"}
+                    {loading ? "Preparando..." : selectedDificultad === "tutorial" ? "Comenzar Tutorial" : "Comenzar Entrenamiento"}
                   </Button>
                 </CardContent>
               </Card>
@@ -620,7 +973,9 @@ const Coach = () => {
                   <Sparkles className="w-4 h-4 lg:w-5 lg:h-5 text-secondary" />
                 </div>
                 <div>
-                  <h1 className="font-heading text-lg lg:text-xl font-bold text-white">Coach de Debate</h1>
+                  <h1 className="font-heading text-lg lg:text-xl font-bold text-white">
+                    {isTutorialMode ? "Tutorial" : "Coach de Debate"}
+                  </h1>
                   <p className="text-xs lg:text-sm text-white/70 truncate max-w-[150px] lg:max-w-none">{selectedTema}</p>
                 </div>
               </div>
@@ -630,9 +985,22 @@ const Coach = () => {
                   <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                   <span className="font-bold text-sm">{totalPoints}</span>
                 </div>
-                <Badge className="glass-button bg-secondary/20 text-white border-secondary/30 text-xs">
+                <Badge className={`glass-button text-white border-secondary/30 text-xs ${
+                  isTutorialMode ? "bg-blue-500/20 border-blue-500/30" : "bg-secondary/20"
+                }`}>
                   {dificultades.find((d) => d.value === selectedDificultad)?.label}
                 </Badge>
+                {/* Toggle tutorial panel button */}
+                {isTutorialMode && !showTutorialPanel && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setShowTutorialPanel(true)}
+                    className="glass-button text-white hover:bg-white/20 h-8 w-8"
+                  >
+                    <Lightbulb className="w-4 h-4" />
+                  </Button>
+                )}
               </div>
             </div>
           </motion.header>
@@ -658,6 +1026,20 @@ const Coach = () => {
         <main className="flex-1 container mx-auto px-4 py-4 lg:py-6 flex flex-col lg:flex-row gap-4 max-w-7xl overflow-hidden">
           {!evaluation ? (
             <>
+              {/* Tutorial panel - Mobile: top, Desktop: side */}
+              {isTutorialMode && showTutorialPanel && (
+                <>
+                  {/* Mobile tutorial panel */}
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="lg:hidden mb-2"
+                  >
+                    <TutorialPanel />
+                  </motion.div>
+                </>
+              )}
+
               <motion.div 
                 className="flex-1 flex flex-col min-h-0"
                 initial={{ opacity: 0 }}
@@ -674,7 +1056,7 @@ const Coach = () => {
                       transition={{ duration: 0.3 }}
                       className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                     >
-                      <div className={`max-w-[85%] lg:max-w-[80%]`}>
+                      <div className="max-w-[85%] lg:max-w-[80%]">
                         <Card
                           className={`${
                             message.role === "user"
@@ -709,7 +1091,7 @@ const Coach = () => {
                     <Textarea
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
-                      placeholder="Escribe tu respuesta..."
+                      placeholder={isTutorialMode ? "Escribe tu respuesta (usa las sugerencias del panel de guía)..." : "Escribe tu respuesta..."}
                       className="resize-none glass-button bg-background/50 flex-1 min-h-[60px] lg:min-h-[80px]"
                       rows={isMobile ? 2 : 3}
                       onKeyDown={(e) => {
@@ -782,29 +1164,42 @@ const Coach = () => {
                 </div>
               </motion.div>
 
-              {/* Desktop: Side panel for suggestions */}
-              {showSuggestions && suggestion && !isMobile && (
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.4 }}
-                  className="hidden lg:block"
-                >
-                  <Card className="w-80 xl:w-96 flex-shrink-0 glass-card border-border/50">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="flex items-center justify-between text-base">
-                        <span>Sugerencias</span>
-                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setShowSuggestions(false)}>
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <SuggestionsContent />
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              )}
+              {/* Desktop: Side panels */}
+              <div className="hidden lg:flex flex-col gap-4 w-80 xl:w-96 flex-shrink-0">
+                {/* Tutorial panel - Desktop */}
+                {isTutorialMode && showTutorialPanel && (
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4 }}
+                  >
+                    <TutorialPanel />
+                  </motion.div>
+                )}
+
+                {/* Suggestions panel */}
+                {showSuggestions && suggestion && (
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4 }}
+                  >
+                    <Card className="glass-card border-border/50">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="flex items-center justify-between text-base">
+                          <span>Sugerencias</span>
+                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setShowSuggestions(false)}>
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <SuggestionsContent />
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                )}
+              </div>
 
               {/* Mobile: Sheet for suggestions */}
               <Sheet open={showSuggestions && isMobile && !!suggestion} onOpenChange={setShowSuggestions}>
@@ -828,13 +1223,18 @@ const Coach = () => {
               <Card className="glass-card border-border/50">
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
-                    <span>Evaluación del Debate</span>
+                    <span>{isTutorialMode ? "Tutorial Completado" : "Evaluación del Debate"}</span>
                     <div className="flex items-center gap-1 text-yellow-500">
                       <Star className="w-5 h-5 fill-yellow-400" />
                       <span className="font-bold">{totalPoints} pts</span>
                     </div>
                   </CardTitle>
-                  <CardDescription>Tu desempeño en este entrenamiento</CardDescription>
+                  <CardDescription>
+                    {isTutorialMode 
+                      ? `Completaste ${completedTutorialSteps.length} de ${currentTutorialTips.length} pasos del tutorial`
+                      : "Tu desempeño en este entrenamiento"
+                    }
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-3 gap-2 lg:gap-4">
@@ -879,10 +1279,12 @@ const Coach = () => {
                         setEvaluation(null);
                         setDebateId(null);
                         setTotalPoints(0);
+                        setTutorialStep(0);
+                        setCompletedTutorialSteps([]);
                       }}
                       className="flex-1 shadow-glow"
                     >
-                      Nuevo Debate
+                      {isTutorialMode ? "Nuevo Tutorial" : "Nuevo Debate"}
                     </Button>
                   </div>
                 </CardContent>
