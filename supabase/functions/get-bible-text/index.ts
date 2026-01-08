@@ -229,8 +229,8 @@ const BOOK_MAP: Record<string, string> = {
 function parseReference(reference: string): { book: string; chapters: number[]; verses?: { start: number; end: number } } | null {
   const normalizedRef = reference.toLowerCase().trim();
   
-  // Match patterns like "Génesis 1-3", "Salmo 23", "Proverbios 1:1-7"
-  const match = normalizedRef.match(/^([a-záéíóúñ\s\d]+?)\s+(\d+)(?:-(\d+))?(?::(\d+)(?:-(\d+))?)?$/);
+  // Match patterns like "Génesis 1-3", "Salmo 23", "Proverbios 1:1-7", "Ef 2,20"
+  const match = normalizedRef.match(/^([a-záéíóúñ\s\d]+?)\s+(\d+)(?:-(\d+))?(?:[,:](\d+)(?:-(\d+))?)?$/);
   
   if (!match) return null;
   
