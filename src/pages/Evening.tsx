@@ -23,12 +23,16 @@ import {
   ArrowLeft,
   Loader2,
   CheckCircle2,
-  Star
+  Star,
+  Calendar
 } from "lucide-react";
+import { GospelCard } from "@/components/gospel/GospelCard";
+import { useDailyGospel } from "@/hooks/useDailyGospel";
 
 const STEPS = [
   { id: 'examen', title: 'Examen de conciencia' },
   { id: 'evangelizacion', title: 'Evangelización del día' },
+  { id: 'evangelio_manana', title: 'Evangelio de mañana' },
   { id: 'diario', title: 'Diario personal' },
   { id: 'completas', title: 'Oración de Completas' },
   { id: 'ensenanza', title: 'Enseñanza del día' },
@@ -39,6 +43,7 @@ const Evening = () => {
   const { toast } = useToast();
   const { content, ritual, loading, generating, completeEveningRitual } = useDailyContent();
   const { stats, addPoints } = useUserStats();
+  const { tomorrowGospel } = useDailyGospel();
   
   const [currentStep, setCurrentStep] = useState(0);
   const [examenConciencia, setExamenConciencia] = useState<Record<string, string>>({});
@@ -238,6 +243,27 @@ const Evening = () => {
                   </p>
                 </div>
               )}
+            </CardContent>
+          </Card>
+        );
+      
+      case 'evangelio_manana':
+        return tomorrowGospel ? (
+          <GospelCard 
+            gospel={tomorrowGospel}
+            title="Evangelio de Mañana"
+            subtitle="Prepárate espiritualmente para mañana"
+          />
+        ) : (
+          <Card className="border-amber-200/50">
+            <CardContent className="pt-6 text-center space-y-3">
+              <div className="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mx-auto">
+                <Calendar className="h-6 w-6 text-amber-600" />
+              </div>
+              <h3 className="font-medium">Evangelio de mañana</h3>
+              <p className="text-sm text-muted-foreground">
+                El evangelio de mañana estará disponible pronto.
+              </p>
             </CardContent>
           </Card>
         );

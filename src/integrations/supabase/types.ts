@@ -589,6 +589,45 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_gospel: {
+        Row: {
+          created_at: string | null
+          fecha: string
+          id: string
+          published_at: string | null
+          referencia: string
+          sacerdote: string | null
+          tiempo_liturgico: string | null
+          titulo: string | null
+          updated_at: string | null
+          youtube_video_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          fecha: string
+          id?: string
+          published_at?: string | null
+          referencia: string
+          sacerdote?: string | null
+          tiempo_liturgico?: string | null
+          titulo?: string | null
+          updated_at?: string | null
+          youtube_video_id: string
+        }
+        Update: {
+          created_at?: string | null
+          fecha?: string
+          id?: string
+          published_at?: string | null
+          referencia?: string
+          sacerdote?: string | null
+          tiempo_liturgico?: string | null
+          titulo?: string | null
+          updated_at?: string | null
+          youtube_video_id?: string
+        }
+        Relationships: []
+      }
       debates: {
         Row: {
           completed: boolean | null
