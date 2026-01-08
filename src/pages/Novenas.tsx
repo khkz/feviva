@@ -11,6 +11,7 @@ import { NovenasWhyModal } from "@/components/novenas/NovenasWhyModal";
 import { useNovenas, Novena } from "@/hooks/useNovenas";
 import { useNotifications } from "@/hooks/useNotifications";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
+import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -144,8 +145,10 @@ const Novenas = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      {/* Hero Header */}
+    <div className="min-h-screen flex w-full">
+      <DesktopSidebar />
+      <div className="flex-1 min-h-screen bg-background pb-20 lg:ml-64">
+        {/* Hero Header */}
       <motion.div 
         className="relative overflow-hidden"
         initial={{ opacity: 0 }}
@@ -359,9 +362,10 @@ const Novenas = () => {
             )}
           </TabsContent>
         </Tabs>
-      </motion.div>
+        </motion.div>
 
-      <BottomNavigation />
+        <BottomNavigation />
+      </div>
     </div>
   );
 };
