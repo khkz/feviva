@@ -89,6 +89,87 @@ export type Database = {
         }
         Relationships: []
       }
+      apostle_path_activities: {
+        Row: {
+          actividad_id: string
+          actividad_tipo: string
+          completado_en: string
+          etapa: number
+          id: string
+          metadata: Json | null
+          puntos_ganados: number
+          user_id: string
+        }
+        Insert: {
+          actividad_id: string
+          actividad_tipo: string
+          completado_en?: string
+          etapa: number
+          id?: string
+          metadata?: Json | null
+          puntos_ganados?: number
+          user_id: string
+        }
+        Update: {
+          actividad_id?: string
+          actividad_tipo?: string
+          completado_en?: string
+          etapa?: number
+          id?: string
+          metadata?: Json | null
+          puntos_ganados?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      apostle_path_progress: {
+        Row: {
+          apostol_completado: boolean
+          cimientos_completado: boolean
+          created_at: string
+          debatidor_completado: boolean
+          defensor_completado: boolean
+          etapa_actual: number
+          fecha_inicio: string
+          fecha_ultima_actividad: string | null
+          id: string
+          misionero_completado: boolean
+          puntos_ruta: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          apostol_completado?: boolean
+          cimientos_completado?: boolean
+          created_at?: string
+          debatidor_completado?: boolean
+          defensor_completado?: boolean
+          etapa_actual?: number
+          fecha_inicio?: string
+          fecha_ultima_actividad?: string | null
+          id?: string
+          misionero_completado?: boolean
+          puntos_ruta?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          apostol_completado?: boolean
+          cimientos_completado?: boolean
+          created_at?: string
+          debatidor_completado?: boolean
+          defensor_completado?: boolean
+          etapa_actual?: number
+          fecha_inicio?: string
+          fecha_ultima_actividad?: string | null
+          id?: string
+          misionero_completado?: boolean
+          puntos_ruta?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       argument_cards: {
         Row: {
           autor_id: string | null

@@ -25,6 +25,7 @@ import SleepStories from "./pages/SleepStories";
 import Novenas from "./pages/Novenas";
 import BiblePlan from "./pages/BiblePlan";
 import NotFound from "./pages/NotFound";
+import ApostlePath from "./pages/ApostlePath";
 import { AdminLayout } from "./layouts/AdminLayout";
 import {
   AdminDashboard,
@@ -72,6 +73,7 @@ const App = () => (
             <Route path="/sleep" element={<SleepStories />} />
             <Route path="/novenas" element={<Novenas />} />
             <Route path="/bible-plan" element={<BiblePlan />} />
+            <Route path="/apostle-path" element={<ApostlePath />} />
             
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminLayout />}>

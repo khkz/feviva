@@ -50,3 +50,6 @@ verify_jwt = false
 
 [functions.regenerate-daily-audio]
 verify_jwt = false
+
+[functions.apostle-path-ai]
+verify_jwt = true

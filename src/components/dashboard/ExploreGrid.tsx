@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { MessageCircle, BookOpen, Users, Target } from "lucide-react";
+import { MessageCircle, BookOpen, Users, Target, Route } from "lucide-react";
 import { motion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 import coachImage from "@/assets/coach-section.jpg";
@@ -13,9 +13,18 @@ interface ExploreItem {
   description: string;
   path: string;
   image: string;
+  featured?: boolean;
 }
 
 const exploreItems: ExploreItem[] = [
+  {
+    icon: Route,
+    label: "Ruta del Apóstol",
+    description: "Tu formación completa",
+    path: "/apostle-path",
+    image: coachImage,
+    featured: true
+  },
   {
     icon: MessageCircle,
     label: "Coach IA",
