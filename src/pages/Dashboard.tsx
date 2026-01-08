@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Sparkles, Shield } from "lucide-react";
@@ -8,22 +8,31 @@ import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { HeroSection } from "@/components/dashboard/HeroSection";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 import { ProgressCard } from "@/components/dashboard/ProgressCard";
-import { PracticeStreaksCard } from "@/components/dashboard/PracticeStreaksCard";
-import { PracticeRemindersCard } from "@/components/dashboard/PracticeRemindersCard";
-import { NovenaCarousel } from "@/components/dashboard/NovenaCarousel";
-import { ExploreGrid } from "@/components/dashboard/ExploreGrid";
-import { DailyChallenge } from "@/components/dashboard/DailyChallenge";
-import { FeaturedContent } from "@/components/dashboard/FeaturedContent";
-import { GratitudePrompt } from "@/components/dashboard/GratitudePrompt";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+
+// Lazy load heavy components
+const PracticeStreaksCard = lazy(() => import("@/components/dashboard/PracticeStreaksCard").then(m => ({ default: m.PracticeStreaksCard })));
+const PracticeRemindersCard = lazy(() => import("@/components/dashboard/PracticeRemindersCard").then(m => ({ default: m.PracticeRemindersCard })));
+const NovenaCarousel = lazy(() => import("@/components/dashboard/NovenaCarousel").then(m => ({ default: m.NovenaCarousel })));
+const ExploreGrid = lazy(() => import("@/components/dashboard/ExploreGrid").then(m => ({ default: m.ExploreGrid })));
+const DailyChallenge = lazy(() => import("@/components/dashboard/DailyChallenge").then(m => ({ default: m.DailyChallenge })));
+const FeaturedContent = lazy(() => import("@/components/dashboard/FeaturedContent").then(m => ({ default: m.FeaturedContent })));
+const GratitudePrompt = lazy(() => import("@/components/dashboard/GratitudePrompt").then(m => ({ default: m.GratitudePrompt })));
 
 interface Profile {
   nombre: string;
   perfil_doctrinal: string;
   edad_segmento: string;
 }
+
+const CardSkeleton = () => (
+  <div className="px-5 lg:px-0 mb-4">
+    <Skeleton className="h-40 w-full rounded-xl" />
+  </div>
+);
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -41,8 +50,13 @@ const Dashboard = () => {
 
   useEffect(() => {
     checkAuth();
-    updateStreak();
   }, []);
+
+  useEffect(() => {
+    if (stats) {
+      updateStreak();
+    }
+  }, [stats?.id]);
 
   const checkAuth = async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -129,58 +143,57 @@ const Dashboard = () => {
             {/* Left Column - Main Content */}
             <div className="lg:col-span-2">
               {/* Daily Challenge */}
-              <DailyChallenge />
+              <Suspense fallback={<CardSkeleton />}>
+                <DailyChallenge />
+              </Suspense>
 
               {/* Featured Content */}
-              <FeaturedContent />
+              <Suspense fallback={<CardSkeleton />}>
+                <FeaturedContent />
+              </Suspense>
 
               {/* Explore Grid */}
-              <ExploreGrid />
+              <Suspense fallback={<CardSkeleton />}>
+                <ExploreGrid />
+              </Suspense>
             </div>
 
             {/* Right Column - Sidebar Content */}
             <div className="lg:col-span-1">
               {/* Gratitude Prompt */}
-              <GratitudePrompt />
+              <Suspense fallback={<CardSkeleton />}>
+                <GratitudePrompt />
+              </Suspense>
 
               {/* Practice Streaks */}
-              <PracticeStreaksCard />
+              <Suspense fallback={<CardSkeleton />}>
+                <PracticeStreaksCard />
+              </Suspense>
 
               {/* Practice Reminders */}
-              <PracticeRemindersCard />
+              <Suspense fallback={<CardSkeleton />}>
+                <PracticeRemindersCard />
+              </Suspense>
 
-              {/* Progress Card - Hidden on desktop (shown in hero) */}
-              <div className="lg:hidden">
-                {stats && (
-                  <ProgressCard
-                    nivel={stats.nivel}
-                    puntosTotales={stats.puntos_totales}
-                    puntosParaSiguiente={getPointsForNextLevel()}
-                    progreso={getProgressToNextLevel()}
-                    racha={stats.racha_actual_dias}
-                  />
-                )}
-              </div>
-
-              {/* Desktop-only Progress Card */}
-              <div className="hidden lg:block">
-                {stats && (
-                  <ProgressCard
-                    nivel={stats.nivel}
-                    puntosTotales={stats.puntos_totales}
-                    puntosParaSiguiente={getPointsForNextLevel()}
-                    progreso={getProgressToNextLevel()}
-                    racha={stats.racha_actual_dias}
-                  />
-                )}
-              </div>
+              {/* Progress Card */}
+              {stats && (
+                <ProgressCard
+                  nivel={stats.nivel}
+                  puntosTotales={stats.puntos_totales}
+                  puntosParaSiguiente={getPointsForNextLevel()}
+                  progreso={getProgressToNextLevel()}
+                  racha={stats.racha_actual_dias}
+                />
+              )}
 
               {/* Novena Carousel */}
-              <NovenaCarousel
-                novenas={novenas}
-                getProgress={getProgressForNovena}
-                loading={novenasLoading}
-              />
+              <Suspense fallback={<CardSkeleton />}>
+                <NovenaCarousel
+                  novenas={novenas}
+                  getProgress={getProgressForNovena}
+                  loading={novenasLoading}
+                />
+              </Suspense>
             </div>
           </div>
         </div>

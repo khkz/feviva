@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -33,70 +33,125 @@ interface UserAchievement {
   desbloqueado_en: string;
 }
 
-export const useUserStats = () => {
-  const [stats, setStats] = useState<UserStats | null>(null);
-  const [achievements, setAchievements] = useState<Achievement[]>([]);
-  const [userAchievements, setUserAchievements] = useState<UserAchievement[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
+const fetchUserStats = async (): Promise<UserStats | null> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
 
-  useEffect(() => {
-    fetchStats();
-    fetchAchievements();
-    fetchUserAchievements();
-  }, []);
+  let { data, error } = await supabase
+    .from("user_stats")
+    .select("*")
+    .eq("user_id", user.id)
+    .single();
 
-  const fetchStats = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    let { data, error } = await supabase
+  if (error && error.code === "PGRST116") {
+    const { data: newStats, error: insertError } = await supabase
       .from("user_stats")
-      .select("*")
-      .eq("user_id", user.id)
+      .insert({ user_id: user.id })
+      .select()
       .single();
 
-    if (error && error.code === "PGRST116") {
-      // No stats yet, create initial stats
-      const { data: newStats, error: insertError } = await supabase
-        .from("user_stats")
-        .insert({ user_id: user.id })
-        .select()
-        .single();
-
-      if (!insertError) {
-        data = newStats;
-      }
+    if (!insertError) {
+      data = newStats;
     }
+  }
 
-    if (data) {
-      setStats(data);
-    }
-    setLoading(false);
+  return data;
+};
+
+const fetchAchievements = async (): Promise<Achievement[]> => {
+  const { data, error } = await supabase
+    .from("achievements")
+    .select("*")
+    .order("categoria");
+
+  if (error) return [];
+  return data || [];
+};
+
+const fetchUserAchievements = async (): Promise<UserAchievement[]> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data, error } = await supabase
+    .from("user_achievements")
+    .select("achievement_id, desbloqueado_en")
+    .eq("user_id", user.id);
+
+  if (error) return [];
+  return data || [];
+};
+
+export const useUserStats = () => {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const { data: stats, isLoading: statsLoading } = useQuery({
+    queryKey: ['user-stats'],
+    queryFn: fetchUserStats,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000,
+  });
+
+  const { data: achievements = [] } = useQuery({
+    queryKey: ['achievements'],
+    queryFn: fetchAchievements,
+    staleTime: 30 * 60 * 1000, // 30 minutes - rarely changes
+  });
+
+  const { data: userAchievements = [] } = useQuery({
+    queryKey: ['user-achievements'],
+    queryFn: fetchUserAchievements,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const calculateLevel = (points: number): number => {
+    if (points < 100) return 1;
+    if (points < 300) return 2;
+    if (points < 600) return 3;
+    if (points < 1000) return 4;
+    return 5 + Math.floor((points - 1000) / 500);
   };
 
-  const fetchAchievements = async () => {
-    const { data, error } = await supabase
-      .from("achievements")
-      .select("*")
-      .order("categoria");
-
-    if (!error && data) {
-      setAchievements(data);
-    }
-  };
-
-  const fetchUserAchievements = async () => {
+  const checkAchievements = async (currentStats: UserStats) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    const { data, error } = await supabase
-      .from("user_achievements")
-      .select("achievement_id, desbloqueado_en")
-      .eq("user_id", user.id);
+    for (const achievement of achievements) {
+      const alreadyUnlocked = userAchievements.some(
+        ua => ua.achievement_id === achievement.id
+      );
 
-    if (!error && data) {
-      setUserAchievements(data);
+      if (alreadyUnlocked) continue;
+
+      let shouldUnlock = false;
+
+      if (achievement.debates_requeridos && currentStats.debates_completados >= achievement.debates_requeridos) {
+        shouldUnlock = true;
+      } else if (achievement.lecciones_requeridas && currentStats.lecciones_completadas >= achievement.lecciones_requeridas) {
+        shouldUnlock = true;
+      } else if (achievement.racha_requerida && currentStats.racha_actual_dias >= achievement.racha_requerida) {
+        shouldUnlock = true;
+      } else if (achievement.puntos_requeridos && currentStats.puntos_totales >= achievement.puntos_requeridos) {
+        shouldUnlock = true;
+      }
+
+      if (shouldUnlock) {
+        const { error } = await supabase
+          .from("user_achievements")
+          .insert({
+            user_id: user.id,
+            achievement_id: achievement.id,
+          });
+
+        if (!error) {
+          toast({
+            title: `🎉 ¡Logro desbloqueado!`,
+            description: `${achievement.icono} ${achievement.nombre}: ${achievement.descripcion}`,
+          });
+
+          queryClient.invalidateQueries({ queryKey: ['user-achievements'] });
+        }
+      }
     }
   };
 
@@ -118,7 +173,11 @@ export const useUserStats = () => {
       .eq("user_id", user.id);
 
     if (!error) {
-      setStats({ ...stats, puntos_totales: newPoints, nivel: newLevel });
+      queryClient.setQueryData(['user-stats'], { 
+        ...stats, 
+        puntos_totales: newPoints, 
+        nivel: newLevel 
+      });
       
       toast({
         title: `+${points} puntos`,
@@ -132,7 +191,7 @@ export const useUserStats = () => {
         });
       }
 
-      await checkAchievements();
+      await checkAchievements({ ...stats, puntos_totales: newPoints, nivel: newLevel });
     }
   };
 
@@ -151,9 +210,10 @@ export const useUserStats = () => {
       .eq("user_id", user.id);
 
     if (!error) {
-      setStats({ ...stats, debates_completados: newCount });
+      const updatedStats = { ...stats, debates_completados: newCount };
+      queryClient.setQueryData(['user-stats'], updatedStats);
       await addPoints(20, "Debate completado");
-      await checkAchievements();
+      await checkAchievements(updatedStats);
     }
   };
 
@@ -172,9 +232,10 @@ export const useUserStats = () => {
       .eq("user_id", user.id);
 
     if (!error) {
-      setStats({ ...stats, lecciones_completadas: newCount });
+      const updatedStats = { ...stats, lecciones_completadas: newCount };
+      queryClient.setQueryData(['user-stats'], updatedStats);
       await addPoints(10, "Lección completada");
-      await checkAchievements();
+      await checkAchievements(updatedStats);
     }
   };
 
@@ -216,68 +277,15 @@ export const useUserStats = () => {
       .eq("user_id", user.id);
 
     if (!error) {
-      setStats({ 
+      const updatedStats = { 
         ...stats, 
         racha_actual_dias: newStreak, 
         racha_maxima_dias: newMaxStreak,
         ultima_actividad: today 
-      });
-      await checkAchievements();
+      };
+      queryClient.setQueryData(['user-stats'], updatedStats);
+      await checkAchievements(updatedStats);
     }
-  };
-
-  const checkAchievements = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user || !stats) return;
-
-    for (const achievement of achievements) {
-      const alreadyUnlocked = userAchievements.some(
-        ua => ua.achievement_id === achievement.id
-      );
-
-      if (alreadyUnlocked) continue;
-
-      let shouldUnlock = false;
-
-      if (achievement.debates_requeridos && stats.debates_completados >= achievement.debates_requeridos) {
-        shouldUnlock = true;
-      } else if (achievement.lecciones_requeridas && stats.lecciones_completadas >= achievement.lecciones_requeridas) {
-        shouldUnlock = true;
-      } else if (achievement.racha_requerida && stats.racha_actual_dias >= achievement.racha_requerida) {
-        shouldUnlock = true;
-      } else if (achievement.puntos_requeridos && stats.puntos_totales >= achievement.puntos_requeridos) {
-        shouldUnlock = true;
-      }
-
-      if (shouldUnlock) {
-        const { error } = await supabase
-          .from("user_achievements")
-          .insert({
-            user_id: user.id,
-            achievement_id: achievement.id,
-          });
-
-        if (!error) {
-          toast({
-            title: `🎉 ¡Logro desbloqueado!`,
-            description: `${achievement.icono} ${achievement.nombre}: ${achievement.descripcion}`,
-          });
-
-          setUserAchievements([
-            ...userAchievements,
-            { achievement_id: achievement.id, desbloqueado_en: new Date().toISOString() }
-          ]);
-        }
-      }
-    }
-  };
-
-  const calculateLevel = (points: number): number => {
-    if (points < 100) return 1;
-    if (points < 300) return 2;
-    if (points < 600) return 3;
-    if (points < 1000) return 4;
-    return 5 + Math.floor((points - 1000) / 500);
   };
 
   const getPointsForNextLevel = (): number => {
@@ -305,16 +313,16 @@ export const useUserStats = () => {
   };
 
   return {
-    stats,
+    stats: stats ?? null,
     achievements,
     userAchievements,
-    loading,
+    loading: statsLoading,
     addPoints,
     incrementDebates,
     incrementLessons,
     updateStreak,
     getPointsForNextLevel,
     getProgressToNextLevel,
-    refreshStats: fetchStats,
+    refreshStats: () => queryClient.invalidateQueries({ queryKey: ['user-stats'] }),
   };
 };

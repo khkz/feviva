@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 interface DailyContent {
@@ -33,114 +33,100 @@ interface UserRitual {
   examen_conciencia: Record<string, string> | null;
 }
 
+const today = new Date().toISOString().split('T')[0];
+
+const fetchDailyContent = async (): Promise<DailyContent | null> => {
+  const { data: existingContent, error } = await supabase
+    .from('daily_content')
+    .select('*')
+    .eq('fecha', today)
+    .maybeSingle();
+
+  if (error) throw error;
+  return existingContent as DailyContent | null;
+};
+
+const fetchUserRitual = async (): Promise<UserRitual | null> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  const { data, error } = await supabase
+    .from('user_rituals')
+    .select('*')
+    .eq('user_id', user.id)
+    .eq('fecha', today)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data as UserRitual | null;
+};
+
 export const useDailyContent = () => {
-  const [content, setContent] = useState<DailyContent | null>(null);
-  const [ritual, setRitual] = useState<UserRitual | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [generating, setGenerating] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-  const today = new Date().toISOString().split('T')[0];
+  const { 
+    data: content, 
+    isLoading: contentLoading, 
+    error: contentError,
+    refetch: refetchContent
+  } = useQuery({
+    queryKey: ['daily-content', today],
+    queryFn: fetchDailyContent,
+    staleTime: 30 * 60 * 1000, // 30 minutes - content doesn't change often
+  });
 
-  const fetchContent = async () => {
-    try {
-      // First try to get existing content
-      const { data: existingContent, error: fetchError } = await supabase
-        .from('daily_content')
-        .select('*')
-        .eq('fecha', today)
-        .maybeSingle();
+  const { 
+    data: ritual, 
+    isLoading: ritualLoading,
+    refetch: refetchRitual
+  } = useQuery({
+    queryKey: ['user-ritual', today],
+    queryFn: fetchUserRitual,
+    staleTime: 5 * 60 * 1000,
+  });
 
-      if (fetchError) throw fetchError;
-
-      if (existingContent) {
-        setContent(existingContent as DailyContent);
-      } else {
-        // Generate new content
-        await generateContent();
-      }
-    } catch (err) {
-      console.error('Error fetching content:', err);
-      setError(err instanceof Error ? err.message : 'Error al cargar contenido');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const generateContent = async () => {
-    setGenerating(true);
-    try {
-      const { data, error: funcError } = await supabase.functions.invoke('generate-daily-content', {
+  const generateMutation = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke('generate-daily-content', {
         body: { fecha: today }
       });
-
-      if (funcError) throw funcError;
-
-      if (data?.content) {
-        setContent(data.content as DailyContent);
-      }
-    } catch (err) {
-      console.error('Error generating content:', err);
-      setError(err instanceof Error ? err.message : 'Error al generar contenido');
-    } finally {
-      setGenerating(false);
-    }
-  };
-
-  const fetchRitual = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data: existingRitual, error: fetchError } = await supabase
-        .from('user_rituals')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('fecha', today)
-        .maybeSingle();
-
-      if (fetchError) throw fetchError;
-
-      setRitual(existingRitual as UserRitual | null);
-    } catch (err) {
-      console.error('Error fetching ritual:', err);
-    }
-  };
+      if (error) throw error;
+      return data?.content as DailyContent;
+    },
+    onSuccess: (newContent) => {
+      queryClient.setQueryData(['daily-content', today], newContent);
+    },
+  });
 
   const updateRitual = async (updates: Partial<UserRitual>) => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('No user logged in');
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('No user logged in');
 
-      if (ritual) {
-        // Update existing
-        const { data, error } = await supabase
-          .from('user_rituals')
-          .update(updates)
-          .eq('id', ritual.id)
-          .select()
-          .single();
+    if (ritual) {
+      const { data, error } = await supabase
+        .from('user_rituals')
+        .update(updates)
+        .eq('id', ritual.id)
+        .select()
+        .single();
 
-        if (error) throw error;
-        setRitual(data as UserRitual);
-      } else {
-        // Create new
-        const { data, error } = await supabase
-          .from('user_rituals')
-          .insert({
-            user_id: user.id,
-            fecha: today,
-            ...updates
-          })
-          .select()
-          .single();
+      if (error) throw error;
+      queryClient.setQueryData(['user-ritual', today], data);
+      return data;
+    } else {
+      const { data, error } = await supabase
+        .from('user_rituals')
+        .insert({
+          user_id: user.id,
+          fecha: today,
+          ...updates
+        })
+        .select()
+        .single();
 
-        if (error) throw error;
-        setRitual(data as UserRitual);
-      }
-    } catch (err) {
-      console.error('Error updating ritual:', err);
-      throw err;
+      if (error) throw error;
+      queryClient.setQueryData(['user-ritual', today], data);
+      return data;
     }
   };
 
@@ -166,24 +152,19 @@ export const useDailyContent = () => {
     });
   };
 
-  useEffect(() => {
-    fetchContent();
-    fetchRitual();
-  }, []);
-
   return {
-    content,
-    ritual,
-    loading,
-    generating,
-    error,
-    generateContent,
+    content: content ?? null,
+    ritual: ritual ?? null,
+    loading: contentLoading || ritualLoading,
+    generating: generateMutation.isPending,
+    error: contentError?.message || null,
+    generateContent: generateMutation.mutateAsync,
     completeMorningRitual,
     completeEveningRitual,
     updateRitual,
     refetch: () => {
-      fetchContent();
-      fetchRitual();
+      refetchContent();
+      refetchRitual();
     }
   };
 };
