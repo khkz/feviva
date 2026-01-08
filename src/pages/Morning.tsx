@@ -10,6 +10,7 @@ import { useUserStats } from "@/hooks/useUserStats";
 import { DailyVerse } from "@/components/rituals/DailyVerse";
 import { LaudesOracion } from "@/components/rituals/LaudesOracion";
 import { Skeleton } from "@/components/ui/skeleton";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   Sun, 
   ChevronRight, 
@@ -19,16 +20,19 @@ import {
   Shield, 
   ArrowLeft,
   Loader2,
-  CheckCircle2
+  CheckCircle2,
+  Flame,
+  BookOpen,
+  Heart
 } from "lucide-react";
 
 const STEPS = [
-  { id: 'saludo', title: 'Buenos días' },
-  { id: 'versiculo', title: 'Versículo del día' },
-  { id: 'reflexion', title: 'Reflexión' },
-  { id: 'laudes', title: 'Oración de Laudes' },
-  { id: 'meta', title: 'Meta de evangelización' },
-  { id: 'tip', title: 'Tip apologético' },
+  { id: 'saludo', title: 'Buenos días', icon: Sun },
+  { id: 'versiculo', title: 'Versículo del día', icon: BookOpen },
+  { id: 'reflexion', title: 'Reflexión', icon: Sparkles },
+  { id: 'laudes', title: 'Oración de Laudes', icon: Heart },
+  { id: 'meta', title: 'Meta de evangelización', icon: Target },
+  { id: 'tip', title: 'Tip apologético', icon: Shield },
 ];
 
 const Morning = () => {
@@ -108,14 +112,23 @@ const Morning = () => {
 
   if (loading || generating) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-50/50 to-background dark:from-amber-950/20 p-4 md:p-8">
-        <div className="max-w-2xl mx-auto space-y-6">
-          <Skeleton className="h-8 w-48" />
-          <Skeleton className="h-64 w-full" />
-          <Skeleton className="h-32 w-full" />
-          <div className="flex items-center justify-center gap-2 text-muted-foreground">
-            <Loader2 className="h-5 w-5 animate-spin" />
-            <span>{generating ? 'Generando contenido con IA...' : 'Cargando...'}</span>
+      <div className="min-h-screen bg-gradient-to-b from-secondary/10 via-background to-background">
+        <div className="max-w-2xl mx-auto p-4 md:p-8 space-y-6">
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-12 w-12 rounded-full" />
+            <div className="space-y-2">
+              <Skeleton className="h-5 w-32" />
+              <Skeleton className="h-4 w-24" />
+            </div>
+          </div>
+          <Skeleton className="h-72 w-full rounded-2xl" />
+          <Skeleton className="h-24 w-full rounded-xl" />
+          <div className="flex items-center justify-center gap-3 text-muted-foreground pt-8">
+            <div className="relative">
+              <div className="absolute inset-0 bg-primary/20 rounded-full animate-ping" />
+              <Loader2 className="h-6 w-6 animate-spin text-primary relative z-10" />
+            </div>
+            <span className="font-medium">{generating ? 'Preparando tu ritual matutino...' : 'Cargando...'}</span>
           </div>
         </div>
       </div>
@@ -124,45 +137,85 @@ const Morning = () => {
 
   if (!content) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-50/50 to-background dark:from-amber-950/20 p-4 md:p-8">
-        <div className="max-w-2xl mx-auto text-center space-y-4">
-          <h1 className="text-2xl font-bold">No hay contenido disponible</h1>
-          <p className="text-muted-foreground">No se pudo cargar el contenido del día.</p>
-          <Button onClick={() => navigate('/dashboard')}>Volver al inicio</Button>
-        </div>
+      <div className="min-h-screen bg-gradient-to-b from-secondary/10 via-background to-background flex items-center justify-center p-4">
+        <Card className="glass-card max-w-md w-full text-center">
+          <CardContent className="pt-8 pb-8 space-y-4">
+            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto">
+              <Sun className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <h1 className="text-xl font-bold">No hay contenido disponible</h1>
+            <p className="text-muted-foreground text-sm">No se pudo cargar el contenido del día. Intenta de nuevo más tarde.</p>
+            <Button onClick={() => navigate('/dashboard')} className="mt-4">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Volver al inicio
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
+
+  const StepIcon = STEPS[currentStep].icon;
 
   const renderStep = () => {
     switch (STEPS[currentStep].id) {
       case 'saludo':
         return (
-          <Card className="border-amber-200/50">
-            <CardContent className="pt-6 text-center space-y-4">
-              <Sun className="h-16 w-16 mx-auto text-amber-500" />
-              <h2 className="text-3xl font-bold text-foreground">
-                Buenos días, {profile?.nombre || 'peregrino'}
-              </h2>
-              <p className="text-muted-foreground">
-                {new Date().toLocaleDateString('es-ES', { 
-                  weekday: 'long', 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })}
-              </p>
+          <Card className="glass-card border-0 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-secondary/20 via-transparent to-primary/10" />
+            <CardContent className="relative pt-8 pb-8 text-center space-y-6">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", duration: 0.6 }}
+                className="relative mx-auto w-24 h-24"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-secondary to-secondary/50 rounded-full animate-pulse" />
+                <div className="absolute inset-2 bg-background rounded-full flex items-center justify-center">
+                  <Sun className="h-10 w-10 text-secondary" />
+                </div>
+              </motion.div>
+              
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="space-y-2"
+              >
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+                  Buenos días, {profile?.nombre?.split(' ')[0] || 'peregrino'}
+                </h2>
+                <p className="text-muted-foreground capitalize">
+                  {new Date().toLocaleDateString('es-ES', { 
+                    weekday: 'long', 
+                    day: 'numeric',
+                    month: 'long'
+                  })}
+                </p>
+              </motion.div>
+              
               {stats && (
-                <div className="flex items-center justify-center gap-2 text-primary">
-                  <Sparkles className="h-5 w-5" />
-                  <span className="font-medium">Racha: {stats.racha_actual_dias} días</span>
-                </div>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary"
+                >
+                  <Flame className="h-4 w-4" />
+                  <span className="font-semibold text-sm">{stats.racha_actual_dias} días de racha</span>
+                </motion.div>
               )}
+              
               {ritual?.ritual_matutino_completado && (
-                <div className="flex items-center justify-center gap-2 text-green-600">
-                  <CheckCircle2 className="h-5 w-5" />
-                  <span>Ya completaste el ritual de hoy</span>
-                </div>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 text-green-600 dark:text-green-400"
+                >
+                  <CheckCircle2 className="h-4 w-4" />
+                  <span className="font-medium text-sm">Ritual completado hoy</span>
+                </motion.div>
               )}
             </CardContent>
           </Card>
@@ -179,19 +232,27 @@ const Morning = () => {
       
       case 'reflexion':
         return (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-primary" />
-                Reflexión del día
+          <Card className="glass-card border-0">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                </div>
+                <span>Reflexión del día</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="prose prose-sm dark:prose-invert max-w-none">
-                {content.reflexion_ia.split('\n').map((paragraph, index) => (
-                  <p key={index} className="text-foreground leading-relaxed mb-4">
+                {content.reflexion_ia.split('\n').filter(p => p.trim()).map((paragraph, index) => (
+                  <motion.p 
+                    key={index}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="text-foreground leading-relaxed mb-4 last:mb-0"
+                  >
                     {paragraph}
-                  </p>
+                  </motion.p>
                 ))}
               </div>
             </CardContent>
@@ -203,30 +264,44 @@ const Morning = () => {
       
       case 'meta':
         return (
-          <Card className="border-green-200/50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-green-700 dark:text-green-400">
-                <Target className="h-5 w-5" />
-                Meta de evangelización
+          <Card className="glass-card border-0">
+            <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 via-transparent to-transparent rounded-xl" />
+            <CardHeader className="relative pb-4">
+              <CardTitle className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500/20 to-green-500/5 flex items-center justify-center">
+                  <Target className="h-5 w-5 text-green-600 dark:text-green-400" />
+                </div>
+                <span className="text-green-700 dark:text-green-400">Meta de evangelización</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">
-                ¿Cuál será tu compromiso de compartir la fe hoy?
+            <CardContent className="relative space-y-4">
+              <p className="text-muted-foreground text-sm">
+                Define tu compromiso para compartir la fe hoy
               </p>
               <Textarea
                 value={metaEvangelizacion}
                 onChange={(e) => setMetaEvangelizacion(e.target.value)}
-                placeholder="Ej: Hablar con un compañero de trabajo sobre mi fe, invitar a alguien a misa..."
-                className="min-h-[100px]"
+                placeholder="Ej: Hablar con un compañero sobre mi fe..."
+                className="min-h-[100px] bg-background/50 border-green-200/50 dark:border-green-800/30 focus:border-green-500/50 resize-none"
               />
-              <div className="bg-secondary/20 p-3 rounded-lg text-sm text-muted-foreground">
-                <p className="font-medium mb-1">💡 Ideas:</p>
-                <ul className="list-disc list-inside space-y-1">
-                  <li>Compartir un versículo en redes sociales</li>
-                  <li>Invitar a un amigo a la iglesia</li>
-                  <li>Ofrecer ayuda a alguien necesitado</li>
-                  <li>Iniciar una conversación sobre Dios</li>
+              <div className="bg-muted/50 p-4 rounded-xl">
+                <p className="font-medium text-sm mb-2 flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-secondary" />
+                  Ideas para hoy
+                </p>
+                <ul className="text-sm text-muted-foreground space-y-1.5">
+                  <li className="flex items-start gap-2">
+                    <span className="text-secondary">•</span>
+                    Compartir un versículo en redes sociales
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-secondary">•</span>
+                    Invitar a un amigo a la iglesia
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-secondary">•</span>
+                    Ofrecer ayuda a alguien necesitado
+                  </li>
                 </ul>
               </div>
             </CardContent>
@@ -235,22 +310,26 @@ const Morning = () => {
       
       case 'tip':
         return (
-          <Card className="border-blue-200/50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-blue-700 dark:text-blue-400">
-                <Shield className="h-5 w-5" />
-                Tip apologético del día
+          <Card className="glass-card border-0">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-transparent rounded-xl" />
+            <CardHeader className="relative pb-4">
+              <CardTitle className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-500/5 flex items-center justify-center">
+                  <Shield className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                <span className="text-blue-700 dark:text-blue-400">Tip apologético</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="relative space-y-4">
               <p className="text-foreground leading-relaxed">
                 {content.tip_apologetico}
               </p>
               <Button 
                 variant="outline" 
-                className="w-full"
+                className="w-full border-blue-200/50 dark:border-blue-800/30 hover:bg-blue-500/10"
                 onClick={() => navigate('/coach')}
               >
+                <Shield className="h-4 w-4 mr-2" />
                 Practicar con el Coach de Debate
               </Button>
             </CardContent>
@@ -263,74 +342,111 @@ const Morning = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50/50 to-background dark:from-amber-950/20">
+    <div className="min-h-screen bg-gradient-to-b from-secondary/10 via-background to-background">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b">
+      <header className="sticky top-0 z-10 glass-nav border-b">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
-          <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')}>
-            <ArrowLeft className="h-4 w-4 mr-1" />
-            Volver
+          <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')} className="gap-1.5">
+            <ArrowLeft className="h-4 w-4" />
+            <span className="hidden sm:inline">Volver</span>
           </Button>
-          <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
+          
+          <div className="flex items-center gap-2 text-secondary">
             <Sun className="h-5 w-5" />
-            <span className="font-medium">Ritual Matutino</span>
+            <span className="font-semibold text-foreground">Ritual Matutino</span>
           </div>
-          <div className="w-20" />
+          
+          <div className="w-16 sm:w-20" />
         </div>
         
         {/* Progress bar */}
-        <div className="flex gap-1 px-4 pb-2">
-          {STEPS.map((_, index) => (
-            <div
-              key={index}
-              className={`h-1 flex-1 rounded-full transition-colors ${
-                index <= currentStep ? 'bg-amber-500' : 'bg-muted'
-              }`}
-            />
-          ))}
+        <div className="px-4 pb-3">
+          <div className="max-w-2xl mx-auto flex gap-1.5">
+            {STEPS.map((step, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentStep(index)}
+                className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
+                  index < currentStep 
+                    ? 'bg-primary' 
+                    : index === currentStep 
+                      ? 'bg-secondary shadow-glow' 
+                      : 'bg-muted'
+                }`}
+              />
+            ))}
+          </div>
         </div>
       </header>
 
       {/* Content */}
-      <main className="max-w-2xl mx-auto p-4 space-y-6">
-        <div className="text-sm text-muted-foreground text-center">
-          Paso {currentStep + 1} de {STEPS.length}: {STEPS[currentStep].title}
-        </div>
+      <main className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+        {/* Step indicator */}
+        <motion.div 
+          key={currentStep}
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center justify-center gap-2 text-sm"
+        >
+          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+            <StepIcon className="h-4 w-4 text-primary" />
+          </div>
+          <span className="text-muted-foreground">
+            Paso {currentStep + 1} de {STEPS.length}
+          </span>
+          <span className="text-foreground font-medium">
+            {STEPS[currentStep].title}
+          </span>
+        </motion.div>
         
-        {renderStep()}
+        {/* Step content */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentStep}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            {renderStep()}
+          </motion.div>
+        </AnimatePresence>
 
         {/* Navigation */}
-        <div className="flex justify-between pt-4">
+        <div className="flex justify-between items-center pt-4 gap-3">
           <Button
             variant="outline"
             onClick={prevStep}
             disabled={currentStep === 0}
+            className="flex-1 sm:flex-none"
           >
             <ChevronLeft className="h-4 w-4 mr-1" />
-            Anterior
+            <span className="hidden sm:inline">Anterior</span>
           </Button>
           
           {currentStep === STEPS.length - 1 ? (
             <Button 
               onClick={handleComplete}
               disabled={completing || ritual?.ritual_matutino_completado}
-              className="bg-amber-600 hover:bg-amber-700"
+              className="flex-1 sm:flex-none bg-gradient-to-r from-secondary to-secondary/80 text-secondary-foreground hover:from-secondary/90 hover:to-secondary/70 shadow-glow"
             >
               {completing ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Completando...
+                  <span className="hidden sm:inline">Completando...</span>
                 </>
               ) : (
                 <>
-                  Comenzar mi día
+                  <span className="hidden sm:inline">Comenzar mi día</span>
+                  <span className="sm:hidden">Completar</span>
                   <Sun className="h-4 w-4 ml-2" />
                 </>
               )}
             </Button>
           ) : (
-            <Button onClick={nextStep}>
-              Siguiente
+            <Button onClick={nextStep} className="flex-1 sm:flex-none">
+              <span className="hidden sm:inline">Siguiente</span>
+              <span className="sm:hidden">Continuar</span>
               <ChevronRight className="h-4 w-4 ml-1" />
             </Button>
           )}
