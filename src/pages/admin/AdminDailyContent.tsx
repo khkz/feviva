@@ -31,6 +31,10 @@ interface DailyContentRecord {
   ensenanza_contenido: string | null;
   audio_versiculo_url: string | null;
   audio_ensenanza_url: string | null;
+  audio_reflexion_url: string | null;
+  audio_laudes_url: string | null;
+  audio_completas_url: string | null;
+  audio_tip_url: string | null;
   created_at: string | null;
 }
 
@@ -44,6 +48,35 @@ export const AdminDailyContent = () => {
   const [days, setDays] = useState<ContentDay[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState<string | null>(null);
+  const [regeneratingAudio, setRegeneratingAudio] = useState(false);
+
+  // Count days with missing audio
+  const daysWithMissingAudio = days.filter(day => {
+    if (!day.content) return false;
+    return !day.content.audio_reflexion_url || 
+           !day.content.audio_laudes_url || 
+           !day.content.audio_completas_url || 
+           !day.content.audio_tip_url;
+  }).length;
+
+  const regenerateMissingAudio = async () => {
+    setRegeneratingAudio(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('regenerate-daily-audio', {
+        body: {}
+      });
+
+      if (error) throw error;
+
+      toast.success(`${data.totalAudios} audios generados para ${data.processed} días`);
+      await fetchContentHistory();
+    } catch (err) {
+      console.error('Error regenerating audio:', err);
+      toast.error('Error al regenerar audios');
+    } finally {
+      setRegeneratingAudio(false);
+    }
+  };
 
   const fetchContentHistory = async () => {
     setLoading(true);
@@ -135,17 +168,34 @@ export const AdminDailyContent = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">Contenido Diario</h1>
           <p className="text-muted-foreground">
             Monitor del cron job y generación de contenido diario
           </p>
         </div>
-        <Button onClick={fetchContentHistory} variant="outline" size="sm">
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Actualizar
-        </Button>
+        <div className="flex items-center gap-2">
+          {daysWithMissingAudio > 0 && (
+            <Button 
+              onClick={regenerateMissingAudio} 
+              variant="default" 
+              size="sm"
+              disabled={regeneratingAudio}
+            >
+              {regeneratingAudio ? (
+                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Volume2 className="h-4 w-4 mr-2" />
+              )}
+              Regenerar Audios ({daysWithMissingAudio})
+            </Button>
+          )}
+          <Button onClick={fetchContentHistory} variant="outline" size="sm">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Actualizar
+          </Button>
+        </div>
       </div>
 
       {/* Cron Status Card */}
@@ -221,18 +271,42 @@ export const AdminDailyContent = () => {
                               {day.content.versiculo_referencia}
                             </span>
                           </div>
-                          <div className="flex items-center gap-4">
+                          <div className="flex flex-wrap items-center gap-2">
                             {day.content.audio_versiculo_url && (
-                              <span className="flex items-center gap-1 text-green-600">
-                                <Volume2 className="h-3 w-3" />
-                                Audio versículo
-                              </span>
+                              <Badge variant="outline" className="text-green-600 border-green-600/30">
+                                <Volume2 className="h-3 w-3 mr-1" />
+                                Versículo
+                              </Badge>
+                            )}
+                            {day.content.audio_reflexion_url && (
+                              <Badge variant="outline" className="text-green-600 border-green-600/30">
+                                <Volume2 className="h-3 w-3 mr-1" />
+                                Reflexión
+                              </Badge>
+                            )}
+                            {day.content.audio_laudes_url && (
+                              <Badge variant="outline" className="text-green-600 border-green-600/30">
+                                <Volume2 className="h-3 w-3 mr-1" />
+                                Laudes
+                              </Badge>
+                            )}
+                            {day.content.audio_completas_url && (
+                              <Badge variant="outline" className="text-green-600 border-green-600/30">
+                                <Volume2 className="h-3 w-3 mr-1" />
+                                Completas
+                              </Badge>
+                            )}
+                            {day.content.audio_tip_url && (
+                              <Badge variant="outline" className="text-green-600 border-green-600/30">
+                                <Volume2 className="h-3 w-3 mr-1" />
+                                Tip
+                              </Badge>
                             )}
                             {day.content.audio_ensenanza_url && (
-                              <span className="flex items-center gap-1 text-green-600">
-                                <Volume2 className="h-3 w-3" />
-                                Audio enseñanza
-                              </span>
+                              <Badge variant="outline" className="text-green-600 border-green-600/30">
+                                <Volume2 className="h-3 w-3 mr-1" />
+                                Enseñanza
+                              </Badge>
                             )}
                           </div>
                           {day.content.created_at && (
