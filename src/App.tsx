@@ -42,6 +42,7 @@ import {
   AdminMovies,
   AdminDailyContent,
   AdminCommunity,
+  AdminGratitude,
 } from "./pages/admin";
 import AdminBiblePlan from "./pages/admin/AdminBiblePlan";
 
@@ -95,6 +96,7 @@ const App = () => (
               <Route path="live" element={<AdminLiveSessions />} />
               <Route path="movies" element={<AdminMovies />} />
               <Route path="bible-plan" element={<AdminBiblePlan />} />
+              <Route path="gratitude" element={<AdminGratitude />} />
             </Route>
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
