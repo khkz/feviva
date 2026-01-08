@@ -20,6 +20,7 @@ import { RosarioDecena } from "@/components/rosario/RosarioDecena";
 import { RosarioWhyModal } from "@/components/rosario/RosarioWhyModal";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
+import { ReminderButton } from "@/components/shared/ReminderButton";
 import { AmbientSoundMixer } from "@/components/sleep/AmbientSoundMixer";
 import { useRosarioExperience } from "@/hooks/useRosarioExperience";
 import { 
@@ -236,6 +237,8 @@ export default function Rosario() {
             </div>
             <p className="text-sm text-muted-foreground">{misterios.nombre}</p>
           </div>
+          
+          {step === "inicio" && <ReminderButton practice="rosario" />}
           
           {step !== "inicio" && (
             <div className="flex items-center gap-2">
