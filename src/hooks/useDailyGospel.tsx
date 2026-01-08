@@ -51,7 +51,7 @@ export const useDailyGospel = (specificDate?: string) => {
     enabled: !specificDate, // Only fetch if not looking at specific date
   });
 
-  // Fetch tomorrow's gospel (for evening display)
+  // Fetch tomorrow's gospel (for evening display) - with auto-sync if missing
   const { data: tomorrowGospel } = useQuery({
     queryKey: ['gospel', tomorrow],
     queryFn: async () => {
@@ -62,6 +62,23 @@ export const useDailyGospel = (specificDate?: string) => {
         .single();
       
       if (error && error.code !== 'PGRST116') throw error;
+      
+      // If tomorrow's gospel is missing, try to sync from YouTube
+      if (!data) {
+        try {
+          await supabase.functions.invoke('fetch-gospel-videos');
+          // Retry fetching after sync
+          const { data: retryData } = await supabase
+            .from('daily_gospel')
+            .select('*')
+            .eq('fecha', tomorrow)
+            .single();
+          return retryData as DailyGospel | null;
+        } catch {
+          return null;
+        }
+      }
+      
       return data as DailyGospel | null;
     },
     staleTime: 60 * 60 * 1000,

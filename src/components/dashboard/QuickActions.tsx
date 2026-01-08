@@ -1,8 +1,15 @@
 import { useNavigate } from "react-router-dom";
-import { Hand, BookOpen, Flame, MessageCircle, Moon } from "lucide-react";
+import { Hand, BookOpen, Flame, MessageCircle, Moon, Play } from "lucide-react";
 import { motion } from "framer-motion";
 
 const actions = [
+  { 
+    icon: Play, 
+    label: "Evangelio", 
+    path: "/evangelio",
+    gradient: "from-yellow-400 to-amber-500",
+    bgGradient: "from-yellow-500/20 to-amber-500/20"
+  },
   { 
     icon: Hand, 
     label: "Orar", 
