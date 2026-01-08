@@ -25,8 +25,10 @@ import {
   CheckCircle2,
   Flame,
   BookOpen,
-  Heart
+  Heart,
+  Share2
 } from "lucide-react";
+import { ShareModal } from "@/components/shared/ShareModal";
 
 const STEPS = [
   { id: 'saludo', title: 'Buenos días', icon: Sun },
@@ -47,6 +49,7 @@ const Morning = () => {
   const [metaEvangelizacion, setMetaEvangelizacion] = useState('');
   const [profile, setProfile] = useState<{ nombre: string } | null>(null);
   const [completing, setCompleting] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -271,16 +274,31 @@ const Morning = () => {
                 placeholder="Ej: Hablar con un compañero sobre mi fe..."
                 className="min-h-[100px] bg-background/50 border-green-200/50 dark:border-green-800/30 focus:border-green-500/50 resize-none"
               />
-              <div className="bg-muted/50 p-4 rounded-xl">
-                <p className="font-medium text-sm mb-2 flex items-center gap-2">
+              <div className="bg-muted/50 p-4 rounded-xl space-y-3">
+                <p className="font-medium text-sm flex items-center gap-2">
                   <Sparkles className="h-4 w-4 text-secondary" />
                   Ideas para hoy
                 </p>
-                <ul className="text-sm text-muted-foreground space-y-1.5">
-                  <li className="flex items-start gap-2">
-                    <span className="text-secondary">•</span>
-                    Compartir un versículo en redes sociales
-                  </li>
+                
+                {/* Botón interactivo para compartir versículo */}
+                <button
+                  onClick={() => setShowShareModal(true)}
+                  className="w-full flex items-center gap-3 p-3 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors text-left group"
+                >
+                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                    <Share2 className="h-4 w-4 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-medium text-sm">Compartir versículo del día</p>
+                    <p className="text-xs text-muted-foreground">
+                      Facebook, WhatsApp, X y más
+                    </p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                </button>
+                
+                {/* Otras ideas */}
+                <ul className="text-sm text-muted-foreground space-y-1.5 pl-1">
                   <li className="flex items-start gap-2">
                     <span className="text-secondary">•</span>
                     Invitar a un amigo a la iglesia
@@ -419,6 +437,15 @@ const Morning = () => {
           )}
         </div>
       </main>
+
+      {/* Share Modal */}
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        title="Versículo del día - ElRugido"
+        text={content.versiculo_texto}
+        reference={content.versiculo_referencia}
+      />
     </div>
   );
 };
