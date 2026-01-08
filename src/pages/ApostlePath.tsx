@@ -66,7 +66,7 @@ const ApostlePath = () => {
         document.getElementById('ai-reflection-section')?.scrollIntoView({ behavior: 'smooth' });
         break;
       case 'gratitud':
-        navigate('/morning');
+        navigate('/gratitude');
         break;
     }
   };
