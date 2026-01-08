@@ -59,7 +59,7 @@ NO repitas frases como "Que Dios te bendiga" que se agregarán después.`;
               { role: "system", content: systemPrompt },
               { role: "user", content: userPrompt },
             ],
-            max_tokens: 800,
+            max_tokens: 2500,
             temperature: 0.7,
           }),
         });
