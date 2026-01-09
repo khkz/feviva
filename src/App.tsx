@@ -50,6 +50,7 @@ import {
   AdminCommunity,
   AdminGratitude,
   AdminOraciones,
+  AdminSantos,
 } from "./pages/admin";
 import AdminBiblePlan from "./pages/admin/AdminBiblePlan";
 import AdminInvitations from "./pages/admin/AdminInvitations";
@@ -112,6 +113,7 @@ const App = () => (
                 <Route path="bible-plan" element={<AdminBiblePlan />} />
                 <Route path="gratitude" element={<AdminGratitude />} />
                 <Route path="invitations" element={<AdminInvitations />} />
+                <Route path="santos" element={<AdminSantos />} />
               </Route>
               
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
