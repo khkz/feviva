@@ -24,8 +24,10 @@ import {
   Loader2,
   CheckCircle2,
   Star,
-  Calendar
+  Calendar,
+  Share2
 } from "lucide-react";
+import { ShareModal } from "@/components/shared/ShareModal";
 import { GospelCard } from "@/components/gospel/GospelCard";
 import { ReminderButton } from "@/components/shared/ReminderButton";
 import { useDailyGospel } from "@/hooks/useDailyGospel";
@@ -54,6 +56,7 @@ const Evening = () => {
   const [profile, setProfile] = useState<{ nombre: string } | null>(null);
   const [completing, setCompleting] = useState(false);
   const [examenCompleted, setExamenCompleted] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -184,12 +187,21 @@ const Evening = () => {
               <CheckCircle2 className="h-12 w-12 mx-auto text-green-500" />
               <h3 className="text-lg font-medium">Examen completado</h3>
               <p className="text-muted-foreground">Has reflexionado sobre tu día.</p>
-              <Button 
-                variant="outline" 
-                onClick={() => setExamenCompleted(false)}
-              >
-                Revisar respuestas
-              </Button>
+              <div className="flex items-center justify-center gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setExamenCompleted(false)}
+                >
+                  Revisar respuestas
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={() => setShowShareModal(true)}
+                >
+                  <Share2 className="h-4 w-4" />
+                </Button>
+              </div>
             </CardContent>
           </Card>
         ) : (
@@ -415,6 +427,13 @@ const Evening = () => {
             </Button>
           )}
         </div>
+
+        <ShareModal
+          isOpen={showShareModal}
+          onClose={() => setShowShareModal(false)}
+          title="Reflexión Nocturna"
+          text={content.reflexion_ia || "He completado mi examen de conciencia de hoy."}
+        />
       </main>
     </div>
   );
