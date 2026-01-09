@@ -243,9 +243,9 @@ export const ShareModal = ({ isOpen, onClose, title, text, reference }: ShareMod
             <img src={logoElRugido} alt="ElRugido" className="h-8 brightness-0 invert opacity-80" />
           </div>
           
-          <div className="relative bg-white rounded-lg p-4 shadow-xl mx-auto max-w-[200px]">
-            <p className="text-gray-800 text-sm font-serif italic text-center leading-relaxed">
-              "{text.length > 100 ? text.substring(0, 100) + "..." : text}"
+          <div className="relative bg-white rounded-lg p-4 shadow-xl mx-auto max-w-[240px]">
+            <p className="text-gray-800 text-xs font-serif italic text-center leading-relaxed">
+              "{text.length > 180 ? text.substring(0, 180) + "..." : text}"
             </p>
             {reference && (
               <p className="text-gray-600 text-xs text-center mt-3 font-medium">
@@ -255,13 +255,7 @@ export const ShareModal = ({ isOpen, onClose, title, text, reference }: ShareMod
           </div>
 
           <div className="text-center mt-4">
-            <p className="text-white/90 text-sm font-medium line-clamp-2">
-              {text.length > 60 ? text.substring(0, 60) + "..." : text}
-            </p>
-            {reference && (
-              <p className="text-white/70 text-xs mt-1">{reference}</p>
-            )}
-            <p className="text-white/50 text-xs mt-2">elrugido.com</p>
+            <p className="text-white/50 text-xs">elrugido.com</p>
           </div>
         </div>
 
