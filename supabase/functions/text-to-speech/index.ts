@@ -137,7 +137,7 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini-tts',
+          model: 'tts-1-hd',
           input: chunk,
           voice: voice,
           response_format: 'opus', // Compressed format for faster loading
