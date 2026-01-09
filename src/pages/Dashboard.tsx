@@ -166,46 +166,36 @@ const Dashboard = () => {
             </div>
           </section>
 
-          {/* Daily Challenge */}
-          <Suspense fallback={<CardSkeleton height="h-48" />}>
-            <DailyChallenge />
-          </Suspense>
+          {/* === CONTENIDO PRINCIPAL + SIDEBAR === */}
+          <div className="lg:grid lg:grid-cols-3 lg:gap-6">
+            {/* Columna izquierda - Contenido principal (2/3) */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Daily Challenge */}
+              <Suspense fallback={<CardSkeleton height="h-48" />}>
+                <DailyChallenge />
+              </Suspense>
 
-          {/* === FORMACIÓN Y CONTINUIDAD === */}
+              {/* Explore Grid - Crece en tu Fe */}
+              <Suspense fallback={<CardSkeleton height="h-96" />}>
+                <ExploreGrid />
+              </Suspense>
 
-          {/* Explore Grid - Crece en tu Fe */}
-          <Suspense fallback={<CardSkeleton height="h-96" />}>
-            <ExploreGrid />
-          </Suspense>
-
-          {/* Novena Carousel - Continúa tu Camino */}
-          <Suspense fallback={<CardSkeleton height="h-64" />}>
-            <NovenaCarousel
-              novenas={novenas}
-              getProgress={getProgressForNovena}
-              loading={novenasLoading}
-            />
-          </Suspense>
-
-          {/* Desktop: Sidebar for stats */}
-          <div className="lg:grid lg:grid-cols-3 lg:gap-6 lg:mt-6">
-            <div className="lg:col-span-2">
-              {/* Gratitude Prompt - Mobile */}
-              <div className="lg:hidden">
-                <Suspense fallback={<CardSkeleton height="h-24" />}>
-                  <GratitudePrompt />
-                </Suspense>
-              </div>
+              {/* Novena Carousel - Continúa tu Camino */}
+              <Suspense fallback={<CardSkeleton height="h-64" />}>
+                <NovenaCarousel
+                  novenas={novenas}
+                  getProgress={getProgressForNovena}
+                  loading={novenasLoading}
+                />
+              </Suspense>
             </div>
 
-            {/* Right Column - Stats Sidebar */}
-            <div className="lg:col-span-1 space-y-4 px-5 lg:px-0">
-              {/* Gratitude Prompt - Desktop */}
-              <div className="hidden lg:block">
-                <Suspense fallback={<CardSkeleton height="h-24" />}>
-                  <GratitudePrompt />
-                </Suspense>
-              </div>
+            {/* Columna derecha - Sidebar Stats (1/3) */}
+            <div className="lg:col-span-1 space-y-4 px-5 lg:px-0 mt-6 lg:mt-0">
+              {/* Gratitude Prompt */}
+              <Suspense fallback={<CardSkeleton height="h-24" />}>
+                <GratitudePrompt />
+              </Suspense>
 
               {/* Practice Streaks */}
               <Suspense fallback={<CardSkeleton height="h-32" />}>
