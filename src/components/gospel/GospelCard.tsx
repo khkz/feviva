@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,6 +8,7 @@ import { useDailyGospel, DailyGospel } from '@/hooks/useDailyGospel';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import gospelFallback from '@/assets/feature-bible.jpg';
 
 interface GospelCardProps {
   gospel?: DailyGospel | null;
@@ -18,6 +20,7 @@ interface GospelCardProps {
 export const GospelCard = ({ gospel: propGospel, title, subtitle, compact = false }: GospelCardProps) => {
   const navigate = useNavigate();
   const { activeGospel, isShowingTomorrow, isLoading } = useDailyGospel();
+  const [imageError, setImageError] = useState(false);
   
   const gospel = propGospel ?? activeGospel;
   
@@ -73,11 +76,20 @@ export const GospelCard = ({ gospel: propGospel, title, subtitle, compact = fals
           whileTap={{ scale: 0.98 }}
         >
           <img 
-            src={`https://img.youtube.com/vi/${gospel.youtube_video_id}/maxresdefault.jpg`}
+            src={
+              !gospel.youtube_video_id || imageError
+                ? gospelFallback
+                : `https://img.youtube.com/vi/${gospel.youtube_video_id}/maxresdefault.jpg`
+            }
             alt={gospel.referencia}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             onError={(e) => {
-              e.currentTarget.src = `https://img.youtube.com/vi/${gospel.youtube_video_id}/hqdefault.jpg`;
+              const target = e.currentTarget;
+              if (gospel.youtube_video_id && target.src.includes('maxresdefault')) {
+                target.src = `https://img.youtube.com/vi/${gospel.youtube_video_id}/hqdefault.jpg`;
+              } else {
+                setImageError(true);
+              }
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex items-center justify-center">

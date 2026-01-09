@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Play, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
+import bibleFallback from '@/assets/feature-bible.jpg';
 
 interface YouTubePlayerProps {
   videoId?: string | null;
@@ -11,6 +12,7 @@ interface YouTubePlayerProps {
 
 export const YouTubePlayer = ({ videoId, dia, channelUrl = "https://www.youtube.com/@LaBibliaEn365Dias/videos" }: YouTubePlayerProps) => {
   const [showVideo, setShowVideo] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   if (!videoId) {
     return (
@@ -49,11 +51,20 @@ export const YouTubePlayer = ({ videoId, dia, channelUrl = "https://www.youtube.
         whileTap={{ scale: 0.98 }}
       >
         <img 
-          src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
+          src={
+            imageError
+              ? bibleFallback
+              : `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
+          }
           alt={`Video del día ${dia}`}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           onError={(e) => {
-            e.currentTarget.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+            const target = e.currentTarget;
+            if (target.src.includes('maxresdefault')) {
+              target.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+            } else {
+              setImageError(true);
+            }
           }}
         />
         {/* Glass overlay */}
