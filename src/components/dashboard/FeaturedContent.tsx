@@ -178,9 +178,9 @@ export function FeaturedContent({ hideTitle = false }: FeaturedContentProps) {
         ))}
       </motion.div>
 
-      {/* Desktop: Grid with images */}
+      {/* Desktop: Grid with images - 2x2 grid */}
       <motion.div 
-        className="hidden lg:grid grid-cols-2 xl:grid-cols-4 gap-4"
+        className="hidden lg:grid lg:grid-cols-2 gap-4 h-full"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -189,7 +189,7 @@ export function FeaturedContent({ hideTitle = false }: FeaturedContentProps) {
           <motion.button
             key={item.id}
             onClick={() => navigate(item.path)}
-            className="group relative h-64 rounded-2xl overflow-hidden text-left"
+            className="group relative h-48 rounded-2xl overflow-hidden text-left"
             variants={itemVariants}
             whileHover={{ scale: 1.03, y: -4 }}
             whileTap={{ scale: 0.98 }}
