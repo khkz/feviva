@@ -83,6 +83,12 @@ export const GospelCard = ({ gospel: propGospel, title, subtitle, compact = fals
             }
             alt={gospel.referencia}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            onLoad={(e) => {
+              const target = e.currentTarget;
+              if (target.naturalWidth <= 120) {
+                setImageError(true);
+              }
+            }}
             onError={(e) => {
               const target = e.currentTarget;
               if (gospel.youtube_video_id && target.src.includes('maxresdefault')) {
