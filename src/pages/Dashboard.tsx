@@ -160,7 +160,7 @@ const Dashboard = () => {
             <div className="hidden lg:grid lg:grid-cols-3 lg:gap-6">
               <div className="lg:col-span-1 space-y-4">
                 <SaintOfTheDayCard userCountryCode={profile?.country_code} />
-                <GospelCard variant="featured" />
+                <GospelCard />
               </div>
               <div className="lg:col-span-2">
                 <Suspense fallback={<CardSkeleton height="h-64" />}>
