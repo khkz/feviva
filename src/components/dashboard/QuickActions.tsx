@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Hand, BookOpen, Flame, MessageCircle, Moon, Play } from "lucide-react";
+import { Hand, BookOpen, Flame, Moon, Play } from "lucide-react";
 import { motion } from "framer-motion";
 
 const actions = [
@@ -37,13 +37,6 @@ const actions = [
     path: "/sleep-stories",
     gradient: "from-indigo-500 to-purple-600",
     bgGradient: "from-indigo-500/20 to-purple-500/20"
-  },
-  { 
-    icon: MessageCircle, 
-    label: "Coach", 
-    path: "/coach",
-    gradient: "from-emerald-400 to-teal-500",
-    bgGradient: "from-emerald-500/20 to-teal-500/20"
   },
 ];
 
@@ -105,7 +98,7 @@ export function QuickActions() {
 
       {/* Desktop: Full grid */}
       <motion.div 
-        className="hidden lg:grid grid-cols-6 gap-4"
+        className="hidden lg:grid grid-cols-5 gap-4"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
