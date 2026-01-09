@@ -46,8 +46,8 @@ export function useOracionAudio({ oracionId, nombre, texto, existingAudioUrl }: 
         body: { 
           text: texto, 
           filename,
-          voice: 'shimmer', // Calm, gentle voice for prayers
-          targetTable: 'oraciones', // Save audio URL directly from edge function
+          voice: 'echo', // Male deep voice for solemn prayers - Spanish Latino
+          targetTable: 'oraciones',
           targetId: oracionId
         },
       });
