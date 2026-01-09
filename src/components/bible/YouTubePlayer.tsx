@@ -58,6 +58,12 @@ export const YouTubePlayer = ({ videoId, dia, channelUrl = "https://www.youtube.
           }
           alt={`Video del día ${dia}`}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          onLoad={(e) => {
+            const target = e.currentTarget;
+            if (target.naturalWidth <= 120) {
+              setImageError(true);
+            }
+          }}
           onError={(e) => {
             const target = e.currentTarget;
             if (target.src.includes('maxresdefault')) {

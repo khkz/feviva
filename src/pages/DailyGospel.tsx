@@ -159,6 +159,12 @@ const DailyGospel = () => {
                         }
                         alt={displayGospel.referencia}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        onLoad={(e) => {
+                          const target = e.currentTarget;
+                          if (target.naturalWidth <= 120) {
+                            setImageError(true);
+                          }
+                        }}
                         onError={(e) => {
                           const target = e.currentTarget;
                           if (displayGospel.youtube_video_id && target.src.includes('maxresdefault')) {
@@ -297,6 +303,12 @@ const DailyGospel = () => {
                       }
                       alt={g.referencia}
                       className="w-16 h-12 object-cover rounded"
+                      onLoad={(e) => {
+                        const target = e.currentTarget;
+                        if (target.naturalWidth <= 120) {
+                          target.src = gospelFallback;
+                        }
+                      }}
                       onError={(e) => {
                         e.currentTarget.src = gospelFallback;
                       }}
