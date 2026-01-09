@@ -140,22 +140,28 @@ export default function Oraciones() {
       .map(oracionToQueueItem);
     
     if (queueItems.length > 0) {
-      playQueue(queueItems, startIndex);
+      // Find the correct start index in the filtered list
+      const filteredIndex = startIndex >= 0 ? 
+        queueItems.findIndex((item, idx) => {
+          const originalItem = oracionList.filter(o => o.audio_url)[idx];
+          return originalItem?.id === oracionList[startIndex]?.id;
+        }) : 0;
+      
+      playQueue(queueItems, Math.max(0, filteredIndex));
     }
   }, [playQueue]);
 
-  // Handle playing a single prayer (adds siblings to queue)
-  const handlePlayOracion = useCallback((oracion: typeof oraciones[0], siblings: typeof oraciones) => {
-    const queueItems = siblings
-      .filter(o => o.audio_url)
-      .map(oracionToQueueItem);
-    
+  // Handle playing a single prayer - queue ALL prayers, start from selected
+  const handlePlayOracion = useCallback((oracion: typeof oraciones[0]) => {
+    // Queue all prayers with audio, start from selected one
+    const allWithAudio = oraciones.filter(o => o.audio_url);
+    const queueItems = allWithAudio.map(oracionToQueueItem);
     const startIndex = queueItems.findIndex(item => item.id === oracion.id);
     
     if (queueItems.length > 0) {
       playQueue(queueItems, Math.max(0, startIndex));
     }
-  }, [playQueue]);
+  }, [oraciones, playQueue]);
 
   // Check if a prayer is currently playing
   const isCurrentlyPlaying = currentItem?.type === 'oracion' && !isMinimized;
@@ -211,6 +217,18 @@ export default function Oraciones() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
+          {/* Play All button - only show if there are prayers with audio */}
+          {oraciones.filter(o => o.audio_url).length > 0 && (
+            <Button 
+              variant="secondary" 
+              size="sm" 
+              className="gap-2 whitespace-nowrap bg-primary/20 text-primary border-primary/30 rounded-xl h-10 hover:bg-primary/30"
+              onClick={() => handlePlayAll(oraciones)}
+            >
+              <Play className="h-4 w-4" />
+              Reproducir todas ({oraciones.filter(o => o.audio_url).length})
+            </Button>
+          )}
           <Link to="/rosario">
             <Button variant="secondary" size="sm" className="gap-2 whitespace-nowrap glass-button border-0 rounded-xl h-10">
               <BookOpen className="h-4 w-4" />
@@ -294,7 +312,7 @@ export default function Oraciones() {
                   onToggleFavorite={toggleFavorite}
                   onSelect={() => setSelectedOracion(oracion.id)}
                   esFundamental={oracion.es_fundamental ?? false}
-                  onPlay={() => handlePlayOracion(oracion, filteredOraciones)}
+                  onPlay={() => handlePlayOracion(oracion)}
                 />
               </motion.div>
             ))}
@@ -350,7 +368,7 @@ export default function Oraciones() {
                   onToggleFavorite={toggleFavorite}
                   onSelect={() => setSelectedOracion(oracion.id)}
                   esFundamental={oracion.es_fundamental ?? false}
-                  onPlay={() => handlePlayOracion(oracion, favoritasOraciones)}
+                  onPlay={() => handlePlayOracion(oracion)}
                 />
               </motion.div>
             ))}
@@ -406,7 +424,7 @@ export default function Oraciones() {
                     onToggleFavorite={toggleFavorite}
                     onSelect={() => setSelectedOracion(oracion.id)}
                     esFundamental={oracion.es_fundamental ?? false}
-                    onPlay={() => handlePlayOracion(oracion, displayedOraciones)}
+                    onPlay={() => handlePlayOracion(oracion)}
                   />
                 </motion.div>
               ))}
@@ -461,7 +479,7 @@ export default function Oraciones() {
                         isFavorite={isFavorite(oracion.id)}
                         onToggleFavorite={toggleFavorite}
                         onSelect={() => setSelectedOracion(oracion.id)}
-                        onPlay={() => handlePlayAll(oracionesFundamentales, idx)}
+                        onPlay={() => handlePlayOracion(oracion)}
                       />
                     ))}
                   </div>
