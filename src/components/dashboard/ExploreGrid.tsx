@@ -98,7 +98,7 @@ export function ExploreGrid() {
       </h2>
 
       <motion.div 
-        className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4"
+        className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -107,7 +107,7 @@ export function ExploreGrid() {
           <motion.button
             key={item.path}
             onClick={() => navigate(item.path)}
-            className="relative h-32 lg:h-44 rounded-2xl overflow-hidden group"
+            className="relative h-32 lg:h-36 rounded-2xl overflow-hidden group"
             variants={cardVariants}
             whileHover={{ scale: 1.03, y: -2 }}
             whileTap={{ scale: 0.97 }}
