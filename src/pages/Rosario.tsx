@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Check, ChevronDown, Play, Pause, RotateCcw, Volume2, VolumeX, Sparkles, Moon, HelpCircle } from "lucide-react";
+import { ArrowLeft, Check, ChevronDown, Play, Pause, RotateCcw, Volume2, VolumeX, Sparkles, Moon, HelpCircle, Share2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ShareModal } from "@/components/shared/ShareModal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -109,6 +110,7 @@ export default function Rosario() {
   const [masterVolume, setMasterVolume] = useState(0.5);
   const [showSettings, setShowSettings] = useState(false);
   const [showWhyModal, setShowWhyModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   
   const {
     isAudioEnabled,
@@ -602,12 +604,27 @@ export default function Rosario() {
                   Rezar Otro
                 </Button>
                 <Button 
+                  variant="outline"
+                  onClick={() => setShowShareModal(true)} 
+                  className="h-12 rounded-xl"
+                >
+                  <Share2 className="h-4 w-4" />
+                </Button>
+                <Button 
                   onClick={() => navigate("/oraciones")} 
                   className="flex-1 h-12 rounded-xl bg-gradient-to-r from-primary to-primary-hover"
                 >
                   Terminar
                 </Button>
               </motion.div>
+
+              <ShareModal
+                isOpen={showShareModal}
+                onClose={() => setShowShareModal(false)}
+                title="¡Rosario Completado!"
+                text={`He rezado el Santo Rosario - ${misterios.nombre}. ${startTime ? Math.round((new Date().getTime() - startTime.getTime()) / 60000) : 0} minutos en oración.`}
+                reference="elrugido.com"
+              />
             </motion.div>
           )}
         </AnimatePresence>

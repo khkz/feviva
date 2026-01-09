@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, BookOpen, Check } from "lucide-react";
+import { Sparkles, BookOpen, Check, Share2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ShareModal } from "@/components/shared/ShareModal";
 
 interface GratitudeCierreProps {
   reflexionBiblica?: string | null;
@@ -8,6 +11,7 @@ interface GratitudeCierreProps {
 }
 
 export const GratitudeCierre = ({ reflexionBiblica, versiculoSugerido }: GratitudeCierreProps) => {
+  const [showShareModal, setShowShareModal] = useState(false);
   return (
     <Card className="border-0 overflow-hidden bg-gradient-to-br from-amber-500/10 via-rose-500/10 to-purple-500/10">
       <CardContent className="pt-8 pb-8 text-center space-y-6">
@@ -53,6 +57,25 @@ export const GratitudeCierre = ({ reflexionBiblica, versiculoSugerido }: Gratitu
           </motion.div>
         )}
 
+        {reflexionBiblica && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="flex justify-center"
+          >
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowShareModal(true)}
+              className="gap-2"
+            >
+              <Share2 className="w-4 h-4" />
+              Compartir reflexión
+            </Button>
+          </motion.div>
+        )}
+
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -68,6 +91,14 @@ export const GratitudeCierre = ({ reflexionBiblica, versiculoSugerido }: Gratitu
           </p>
         </motion.div>
       </CardContent>
+
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        title="Mi reflexión de gratitud"
+        text={reflexionBiblica || "Gratitud completada"}
+        reference={versiculoSugerido || undefined}
+      />
     </Card>
   );
 };
