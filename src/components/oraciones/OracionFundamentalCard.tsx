@@ -17,6 +17,7 @@ interface OracionFundamentalCardProps {
   isFavorite?: boolean;
   onToggleFavorite?: (id: string) => void;
   onSelect?: () => void;
+  onPlay?: () => void;
 }
 
 // Map prayer names to their images
@@ -49,6 +50,7 @@ export function OracionFundamentalCard({
   isFavorite = false,
   onToggleFavorite,
   onSelect,
+  onPlay,
 }: OracionFundamentalCardProps) {
   const imageSrc = getPrayerImage(nombre);
 
@@ -117,15 +119,22 @@ export function OracionFundamentalCard({
         
         {/* Play indicator */}
         <div className="flex items-center gap-2">
-          <div className={cn(
-            "flex items-center justify-center",
-            "h-10 w-10 rounded-full",
-            "bg-primary text-primary-foreground",
-            "shadow-lg shadow-primary/30",
-            "group-hover:shadow-xl group-hover:shadow-primary/40 transition-shadow"
-          )}>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onPlay?.();
+            }}
+            className={cn(
+              "flex items-center justify-center",
+              "h-10 w-10 rounded-full",
+              "bg-primary text-primary-foreground",
+              "shadow-lg shadow-primary/30",
+              "group-hover:shadow-xl group-hover:shadow-primary/40 transition-shadow",
+              "hover:scale-105 active:scale-95"
+            )}
+          >
             <Play className="h-5 w-5 ml-0.5" />
-          </div>
+          </button>
           <span className="text-sm text-white/80 font-medium">
             Rezar ahora
           </span>
