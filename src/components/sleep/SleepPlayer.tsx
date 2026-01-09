@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { 
@@ -10,10 +10,12 @@ import {
   VolumeX,
   Timer,
   Loader2,
-  Stars
+  Stars,
+  Minimize2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SleepStory } from "@/hooks/useSleepStories";
+import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
 import { AmbientSoundMixer } from "./AmbientSoundMixer";
 import { ContentFeedback } from "@/components/feedback/ContentFeedback";
 import logoElRugido from "@/assets/logo-elrugido.svg";
@@ -34,6 +36,8 @@ const TIMER_OPTIONS = [
   { label: "Sin timer", value: 0 },
 ];
 
+const SLEEP_SPEEDS = [0.7, 0.8, 0.9, 1.0];
+
 export const SleepPlayer = ({
   story,
   audioUrl,
@@ -42,68 +46,43 @@ export const SleepPlayer = ({
   onGenerateAudio,
   onSaveProgress,
 }: SleepPlayerProps) => {
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [isMuted, setIsMuted] = useState(false);
-  const [masterVolume, setMasterVolume] = useState(1);
+  const audioPlayer = useAudioPlayer();
   const [selectedTimer, setSelectedTimer] = useState(15);
-  const [timerRemaining, setTimerRemaining] = useState<number | null>(null);
   const [showTimerPicker, setShowTimerPicker] = useState(!audioUrl);
-  const [playbackRate, setPlaybackRate] = useState(0.9);
+  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
 
-  const SLEEP_SPEEDS = [0.7, 0.8, 0.9, 1.0];
+  // Use context values
+  const { 
+    isPlaying, 
+    currentTime, 
+    duration, 
+    volume: masterVolume, 
+    playbackRate,
+    timerRemaining,
+    audioRef,
+    togglePlay,
+    seek,
+    setVolume,
+    setPlaybackRate,
+    setTimer,
+    minimize,
+    close
+  } = audioPlayer;
 
   const cyclePlaybackRate = () => {
     const currentIndex = SLEEP_SPEEDS.indexOf(playbackRate);
     const nextIndex = (currentIndex + 1) % SLEEP_SPEEDS.length;
-    const newRate = SLEEP_SPEEDS[nextIndex];
-    setPlaybackRate(newRate);
-    if (audioRef.current) {
-      audioRef.current.playbackRate = newRate;
-    }
+    setPlaybackRate(SLEEP_SPEEDS[nextIndex]);
   };
-  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    
-    if (isPlaying && timerRemaining !== null && timerRemaining > 0) {
-      interval = setInterval(() => {
-        setTimerRemaining((prev) => {
-          if (prev === null || prev <= 1) {
-            if (audioRef.current) {
-              audioRef.current.pause();
-              setIsPlaying(false);
-            }
-            onSaveProgress(Math.floor(currentTime / 60), false);
-            return null;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-
-    return () => clearInterval(interval);
-  }, [isPlaying, timerRemaining, currentTime, onSaveProgress]);
-
-  const togglePlay = () => {
-    if (!audioUrl) {
-      onGenerateAudio();
-      return;
-    }
-
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        if (timerRemaining === null && selectedTimer > 0) {
-          setTimerRemaining(selectedTimer * 60);
-        }
-        audioRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
+  const handleMasterVolumeChange = (value: number[]) => {
+    const newVolume = value[0];
+    setVolume(newVolume);
+    if (newVolume === 0) {
+      setIsMuted(true);
+    } else if (isMuted) {
+      setIsMuted(false);
     }
   };
 
@@ -114,42 +93,8 @@ export const SleepPlayer = ({
     }
   };
 
-  const handleMasterVolumeChange = (value: number[]) => {
-    const newVolume = value[0];
-    setMasterVolume(newVolume);
-    if (audioRef.current) {
-      audioRef.current.volume = newVolume;
-    }
-    if (newVolume === 0) {
-      setIsMuted(true);
-    } else if (isMuted) {
-      setIsMuted(false);
-    }
-  };
-
-  const handleTimeUpdate = () => {
-    if (audioRef.current) {
-      setCurrentTime(audioRef.current.currentTime);
-    }
-  };
-
-  const handleLoadedMetadata = () => {
-    if (audioRef.current) {
-      setDuration(audioRef.current.duration);
-      audioRef.current.playbackRate = playbackRate;
-    }
-  };
-
   const handleSeek = (value: number[]) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = value[0];
-      setCurrentTime(value[0]);
-    }
-  };
-
-  const handleEnded = () => {
-    setIsPlaying(false);
-    onSaveProgress(Math.floor(duration / 60), true);
+    seek(value[0]);
   };
 
   const formatTime = (time: number) => {
@@ -161,18 +106,23 @@ export const SleepPlayer = ({
   const startWithTimer = (minutes: number) => {
     setSelectedTimer(minutes);
     setShowTimerPicker(false);
-    if (minutes > 0) {
-      setTimerRemaining(minutes * 60);
-    } else {
-      setTimerRemaining(null);
-    }
+    setTimer(minutes);
     
     if (!audioUrl) {
       onGenerateAudio();
-    } else if (audioRef.current) {
-      audioRef.current.play();
-      setIsPlaying(true);
+    } else {
+      togglePlay();
     }
+  };
+
+  const handleMinimize = () => {
+    minimize();
+    onClose();
+  };
+
+  const handleClose = () => {
+    close();
+    onSaveProgress(Math.floor(currentTime / 60), false);
   };
 
   return (
@@ -222,10 +172,11 @@ export const SleepPlayer = ({
           <Button 
             variant="ghost" 
             size="icon" 
-            onClick={onClose}
+            onClick={handleMinimize}
             className="text-white/70 hover:text-white hover:bg-white/10"
+            title="Minimizar"
           >
-            <X className="w-5 h-5" />
+            <Minimize2 className="w-5 h-5" />
           </Button>
           <div className="flex items-center gap-2 text-indigo-300">
             <img 
@@ -235,7 +186,15 @@ export const SleepPlayer = ({
             />
             <span className="font-medium text-sm">Sleep Story</span>
           </div>
-          <div className="w-10" />
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={handleClose}
+            className="text-white/70 hover:text-white hover:bg-white/10"
+            title="Cerrar"
+          >
+            <X className="w-5 h-5" />
+          </Button>
         </motion.div>
 
         {/* Content */}
@@ -347,16 +306,6 @@ export const SleepPlayer = ({
               </div>
             ) : (
               <div className="space-y-6">
-                {audioUrl && (
-                  <audio
-                    ref={audioRef}
-                    src={audioUrl}
-                    onTimeUpdate={handleTimeUpdate}
-                    onLoadedMetadata={handleLoadedMetadata}
-                    onEnded={handleEnded}
-                  />
-                )}
-
                 {/* Glass card for controls */}
                 <div className="glass-card rounded-3xl p-6 bg-white/5 backdrop-blur-xl border border-white/10">
                   {/* Progress slider */}
@@ -432,7 +381,7 @@ export const SleepPlayer = ({
                         size="icon"
                         className="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 shadow-lg shadow-indigo-500/30"
                         onClick={togglePlay}
-                        disabled={isGenerating}
+                        disabled={isGenerating || !audioUrl}
                       >
                         {isGenerating ? (
                           <Loader2 className="w-10 h-10 animate-spin" />

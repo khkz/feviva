@@ -16,6 +16,7 @@ import { motion } from "framer-motion";
 import { useSleepStories, SleepStory } from "@/hooks/useSleepStories";
 import { useProcessingJobs } from "@/hooks/useProcessingJobs";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
 import { SleepStoryCard } from "@/components/sleep/SleepStoryCard";
 import { SleepPlayer } from "@/components/sleep/SleepPlayer";
 import { JobProgressPanel } from "@/components/processing/JobProgressPanel";
@@ -48,39 +49,38 @@ const SleepStories = () => {
   const { stories, loading, generateAudio, saveProgress, refetch } = useSleepStories();
   const { queueJobs, stats: jobStats } = useProcessingJobs({ jobType: 'sleep_tts' });
   const { isAdmin, isModerator } = useAdminAuth();
+  const audioPlayer = useAudioPlayer();
   
   const canManageContent = isAdmin || isModerator;
-  const [selectedStory, setSelectedStory] = useState<SleepStory | null>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedAudioUrl, setGeneratedAudioUrl] = useState<string | null>(null);
   const [isCreatingStories, setIsCreatingStories] = useState(false);
   const [isExpandingStories, setIsExpandingStories] = useState(false);
   const [isGeneratingImages, setIsGeneratingImages] = useState(false);
 
+  // Check if expanded player should show (story selected and not minimized)
+  const showExpandedPlayer = audioPlayer.currentStory && !audioPlayer.isMinimized;
+
   const handleStorySelect = (story: SleepStory) => {
-    setSelectedStory(story);
-    setGeneratedAudioUrl(story.audio_url);
+    audioPlayer.play(story, story.audio_url);
   };
 
   const handleGenerateAudio = async () => {
-    if (!selectedStory) return;
+    if (!audioPlayer.currentStory) return;
     
-    setIsGenerating(true);
-    const audioUrl = await generateAudio(selectedStory);
+    audioPlayer.setIsGenerating(true);
+    const audioUrl = await generateAudio(audioPlayer.currentStory);
     if (audioUrl) {
-      setGeneratedAudioUrl(audioUrl);
+      audioPlayer.setAudioUrl(audioUrl);
     }
-    setIsGenerating(false);
+    audioPlayer.setIsGenerating(false);
   };
 
   const handleClosePlayer = () => {
-    setSelectedStory(null);
-    setGeneratedAudioUrl(null);
+    audioPlayer.minimize();
   };
 
   const handleSaveProgress = (duration: number, completed: boolean) => {
-    if (selectedStory) {
-      saveProgress(selectedStory.id, duration, completed);
+    if (audioPlayer.currentStory) {
+      saveProgress(audioPlayer.currentStory.id, duration, completed);
     }
   };
 
@@ -429,12 +429,12 @@ const SleepStories = () => {
         ))}
       </motion.div>
 
-      {/* Player modal */}
-      {selectedStory && (
+      {/* Player modal - only show when not minimized */}
+      {showExpandedPlayer && audioPlayer.currentStory && (
         <SleepPlayer
-          story={selectedStory}
-          audioUrl={generatedAudioUrl}
-          isGenerating={isGenerating}
+          story={audioPlayer.currentStory}
+          audioUrl={audioPlayer.audioUrl}
+          isGenerating={audioPlayer.isGenerating}
           onClose={handleClosePlayer}
           onGenerateAudio={handleGenerateAudio}
           onSaveProgress={handleSaveProgress}
