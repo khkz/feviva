@@ -22,6 +22,7 @@ import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import logoElRugido from "@/assets/logo-elrugido.svg";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -246,6 +247,13 @@ const SleepStories = () => {
             >
               <ArrowLeft className="w-5 h-5" />
             </motion.button>
+            
+            {/* Logo solo visible en móvil */}
+            <img 
+              src={logoElRugido} 
+              alt="El Rugido" 
+              className="h-8 w-auto lg:hidden"
+            />
             <div>
               <motion.h1 
                 className="text-2xl font-bold"
