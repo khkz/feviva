@@ -1280,37 +1280,49 @@ export type Database = {
         Row: {
           audio_url: string | null
           categoria: string
+          cita_autor: string | null
+          cita_celebre: string | null
           created_at: string
+          es_fundamental: boolean | null
           historia: string | null
           id: string
           language: string | null
           nombre: string
           orden: number | null
           subcategoria: string | null
+          tagline: string | null
           texto: string
         }
         Insert: {
           audio_url?: string | null
           categoria: string
+          cita_autor?: string | null
+          cita_celebre?: string | null
           created_at?: string
+          es_fundamental?: boolean | null
           historia?: string | null
           id?: string
           language?: string | null
           nombre: string
           orden?: number | null
           subcategoria?: string | null
+          tagline?: string | null
           texto: string
         }
         Update: {
           audio_url?: string | null
           categoria?: string
+          cita_autor?: string | null
+          cita_celebre?: string | null
           created_at?: string
+          es_fundamental?: boolean | null
           historia?: string | null
           id?: string
           language?: string | null
           nombre?: string
           orden?: number | null
           subcategoria?: string | null
+          tagline?: string | null
           texto?: string
         }
         Relationships: []

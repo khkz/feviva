@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Heart, Play, Pause, ChevronRight, Volume2, Loader2 } from "lucide-react";
+import { Heart, Play, Pause, ChevronRight, Volume2, Loader2, Cross } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -16,6 +16,7 @@ interface OracionCardProps {
   isFavorite?: boolean;
   onToggleFavorite?: (id: string) => void;
   onSelect?: () => void;
+  esFundamental?: boolean;
 }
 
 export function OracionCard({
@@ -29,6 +30,7 @@ export function OracionCard({
   isFavorite = false,
   onToggleFavorite,
   onSelect,
+  esFundamental = false,
 }: OracionCardProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -109,7 +111,8 @@ export function OracionCard({
         "transition-all duration-300",
         "hover:shadow-medium hover:border-primary/20",
         "active:scale-[0.98]",
-        "group"
+        "group",
+        esFundamental && "border-secondary/30 bg-gradient-to-br from-secondary/5 to-card"
       )}
       onClick={onSelect}
       whileHover={{ y: -2 }}
@@ -122,7 +125,13 @@ export function OracionCard({
         <div className="flex items-start gap-3">
           {/* Content */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1.5">
+            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+              {esFundamental && (
+                <span className="text-xs font-medium text-secondary bg-secondary/10 px-2 py-0.5 rounded-full inline-flex items-center gap-1">
+                  <Cross className="h-3 w-3" />
+                  Fundamental
+                </span>
+              )}
               <span className="text-xs font-medium text-muted-foreground bg-muted/80 px-2 py-0.5 rounded-full">
                 {subcategoria || categoria}
               </span>
