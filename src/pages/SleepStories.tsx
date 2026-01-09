@@ -15,6 +15,7 @@ import {
 import { motion } from "framer-motion";
 import { useSleepStories, SleepStory } from "@/hooks/useSleepStories";
 import { useProcessingJobs } from "@/hooks/useProcessingJobs";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { SleepStoryCard } from "@/components/sleep/SleepStoryCard";
 import { SleepPlayer } from "@/components/sleep/SleepPlayer";
 import { JobProgressPanel } from "@/components/processing/JobProgressPanel";
@@ -46,6 +47,9 @@ const SleepStories = () => {
   const navigate = useNavigate();
   const { stories, loading, generateAudio, saveProgress, refetch } = useSleepStories();
   const { queueJobs, stats: jobStats } = useProcessingJobs({ jobType: 'sleep_tts' });
+  const { isAdmin, isModerator } = useAdminAuth();
+  
+  const canManageContent = isAdmin || isModerator;
   const [selectedStory, setSelectedStory] = useState<SleepStory | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedAudioUrl, setGeneratedAudioUrl] = useState<string | null>(null);
@@ -295,13 +299,15 @@ const SleepStories = () => {
         </div>
       </motion.header>
 
-      {/* Panel de progreso de jobs */}
-      <div className="px-4 mb-4">
-        <JobProgressPanel 
-          jobType="sleep_tts" 
-          title="Generación de Audio" 
-        />
-      </div>
+      {/* Panel de progreso de jobs - Solo admin/moderador */}
+      {canManageContent && (
+        <div className="px-4 mb-4">
+          <JobProgressPanel 
+            jobType="sleep_tts" 
+            title="Generación de Audio" 
+          />
+        </div>
+      )}
 
       {/* Stats counter */}
       <motion.div 
@@ -322,75 +328,77 @@ const SleepStories = () => {
         </div>
       </motion.div>
 
-      {/* AI Generation buttons */}
-      <motion.div 
-        className="px-4 mb-6 space-y-2"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.7 }}
-      >
-        <Button
-          variant="outline"
-          className="w-full justify-start gap-2 glass-button border-border/30 h-12"
-          onClick={handleCreateNewStories}
-          disabled={isAnyProcessRunning}
+      {/* AI Generation buttons - Solo admin/moderador */}
+      {canManageContent && (
+        <motion.div 
+          className="px-4 mb-6 space-y-2"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
         >
-          {isCreatingStories ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <PlusCircle className="w-4 h-4 text-indigo-400" />
+          <Button
+            variant="outline"
+            className="w-full justify-start gap-2 glass-button border-border/30 h-12"
+            onClick={handleCreateNewStories}
+            disabled={isAnyProcessRunning}
+          >
+            {isCreatingStories ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <PlusCircle className="w-4 h-4 text-indigo-400" />
+            )}
+            <span>Crear nuevas historias bíblicas</span>
+            <Sparkles className="w-4 h-4 text-amber-500 ml-auto" />
+          </Button>
+          
+          {shortStoriesCount > 0 && (
+            <Button
+              variant="outline"
+              className="w-full justify-start gap-2 glass-button border-border/30 h-12"
+              onClick={handleExpandStories}
+              disabled={isAnyProcessRunning}
+            >
+              {isExpandingStories ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Expand className="w-4 h-4 text-purple-400" />
+              )}
+              <span>Expandir {shortStoriesCount} historias cortas</span>
+              <Sparkles className="w-4 h-4 text-amber-500 ml-auto" />
+            </Button>
           )}
-          <span>Crear nuevas historias bíblicas</span>
-          <Sparkles className="w-4 h-4 text-amber-500 ml-auto" />
-        </Button>
-        
-        {shortStoriesCount > 0 && (
-          <Button
-            variant="outline"
-            className="w-full justify-start gap-2 glass-button border-border/30 h-12"
-            onClick={handleExpandStories}
-            disabled={isAnyProcessRunning}
-          >
-            {isExpandingStories ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Expand className="w-4 h-4 text-purple-400" />
-            )}
-            <span>Expandir {shortStoriesCount} historias cortas</span>
-            <Sparkles className="w-4 h-4 text-amber-500 ml-auto" />
-          </Button>
-        )}
 
-        {storiesWithoutImageCount > 0 && (
-          <Button
-            variant="outline"
-            className="w-full justify-start gap-2 glass-button border-border/30 h-12"
-            onClick={handleGenerateAllImages}
-            disabled={isAnyProcessRunning}
-          >
-            {isGeneratingImages ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <ImagePlus className="w-4 h-4 text-cyan-400" />
-            )}
-            <span>Generar {storiesWithoutImageCount} imágenes</span>
-            <Sparkles className="w-4 h-4 text-amber-500 ml-auto" />
-          </Button>
-        )}
+          {storiesWithoutImageCount > 0 && (
+            <Button
+              variant="outline"
+              className="w-full justify-start gap-2 glass-button border-border/30 h-12"
+              onClick={handleGenerateAllImages}
+              disabled={isAnyProcessRunning}
+            >
+              {isGeneratingImages ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <ImagePlus className="w-4 h-4 text-cyan-400" />
+              )}
+              <span>Generar {storiesWithoutImageCount} imágenes</span>
+              <Sparkles className="w-4 h-4 text-amber-500 ml-auto" />
+            </Button>
+          )}
 
-        {storiesWithoutAudioCount > 0 && !hasActiveJobs && (
-          <Button
-            variant="outline"
-            className="w-full justify-start gap-2 glass-button border-border/30 h-12"
-            onClick={handleQueueAudioGeneration}
-            disabled={isAnyProcessRunning}
-          >
-            <Volume2 className="w-4 h-4 text-green-400" />
-            <span>Encolar audio TTS para {storiesWithoutAudioCount} historias</span>
-            <Sparkles className="w-4 h-4 text-amber-500 ml-auto" />
-          </Button>
-        )}
-      </motion.div>
+          {storiesWithoutAudioCount > 0 && !hasActiveJobs && (
+            <Button
+              variant="outline"
+              className="w-full justify-start gap-2 glass-button border-border/30 h-12"
+              onClick={handleQueueAudioGeneration}
+              disabled={isAnyProcessRunning}
+            >
+              <Volume2 className="w-4 h-4 text-green-400" />
+              <span>Encolar audio TTS para {storiesWithoutAudioCount} historias</span>
+              <Sparkles className="w-4 h-4 text-amber-500 ml-auto" />
+            </Button>
+          )}
+        </motion.div>
+      )}
 
       {/* Stories grid */}
       <motion.div 
