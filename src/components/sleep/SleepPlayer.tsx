@@ -51,6 +51,19 @@ export const SleepPlayer = ({
   const [selectedTimer, setSelectedTimer] = useState(15);
   const [timerRemaining, setTimerRemaining] = useState<number | null>(null);
   const [showTimerPicker, setShowTimerPicker] = useState(!audioUrl);
+  const [playbackRate, setPlaybackRate] = useState(0.9);
+
+  const SLEEP_SPEEDS = [0.7, 0.8, 0.9, 1.0];
+
+  const cyclePlaybackRate = () => {
+    const currentIndex = SLEEP_SPEEDS.indexOf(playbackRate);
+    const nextIndex = (currentIndex + 1) % SLEEP_SPEEDS.length;
+    const newRate = SLEEP_SPEEDS[nextIndex];
+    setPlaybackRate(newRate);
+    if (audioRef.current) {
+      audioRef.current.playbackRate = newRate;
+    }
+  };
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
 
   useEffect(() => {
@@ -123,6 +136,7 @@ export const SleepPlayer = ({
   const handleLoadedMetadata = () => {
     if (audioRef.current) {
       setDuration(audioRef.current.duration);
+      audioRef.current.playbackRate = playbackRate;
     }
   };
 
@@ -363,7 +377,18 @@ export const SleepPlayer = ({
                   )}
 
                   {/* Main controls */}
-                  <div className="flex items-center justify-center gap-6">
+                  <div className="flex items-center justify-center gap-4">
+                    {/* Speed control */}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="w-12 h-12 text-white/70 hover:text-white hover:bg-white/10"
+                      onClick={cyclePlaybackRate}
+                      title="Velocidad de reproducción"
+                    >
+                      <span className="text-sm font-medium">{playbackRate}x</span>
+                    </Button>
+
                     <div className="relative">
                       <Button
                         variant="ghost"
