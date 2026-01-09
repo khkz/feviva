@@ -70,11 +70,11 @@ export const GospelCard = ({ gospel: propGospel, title, subtitle, compact = fals
   }
 
   return (
-    <Card className={`overflow-hidden border-0 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 ${isFeatured ? 'h-full' : ''}`}>
-      <CardContent className="p-0 h-full flex flex-col">
+    <Card className="overflow-hidden border-0 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30">
+      <CardContent className="p-0">
         {/* Thumbnail */}
         <motion.div 
-          className={`relative cursor-pointer group ${isFeatured ? 'flex-1 min-h-[200px]' : 'aspect-video'}`}
+          className="relative cursor-pointer group aspect-video"
           onClick={() => navigate('/evangelio')}
           whileTap={{ scale: 0.98 }}
         >
@@ -103,10 +103,10 @@ export const GospelCard = ({ gospel: propGospel, title, subtitle, compact = fals
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex items-center justify-center">
             <motion.div 
-              className={`${isFeatured ? 'w-20 h-20' : 'w-16 h-16'} bg-amber-500/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-xl`}
+              className="w-16 h-16 bg-amber-500/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-xl"
               whileHover={{ scale: 1.1 }}
             >
-              <Play className={`${isFeatured ? 'w-10 h-10' : 'w-8 h-8'} text-white ml-1`} fill="white" />
+              <Play className="w-8 h-8 text-white ml-1" fill="white" />
             </motion.div>
           </div>
           
@@ -120,7 +120,7 @@ export const GospelCard = ({ gospel: propGospel, title, subtitle, compact = fals
           
           {/* Info overlay */}
           <div className="absolute bottom-0 left-0 right-0 p-4">
-            <p className={`text-white font-semibold drop-shadow-lg ${isFeatured ? 'text-xl' : 'text-lg'}`}>
+            <p className="text-white font-semibold drop-shadow-lg text-lg">
               {gospel.referencia}
             </p>
             <p className="text-white/80 text-sm capitalize">
@@ -130,17 +130,15 @@ export const GospelCard = ({ gospel: propGospel, title, subtitle, compact = fals
         </motion.div>
         
         {/* Content */}
-        <div className={`p-4 space-y-3 ${isFeatured ? 'flex-shrink-0' : ''}`}>
+        <div className="p-4 space-y-3">
           <div className="flex items-center gap-2">
             <BookOpen className="h-5 w-5 text-amber-600 dark:text-amber-400" />
             <h3 className="font-semibold text-amber-900 dark:text-amber-100">{displayTitle}</h3>
           </div>
           
-          {!isFeatured && (
-            <p className="text-sm text-muted-foreground">
-              {displaySubtitle}
-            </p>
-          )}
+          <p className="text-sm text-muted-foreground">
+            {displaySubtitle}
+          </p>
           
           {gospel.sacerdote && (
             <p className="text-xs text-muted-foreground">
