@@ -56,18 +56,31 @@ const SleepStories = () => {
   const [isExpandingStories, setIsExpandingStories] = useState(false);
   const [isGeneratingImages, setIsGeneratingImages] = useState(false);
 
-  // Check if expanded player should show (story selected and not minimized)
-  const showExpandedPlayer = audioPlayer.currentStory && !audioPlayer.isMinimized;
+  // Check if expanded player should show (item selected and not minimized)
+  const showExpandedPlayer = audioPlayer.currentItem && 
+    audioPlayer.currentItem.type === 'sleep_story' && 
+    !audioPlayer.isMinimized;
+
+  // Get the current story from the queue item's original data
+  const currentStory = audioPlayer.currentItem?.originalData as SleepStory | undefined;
 
   const handleStorySelect = (story: SleepStory) => {
-    audioPlayer.play(story, story.audio_url);
+    audioPlayer.play({
+      id: story.id,
+      title: story.titulo,
+      subtitle: story.categoria,
+      imageUrl: story.imagen_url || undefined,
+      audioUrl: story.audio_url,
+      type: 'sleep_story',
+      originalData: story,
+    });
   };
 
   const handleGenerateAudio = async () => {
-    if (!audioPlayer.currentStory) return;
+    if (!currentStory) return;
     
     audioPlayer.setIsGenerating(true);
-    const audioUrl = await generateAudio(audioPlayer.currentStory);
+    const audioUrl = await generateAudio(currentStory);
     if (audioUrl) {
       audioPlayer.setAudioUrl(audioUrl);
     }
@@ -79,8 +92,8 @@ const SleepStories = () => {
   };
 
   const handleSaveProgress = (duration: number, completed: boolean) => {
-    if (audioPlayer.currentStory) {
-      saveProgress(audioPlayer.currentStory.id, duration, completed);
+    if (currentStory) {
+      saveProgress(currentStory.id, duration, completed);
     }
   };
 
@@ -430,9 +443,9 @@ const SleepStories = () => {
       </motion.div>
 
       {/* Player modal - only show when not minimized */}
-      {showExpandedPlayer && audioPlayer.currentStory && (
+      {showExpandedPlayer && currentStory && (
         <SleepPlayer
-          story={audioPlayer.currentStory}
+          story={currentStory}
           audioUrl={audioPlayer.audioUrl}
           isGenerating={audioPlayer.isGenerating}
           onClose={handleClosePlayer}

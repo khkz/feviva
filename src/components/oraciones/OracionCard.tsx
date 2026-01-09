@@ -16,6 +16,7 @@ interface OracionCardProps {
   isFavorite?: boolean;
   onToggleFavorite?: (id: string) => void;
   onSelect?: () => void;
+  onPlay?: () => void;
   esFundamental?: boolean;
 }
 
@@ -30,6 +31,7 @@ export function OracionCard({
   isFavorite = false,
   onToggleFavorite,
   onSelect,
+  onPlay,
   esFundamental = false,
 }: OracionCardProps) {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -60,6 +62,12 @@ export function OracionCard({
   const handlePlayPause = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!audioUrl) return;
+    
+    // If onPlay is provided, use global player instead of local audio
+    if (onPlay) {
+      onPlay();
+      return;
+    }
     
     if (isPlaying && audioRef.current) {
       audioRef.current.pause();
