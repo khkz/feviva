@@ -4,6 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
+import { AudioPlayerProvider } from "@/contexts/AudioPlayerContext";
+import { MiniPlayer } from "@/components/audio/MiniPlayer";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -53,62 +55,67 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/coach" element={<Coach />} />
-            <Route path="/cards" element={<Cards />} />
-            <Route path="/habits" element={<Habits />} />
-            <Route path="/community" element={<Community />} />
-            <Route path="/library" element={<Library />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/profile/reminders" element={<ProfileReminders />} />
-            <Route path="/debate-history" element={<DebateHistory />} />
-            <Route path="/gamification" element={<Gamification />} />
-            <Route path="/morning" element={<Morning />} />
-            <Route path="/evening" element={<Evening />} />
-            <Route path="/prayer" element={<Prayer />} />
-            <Route path="/mission" element={<Mission />} />
-            <Route path="/oraciones" element={<Oraciones />} />
-            <Route path="/rosario" element={<Rosario />} />
-            <Route path="/sleep-stories" element={<SleepStories />} />
-            <Route path="/sleep" element={<SleepStories />} />
-            <Route path="/novenas" element={<Novenas />} />
-            <Route path="/bible-plan" element={<BiblePlan />} />
-            <Route path="/apostle-path" element={<ApostlePath />} />
-            <Route path="/apologetics-intro" element={<ApologeticsIntro />} />
-            <Route path="/gratitude" element={<Gratitude />} />
-            <Route path="/evangelio" element={<DailyGospel />} />
-            <Route path="/evangelio/:fecha" element={<DailyGospel />} />
+      <AudioPlayerProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/coach" element={<Coach />} />
+              <Route path="/cards" element={<Cards />} />
+              <Route path="/habits" element={<Habits />} />
+              <Route path="/community" element={<Community />} />
+              <Route path="/library" element={<Library />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/profile/reminders" element={<ProfileReminders />} />
+              <Route path="/debate-history" element={<DebateHistory />} />
+              <Route path="/gamification" element={<Gamification />} />
+              <Route path="/morning" element={<Morning />} />
+              <Route path="/evening" element={<Evening />} />
+              <Route path="/prayer" element={<Prayer />} />
+              <Route path="/mission" element={<Mission />} />
+              <Route path="/oraciones" element={<Oraciones />} />
+              <Route path="/rosario" element={<Rosario />} />
+              <Route path="/sleep-stories" element={<SleepStories />} />
+              <Route path="/sleep" element={<SleepStories />} />
+              <Route path="/novenas" element={<Novenas />} />
+              <Route path="/bible-plan" element={<BiblePlan />} />
+              <Route path="/apostle-path" element={<ApostlePath />} />
+              <Route path="/apologetics-intro" element={<ApologeticsIntro />} />
+              <Route path="/gratitude" element={<Gratitude />} />
+              <Route path="/evangelio" element={<DailyGospel />} />
+              <Route path="/evangelio/:fecha" element={<DailyGospel />} />
+              
+              {/* Admin Routes */}
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<AdminDashboard />} />
+                <Route path="users" element={<AdminUsers />} />
+                <Route path="community" element={<AdminCommunity />} />
+                <Route path="content" element={<AdminContent />} />
+                <Route path="daily-content" element={<AdminDailyContent />} />
+                <Route path="feedback" element={<AdminFeedback />} />
+                <Route path="processing" element={<AdminProcessing />} />
+                <Route path="analytics" element={<AdminAnalytics />} />
+                <Route path="media" element={<AdminMedia />} />
+                <Route path="courses" element={<AdminCourses />} />
+                <Route path="live" element={<AdminLiveSessions />} />
+                <Route path="movies" element={<AdminMovies />} />
+                <Route path="bible-plan" element={<AdminBiblePlan />} />
+                <Route path="gratitude" element={<AdminGratitude />} />
+              </Route>
+              
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
             
-            {/* Admin Routes */}
-            <Route path="/admin" element={<AdminLayout />}>
-              <Route index element={<AdminDashboard />} />
-              <Route path="users" element={<AdminUsers />} />
-              <Route path="community" element={<AdminCommunity />} />
-              <Route path="content" element={<AdminContent />} />
-              <Route path="daily-content" element={<AdminDailyContent />} />
-              <Route path="feedback" element={<AdminFeedback />} />
-              <Route path="processing" element={<AdminProcessing />} />
-              <Route path="analytics" element={<AdminAnalytics />} />
-              <Route path="media" element={<AdminMedia />} />
-              <Route path="courses" element={<AdminCourses />} />
-              <Route path="live" element={<AdminLiveSessions />} />
-              <Route path="movies" element={<AdminMovies />} />
-              <Route path="bible-plan" element={<AdminBiblePlan />} />
-              <Route path="gratitude" element={<AdminGratitude />} />
-            </Route>
-            
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+            {/* Global Mini Player */}
+            <MiniPlayer />
+          </BrowserRouter>
+        </TooltipProvider>
+      </AudioPlayerProvider>
     </ThemeProvider>
   </QueryClientProvider>
 );
