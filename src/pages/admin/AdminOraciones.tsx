@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Progress } from '@/components/ui/progress';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Play, 
@@ -16,8 +17,18 @@ import {
   Loader2,
   CheckCircle2,
   XCircle,
-  BookHeart
+  BookHeart,
+  Mic
 } from 'lucide-react';
+
+const AVAILABLE_VOICES = [
+  { id: 'onyx', name: 'Onyx', gender: 'Masculina', description: 'Voz más grave y profunda' },
+  { id: 'echo', name: 'Echo', gender: 'Masculina', description: 'Voz grave, clara y formal' },
+  { id: 'fable', name: 'Fable', gender: 'Masculina', description: 'Voz cálida, narrativa' },
+  { id: 'alloy', name: 'Alloy', gender: 'Neutral', description: 'Voz balanceada, versátil' },
+  { id: 'nova', name: 'Nova', gender: 'Femenina', description: 'Voz cálida y expresiva' },
+  { id: 'shimmer', name: 'Shimmer', gender: 'Femenina', description: 'Voz suave y clara' },
+];
 
 interface Oracion {
   id: string;
@@ -33,7 +44,14 @@ export default function AdminOraciones() {
   const [playingId, setPlayingId] = useState<string | null>(null);
   const [regeneratingId, setRegeneratingId] = useState<string | null>(null);
   const [batchProgress, setBatchProgress] = useState<{ current: number; total: number } | null>(null);
+  const [selectedVoice, setSelectedVoice] = useState<string>(() => {
+    return localStorage.getItem('admin_oraciones_voice') || 'onyx';
+  });
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    localStorage.setItem('admin_oraciones_voice', selectedVoice);
+  }, [selectedVoice]);
 
   // Fetch all oraciones
   const { data: oraciones, isLoading } = useQuery({
@@ -54,16 +72,16 @@ export default function AdminOraciones() {
     mutationFn: async (oracionId: string) => {
       setRegeneratingId(oracionId);
       const { data, error } = await supabase.functions.invoke('regenerate-oracion-audio', {
-        body: { oracionId }
+        body: { oracionId, voice: selectedVoice }
       });
       if (error) throw error;
       return data;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-oraciones'] });
       toast({
         title: 'Audio regenerado',
-        description: `Se ha regenerado el audio correctamente.`
+        description: `Se ha regenerado el audio con voz "${selectedVoice}".`
       });
     },
     onError: (error) => {
@@ -85,7 +103,7 @@ export default function AdminOraciones() {
       setBatchProgress({ current: 0, total });
       
       const { data, error } = await supabase.functions.invoke('regenerate-oracion-audio', {
-        body: {}
+        body: { voice: selectedVoice }
       });
       
       if (error) throw error;
@@ -95,7 +113,7 @@ export default function AdminOraciones() {
       queryClient.invalidateQueries({ queryKey: ['admin-oraciones'] });
       toast({
         title: 'Audios regenerados',
-        description: `Se procesaron ${data.processed} oraciones: ${data.successCount} exitosas, ${data.errorCount} errores.`
+        description: `Se procesaron ${data.processed} oraciones con voz "${selectedVoice}": ${data.successCount} exitosas, ${data.errorCount} errores.`
       });
     },
     onError: (error) => {
@@ -135,6 +153,7 @@ export default function AdminOraciones() {
 
   const withAudio = oraciones?.filter(o => o.audio_url) || [];
   const withoutAudio = oraciones?.filter(o => !o.audio_url) || [];
+  const selectedVoiceInfo = AVAILABLE_VOICES.find(v => v.id === selectedVoice);
 
   if (isLoading) {
     return (
@@ -152,10 +171,32 @@ export default function AdminOraciones() {
           <BookHeart className="h-8 w-8 text-primary" />
           <div>
             <h1 className="text-2xl font-bold">Gestión de Oraciones</h1>
-            <p className="text-sm text-muted-foreground">Administrar audios con voz "echo"</p>
+            <p className="text-sm text-muted-foreground">Administrar audios de oraciones</p>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Voice Selector */}
+          <div className="flex items-center gap-2">
+            <Mic className="h-4 w-4 text-muted-foreground" />
+            <Select value={selectedVoice} onValueChange={setSelectedVoice}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {AVAILABLE_VOICES.map((voice) => (
+                  <SelectItem key={voice.id} value={voice.id}>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">{voice.name}</span>
+                      <span className="text-xs text-muted-foreground">
+                        ({voice.gender})
+                      </span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
           <Button 
             onClick={() => queryClient.invalidateQueries({ queryKey: ['admin-oraciones'] })}
             variant="outline"
@@ -174,7 +215,7 @@ export default function AdminOraciones() {
             ) : (
               <RefreshCw className="h-4 w-4 mr-2" />
             )}
-            Regenerar Todos ({oraciones?.length || 0})
+            Regenerar Todos con "{selectedVoiceInfo?.name}"
           </Button>
         </div>
       </div>
@@ -186,7 +227,7 @@ export default function AdminOraciones() {
             <div className="flex items-center gap-4">
               <Loader2 className="h-5 w-5 animate-spin text-primary" />
               <div className="flex-1">
-                <p className="text-sm font-medium">Regenerando audios...</p>
+                <p className="text-sm font-medium">Regenerando audios con voz "{selectedVoiceInfo?.name}"...</p>
                 <Progress 
                   value={(batchProgress.current / batchProgress.total) * 100} 
                   className="mt-2"
@@ -231,15 +272,16 @@ export default function AdminOraciones() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Voz Configurada
+              Voz Seleccionada
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
-              <Volume2 className="h-5 w-5 text-primary" />
-              <span className="text-2xl font-bold">echo</span>
-              <Badge variant="secondary" className="ml-2">Masculina grave</Badge>
+              <Mic className="h-5 w-5 text-primary" />
+              <span className="text-2xl font-bold capitalize">{selectedVoice}</span>
+              <Badge variant="secondary" className="ml-1">{selectedVoiceInfo?.gender}</Badge>
             </div>
+            <p className="text-xs text-muted-foreground mt-1">{selectedVoiceInfo?.description}</p>
           </CardContent>
         </Card>
       </div>

@@ -98,13 +98,16 @@ function concatenateAudioBuffers(buffers: ArrayBuffer[]): Uint8Array {
   return result;
 }
 
+const VALID_VOICES = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
+
 async function generateAudioForOracion(
   supabase: any,
   openaiApiKey: string,
-  oracion: { id: string; nombre: string; texto: string }
+  oracion: { id: string; nombre: string; texto: string },
+  voice: string = 'echo'
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    console.log(`Generating audio for: ${oracion.nombre}`);
+    console.log(`Generating audio for: ${oracion.nombre} with voice: ${voice}`);
     
     // Clean text for Spanish pronunciation
     const cleanedText = cleanTextForSpanishTTS(oracion.texto);
@@ -115,7 +118,7 @@ async function generateAudioForOracion(
 
     const audioBuffers: ArrayBuffer[] = [];
 
-    // Generate audio for each chunk with 'echo' voice (male, deep)
+    // Generate audio for each chunk
     for (let i = 0; i < chunks.length; i++) {
       const chunk = chunks[i];
       console.log(`Processing chunk ${i + 1}/${chunks.length} (${chunk.length} chars)`);
@@ -129,7 +132,7 @@ async function generateAudioForOracion(
         body: JSON.stringify({
           model: 'gpt-4o-mini-tts',
           input: chunk,
-          voice: 'echo', // Male deep voice for solemn prayers
+          voice: voice,
           response_format: 'opus',
         }),
       });
@@ -203,7 +206,12 @@ serve(async (req) => {
   }
 
   try {
-    const { oracionId } = await req.json().catch(() => ({}));
+    const body = await req.json().catch(() => ({}));
+    const { oracionId, voice = 'echo' } = body;
+    
+    // Validate voice parameter
+    const selectedVoice = VALID_VOICES.includes(voice) ? voice : 'echo';
+    console.log('Request received:', { oracionId, voice: selectedVoice });
 
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
     if (!openaiApiKey) {
@@ -230,7 +238,7 @@ serve(async (req) => {
         throw new Error(`Oracion not found: ${oracionId}`);
       }
 
-      const result = await generateAudioForOracion(supabase, openaiApiKey, oracion);
+      const result = await generateAudioForOracion(supabase, openaiApiKey, oracion, selectedVoice);
       results.push({ id: oracion.id, nombre: oracion.nombre, ...result });
     } else {
       // Regenerate all oraciones
@@ -248,7 +256,7 @@ serve(async (req) => {
       console.log(`Found ${oraciones?.length || 0} oraciones to process`);
 
       for (const oracion of oraciones || []) {
-        const result = await generateAudioForOracion(supabase, openaiApiKey, oracion);
+        const result = await generateAudioForOracion(supabase, openaiApiKey, oracion, selectedVoice);
         results.push({ id: oracion.id, nombre: oracion.nombre, ...result });
         
         // Delay between oraciones to avoid rate limiting
