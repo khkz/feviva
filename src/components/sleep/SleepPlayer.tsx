@@ -16,6 +16,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { SleepStory } from "@/hooks/useSleepStories";
 import { AmbientSoundMixer } from "./AmbientSoundMixer";
 import { ContentFeedback } from "@/components/feedback/ContentFeedback";
+import logoElRugido from "@/assets/logo-elrugido.svg";
 
 interface SleepPlayerProps {
   story: SleepStory;
@@ -213,7 +214,11 @@ export const SleepPlayer = ({
             <X className="w-5 h-5" />
           </Button>
           <div className="flex items-center gap-2 text-indigo-300">
-            <Moon className="w-5 h-5" />
+            <img 
+              src={logoElRugido} 
+              alt="El Rugido" 
+              className="h-6 w-auto"
+            />
             <span className="font-medium text-sm">Sleep Story</span>
           </div>
           <div className="w-10" />
