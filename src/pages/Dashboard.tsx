@@ -137,7 +137,21 @@ const Dashboard = () => {
           {/* Quick Actions */}
           <QuickActions />
 
-          {/* Desktop: Two column layout for main content */}
+          {/* Explore Grid - Full Width */}
+          <Suspense fallback={<CardSkeleton height="h-96" />}>
+            <ExploreGrid />
+          </Suspense>
+
+          {/* Novena Carousel - Full Width */}
+          <Suspense fallback={<CardSkeleton height="h-64" />}>
+            <NovenaCarousel
+              novenas={novenas}
+              getProgress={getProgressForNovena}
+              loading={novenasLoading}
+            />
+          </Suspense>
+
+          {/* Desktop: Two column layout for remaining content */}
           <div className="lg:grid lg:grid-cols-3 lg:gap-6 lg:mt-6">
             {/* Left Column - Main Content */}
             <div className="lg:col-span-2 space-y-4">
@@ -149,11 +163,6 @@ const Dashboard = () => {
               {/* Featured Content */}
               <Suspense fallback={<CardSkeleton height="h-64" />}>
                 <FeaturedContent />
-              </Suspense>
-
-              {/* Explore Grid */}
-              <Suspense fallback={<CardSkeleton height="h-48" />}>
-                <ExploreGrid />
               </Suspense>
             </div>
 
@@ -194,15 +203,6 @@ const Dashboard = () => {
                   racha={stats.racha_actual_dias}
                 />
               )}
-
-              {/* Novena Carousel */}
-              <Suspense fallback={<CardSkeleton height="h-48" />}>
-                <NovenaCarousel
-                  novenas={novenas}
-                  getProgress={getProgressForNovena}
-                  loading={novenasLoading}
-                />
-              </Suspense>
             </div>
           </div>
         </div>

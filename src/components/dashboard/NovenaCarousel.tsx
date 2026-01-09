@@ -147,7 +147,7 @@ export function NovenaCarousel({ novenas, getProgress, loading }: NovenaCarousel
 
       {/* Desktop: Grid */}
       <motion.div 
-        className="hidden lg:grid grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-3"
+        className="hidden lg:grid grid-cols-3 xl:grid-cols-4 gap-4"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -165,7 +165,7 @@ export function NovenaCarousel({ novenas, getProgress, loading }: NovenaCarousel
               whileHover={{ scale: 1.02, y: -4 }}
               whileTap={{ scale: 0.98 }}
             >
-              <div className="relative h-28 lg:h-32 bg-gradient-to-br from-primary/30 to-secondary/30">
+              <div className="relative h-36 lg:h-40 bg-gradient-to-br from-primary/30 to-secondary/30">
                 {novena.imagen_url ? (
                   <img 
                     src={novena.imagen_url} 
@@ -191,7 +191,7 @@ export function NovenaCarousel({ novenas, getProgress, loading }: NovenaCarousel
                   </motion.div>
                 )}
               </div>
-              <div className="p-3">
+              <div className="p-4">
                 <h3 className="font-medium text-base text-foreground line-clamp-2 mb-1 group-hover:text-primary transition-colors">
                   {novena.titulo}
                 </h3>
