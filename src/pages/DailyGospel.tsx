@@ -25,6 +25,7 @@ const DailyGospel = () => {
   const [selectedDate, setSelectedDate] = useState<string | undefined>(urlFecha);
   const [showVideo, setShowVideo] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
   
   const { 
     gospel, 
@@ -43,6 +44,7 @@ const DailyGospel = () => {
   const handlePrevDay = () => {
     const currentDate = selectedDate || today;
     const prevDate = format(subDays(new Date(currentDate + 'T12:00:00'), 1), 'yyyy-MM-dd');
+    setSwipeDirection('right');
     setSelectedDate(prevDate);
     setShowVideo(false);
     setImageError(false);
@@ -52,6 +54,7 @@ const DailyGospel = () => {
     const currentDate = selectedDate || today;
     const nextDate = format(addDays(new Date(currentDate + 'T12:00:00'), 1), 'yyyy-MM-dd');
     if (nextDate <= format(addDays(new Date(), 1), 'yyyy-MM-dd')) {
+      setSwipeDirection('left');
       setSelectedDate(nextDate);
       setShowVideo(false);
       setImageError(false);
@@ -59,6 +62,7 @@ const DailyGospel = () => {
   };
 
   const handleGoToToday = () => {
+    setSwipeDirection(null);
     setSelectedDate(undefined);
     setShowVideo(false);
     setImageError(false);
@@ -91,9 +95,14 @@ const DailyGospel = () => {
       {/* Header */}
       <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
-          <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="gap-1.5">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => navigate('/dashboard')} 
+            className="gap-1.5 hover:bg-muted"
+          >
             <ArrowLeft className="h-4 w-4" />
-            <span className="hidden sm:inline">Volver</span>
+            <span>Inicio</span>
           </Button>
           
           <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
@@ -101,46 +110,76 @@ const DailyGospel = () => {
             <span className="font-semibold text-foreground">Evangelio del Día</span>
           </div>
           
-          <div className="w-16 sm:w-20" />
+          <div className="w-16" />
         </div>
       </header>
 
       <main className="max-w-2xl mx-auto p-4 space-y-6">
-        {/* Date navigation */}
-        <div className="flex items-center justify-between">
-          <Button variant="outline" size="icon" onClick={handlePrevDay}>
-            <ChevronLeft className="h-4 w-4" />
+        {/* Date navigation - Improved */}
+        <div className="flex items-center justify-center gap-3 py-2">
+          <Button 
+            variant="outline" 
+            size="icon" 
+            onClick={handlePrevDay}
+            className="h-10 w-10 rounded-full border-border/60 hover:bg-muted hover:border-primary/30 transition-all"
+          >
+            <ChevronLeft className="h-5 w-5" />
           </Button>
           
-          <button 
-            onClick={handleGoToToday}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-muted transition-colors"
-          >
+          <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-muted/50 border border-border/30">
             <Calendar className="h-4 w-4 text-amber-600" />
             <span className="text-sm font-medium capitalize">{formattedDate}</span>
             {isShowingTomorrow && isViewingToday && (
-              <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500 text-white">Mañana</span>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500 text-white font-medium">Mañana</span>
             )}
-          </button>
+          </div>
           
           <Button 
             variant="outline" 
             size="icon" 
             onClick={handleNextDay}
-            disabled={selectedDate === format(addDays(new Date(), 1), 'yyyy-MM-dd')}
+            disabled={(selectedDate || today) >= format(addDays(new Date(), 1), 'yyyy-MM-dd')}
+            className="h-10 w-10 rounded-full border-border/60 hover:bg-muted hover:border-primary/30 transition-all disabled:opacity-30"
           >
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-5 w-5" />
           </Button>
         </div>
+
+        {/* "Go to Today" button - visible when not viewing today */}
+        {!isViewingToday && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex justify-center"
+          >
+            <Button 
+              variant="secondary" 
+              size="sm" 
+              onClick={handleGoToToday}
+              className="gap-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-500/20"
+            >
+              <Calendar className="h-4 w-4" />
+              Ir al evangelio de hoy
+            </Button>
+          </motion.div>
+        )}
 
         {displayGospel ? (
           <AnimatePresence mode="wait">
             <motion.div
               key={displayGospel.fecha}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="space-y-6"
+              initial={{ opacity: 0, x: swipeDirection === 'left' ? 40 : swipeDirection === 'right' ? -40 : 0 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: swipeDirection === 'left' ? -40 : 40 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.15}
+              onDragEnd={(_, info) => {
+                if (info.offset.x > 80) handlePrevDay();
+                else if (info.offset.x < -80) handleNextDay();
+              }}
+              className="space-y-6 touch-pan-y"
             >
               {/* Video player */}
               <Card className="overflow-hidden border-0 shadow-lg">
