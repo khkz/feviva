@@ -11,7 +11,12 @@ interface Oracion {
   subcategoria: string | null;
   historia: string | null;
   audio_url: string | null;
-  orden: number;
+  orden: number | null;
+  // New fields for enhanced UX
+  tagline: string | null;
+  es_fundamental: boolean | null;
+  cita_celebre: string | null;
+  cita_autor: string | null;
 }
 
 export function useOraciones() {
@@ -105,11 +110,35 @@ export function useOraciones() {
     return acc;
   }, {} as Record<string, Oracion[]>);
 
+  // Get fundamental prayers (sorted by importance)
+  const oracionesFundamentales = oraciones
+    .filter((o) => o.es_fundamental === true)
+    .sort((a, b) => {
+      // Custom order: Padre Nuestro, Ave María, Gloria, Credo
+      const order: Record<string, number> = {
+        "padre nuestro": 1,
+        "ave": 2,
+        "gloria": 3,
+        "credo": 4,
+      };
+      
+      const getOrder = (name: string) => {
+        const lower = name.toLowerCase();
+        for (const [key, value] of Object.entries(order)) {
+          if (lower.includes(key)) return value;
+        }
+        return 999;
+      };
+      
+      return getOrder(a.nombre) - getOrder(b.nombre);
+    });
+
   return {
     oraciones,
     favoritos,
     categorias,
     oracionesByCategoria,
+    oracionesFundamentales,
     isLoading: isLoadingOraciones,
     toggleFavorite: (id: string) => toggleFavoriteMutation.mutate(id),
     isFavorite: (id: string) => favoritos.includes(id),

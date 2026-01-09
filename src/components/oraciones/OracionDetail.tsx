@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { X, Heart, Play, Pause, Volume2, Info, Loader2, Share2, ChevronUp, ChevronDown } from "lucide-react";
+import { useState } from "react";
+import { X, Heart, Play, Pause, Volume2, Info, Loader2, Share2, ChevronUp, ChevronDown, Cross, Quote } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -9,6 +9,12 @@ import { useOracionAudio } from "@/hooks/useOracionAudio";
 import { ShareModal } from "@/components/shared/ShareModal";
 import { AmbientSoundMixer } from "@/components/sleep/AmbientSoundMixer";
 import { cn } from "@/lib/utils";
+
+// Import images for header backgrounds
+import padreNuestroImg from "@/assets/oracion-padre-nuestro.jpg";
+import aveMariaImg from "@/assets/oracion-ave-maria.jpg";
+import gloriaImg from "@/assets/oracion-gloria.jpg";
+import credoImg from "@/assets/oracion-credo.jpg";
 
 interface OracionDetailProps {
   id: string;
@@ -20,6 +26,23 @@ interface OracionDetailProps {
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
   onClose: () => void;
+  // New enhanced props
+  tagline?: string;
+  esFundamental?: boolean;
+  citaCelebre?: string;
+  citaAutor?: string;
+}
+
+// Map prayer names to their images
+function getPrayerImage(nombre: string): string | null {
+  const normalizedName = nombre.toLowerCase();
+  
+  if (normalizedName.includes("padre nuestro")) return padreNuestroImg;
+  if (normalizedName.includes("ave") && normalizedName.includes("mar")) return aveMariaImg;
+  if (normalizedName.includes("gloria")) return gloriaImg;
+  if (normalizedName.includes("credo")) return credoImg;
+  
+  return null;
 }
 
 export function OracionDetail({
@@ -32,6 +55,10 @@ export function OracionDetail({
   isFavorite = false,
   onToggleFavorite,
   onClose,
+  tagline,
+  esFundamental = false,
+  citaCelebre,
+  citaAutor,
 }: OracionDetailProps) {
   const [showHistory, setShowHistory] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
@@ -52,7 +79,10 @@ export function OracionDetail({
     existingAudioUrl,
   });
 
-  // Font size classes
+  const headerImage = getPrayerImage(nombre);
+  const hasHeaderImage = !!headerImage && esFundamental;
+
+  // Font size classes - using serif for solemn feel
   const fontSizeClasses = {
     normal: "text-lg leading-relaxed",
     large: "text-xl leading-relaxed",
@@ -72,62 +102,143 @@ export function OracionDetail({
         <div className="absolute bottom-1/4 right-0 w-[400px] h-[400px] bg-gradient-radial from-primary/5 via-transparent to-transparent rounded-full blur-2xl" />
       </div>
 
-      {/* Header */}
-      <motion.header 
-        className="relative z-10 flex items-center justify-between p-4 border-b border-border/50 bg-background/80 backdrop-blur-md"
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.1 }}
-      >
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={onClose}
-          className="rounded-full"
+      {/* Header with Image (for fundamental prayers) */}
+      {hasHeaderImage ? (
+        <motion.header 
+          className="relative z-10 h-48 lg:h-56 overflow-hidden"
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.1 }}
         >
-          <X className="h-5 w-5" />
-        </Button>
-        
-        <div className="text-center flex-1 px-4">
-          <span className="text-xs font-medium text-muted-foreground bg-muted/50 px-3 py-1 rounded-full">
-            {categoria}
-          </span>
-        </div>
-        
-        <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setShowShareModal(true)}
+          {/* Background Image */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${headerImage})` }}
+          />
+          
+          {/* Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-background" />
+          
+          {/* Top Bar */}
+          <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={onClose}
+              className="rounded-full bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white"
+            >
+              <X className="h-5 w-5" />
+            </Button>
+            
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowShareModal(true)}
+                className="rounded-full bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white"
+              >
+                <Share2 className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className={cn(
+                  "rounded-full bg-white/10 backdrop-blur-sm hover:bg-white/20",
+                  isFavorite ? "text-destructive" : "text-white"
+                )}
+                onClick={onToggleFavorite}
+              >
+                <Heart 
+                  className="h-5 w-5" 
+                  fill={isFavorite ? "currentColor" : "none"}
+                />
+              </Button>
+            </div>
+          </div>
+          
+          {/* Title Overlay */}
+          <div className="absolute bottom-0 left-0 right-0 p-6 text-center">
+            {/* Fundamental Badge */}
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-secondary/90 text-secondary-foreground mb-3 backdrop-blur-sm">
+              <Cross className="h-3 w-3" />
+              Oración Fundamental
+            </span>
+            
+            <h1 className="font-heading text-2xl lg:text-3xl font-bold text-white drop-shadow-lg">
+              {nombre}
+            </h1>
+            {tagline && (
+              <p className="text-white/80 text-sm mt-1 drop-shadow-md">
+                {tagline}
+              </p>
+            )}
+          </div>
+        </motion.header>
+      ) : (
+        // Standard Header (for non-fundamental prayers)
+        <motion.header 
+          className="relative z-10 flex items-center justify-between p-4 border-b border-border/50 bg-background/80 backdrop-blur-md"
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.1 }}
+        >
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={onClose}
             className="rounded-full"
           >
-            <Share2 className="h-5 w-5" />
+            <X className="h-5 w-5" />
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className={cn("rounded-full", isFavorite && "text-destructive")}
-            onClick={onToggleFavorite}
-          >
-            <Heart 
-              className="h-5 w-5" 
-              fill={isFavorite ? "currentColor" : "none"}
-            />
-          </Button>
-        </div>
-      </motion.header>
+          
+          <div className="text-center flex-1 px-4">
+            <span className="text-xs font-medium text-muted-foreground bg-muted/50 px-3 py-1 rounded-full">
+              {categoria}
+            </span>
+          </div>
+          
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowShareModal(true)}
+              className="rounded-full"
+            >
+              <Share2 className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn("rounded-full", isFavorite && "text-destructive")}
+              onClick={onToggleFavorite}
+            >
+              <Heart 
+                className="h-5 w-5" 
+                fill={isFavorite ? "currentColor" : "none"}
+              />
+            </Button>
+          </div>
+        </motion.header>
+      )}
 
-      {/* Title */}
-      <motion.div 
-        className="relative z-10 p-6 pb-4 text-center"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.2 }}
-      >
-        <h1 className="font-heading text-2xl font-bold text-foreground">
-          {nombre}
-        </h1>
-      </motion.div>
+      {/* Title (for non-image headers) */}
+      {!hasHeaderImage && (
+        <motion.div 
+          className="relative z-10 p-6 pb-4 text-center"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          <h1 className="font-heading text-2xl font-bold text-foreground">
+            {nombre}
+          </h1>
+          {tagline && (
+            <p className="text-muted-foreground text-sm mt-1">
+              {tagline}
+            </p>
+          )}
+        </motion.div>
+      )}
 
       {/* Content */}
       <ScrollArea className="flex-1 relative z-10">
@@ -138,6 +249,24 @@ export function OracionDetail({
           transition={{ delay: 0.3 }}
         >
           <div className="max-w-lg mx-auto">
+            {/* Famous Quote (for fundamental prayers) */}
+            {citaCelebre && citaAutor && (
+              <motion.div
+                className="mb-8 p-4 rounded-2xl bg-secondary/10 border border-secondary/20"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.35 }}
+              >
+                <Quote className="h-5 w-5 text-secondary mb-2" />
+                <p className="text-foreground italic leading-relaxed">
+                  "{citaCelebre}"
+                </p>
+                <p className="text-sm text-muted-foreground mt-2 font-medium">
+                  — {citaAutor}
+                </p>
+              </motion.div>
+            )}
+
             {/* Font size controls */}
             <div className="flex items-center justify-center gap-2 mb-6">
               <span className="text-xs text-muted-foreground">Tamaño:</span>
@@ -158,10 +287,10 @@ export function OracionDetail({
               ))}
             </div>
             
-            {/* Prayer text - formatted for reading */}
+            {/* Prayer text - formatted for reading with serif font for solemnity */}
             <div className={cn(
               "prose prose-lg dark:prose-invert max-w-none",
-              "text-center",
+              "text-center font-serif",
               fontSizeClasses[fontSize]
             )}>
               {texto.split('\n').map((line, i) => (
