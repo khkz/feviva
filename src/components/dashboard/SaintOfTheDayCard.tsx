@@ -208,10 +208,21 @@ export const SaintOfTheDayCard = ({ userCountryCode }: SaintOfTheDayCardProps) =
 
             {/* Show more saints indicator */}
             {allSaintsToday.length > 1 && (
-              <p className="text-xs text-muted-foreground mt-3">
-                +{allSaintsToday.length - 1} santo(s) más hoy
+              <p 
+                className="text-xs text-muted-foreground mt-3 cursor-pointer hover:text-primary transition-colors"
+                onClick={() => navigate('/santos')}
+              >
+                +{allSaintsToday.length - 1} santo(s) más hoy →
               </p>
             )}
+
+            {/* Link to all saints */}
+            <p 
+              className="text-xs text-primary mt-2 cursor-pointer hover:underline"
+              onClick={() => navigate('/santos')}
+            >
+              Ver todos los santos →
+            </p>
           </CardContent>
         </Card>
       </motion.div>
