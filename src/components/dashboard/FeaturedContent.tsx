@@ -106,25 +106,31 @@ const itemVariants = {
   },
 } as const;
 
-export function FeaturedContent() {
+interface FeaturedContentProps {
+  hideTitle?: boolean;
+}
+
+export function FeaturedContent({ hideTitle = false }: FeaturedContentProps) {
   const navigate = useNavigate();
   const { data: sessionCounts } = useSessionCounts();
 
   return (
     <motion.section 
-      className="px-5 py-4 lg:px-0"
+      className={hideTitle ? "" : "px-5 py-4 lg:px-0"}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: 0.15 }}
     >
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="font-heading text-xl font-bold text-foreground">
-          Para Ti
-        </h2>
-        <button className="text-sm text-primary font-medium hover:text-primary-hover transition-colors">
-          Ver todo
-        </button>
-      </div>
+      {!hideTitle && (
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-heading text-xl font-bold text-foreground">
+            Para Ti
+          </h2>
+          <button className="text-sm text-primary font-medium hover:text-primary-hover transition-colors">
+            Ver todo
+          </button>
+        </div>
+      )}
 
       {/* Mobile: List view */}
       <motion.div 
