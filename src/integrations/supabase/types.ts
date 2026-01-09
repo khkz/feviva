@@ -356,6 +356,56 @@ export type Database = {
         }
         Relationships: []
       }
+      calendar_saints: {
+        Row: {
+          category: string
+          country_code: string | null
+          created_at: string | null
+          description: string | null
+          feast_day: number
+          feast_month: number
+          id: string
+          image_url: string | null
+          name: string
+          prayer_id: string | null
+          tags: string[] | null
+        }
+        Insert: {
+          category?: string
+          country_code?: string | null
+          created_at?: string | null
+          description?: string | null
+          feast_day: number
+          feast_month: number
+          id?: string
+          image_url?: string | null
+          name: string
+          prayer_id?: string | null
+          tags?: string[] | null
+        }
+        Update: {
+          category?: string
+          country_code?: string | null
+          created_at?: string | null
+          description?: string | null
+          feast_day?: number
+          feast_month?: number
+          id?: string
+          image_url?: string | null
+          name?: string
+          prayer_id?: string | null
+          tags?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calendar_saints_prayer_id_fkey"
+            columns: ["prayer_id"]
+            isOneToOne: false
+            referencedRelation: "oraciones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       content_feedback: {
         Row: {
           comentario: string | null
@@ -1291,6 +1341,7 @@ export type Database = {
           orden: number | null
           subcategoria: string | null
           tagline: string | null
+          tags: string[] | null
           texto: string
         }
         Insert: {
@@ -1307,6 +1358,7 @@ export type Database = {
           orden?: number | null
           subcategoria?: string | null
           tagline?: string | null
+          tags?: string[] | null
           texto: string
         }
         Update: {
@@ -1323,6 +1375,7 @@ export type Database = {
           orden?: number | null
           subcategoria?: string | null
           tagline?: string | null
+          tags?: string[] | null
           texto?: string
         }
         Relationships: []
@@ -1538,7 +1591,9 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          country_code: string | null
           created_at: string | null
+          devotion_primary: string | null
           edad_segmento: Database["public"]["Enums"]["edad_segmento"] | null
           email: string | null
           id: string
@@ -1552,7 +1607,9 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          country_code?: string | null
           created_at?: string | null
+          devotion_primary?: string | null
           edad_segmento?: Database["public"]["Enums"]["edad_segmento"] | null
           email?: string | null
           id: string
@@ -1566,7 +1623,9 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          country_code?: string | null
           created_at?: string | null
+          devotion_primary?: string | null
           edad_segmento?: Database["public"]["Enums"]["edad_segmento"] | null
           email?: string | null
           id?: string

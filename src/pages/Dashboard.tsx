@@ -6,6 +6,7 @@ import { useUserStats } from "@/hooks/useUserStats";
 import { useNovenas } from "@/hooks/useNovenas";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { useDailyVerse } from "@/hooks/useDailyVerse";
+import { SaintOfTheDayCard } from "@/components/dashboard/SaintOfTheDayCard";
 import { HeroSection } from "@/components/dashboard/HeroSection";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 import { ProgressCard } from "@/components/dashboard/ProgressCard";
@@ -28,6 +29,7 @@ interface Profile {
   nombre: string;
   perfil_doctrinal: string;
   edad_segmento: string;
+  country_code: string | null;
 }
 
 const CardSkeleton = ({ height = "h-40" }: { height?: string }) => (
@@ -71,7 +73,7 @@ const Dashboard = () => {
 
     const { data, error } = await supabase
       .from("profiles")
-      .select("nombre, perfil_doctrinal, edad_segmento")
+      .select("nombre, perfil_doctrinal, edad_segmento, country_code")
       .eq("id", session.user.id)
       .single();
 
@@ -147,6 +149,7 @@ const Dashboard = () => {
             
             {/* Mobile: Stack view */}
             <div className="space-y-4 lg:hidden">
+              <SaintOfTheDayCard userCountryCode={profile?.country_code} />
               <GospelCard />
               <Suspense fallback={<CardSkeleton height="h-64" />}>
                 <FeaturedContent hideTitle />
@@ -155,7 +158,8 @@ const Dashboard = () => {
             
             {/* Desktop: Grid view */}
             <div className="hidden lg:grid lg:grid-cols-3 lg:gap-6">
-              <div className="lg:col-span-1">
+              <div className="lg:col-span-1 space-y-4">
+                <SaintOfTheDayCard userCountryCode={profile?.country_code} />
                 <GospelCard variant="featured" />
               </div>
               <div className="lg:col-span-2">
