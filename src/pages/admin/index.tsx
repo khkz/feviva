@@ -13,3 +13,4 @@ export { AdminDailyContent } from './AdminDailyContent';
 export { default as AdminCommunity } from './AdminCommunity';
 export { default as AdminGratitude } from './AdminGratitude';
 export { default as AdminOraciones } from './AdminOraciones';
+export { default as AdminSantos } from './AdminSantos';
