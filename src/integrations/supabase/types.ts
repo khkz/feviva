@@ -794,6 +794,45 @@ export type Database = {
         }
         Relationships: []
       }
+      gift_invitations: {
+        Row: {
+          accepted_at: string | null
+          created_at: string | null
+          id: string
+          invite_code: string | null
+          personal_message: string | null
+          recipient_email: string
+          recipient_name: string | null
+          sender_id: string | null
+          sent_at: string | null
+          status: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string | null
+          id?: string
+          invite_code?: string | null
+          personal_message?: string | null
+          recipient_email: string
+          recipient_name?: string | null
+          sender_id?: string | null
+          sent_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string | null
+          id?: string
+          invite_code?: string | null
+          personal_message?: string | null
+          recipient_email?: string
+          recipient_name?: string | null
+          sender_id?: string | null
+          sent_at?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
       gratitude_entries: {
         Row: {
           created_at: string

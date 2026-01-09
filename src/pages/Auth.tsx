@@ -24,6 +24,10 @@ const Auth = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   
+  // Invitation state
+  const [inviteCode, setInviteCode] = useState<string | null>(null);
+  const [inviterName, setInviterName] = useState<string | null>(null);
+  
   // Login state
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
@@ -34,6 +38,29 @@ const Auth = () => {
   const [signupPassword, setSignupPassword] = useState("");
   const [perfilDoctrinal, setPerfilDoctrinal] = useState("evangelico");
   const [edadSegmento, setEdadSegmento] = useState("");
+
+  // Check for invite code on mount
+  useEffect(() => {
+    const invite = searchParams.get("invite");
+    if (invite) {
+      setInviteCode(invite);
+      // Fetch invitation details
+      supabase
+        .from('gift_invitations')
+        .select('recipient_name, sender_id, profiles!gift_invitations_sender_id_fkey(nombre)')
+        .eq('invite_code', invite)
+        .eq('status', 'sent')
+        .maybeSingle()
+        .then(({ data }) => {
+          if (data) {
+            // Set the recipient email if available
+            if (data.recipient_name) {
+              setSignupName(data.recipient_name);
+            }
+          }
+        });
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -167,7 +194,7 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data: signUpData, error } = await supabase.auth.signUp({
         email: signupEmail,
         password: signupPassword,
         options: {
@@ -181,6 +208,21 @@ const Auth = () => {
       });
 
       if (error) throw error;
+
+      // Mark invitation as accepted if there was an invite code
+      if (inviteCode && signUpData.user) {
+        try {
+          await supabase
+            .from('gift_invitations')
+            .update({
+              status: 'accepted',
+              accepted_at: new Date().toISOString(),
+            })
+            .eq('invite_code', inviteCode);
+        } catch (inviteError) {
+          console.error("Error updating invitation:", inviteError);
+        }
+      }
 
       // Send welcome email via edge function
       try {
@@ -197,8 +239,10 @@ const Auth = () => {
       }
 
       toast({
-        title: "¡Cuenta creada!",
-        description: "Ya puedes comenzar tu entrenamiento de fe.",
+        title: inviteCode ? "¡Bienvenido a ElRugido!" : "¡Cuenta creada!",
+        description: inviteCode 
+          ? "Tu invitación ha sido aceptada. ¡Comienza tu entrenamiento de fe!"
+          : "Ya puedes comenzar tu entrenamiento de fe.",
       });
       
       navigate("/dashboard");

@@ -14,7 +14,8 @@ import {
   Loader2,
   Library,
   Sunrise,
-  Heart
+  Heart,
+  Gift
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -28,6 +29,7 @@ const navItems = [
   { path: '/admin/content', icon: FileText, label: 'Contenido' },
   { path: '/admin/daily-content', icon: Sunrise, label: 'Contenido Diario' },
   { path: '/admin/gratitude', icon: Heart, label: 'Gratitud' },
+  { path: '/admin/invitations', icon: Gift, label: 'Invitaciones' },
   { path: '/admin/courses', icon: GraduationCap, label: 'Cursos' },
   { path: '/admin/movies', icon: Film, label: 'Películas' },
   { path: '/admin/live', icon: Radio, label: 'En Vivo' },
