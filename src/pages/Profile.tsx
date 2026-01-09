@@ -15,9 +15,34 @@ import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { useNotifications } from "@/hooks/useNotifications";
 
+const COUNTRY_OPTIONS = [
+  { code: 'MX', name: 'México', flag: '🇲🇽' },
+  { code: 'AR', name: 'Argentina', flag: '🇦🇷' },
+  { code: 'CO', name: 'Colombia', flag: '🇨🇴' },
+  { code: 'PE', name: 'Perú', flag: '🇵🇪' },
+  { code: 'CL', name: 'Chile', flag: '🇨🇱' },
+  { code: 'VE', name: 'Venezuela', flag: '🇻🇪' },
+  { code: 'EC', name: 'Ecuador', flag: '🇪🇨' },
+  { code: 'GT', name: 'Guatemala', flag: '🇬🇹' },
+  { code: 'CU', name: 'Cuba', flag: '🇨🇺' },
+  { code: 'BO', name: 'Bolivia', flag: '🇧🇴' },
+  { code: 'DO', name: 'Rep. Dominicana', flag: '🇩🇴' },
+  { code: 'HN', name: 'Honduras', flag: '🇭🇳' },
+  { code: 'PY', name: 'Paraguay', flag: '🇵🇾' },
+  { code: 'SV', name: 'El Salvador', flag: '🇸🇻' },
+  { code: 'NI', name: 'Nicaragua', flag: '🇳🇮' },
+  { code: 'CR', name: 'Costa Rica', flag: '🇨🇷' },
+  { code: 'PA', name: 'Panamá', flag: '🇵🇦' },
+  { code: 'UY', name: 'Uruguay', flag: '🇺🇾' },
+  { code: 'PR', name: 'Puerto Rico', flag: '🇵🇷' },
+  { code: 'BR', name: 'Brasil', flag: '🇧🇷' },
+  { code: 'ES', name: 'España', flag: '🇪🇸' },
+];
+
 const profileSchema = z.object({
   nombre: z.string().min(1, "El nombre es requerido").max(100, "Máximo 100 caracteres"),
   pais: z.string().max(100, "Máximo 100 caracteres").optional(),
+  country_code: z.string().max(2).optional(),
   iglesia: z.string().max(200, "Máximo 200 caracteres").optional(),
   perfil_doctrinal: z.enum(["evangelico", "catolico", "pentecostal", "no_denominacional", "otro"]),
   edad_segmento: z.enum(["18-25", "26-35", "36-50", "51+"]).optional(),
@@ -34,6 +59,7 @@ const Profile = () => {
   const [formData, setFormData] = useState<ProfileFormData>({
     nombre: "",
     pais: "",
+    country_code: undefined,
     iglesia: "",
     perfil_doctrinal: "evangelico",
     edad_segmento: undefined,
@@ -63,6 +89,7 @@ const Profile = () => {
       setFormData({
         nombre: data.nombre || "",
         pais: data.pais || "",
+        country_code: data.country_code || undefined,
         iglesia: data.iglesia || "",
         perfil_doctrinal: data.perfil_doctrinal || "evangelico",
         edad_segmento: data.edad_segmento || undefined,
@@ -100,6 +127,7 @@ const Profile = () => {
       .update({
         nombre: formData.nombre,
         pais: formData.pais || null,
+        country_code: formData.country_code || null,
         iglesia: formData.iglesia || null,
         perfil_doctrinal: formData.perfil_doctrinal,
         edad_segmento: formData.edad_segmento || null,
@@ -302,14 +330,24 @@ const Profile = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="pais">País</Label>
-                  <Input
-                    id="pais"
-                    value={formData.pais}
-                    onChange={(e) => setFormData({ ...formData, pais: e.target.value })}
-                    placeholder="Tu país de residencia"
-                    className="glass-button bg-background/50"
-                  />
+                  <Label htmlFor="country_code">País</Label>
+                  <Select
+                    value={formData.country_code || ""}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, country_code: value || undefined })
+                    }
+                  >
+                    <SelectTrigger className="glass-button bg-background/50">
+                      <SelectValue placeholder="Selecciona tu país" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background/95 backdrop-blur-xl border-border/50 max-h-60">
+                      {COUNTRY_OPTIONS.map((country) => (
+                        <SelectItem key={country.code} value={country.code}>
+                          {country.flag} {country.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="space-y-2">
