@@ -137,12 +137,48 @@ const Dashboard = () => {
           {/* Quick Actions */}
           <QuickActions />
 
-          {/* Explore Grid - Full Width */}
+          {/* === CONTENIDO DIARIO PRIMERO === */}
+          
+          {/* Tu Día - Evangelio + Para Ti */}
+          <section className="px-5 lg:px-0 mb-6">
+            <h2 className="font-heading text-xl font-bold text-foreground mb-4">
+              Tu Día
+            </h2>
+            
+            {/* Mobile: Stack view */}
+            <div className="space-y-4 lg:hidden">
+              <GospelCard />
+              <Suspense fallback={<CardSkeleton height="h-64" />}>
+                <FeaturedContent hideTitle />
+              </Suspense>
+            </div>
+            
+            {/* Desktop: Grid view */}
+            <div className="hidden lg:grid lg:grid-cols-3 lg:gap-6">
+              <div className="lg:col-span-1">
+                <GospelCard variant="featured" />
+              </div>
+              <div className="lg:col-span-2">
+                <Suspense fallback={<CardSkeleton height="h-64" />}>
+                  <FeaturedContent hideTitle />
+                </Suspense>
+              </div>
+            </div>
+          </section>
+
+          {/* Daily Challenge */}
+          <Suspense fallback={<CardSkeleton height="h-48" />}>
+            <DailyChallenge />
+          </Suspense>
+
+          {/* === FORMACIÓN Y CONTINUIDAD === */}
+
+          {/* Explore Grid - Crece en tu Fe */}
           <Suspense fallback={<CardSkeleton height="h-96" />}>
             <ExploreGrid />
           </Suspense>
 
-          {/* Novena Carousel - Full Width */}
+          {/* Novena Carousel - Continúa tu Camino */}
           <Suspense fallback={<CardSkeleton height="h-64" />}>
             <NovenaCarousel
               novenas={novenas}
@@ -151,37 +187,25 @@ const Dashboard = () => {
             />
           </Suspense>
 
-          {/* Desktop: Two column layout for remaining content */}
+          {/* Desktop: Sidebar for stats */}
           <div className="lg:grid lg:grid-cols-3 lg:gap-6 lg:mt-6">
-            {/* Left Column - Main Content */}
-            <div className="lg:col-span-2 space-y-4">
-              {/* Daily Challenge */}
-              <Suspense fallback={<CardSkeleton height="h-48" />}>
-                <DailyChallenge />
-              </Suspense>
-
-              {/* Featured Content */}
-              <Suspense fallback={<CardSkeleton height="h-64" />}>
-                <FeaturedContent />
-              </Suspense>
+            <div className="lg:col-span-2">
+              {/* Gratitude Prompt - Mobile */}
+              <div className="lg:hidden">
+                <Suspense fallback={<CardSkeleton height="h-24" />}>
+                  <GratitudePrompt />
+                </Suspense>
+              </div>
             </div>
 
-            {/* Right Column - Sidebar Content */}
-            <div className="lg:col-span-1 space-y-4">
-              {/* Gospel Card - Desktop only, prominent position */}
+            {/* Right Column - Stats Sidebar */}
+            <div className="lg:col-span-1 space-y-4 px-5 lg:px-0">
+              {/* Gratitude Prompt - Desktop */}
               <div className="hidden lg:block">
-                <GospelCard />
+                <Suspense fallback={<CardSkeleton height="h-24" />}>
+                  <GratitudePrompt />
+                </Suspense>
               </div>
-
-              {/* Gospel Card - Mobile compact version */}
-              <div className="lg:hidden px-5">
-                <GospelCard compact />
-              </div>
-
-              {/* Gratitude Prompt */}
-              <Suspense fallback={<CardSkeleton height="h-24" />}>
-                <GratitudePrompt />
-              </Suspense>
 
               {/* Practice Streaks */}
               <Suspense fallback={<CardSkeleton height="h-32" />}>
