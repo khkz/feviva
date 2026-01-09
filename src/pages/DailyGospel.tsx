@@ -17,12 +17,14 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { format, addDays, subDays } from 'date-fns';
 import { es } from 'date-fns/locale';
+import gospelFallback from '@/assets/feature-bible.jpg';
 
 const DailyGospel = () => {
   const navigate = useNavigate();
   const { fecha: urlFecha } = useParams();
   const [selectedDate, setSelectedDate] = useState<string | undefined>(urlFecha);
   const [showVideo, setShowVideo] = useState(false);
+  const [imageError, setImageError] = useState(false);
   
   const { 
     gospel, 
@@ -43,6 +45,7 @@ const DailyGospel = () => {
     const prevDate = format(subDays(new Date(currentDate + 'T12:00:00'), 1), 'yyyy-MM-dd');
     setSelectedDate(prevDate);
     setShowVideo(false);
+    setImageError(false);
   };
 
   const handleNextDay = () => {
@@ -51,12 +54,14 @@ const DailyGospel = () => {
     if (nextDate <= format(addDays(new Date(), 1), 'yyyy-MM-dd')) {
       setSelectedDate(nextDate);
       setShowVideo(false);
+      setImageError(false);
     }
   };
 
   const handleGoToToday = () => {
     setSelectedDate(undefined);
     setShowVideo(false);
+    setImageError(false);
   };
 
   if (isLoading) {
@@ -147,11 +152,20 @@ const DailyGospel = () => {
                       whileTap={{ scale: 0.98 }}
                     >
                       <img 
-                        src={`https://img.youtube.com/vi/${displayGospel.youtube_video_id}/maxresdefault.jpg`}
+                        src={
+                          !displayGospel.youtube_video_id || imageError
+                            ? gospelFallback
+                            : `https://img.youtube.com/vi/${displayGospel.youtube_video_id}/maxresdefault.jpg`
+                        }
                         alt={displayGospel.referencia}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         onError={(e) => {
-                          e.currentTarget.src = `https://img.youtube.com/vi/${displayGospel.youtube_video_id}/hqdefault.jpg`;
+                          const target = e.currentTarget;
+                          if (displayGospel.youtube_video_id && target.src.includes('maxresdefault')) {
+                            target.src = `https://img.youtube.com/vi/${displayGospel.youtube_video_id}/hqdefault.jpg`;
+                          } else {
+                            setImageError(true);
+                          }
                         }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent flex items-center justify-center">
@@ -277,9 +291,15 @@ const DailyGospel = () => {
                     className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors text-left"
                   >
                     <img 
-                      src={`https://img.youtube.com/vi/${g.youtube_video_id}/default.jpg`}
+                      src={g.youtube_video_id 
+                        ? `https://img.youtube.com/vi/${g.youtube_video_id}/default.jpg`
+                        : gospelFallback
+                      }
                       alt={g.referencia}
                       className="w-16 h-12 object-cover rounded"
+                      onError={(e) => {
+                        e.currentTarget.src = gospelFallback;
+                      }}
                     />
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm truncate">{g.referencia}</p>
