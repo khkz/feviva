@@ -47,6 +47,7 @@ import {
   AdminDailyContent,
   AdminCommunity,
   AdminGratitude,
+  AdminOraciones,
 } from "./pages/admin";
 import AdminBiblePlan from "./pages/admin/AdminBiblePlan";
 import AdminInvitations from "./pages/admin/AdminInvitations";
@@ -97,6 +98,7 @@ const App = () => (
                 <Route path="community" element={<AdminCommunity />} />
                 <Route path="content" element={<AdminContent />} />
                 <Route path="daily-content" element={<AdminDailyContent />} />
+                <Route path="oraciones" element={<AdminOraciones />} />
                 <Route path="feedback" element={<AdminFeedback />} />
                 <Route path="processing" element={<AdminProcessing />} />
                 <Route path="analytics" element={<AdminAnalytics />} />
