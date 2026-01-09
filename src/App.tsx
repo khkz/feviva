@@ -49,6 +49,7 @@ import {
   AdminGratitude,
 } from "./pages/admin";
 import AdminBiblePlan from "./pages/admin/AdminBiblePlan";
+import AdminInvitations from "./pages/admin/AdminInvitations";
 
 const queryClient = new QueryClient();
 
@@ -105,6 +106,7 @@ const App = () => (
                 <Route path="movies" element={<AdminMovies />} />
                 <Route path="bible-plan" element={<AdminBiblePlan />} />
                 <Route path="gratitude" element={<AdminGratitude />} />
+                <Route path="invitations" element={<AdminInvitations />} />
               </Route>
               
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
