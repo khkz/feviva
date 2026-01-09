@@ -180,10 +180,12 @@ async function generateAudioForOracion(
 
     console.log(`Audio uploaded: ${urlData.publicUrl}`);
 
-    // Update the oracion with the audio URL
+    // Update the oracion with the audio URL (add cache-busting timestamp)
+    const audioUrlWithCacheBuster = `${urlData.publicUrl}?v=${Date.now()}`;
+    
     const { error: updateError } = await supabase
       .from('oraciones')
-      .update({ audio_url: urlData.publicUrl })
+      .update({ audio_url: audioUrlWithCacheBuster })
       .eq('id', oracion.id);
     
     if (updateError) {
