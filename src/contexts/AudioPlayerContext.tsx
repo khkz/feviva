@@ -1,8 +1,20 @@
 import React, { createContext, useContext, useState, useRef, useCallback, useEffect } from "react";
-import { SleepStory } from "@/hooks/useSleepStories";
+
+// Generic audio queue item that works for both sleep stories and prayers
+export interface AudioQueueItem {
+  id: string;
+  title: string;
+  subtitle?: string;
+  imageUrl?: string;
+  audioUrl: string | null;
+  type: 'oracion' | 'sleep_story';
+  // Original data for reference
+  originalData?: unknown;
+}
 
 interface AudioPlayerState {
-  currentStory: SleepStory | null;
+  // Current item (backwards compatible with currentStory)
+  currentItem: AudioQueueItem | null;
   audioUrl: string | null;
   isPlaying: boolean;
   currentTime: number;
@@ -12,10 +24,15 @@ interface AudioPlayerState {
   isMinimized: boolean;
   isGenerating: boolean;
   timerRemaining: number | null;
+  // Queue management
+  queue: AudioQueueItem[];
+  currentIndex: number;
+  repeatMode: 'off' | 'one' | 'all';
 }
 
 interface AudioPlayerContextType extends AudioPlayerState {
-  play: (story: SleepStory, audioUrl: string | null) => void;
+  // Existing functions (backwards compatible)
+  play: (item: AudioQueueItem) => void;
   pause: () => void;
   togglePlay: () => void;
   seek: (time: number) => void;
@@ -27,6 +44,17 @@ interface AudioPlayerContextType extends AudioPlayerState {
   setAudioUrl: (url: string) => void;
   setIsGenerating: (generating: boolean) => void;
   setTimer: (minutes: number) => void;
+  // Queue functions
+  playQueue: (items: AudioQueueItem[], startIndex?: number) => void;
+  playNext: () => void;
+  playPrevious: () => void;
+  addToQueue: (item: AudioQueueItem) => void;
+  removeFromQueue: (index: number) => void;
+  clearQueue: () => void;
+  toggleRepeatMode: () => void;
+  // Helper to check if there's next/prev
+  hasNext: boolean;
+  hasPrevious: boolean;
   audioRef: React.RefObject<HTMLAudioElement>;
 }
 
@@ -35,7 +63,7 @@ const AudioPlayerContext = createContext<AudioPlayerContextType | null>(null);
 export function AudioPlayerProvider({ children }: { children: React.ReactNode }) {
   const audioRef = useRef<HTMLAudioElement>(null);
   
-  const [currentStory, setCurrentStory] = useState<SleepStory | null>(null);
+  const [currentItem, setCurrentItem] = useState<AudioQueueItem | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -45,6 +73,11 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   const [isMinimized, setIsMinimized] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [timerRemaining, setTimerRemaining] = useState<number | null>(null);
+  
+  // Queue state
+  const [queue, setQueue] = useState<AudioQueueItem[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [repeatMode, setRepeatMode] = useState<'off' | 'one' | 'all'>('off');
 
   // Timer countdown effect
   useEffect(() => {
@@ -68,6 +101,52 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     return () => clearInterval(interval);
   }, [isPlaying, timerRemaining]);
 
+  // Handle audio ended - with queue and repeat logic
+  const handleEnded = useCallback(() => {
+    if (repeatMode === 'one') {
+      // Repeat current track
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play();
+      }
+      return;
+    }
+
+    const hasNextTrack = currentIndex < queue.length - 1;
+    
+    if (hasNextTrack) {
+      // Play next in queue
+      const nextIndex = currentIndex + 1;
+      const nextItem = queue[nextIndex];
+      setCurrentIndex(nextIndex);
+      setCurrentItem(nextItem);
+      setAudioUrl(nextItem.audioUrl);
+      setCurrentTime(0);
+      
+      if (nextItem.audioUrl && audioRef.current) {
+        audioRef.current.src = nextItem.audioUrl;
+        audioRef.current.load();
+        audioRef.current.play().catch(console.error);
+      }
+    } else if (repeatMode === 'all' && queue.length > 0) {
+      // Loop back to first
+      const firstItem = queue[0];
+      setCurrentIndex(0);
+      setCurrentItem(firstItem);
+      setAudioUrl(firstItem.audioUrl);
+      setCurrentTime(0);
+      
+      if (firstItem.audioUrl && audioRef.current) {
+        audioRef.current.src = firstItem.audioUrl;
+        audioRef.current.load();
+        audioRef.current.play().catch(console.error);
+      }
+    } else {
+      // Stop playing
+      setIsPlaying(false);
+    }
+  }, [repeatMode, currentIndex, queue]);
+
   // Audio event handlers
   useEffect(() => {
     const audio = audioRef.current;
@@ -78,7 +157,6 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       setDuration(audio.duration);
       audio.playbackRate = playbackRate;
     };
-    const handleEnded = () => setIsPlaying(false);
 
     audio.addEventListener("timeupdate", handleTimeUpdate);
     audio.addEventListener("loadedmetadata", handleLoadedMetadata);
@@ -89,17 +167,42 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
       audio.removeEventListener("ended", handleEnded);
     };
-  }, [playbackRate]);
+  }, [playbackRate, handleEnded]);
 
-  const play = useCallback((story: SleepStory, url: string | null) => {
-    setCurrentStory(story);
-    setAudioUrl(url);
+  // Play a single item (adds to queue as single item)
+  const play = useCallback((item: AudioQueueItem) => {
+    setQueue([item]);
+    setCurrentIndex(0);
+    setCurrentItem(item);
+    setAudioUrl(item.audioUrl);
     setIsMinimized(false);
     setCurrentTime(0);
     
-    if (url && audioRef.current) {
-      audioRef.current.src = url;
+    if (item.audioUrl && audioRef.current) {
+      audioRef.current.src = item.audioUrl;
       audioRef.current.load();
+      audioRef.current.play().then(() => setIsPlaying(true)).catch(console.error);
+    }
+  }, []);
+
+  // Play a queue of items
+  const playQueue = useCallback((items: AudioQueueItem[], startIndex = 0) => {
+    if (items.length === 0) return;
+    
+    const validIndex = Math.min(Math.max(0, startIndex), items.length - 1);
+    const firstItem = items[validIndex];
+    
+    setQueue(items);
+    setCurrentIndex(validIndex);
+    setCurrentItem(firstItem);
+    setAudioUrl(firstItem.audioUrl);
+    setIsMinimized(false);
+    setCurrentTime(0);
+    
+    if (firstItem.audioUrl && audioRef.current) {
+      audioRef.current.src = firstItem.audioUrl;
+      audioRef.current.load();
+      audioRef.current.play().then(() => setIsPlaying(true)).catch(console.error);
     }
   }, []);
 
@@ -117,8 +220,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
-      audioRef.current.play();
-      setIsPlaying(true);
+      audioRef.current.play().then(() => setIsPlaying(true)).catch(console.error);
     }
   }, [isPlaying, audioUrl]);
 
@@ -156,13 +258,15 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       audioRef.current.pause();
       audioRef.current.src = "";
     }
-    setCurrentStory(null);
+    setCurrentItem(null);
     setAudioUrl(null);
     setIsPlaying(false);
     setIsMinimized(false);
     setCurrentTime(0);
     setDuration(0);
     setTimerRemaining(null);
+    setQueue([]);
+    setCurrentIndex(0);
   }, []);
 
   const updateAudioUrl = useCallback((url: string) => {
@@ -181,8 +285,77 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     }
   }, []);
 
+  // Queue management
+  const playNext = useCallback(() => {
+    if (currentIndex < queue.length - 1) {
+      const nextIndex = currentIndex + 1;
+      const nextItem = queue[nextIndex];
+      setCurrentIndex(nextIndex);
+      setCurrentItem(nextItem);
+      setAudioUrl(nextItem.audioUrl);
+      setCurrentTime(0);
+      
+      if (nextItem.audioUrl && audioRef.current) {
+        audioRef.current.src = nextItem.audioUrl;
+        audioRef.current.load();
+        audioRef.current.play().then(() => setIsPlaying(true)).catch(console.error);
+      }
+    }
+  }, [currentIndex, queue]);
+
+  const playPrevious = useCallback(() => {
+    // If more than 3 seconds in, restart current track
+    if (currentTime > 3 && audioRef.current) {
+      audioRef.current.currentTime = 0;
+      return;
+    }
+    
+    if (currentIndex > 0) {
+      const prevIndex = currentIndex - 1;
+      const prevItem = queue[prevIndex];
+      setCurrentIndex(prevIndex);
+      setCurrentItem(prevItem);
+      setAudioUrl(prevItem.audioUrl);
+      setCurrentTime(0);
+      
+      if (prevItem.audioUrl && audioRef.current) {
+        audioRef.current.src = prevItem.audioUrl;
+        audioRef.current.load();
+        audioRef.current.play().then(() => setIsPlaying(true)).catch(console.error);
+      }
+    }
+  }, [currentIndex, currentTime, queue]);
+
+  const addToQueue = useCallback((item: AudioQueueItem) => {
+    setQueue(prev => [...prev, item]);
+  }, []);
+
+  const removeFromQueue = useCallback((index: number) => {
+    setQueue(prev => prev.filter((_, i) => i !== index));
+    // Adjust current index if needed
+    if (index < currentIndex) {
+      setCurrentIndex(prev => prev - 1);
+    }
+  }, [currentIndex]);
+
+  const clearQueue = useCallback(() => {
+    setQueue([]);
+    setCurrentIndex(0);
+  }, []);
+
+  const toggleRepeatMode = useCallback(() => {
+    setRepeatMode(prev => {
+      if (prev === 'off') return 'one';
+      if (prev === 'one') return 'all';
+      return 'off';
+    });
+  }, []);
+
+  const hasNext = currentIndex < queue.length - 1;
+  const hasPrevious = currentIndex > 0 || currentTime > 3;
+
   const value: AudioPlayerContextType = {
-    currentStory,
+    currentItem,
     audioUrl,
     isPlaying,
     currentTime,
@@ -192,6 +365,9 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     isMinimized,
     isGenerating,
     timerRemaining,
+    queue,
+    currentIndex,
+    repeatMode,
     play,
     pause,
     togglePlay,
@@ -204,6 +380,15 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     setAudioUrl: updateAudioUrl,
     setIsGenerating,
     setTimer,
+    playQueue,
+    playNext,
+    playPrevious,
+    addToQueue,
+    removeFromQueue,
+    clearQueue,
+    toggleRepeatMode,
+    hasNext,
+    hasPrevious,
     audioRef,
   };
 

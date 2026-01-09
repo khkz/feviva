@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { Heart, BookOpen, Moon, Loader2, Calendar, Sparkles, Cross, Home, Church } from "lucide-react";
+import { Heart, BookOpen, Moon, Loader2, Calendar, Sparkles, Cross, Home, Church, Play } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -12,6 +12,7 @@ import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { useOraciones } from "@/hooks/useOraciones";
 import { useAudioCache } from "@/hooks/useAudioCache";
+import { useAudioPlayer, AudioQueueItem } from "@/contexts/AudioPlayerContext";
 import { cn } from "@/lib/utils";
 
 const containerVariants = {
@@ -58,6 +59,29 @@ const CATEGORY_CONFIG: Record<string, { icon: typeof Cross; gradient: string; bg
   },
 };
 
+// Helper to convert oracion to AudioQueueItem
+interface OracionData {
+  id: string;
+  nombre: string;
+  texto: string;
+  categoria: string;
+  subcategoria?: string | null;
+  audio_url?: string | null;
+  tagline?: string | null;
+  es_fundamental?: boolean | null;
+}
+
+function oracionToQueueItem(oracion: OracionData): AudioQueueItem {
+  return {
+    id: oracion.id,
+    title: oracion.nombre,
+    subtitle: oracion.categoria,
+    audioUrl: oracion.audio_url || null,
+    type: 'oracion',
+    originalData: oracion,
+  };
+}
+
 export default function Oraciones() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedOracion, setSelectedOracion] = useState<string | null>(null);
@@ -76,6 +100,7 @@ export default function Oraciones() {
   } = useOraciones();
 
   const { cacheAudio } = useAudioCache();
+  const { playQueue, currentItem, isMinimized, expand } = useAudioPlayer();
 
   // Pre-cache all existing audio URLs on page load
   useEffect(() => {
@@ -107,6 +132,33 @@ export default function Oraciones() {
   const displayedOraciones = activeCategory 
     ? oracionesByCategoria[activeCategory] || []
     : null;
+
+  // Play all prayers from a list starting at a specific index
+  const handlePlayAll = useCallback((oracionList: typeof oraciones, startIndex = 0) => {
+    const queueItems = oracionList
+      .filter(o => o.audio_url) // Only include prayers with audio
+      .map(oracionToQueueItem);
+    
+    if (queueItems.length > 0) {
+      playQueue(queueItems, startIndex);
+    }
+  }, [playQueue]);
+
+  // Handle playing a single prayer (adds siblings to queue)
+  const handlePlayOracion = useCallback((oracion: typeof oraciones[0], siblings: typeof oraciones) => {
+    const queueItems = siblings
+      .filter(o => o.audio_url)
+      .map(oracionToQueueItem);
+    
+    const startIndex = queueItems.findIndex(item => item.id === oracion.id);
+    
+    if (queueItems.length > 0) {
+      playQueue(queueItems, Math.max(0, startIndex));
+    }
+  }, [playQueue]);
+
+  // Check if a prayer is currently playing
+  const isCurrentlyPlaying = currentItem?.type === 'oracion' && !isMinimized;
 
   if (selected) {
     return (
@@ -212,9 +264,22 @@ export default function Oraciones() {
             initial="hidden"
             animate="visible"
           >
-            <p className="text-sm text-muted-foreground px-1">
-              {filteredOraciones.length} resultado{filteredOraciones.length !== 1 && "s"} para "{searchQuery}"
-            </p>
+            <div className="flex items-center justify-between px-1">
+              <p className="text-sm text-muted-foreground">
+                {filteredOraciones.length} resultado{filteredOraciones.length !== 1 && "s"} para "{searchQuery}"
+              </p>
+              {filteredOraciones.filter(o => o.audio_url).length > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="gap-1.5 text-primary"
+                  onClick={() => handlePlayAll(filteredOraciones)}
+                >
+                  <Play className="h-4 w-4" />
+                  Reproducir todas
+                </Button>
+              )}
+            </div>
             {filteredOraciones.map((oracion) => (
               <motion.div key={oracion.id} variants={itemVariants}>
                 <OracionCard
@@ -229,6 +294,7 @@ export default function Oraciones() {
                   onToggleFavorite={toggleFavorite}
                   onSelect={() => setSelectedOracion(oracion.id)}
                   esFundamental={oracion.es_fundamental ?? false}
+                  onPlay={() => handlePlayOracion(oracion, filteredOraciones)}
                 />
               </motion.div>
             ))}
@@ -253,9 +319,22 @@ export default function Oraciones() {
             initial="hidden"
             animate="visible"
           >
-            <div className="flex items-center gap-2 mb-4">
-              <Heart className="h-5 w-5 text-destructive" fill="currentColor" />
-              <h2 className="font-heading font-semibold text-lg">Mis Favoritas</h2>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Heart className="h-5 w-5 text-destructive" fill="currentColor" />
+                <h2 className="font-heading font-semibold text-lg">Mis Favoritas</h2>
+              </div>
+              {favoritasOraciones.filter(o => o.audio_url).length > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="gap-1.5 text-primary"
+                  onClick={() => handlePlayAll(favoritasOraciones)}
+                >
+                  <Play className="h-4 w-4" />
+                  Reproducir todas
+                </Button>
+              )}
             </div>
             {favoritasOraciones.map((oracion) => (
               <motion.div key={oracion.id} variants={itemVariants}>
@@ -271,6 +350,7 @@ export default function Oraciones() {
                   onToggleFavorite={toggleFavorite}
                   onSelect={() => setSelectedOracion(oracion.id)}
                   esFundamental={oracion.es_fundamental ?? false}
+                  onPlay={() => handlePlayOracion(oracion, favoritasOraciones)}
                 />
               </motion.div>
             ))}
@@ -284,19 +364,32 @@ export default function Oraciones() {
             animate="visible"
           >
             <motion.div 
-              className="flex items-center gap-3 mb-4"
+              className="flex items-center justify-between mb-4"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
             >
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => setActiveCategory(null)}
-                className="text-muted-foreground"
-              >
-                ← Volver
-              </Button>
-              <h2 className="font-heading font-semibold text-lg">{activeCategory}</h2>
+              <div className="flex items-center gap-3">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setActiveCategory(null)}
+                  className="text-muted-foreground"
+                >
+                  ← Volver
+                </Button>
+                <h2 className="font-heading font-semibold text-lg">{activeCategory}</h2>
+              </div>
+              {displayedOraciones.filter(o => o.audio_url).length > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="gap-1.5 text-primary"
+                  onClick={() => handlePlayAll(displayedOraciones)}
+                >
+                  <Play className="h-4 w-4" />
+                  Reproducir todas
+                </Button>
+              )}
             </motion.div>
             <div className="space-y-3">
               {displayedOraciones.map((oracion) => (
@@ -313,6 +406,7 @@ export default function Oraciones() {
                     onToggleFavorite={toggleFavorite}
                     onSelect={() => setSelectedOracion(oracion.id)}
                     esFundamental={oracion.es_fundamental ?? false}
+                    onPlay={() => handlePlayOracion(oracion, displayedOraciones)}
                   />
                 </motion.div>
               ))}
@@ -334,9 +428,22 @@ export default function Oraciones() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
                 >
-                  <div className="flex items-center gap-2 mb-4">
-                    <Cross className="h-5 w-5 text-secondary" />
-                    <h2 className="font-heading font-semibold text-lg">Oraciones Fundamentales</h2>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <Cross className="h-5 w-5 text-secondary" />
+                      <h2 className="font-heading font-semibold text-lg">Oraciones Fundamentales</h2>
+                    </div>
+                    {oracionesFundamentales.filter(o => o.audio_url).length > 0 && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="gap-1.5 text-primary"
+                        onClick={() => handlePlayAll(oracionesFundamentales)}
+                      >
+                        <Play className="h-4 w-4" />
+                        Reproducir
+                      </Button>
+                    )}
                   </div>
                   <p className="text-sm text-muted-foreground mb-4">
                     Las oraciones que han guiado a la humanidad por más de 2000 años
@@ -344,7 +451,7 @@ export default function Oraciones() {
                   
                   {/* Grid of Fundamental Prayer Cards */}
                   <div className="grid grid-cols-2 gap-3">
-                    {oracionesFundamentales.slice(0, 4).map((oracion) => (
+                    {oracionesFundamentales.slice(0, 4).map((oracion, idx) => (
                       <OracionFundamentalCard
                         key={oracion.id}
                         id={oracion.id}
@@ -354,6 +461,7 @@ export default function Oraciones() {
                         isFavorite={isFavorite(oracion.id)}
                         onToggleFavorite={toggleFavorite}
                         onSelect={() => setSelectedOracion(oracion.id)}
+                        onPlay={() => handlePlayAll(oracionesFundamentales, idx)}
                       />
                     ))}
                   </div>
@@ -380,6 +488,7 @@ export default function Oraciones() {
                     };
                     const Icon = config.icon;
                     const count = oracionesByCategoria[categoria]?.length || 0;
+                    const hasAudio = oracionesByCategoria[categoria]?.some(o => o.audio_url);
                     
                     return (
                       <motion.button
@@ -410,6 +519,12 @@ export default function Oraciones() {
                           <p className="text-xs text-muted-foreground">
                             {count} {count === 1 ? "oración" : "oraciones"}
                           </p>
+                          {hasAudio && (
+                            <div className="flex items-center gap-1 mt-2 text-xs text-primary">
+                              <Play className="h-3 w-3" />
+                              <span>Con audio</span>
+                            </div>
+                          )}
                         </div>
                       </motion.button>
                     );

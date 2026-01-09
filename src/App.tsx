@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { AudioPlayerProvider } from "@/contexts/AudioPlayerContext";
 import { MiniPlayer } from "@/components/audio/MiniPlayer";
+import { OracionPlayer } from "@/components/oraciones/OracionPlayer";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -115,7 +116,8 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
             
-            {/* Global Mini Player */}
+            {/* Global Players */}
+            <OracionPlayer />
             <MiniPlayer />
           </BrowserRouter>
         </TooltipProvider>
