@@ -12,3 +12,4 @@ export { AdminBiblePlan } from './AdminBiblePlan';
 export { AdminDailyContent } from './AdminDailyContent';
 export { default as AdminCommunity } from './AdminCommunity';
 export { default as AdminGratitude } from './AdminGratitude';
+export { default as AdminOraciones } from './AdminOraciones';
