@@ -36,7 +36,7 @@ const Auth = () => {
   const [signupName, setSignupName] = useState("");
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
-  const [perfilDoctrinal, setPerfilDoctrinal] = useState("evangelico");
+  const [perfilDoctrinal, setPerfilDoctrinal] = useState("catolico");
   const [edadSegmento, setEdadSegmento] = useState("");
 
   // Check for invite code on mount

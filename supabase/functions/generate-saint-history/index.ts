@@ -1,0 +1,181 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const { saintId, forceRegenerate = false } = await req.json();
+
+    if (!saintId) {
+      return new Response(
+        JSON.stringify({ error: 'saintId is required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
+
+    if (!lovableApiKey) {
+      return new Response(
+        JSON.stringify({ error: 'LOVABLE_API_KEY is not configured' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Fetch saint data
+    const { data: saint, error: saintError } = await supabase
+      .from('calendar_saints')
+      .select('*')
+      .eq('id', saintId)
+      .single();
+
+    if (saintError || !saint) {
+      return new Response(
+        JSON.stringify({ error: 'Saint not found', details: saintError }),
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Skip if already has description and not forcing regeneration
+    if (saint.description && saint.description.length > 100 && !forceRegenerate) {
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          message: 'Saint already has description',
+          saintId: saint.id,
+          skipped: true
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const countryInfo = saint.country_code 
+      ? `Este santo es el patrono de ${saint.country_code}. Incluye información sobre por qué es el patrono de ese país y cómo se celebra su festividad allí.`
+      : '';
+
+    const systemPrompt = `Eres un experto en hagiografía católica. Escribe biografías de santos precisas, inspiradoras y accesibles para el público general hispanohablante. 
+Mantén un tono reverente pero no excesivamente formal. Incluye datos históricos verificables cuando sea posible.
+Escribe en español de América Latina.`;
+
+    const userPrompt = `Escribe una biografía completa de ${saint.name} para una aplicación católica.
+
+Información conocida:
+- Festividad: ${saint.feast_day} de ${getMonthName(saint.feast_month)}
+- Categoría: ${saint.category}
+${saint.tags ? `- Etiquetas: ${saint.tags.join(', ')}` : ''}
+${countryInfo}
+
+Estructura la biografía en 300-500 palabras incluyendo:
+1. Datos biográficos (nacimiento, época, lugar)
+2. Vida y vocación
+3. Obras, milagros o hechos destacados
+4. Muerte y canonización
+5. Por qué es importante para los católicos hoy
+${saint.category === 'patron_country' ? '6. Importancia como patrono nacional y tradiciones asociadas' : ''}
+
+Escribe de forma fluida sin usar encabezados ni viñetas. El texto debe fluir naturalmente.`;
+
+    console.log(`Generating history for saint: ${saint.name}`);
+
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${lovableApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-3-flash-preview",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("AI API error:", response.status, errorText);
+      
+      if (response.status === 429) {
+        return new Response(
+          JSON.stringify({ error: 'Rate limit exceeded, please try again later' }),
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      if (response.status === 402) {
+        return new Response(
+          JSON.stringify({ error: 'Payment required for AI service' }),
+          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      return new Response(
+        JSON.stringify({ error: 'AI API error', details: errorText }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const aiResponse = await response.json();
+    const generatedHistory = aiResponse.choices?.[0]?.message?.content;
+
+    if (!generatedHistory) {
+      return new Response(
+        JSON.stringify({ error: 'No content generated by AI' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Update saint with generated history
+    const { error: updateError } = await supabase
+      .from('calendar_saints')
+      .update({ description: generatedHistory.trim() })
+      .eq('id', saintId);
+
+    if (updateError) {
+      console.error("Error updating saint:", updateError);
+      return new Response(
+        JSON.stringify({ error: 'Failed to update saint', details: updateError }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log(`Successfully generated history for: ${saint.name}`);
+
+    return new Response(
+      JSON.stringify({ 
+        success: true, 
+        saintId: saint.id,
+        saintName: saint.name,
+        descriptionLength: generatedHistory.length
+      }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+
+  } catch (error) {
+    console.error("Error in generate-saint-history:", error);
+    return new Response(
+      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+});
+
+function getMonthName(month: number): string {
+  const months = [
+    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+  ];
+  return months[month - 1] || '';
+}

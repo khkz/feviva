@@ -1,5 +1,4 @@
-import { useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
@@ -12,7 +11,10 @@ import {
   Share2, 
   BookOpen,
   UserPlus,
-  Loader2
+  Loader2,
+  HandHeart,
+  Globe,
+  Heart
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -20,30 +22,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { supabase } from '@/integrations/supabase/client';
 import logoElRugido from '@/assets/logo-elrugido.svg';
-
-// Country mappings
-const countryFlags: Record<string, string> = {
-  AR: '🇦🇷', BO: '🇧🇴', BR: '🇧🇷', CL: '🇨🇱', CO: '🇨🇴',
-  CR: '🇨🇷', CU: '🇨🇺', DO: '🇩🇴', EC: '🇪🇨', SV: '🇸🇻',
-  GT: '🇬🇹', HN: '🇭🇳', MX: '🇲🇽', NI: '🇳🇮', PA: '🇵🇦',
-  PY: '🇵🇾', PE: '🇵🇪', PR: '🇵🇷', UY: '🇺🇾', VE: '🇻🇪',
-};
-
-const countryNames: Record<string, string> = {
-  AR: 'Argentina', BO: 'Bolivia', BR: 'Brasil', CL: 'Chile', CO: 'Colombia',
-  CR: 'Costa Rica', CU: 'Cuba', DO: 'República Dominicana', EC: 'Ecuador', SV: 'El Salvador',
-  GT: 'Guatemala', HN: 'Honduras', MX: 'México', NI: 'Nicaragua', PA: 'Panamá',
-  PY: 'Paraguay', PE: 'Perú', PR: 'Puerto Rico', UY: 'Uruguay', VE: 'Venezuela',
-};
-
-const monthNames = [
-  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-];
+import { countryFlags, countryNames, formatFeastDate, getCountryContinent, continentCountries } from '@/lib/countryMappings';
 
 export default function SantoPage() {
   const { slug } = useParams<{ slug: string }>();
-  const navigate = useNavigate();
 
   // Fetch saint by slug
   const { data: saint, isLoading, error } = useQuery({
@@ -61,7 +43,22 @@ export default function SantoPage() {
     enabled: !!slug,
   });
 
-  // Fetch related saints (same month or same country for patrons)
+  // Fetch prayer if saint has one
+  const { data: prayer } = useQuery({
+    queryKey: ['saint-prayer', saint?.prayer_id],
+    queryFn: async () => {
+      if (!saint?.prayer_id) return null;
+      const { data } = await supabase
+        .from('oraciones')
+        .select('id, nombre, texto')
+        .eq('id', saint.prayer_id)
+        .single();
+      return data;
+    },
+    enabled: !!saint?.prayer_id,
+  });
+
+  // Fetch related saints (same continent or same month)
   const { data: relatedSaints = [] } = useQuery({
     queryKey: ['related-saints', saint?.id, saint?.feast_month, saint?.country_code],
     queryFn: async () => {
@@ -71,13 +68,19 @@ export default function SantoPage() {
         .from('calendar_saints')
         .select('id, name, slug, image_url, feast_day, feast_month, category, country_code')
         .neq('id', saint.id)
+        .not('image_url', 'is', null)
         .limit(4);
 
       if (saint.category === 'patron_country' && saint.country_code) {
-        // For patrons, get saints from same country or same month
-        query = query.or(`country_code.eq.${saint.country_code},feast_month.eq.${saint.feast_month}`);
+        // For patrons, get saints from same continent
+        const continent = getCountryContinent(saint.country_code);
+        if (continent) {
+          const continentCodes = continentCountries[continent] || [];
+          if (continentCodes.length > 0) {
+            query = query.in('country_code', continentCodes);
+          }
+        }
       } else {
-        // For regular saints, get saints from same month
         query = query.eq('feast_month', saint.feast_month);
       }
 
@@ -87,9 +90,31 @@ export default function SantoPage() {
     enabled: !!saint,
   });
 
-  const formatDate = (month: number, day: number) => {
-    return `${day} de ${monthNames[month - 1]}`;
-  };
+  // Fetch other patrons from same continent
+  const { data: continentPatrons = [] } = useQuery({
+    queryKey: ['continent-patrons', saint?.country_code],
+    queryFn: async () => {
+      if (!saint?.country_code || saint.category !== 'patron_country') return [];
+      
+      const continent = getCountryContinent(saint.country_code);
+      if (!continent) return [];
+      
+      const continentCodes = continentCountries[continent] || [];
+      if (continentCodes.length === 0) return [];
+
+      const { data } = await supabase
+        .from('calendar_saints')
+        .select('id, name, slug, image_url, feast_day, feast_month, country_code')
+        .eq('category', 'patron_country')
+        .in('country_code', continentCodes)
+        .neq('id', saint.id)
+        .not('image_url', 'is', null)
+        .limit(6);
+      
+      return data || [];
+    },
+    enabled: !!saint && saint.category === 'patron_country',
+  });
 
   const handleShare = async () => {
     if (navigator.share && saint) {
@@ -134,30 +159,74 @@ export default function SantoPage() {
   const isPatron = saint.category === 'patron_country';
   const metaDescription = saint.description 
     ? saint.description.slice(0, 155) + '...'
-    : `${saint.name} - Fiesta: ${formatDate(saint.feast_month, saint.feast_day)}. Conoce su historia y oración en ElRugido.`;
+    : `${saint.name} - Fiesta: ${formatFeastDate(saint.feast_month, saint.feast_day)}. Conoce su historia y oración en ElRugido.`;
+
+  const schemaOrg = {
+    "@context": "https://schema.org",
+    "@type": "Thing",
+    "name": saint.name,
+    "description": saint.description,
+    "image": saint.image_url,
+    "url": `https://elrugido.com/santo/${saint.slug}`,
+    "sameAs": `https://elrugido.com/santo/${saint.slug}`,
+    ...(isPatron && saint.country_code && {
+      "areaServed": {
+        "@type": "Country",
+        "name": countryNames[saint.country_code]
+      }
+    })
+  };
+
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": `¿Cuándo se celebra la fiesta de ${saint.name}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `La fiesta de ${saint.name} se celebra el ${formatFeastDate(saint.feast_month, saint.feast_day)}.`
+        }
+      },
+      ...(isPatron && saint.country_code ? [{
+        "@type": "Question",
+        "name": `¿De qué país es patrono/a ${saint.name}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `${saint.name} es el santo patrono de ${countryNames[saint.country_code]}.`
+        }
+      }] : []),
+      ...(prayer ? [{
+        "@type": "Question",
+        "name": `¿Hay alguna oración a ${saint.name}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `Sí, existe una oración tradicional para pedir la intercesión de ${saint.name}. Puedes encontrarla en ElRugido.`
+        }
+      }] : [])
+    ]
+  };
 
   return (
     <>
       <Helmet>
-        <title>{saint.name} - Calendario de Santos | ElRugido</title>
+        <title>{saint.name} - Historia, Oración y Festividad | ElRugido</title>
         <meta name="description" content={metaDescription} />
-        <meta property="og:title" content={`${saint.name} - ElRugido`} />
+        <meta name="keywords" content={`${saint.name}, santo, católico, oración, ${isPatron ? `patrono ${countryNames[saint.country_code || '']}` : ''}, ${saint.tags?.join(', ') || ''}`} />
+        <meta property="og:title" content={`${saint.name} - Historia y Oración | ElRugido`} />
         <meta property="og:description" content={metaDescription} />
         {saint.image_url && <meta property="og:image" content={saint.image_url} />}
         <meta property="og:type" content="article" />
+        <meta property="og:url" content={`https://elrugido.com/santo/${saint.slug}`} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${saint.name} - ElRugido`} />
+        <meta name="twitter:description" content={metaDescription} />
+        {saint.image_url && <meta name="twitter:image" content={saint.image_url} />}
         <link rel="canonical" href={`https://elrugido.com/santo/${saint.slug}`} />
         
-        {/* Schema.org markup for rich snippets */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Person",
-            "name": saint.name,
-            "description": saint.description,
-            "image": saint.image_url,
-            "sameAs": `https://elrugido.com/santo/${saint.slug}`
-          })}
-        </script>
+        <script type="application/ld+json">{JSON.stringify(schemaOrg)}</script>
+        <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
       </Helmet>
 
       <div className="min-h-screen bg-background">
@@ -184,31 +253,32 @@ export default function SantoPage() {
           </div>
         </header>
 
-        {/* Back button - Mobile */}
-        <div className="container mx-auto max-w-5xl px-4 py-4 sm:hidden">
-          <Link to="/santos">
-            <Button variant="ghost" size="sm" className="gap-2 -ml-2">
-              <ArrowLeft className="h-4 w-4" />
-              Volver
-            </Button>
-          </Link>
-        </div>
+        {/* Breadcrumbs */}
+        <nav className="container mx-auto max-w-5xl px-4 py-4" aria-label="Breadcrumb">
+          <ol className="flex items-center gap-2 text-sm text-muted-foreground">
+            <li><Link to="/" className="hover:text-foreground">Inicio</Link></li>
+            <li>/</li>
+            <li><Link to="/santos" className="hover:text-foreground">Santos</Link></li>
+            <li>/</li>
+            <li className="text-foreground font-medium truncate">{saint.name}</li>
+          </ol>
+        </nav>
 
         {/* Hero Section */}
         <section className="relative">
-          <div className="container mx-auto max-w-5xl px-4 py-8 md:py-12">
+          <div className="container mx-auto max-w-5xl px-4 pb-8 md:pb-12">
             <div className="grid md:grid-cols-2 gap-8 items-start">
               {/* Image */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5 }}
-                className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10"
+                className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10 shadow-xl"
               >
                 {saint.image_url ? (
                   <img
                     src={saint.image_url}
-                    alt={saint.name}
+                    alt={`Imagen de ${saint.name}`}
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -219,7 +289,7 @@ export default function SantoPage() {
                 
                 {/* Country flag for patrons */}
                 {isPatron && saint.country_code && (
-                  <div className="absolute top-4 right-4 text-4xl">
+                  <div className="absolute top-4 right-4 text-4xl drop-shadow-lg">
                     {countryFlags[saint.country_code]}
                   </div>
                 )}
@@ -236,7 +306,8 @@ export default function SantoPage() {
                   <h1 className="text-3xl md:text-4xl font-display font-bold mb-3">{saint.name}</h1>
                   
                   {isPatron && saint.country_code && (
-                    <p className="text-lg text-primary font-medium mb-4">
+                    <p className="text-lg text-primary font-medium mb-4 flex items-center gap-2">
+                      <Globe className="h-5 w-5" />
                       Patrono/a de {countryNames[saint.country_code]}
                     </p>
                   )}
@@ -244,7 +315,7 @@ export default function SantoPage() {
                   <div className="flex flex-wrap gap-3">
                     <Badge variant="secondary" className="gap-1.5 text-sm py-1 px-3">
                       <Calendar className="h-4 w-4" />
-                      {formatDate(saint.feast_month, saint.feast_day)}
+                      {formatFeastDate(saint.feast_month, saint.feast_day)}
                     </Badge>
                     
                     {saint.country_code && (
@@ -269,14 +340,12 @@ export default function SantoPage() {
 
                 {/* Action buttons */}
                 <div className="flex flex-wrap gap-3">
-                  {saint.prayer_id && (
-                    <Link to="/auth">
-                      <Button className="gap-2">
-                        <Sparkles className="h-4 w-4" />
-                        Rezar oración
-                      </Button>
-                    </Link>
-                  )}
+                  <Link to="/auth">
+                    <Button className="gap-2">
+                      <Sparkles className="h-4 w-4" />
+                      Rezar con audio guiado
+                    </Button>
+                  </Link>
                   <Button variant="outline" className="gap-2" onClick={handleShare}>
                     <Share2 className="h-4 w-4" />
                     Compartir
@@ -288,7 +357,7 @@ export default function SantoPage() {
                   <div className="hidden md:block">
                     <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
                       <BookOpen className="h-5 w-5 text-primary" />
-                      Historia
+                      Historia de {saint.name}
                     </h2>
                     <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
                       {saint.description}
@@ -310,7 +379,7 @@ export default function SantoPage() {
             >
               <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
                 <BookOpen className="h-5 w-5 text-primary" />
-                Historia
+                Historia de {saint.name}
               </h2>
               <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
                 {saint.description}
@@ -318,6 +387,66 @@ export default function SantoPage() {
             </motion.div>
           </section>
         )}
+
+        {/* Prayer Section - PUBLIC */}
+        {prayer && (
+          <section className="container mx-auto max-w-5xl px-4 py-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
+              <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
+                <CardContent className="p-6 md:p-8">
+                  <h2 className="text-xl md:text-2xl font-semibold mb-4 flex items-center gap-2">
+                    <HandHeart className="h-6 w-6 text-primary" />
+                    Oración a {saint.name}
+                  </h2>
+                  <p className="text-foreground leading-relaxed whitespace-pre-line mb-6 italic">
+                    {prayer.texto}
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Link to="/auth">
+                      <Button className="w-full sm:w-auto gap-2">
+                        <Sparkles className="h-4 w-4" />
+                        Escuchar audio guiado
+                      </Button>
+                    </Link>
+                    <Link to="/auth">
+                      <Button variant="outline" className="w-full sm:w-auto gap-2">
+                        <Heart className="h-4 w-4" />
+                        Guardar en favoritos
+                      </Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </section>
+        )}
+
+        {/* Intermediate CTA */}
+        <section className="container mx-auto max-w-5xl px-4 py-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="bg-primary/10 rounded-2xl p-6 md:p-8 text-center"
+          >
+            <h3 className="text-lg md:text-xl font-semibold mb-2">
+              ¿Quieres orar con {saint.name} cada día?
+            </h3>
+            <p className="text-muted-foreground mb-4">
+              Únete gratis y recibe recordatorios en su festividad, oraciones guiadas con audio, y más.
+            </p>
+            <Link to="/auth">
+              <Button className="gap-2">
+                <UserPlus className="h-4 w-4" />
+                Registrarme gratis
+              </Button>
+            </Link>
+          </motion.div>
+        </section>
 
         {/* Related Saints */}
         {relatedSaints.length > 0 && (
@@ -355,7 +484,7 @@ export default function SantoPage() {
                         <div className="p-3">
                           <h3 className="font-medium text-sm line-clamp-1">{related.name}</h3>
                           <p className="text-xs text-muted-foreground">
-                            {formatDate(related.feast_month, related.feast_day)}
+                            {formatFeastDate(related.feast_month, related.feast_day, true)}
                           </p>
                         </div>
                       </CardContent>
@@ -367,7 +496,62 @@ export default function SantoPage() {
           </section>
         )}
 
-        {/* CTA Section */}
+        {/* Continent Patrons */}
+        {continentPatrons.length > 0 && (
+          <section className="container mx-auto max-w-5xl px-4 py-8 border-t">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
+              <h2 className="text-xl font-semibold mb-6">
+                Otros patronos de {getCountryContinent(saint.country_code!) === 'latinoamerica' ? 'Latinoamérica' : 
+                  getCountryContinent(saint.country_code!) === 'europa' ? 'Europa' :
+                  getCountryContinent(saint.country_code!) === 'asia' ? 'Asia' :
+                  getCountryContinent(saint.country_code!) === 'africa' ? 'África' :
+                  getCountryContinent(saint.country_code!) === 'norteamerica' ? 'Norteamérica' :
+                  'Oceanía'}
+              </h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                {continentPatrons.map((patron) => (
+                  <Link key={patron.id} to={`/santo/${patron.slug}`}>
+                    <Card className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer h-full">
+                      <CardContent className="p-0">
+                        <div className="relative aspect-square bg-gradient-to-br from-primary/10 to-secondary/10">
+                          {patron.image_url ? (
+                            <img
+                              src={patron.image_url}
+                              alt={patron.name}
+                              className="w-full h-full object-cover"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <Church className="h-8 w-8 text-muted-foreground/30" />
+                            </div>
+                          )}
+                          {patron.country_code && (
+                            <div className="absolute top-2 right-2 text-lg">
+                              {countryFlags[patron.country_code]}
+                            </div>
+                          )}
+                        </div>
+                        <div className="p-2 text-center">
+                          <h3 className="font-medium text-xs line-clamp-1">{patron.name}</h3>
+                          <p className="text-xs text-muted-foreground">
+                            {countryNames[patron.country_code!]}
+                          </p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+            </motion.div>
+          </section>
+        )}
+
+        {/* Final CTA Section */}
         <section className="bg-gradient-to-br from-primary/5 to-secondary/5 border-t">
           <div className="container mx-auto max-w-5xl px-4 py-12 text-center">
             <motion.div
@@ -380,7 +564,7 @@ export default function SantoPage() {
               </h2>
               <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
                 Únete a ElRugido y accede a oraciones guiadas, meditaciones diarias, 
-                el rosario interactivo y mucho más.
+                el rosario interactivo, el calendario de santos completo y mucho más.
               </p>
               <Link to="/auth">
                 <Button size="lg" className="gap-2">
@@ -392,22 +576,53 @@ export default function SantoPage() {
           </div>
         </section>
 
-        {/* Footer */}
+        {/* Footer with SEO Links */}
         <footer className="py-8 px-4 border-t">
-          <div className="container mx-auto max-w-5xl flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-            <Link to="/" className="flex items-center gap-2">
-              <img src={logoElRugido} alt="ElRugido" className="h-6 w-6" />
-              <span className="font-display font-semibold">ElRugido</span>
-            </Link>
-            <nav className="flex items-center gap-6">
-              <Link to="/santos" className="hover:text-foreground transition-colors">
-                Calendario de Santos
+          <div className="container mx-auto max-w-5xl">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+              <div>
+                <h4 className="font-semibold mb-3">Patronos Populares</h4>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li><Link to="/santo/virgen-de-guadalupe" className="hover:text-foreground">Virgen de Guadalupe</Link></li>
+                  <li><Link to="/santo/san-patricio" className="hover:text-foreground">San Patricio</Link></li>
+                  <li><Link to="/santo/santiago-apostol" className="hover:text-foreground">Santiago Apóstol</Link></li>
+                  <li><Link to="/santo/san-jose" className="hover:text-foreground">San José</Link></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-3">Por Continente</h4>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li><Link to="/santos?continent=latinoamerica" className="hover:text-foreground">Latinoamérica</Link></li>
+                  <li><Link to="/santos?continent=europa" className="hover:text-foreground">Europa</Link></li>
+                  <li><Link to="/santos?continent=asia" className="hover:text-foreground">Asia</Link></li>
+                  <li><Link to="/santos?continent=africa" className="hover:text-foreground">África</Link></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-3">Recursos</h4>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li><Link to="/santos" className="hover:text-foreground">Calendario de Santos</Link></li>
+                  <li><Link to="/auth" className="hover:text-foreground">Oraciones Guiadas</Link></li>
+                  <li><Link to="/auth" className="hover:text-foreground">Rosario Interactivo</Link></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-3">ElRugido</h4>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li><Link to="/" className="hover:text-foreground">Inicio</Link></li>
+                  <li><Link to="/auth" className="hover:text-foreground">Crear Cuenta</Link></li>
+                  <li><Link to="/auth" className="hover:text-foreground">Iniciar Sesión</Link></li>
+                </ul>
+              </div>
+            </div>
+            
+            <div className="pt-6 border-t flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
+              <Link to="/" className="flex items-center gap-2">
+                <img src={logoElRugido} alt="ElRugido" className="h-6 w-6" />
+                <span className="font-display font-semibold">ElRugido</span>
               </Link>
-              <Link to="/" className="hover:text-foreground transition-colors">
-                Inicio
-              </Link>
-            </nav>
-            <p>© {new Date().getFullYear()} ElRugido</p>
+              <p>© {new Date().getFullYear()} ElRugido - Tu compañero de fe católica</p>
+            </div>
           </div>
         </footer>
       </div>
