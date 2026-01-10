@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Save, User, Palette, Bell, ChevronRight } from "lucide-react";
+import { ArrowLeft, Save, User, Palette, Bell, ChevronRight, LogOut } from "lucide-react";
 import { z } from "zod";
 import { ThemeSelector } from "@/components/ui/theme-toggle";
 import { motion } from "framer-motion";
@@ -148,6 +148,11 @@ const Profile = () => {
         description: "Tus cambios han sido guardados correctamente",
       });
     }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/auth");
   };
 
   if (loading) {
@@ -366,6 +371,27 @@ const Profile = () => {
                   {saving ? "Guardando..." : "Guardar Cambios"}
                 </Button>
               </form>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Logout Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="mt-6"
+        >
+          <Card className="glass-card border-destructive/20">
+            <CardContent className="pt-6">
+              <Button 
+                variant="outline" 
+                className="w-full border-destructive/50 text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                onClick={handleLogout}
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                Cerrar Sesión
+              </Button>
             </CardContent>
           </Card>
         </motion.div>
