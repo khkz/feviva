@@ -30,24 +30,21 @@ export const AdminContent = () => {
   const [sleepStories, setSleepStories] = useState<ContentItem[]>([]);
   const [novenas, setNovenas] = useState<ContentItem[]>([]);
   const [lessons, setLessons] = useState<ContentItem[]>([]);
-  const [oraciones, setOraciones] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const { queueJobs, triggerProcessing } = useProcessingJobs();
 
   const fetchContent = async () => {
     try {
-      const [storiesRes, novenasRes, lessonsRes, oracionesRes] = await Promise.all([
+      const [storiesRes, novenasRes, lessonsRes] = await Promise.all([
         supabase.from('sleep_stories').select('id, titulo, audio_url, created_at').order('orden'),
         supabase.from('novenas').select('id, titulo, imagen_url, created_at').order('orden'),
-        supabase.from('library_lessons').select('id, titulo, contenido_enriquecido, audio_url, created_at').order('orden'),
-        supabase.from('oraciones').select('id, nombre, audio_url, created_at').order('orden')
+        supabase.from('library_lessons').select('id, titulo, contenido_enriquecido, audio_url, created_at').order('orden')
       ]);
 
       setSleepStories(storiesRes.data || []);
       setNovenas(novenasRes.data || []);
       setLessons(lessonsRes.data?.map(l => ({ ...l, titulo: l.titulo })) || []);
-      setOraciones(oracionesRes.data?.map(o => ({ ...o, titulo: o.nombre })) || []);
     } catch (error) {
       console.error('Error fetching content:', error);
     } finally {
@@ -159,7 +156,7 @@ export const AdminContent = () => {
       </div>
 
       <Tabs defaultValue="sleep">
-        <TabsList className="grid grid-cols-4 w-full max-w-lg">
+        <TabsList className="grid grid-cols-3 w-full max-w-md">
           <TabsTrigger value="sleep" className="flex items-center gap-1">
             <Moon className="h-4 w-4" />
             <span className="hidden sm:inline">Sueño</span>
@@ -171,10 +168,6 @@ export const AdminContent = () => {
           <TabsTrigger value="lessons" className="flex items-center gap-1">
             <BookOpen className="h-4 w-4" />
             <span className="hidden sm:inline">Lecciones</span>
-          </TabsTrigger>
-          <TabsTrigger value="oraciones" className="flex items-center gap-1">
-            <HandHeart className="h-4 w-4" />
-            <span className="hidden sm:inline">Oraciones</span>
           </TabsTrigger>
         </TabsList>
 
@@ -250,21 +243,6 @@ export const AdminContent = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="oraciones" className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold">Oraciones</h2>
-              <p className="text-sm text-muted-foreground">
-                {oraciones.filter(o => o.audio_url).length}/{oraciones.length} con audio
-              </p>
-            </div>
-          </div>
-          <Card>
-            <CardContent className="p-0">
-              {renderContentTable(oraciones, 'audio', 'audio_url')}
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
     </div>
   );

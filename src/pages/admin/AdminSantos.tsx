@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
@@ -47,6 +47,10 @@ import {
   ChevronLeft,
   ChevronRight,
   ExternalLink,
+  Wand2,
+  FileText,
+  AlertCircle,
+  Play,
 } from 'lucide-react';
 
 interface CalendarSaint {
@@ -66,6 +70,7 @@ interface CalendarSaint {
 interface BatchProgress {
   current: number;
   total: number;
+  type: 'history' | 'prayer' | 'image';
   results: { name: string; success: boolean; error?: string }[];
 }
 
@@ -99,13 +104,19 @@ export default function AdminSantos() {
   const [countryFilter, setCountryFilter] = useState<string>('all');
   const [imageFilter, setImageFilter] = useState<string>('all');
   const [prayerFilter, setPrayerFilter] = useState<string>('all');
+  const [historyFilter, setHistoryFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   
   const [editingSaint, setEditingSaint] = useState<CalendarSaint | null>(null);
   const [editedDescription, setEditedDescription] = useState('');
   const [viewingSaint, setViewingSaint] = useState<CalendarSaint | null>(null);
   const [generatingId, setGeneratingId] = useState<string | null>(null);
+  const [generatingType, setGeneratingType] = useState<string | null>(null);
   const [batchProgress, setBatchProgress] = useState<BatchProgress | null>(null);
+
+  // Batch generation settings
+  const [batchLimit, setBatchLimit] = useState<number>(10);
+  const [batchCategory, setBatchCategory] = useState<string>('all');
 
   // Fetch all saints
   const { data: saints = [], isLoading, refetch } = useQuery({
@@ -156,10 +167,69 @@ export default function AdminSantos() {
     },
   });
 
+  // Generate single history mutation
+  const generateHistoryMutation = useMutation({
+    mutationFn: async (saintId: string) => {
+      setGeneratingId(saintId);
+      setGeneratingType('history');
+      const { data, error } = await supabase.functions.invoke('generate-saint-history', {
+        body: { saintId, forceRegenerate: false },
+      });
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-calendar-saints'] });
+      if (data?.skipped) {
+        toast.info('El santo ya tiene historia');
+      } else {
+        toast.success('Historia generada correctamente');
+      }
+      setGeneratingId(null);
+      setGeneratingType(null);
+    },
+    onError: (error) => {
+      toast.error('Error al generar historia: ' + error.message);
+      setGeneratingId(null);
+      setGeneratingType(null);
+    },
+  });
+
+  // Generate single prayer mutation
+  const generatePrayerMutation = useMutation({
+    mutationFn: async (saintId: string) => {
+      setGeneratingId(saintId);
+      setGeneratingType('prayer');
+      const { data, error } = await supabase.functions.invoke('generate-saint-prayer', {
+        body: { saintId, forceRegenerate: false },
+      });
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-calendar-saints'] });
+      if (data?.skipped) {
+        toast.info('El santo ya tiene oración');
+      } else {
+        toast.success('Oración generada correctamente');
+      }
+      setGeneratingId(null);
+      setGeneratingType(null);
+    },
+    onError: (error) => {
+      toast.error('Error al generar oración: ' + error.message);
+      setGeneratingId(null);
+      setGeneratingType(null);
+    },
+  });
+
   // Generate single image mutation
   const generateImageMutation = useMutation({
     mutationFn: async (saintId: string) => {
       setGeneratingId(saintId);
+      setGeneratingType('image');
       const { data, error } = await supabase.functions.invoke('generate-saint-image', {
         body: { saintId },
       });
@@ -169,52 +239,86 @@ export default function AdminSantos() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['admin-calendar-saints'] });
-      toast.success('Imagen generada correctamente');
+      if (data?.skipped) {
+        toast.info('El santo ya tiene imagen');
+      } else {
+        toast.success('Imagen generada correctamente');
+      }
       setGeneratingId(null);
+      setGeneratingType(null);
     },
     onError: (error) => {
       toast.error('Error al generar imagen: ' + error.message);
       setGeneratingId(null);
+      setGeneratingType(null);
+    },
+  });
+
+  // Batch generate histories
+  const batchHistoryMutation = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke('batch-generate-saint-content', {
+        body: { 
+          contentType: 'history', 
+          onlyPatrons: batchCategory === 'patron_country',
+          limit: batchLimit 
+        },
+      });
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-calendar-saints'] });
+      toast.success(`Generadas ${data?.historyGenerated || 0} historias`);
+    },
+    onError: (error) => {
+      toast.error('Error en batch: ' + error.message);
+    },
+  });
+
+  // Batch generate prayers
+  const batchPrayerMutation = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke('batch-generate-saint-content', {
+        body: { 
+          contentType: 'prayer', 
+          onlyPatrons: batchCategory === 'patron_country',
+          limit: batchLimit 
+        },
+      });
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-calendar-saints'] });
+      toast.success(`Generadas ${data?.prayerGenerated || 0} oraciones`);
+    },
+    onError: (error) => {
+      toast.error('Error en batch: ' + error.message);
     },
   });
 
   // Batch generate images
-  const generateBatchImagesMutation = useMutation({
-    mutationFn: async (onlyPatrons: boolean) => {
-      const saintsWithoutImage = saints.filter(s => 
-        !s.image_url && (onlyPatrons ? s.category === 'patron_country' : true)
-      );
-      
-      setBatchProgress({ current: 0, total: saintsWithoutImage.length, results: [] });
+  const batchImageMutation = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke('batch-generate-saint-images', {
+        body: { 
+          onlyPatrons: batchCategory === 'patron_country',
+          limit: batchLimit 
+        },
+      });
 
-      const results: BatchProgress['results'] = [];
-      
-      for (let i = 0; i < saintsWithoutImage.length; i++) {
-        const saint = saintsWithoutImage[i];
-        try {
-          await supabase.functions.invoke('generate-saint-image', {
-            body: { saintId: saint.id },
-          });
-          results.push({ name: saint.name, success: true });
-        } catch (error: any) {
-          results.push({ name: saint.name, success: false, error: error.message });
-        }
-        setBatchProgress({ current: i + 1, total: saintsWithoutImage.length, results });
-        
-        // Small delay between requests
-        if (i < saintsWithoutImage.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 2000));
-        }
-      }
-
-      return results;
+      if (error) throw error;
+      return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['admin-calendar-saints'] });
-      toast.success('Generación batch completada');
+      toast.success(`Generadas ${data?.successCount || 0} imágenes`);
     },
     onError: (error) => {
-      toast.error('Error en generación batch: ' + error.message);
+      toast.error('Error en batch: ' + error.message);
     },
   });
 
@@ -241,6 +345,12 @@ export default function AdminSantos() {
     if (prayerFilter === 'without' && saint.prayer_id) {
       return false;
     }
+    if (historyFilter === 'with' && (!saint.description || saint.description.length <= 100)) {
+      return false;
+    }
+    if (historyFilter === 'without' && saint.description && saint.description.length > 100) {
+      return false;
+    }
     return true;
   });
 
@@ -258,7 +368,10 @@ export default function AdminSantos() {
     withPrayer: saints.filter(s => s.prayer_id).length,
     withHistory: saints.filter(s => s.description && s.description.length > 100).length,
     patrons: saints.filter(s => s.category === 'patron_country').length,
-    patronsWithoutImage: saints.filter(s => s.category === 'patron_country' && !s.image_url).length,
+    // Missing content
+    withoutImage: saints.filter(s => !s.image_url).length,
+    withoutPrayer: saints.filter(s => !s.prayer_id).length,
+    withoutHistory: saints.filter(s => !s.description || s.description.length <= 100).length,
   };
 
   // Get unique countries
@@ -277,6 +390,8 @@ export default function AdminSantos() {
     }
   };
 
+  const isBatchRunning = batchHistoryMutation.isPending || batchPrayerMutation.isPending || batchImageMutation.isPending;
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -285,7 +400,7 @@ export default function AdminSantos() {
           <Church className="h-8 w-8 text-primary" />
           <div>
             <h1 className="text-2xl font-bold">Gestión de Santos</h1>
-            <p className="text-muted-foreground">Calendario de 395 santos con imágenes, historias y oraciones</p>
+            <p className="text-muted-foreground">Centro de control del Santoral con generación IA</p>
           </div>
         </div>
         <Button variant="outline" onClick={() => refetch()} disabled={isLoading}>
@@ -294,45 +409,156 @@ export default function AdminSantos() {
         </Button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      {/* Stats Cards - Content Status */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="pt-4">
             <div className="text-2xl font-bold">{stats.total}</div>
             <p className="text-xs text-muted-foreground">Total Santos</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className={stats.withoutHistory > 0 ? 'border-amber-500/50' : 'border-green-500/50'}>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-green-600">{stats.withImage}</div>
-            <p className="text-xs text-muted-foreground">Con Imagen</p>
+            <div className="flex items-center gap-2">
+              <BookOpen className="h-5 w-5 text-purple-600" />
+              <div className="text-2xl font-bold text-purple-600">{stats.withHistory}</div>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Con Historia ({stats.withoutHistory} faltan)
+            </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className={stats.withoutPrayer > 0 ? 'border-amber-500/50' : 'border-green-500/50'}>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-blue-600">{stats.withPrayer}</div>
-            <p className="text-xs text-muted-foreground">Con Oración</p>
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-blue-600" />
+              <div className="text-2xl font-bold text-blue-600">{stats.withPrayer}</div>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Con Oración ({stats.withoutPrayer} faltan)
+            </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className={stats.withoutImage > 0 ? 'border-amber-500/50' : 'border-green-500/50'}>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-purple-600">{stats.withHistory}</div>
-            <p className="text-xs text-muted-foreground">Con Historia</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-secondary">{stats.patrons}</div>
-            <p className="text-xs text-muted-foreground">Patronos</p>
-          </CardContent>
-        </Card>
-        <Card className="border-destructive/50">
-          <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-destructive">{stats.patronsWithoutImage}</div>
-            <p className="text-xs text-muted-foreground">Patronos sin Img</p>
+            <div className="flex items-center gap-2">
+              <Image className="h-5 w-5 text-green-600" />
+              <div className="text-2xl font-bold text-green-600">{stats.withImage}</div>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Con Imagen ({stats.withoutImage} faltan)
+            </p>
           </CardContent>
         </Card>
       </div>
+
+      {/* AI Generation Panel */}
+      <Card className="border-primary/30 bg-gradient-to-r from-primary/5 to-secondary/5">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Wand2 className="h-5 w-5 text-primary" />
+            Generación Masiva con IA
+          </CardTitle>
+          <CardDescription>
+            Genera historias, oraciones e imágenes automáticamente para los santos que faltan
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Settings Row */}
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">Límite:</span>
+              <Select value={batchLimit.toString()} onValueChange={(v) => setBatchLimit(parseInt(v))}>
+                <SelectTrigger className="w-[100px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="5">5</SelectItem>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="25">25</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">Categoría:</span>
+              <Select value={batchCategory} onValueChange={setBatchCategory}>
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos los santos</SelectItem>
+                  <SelectItem value="patron_country">Solo Patronos</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-wrap gap-3">
+            <Button
+              variant="outline"
+              onClick={() => batchHistoryMutation.mutate()}
+              disabled={isBatchRunning || stats.withoutHistory === 0}
+              className="gap-2"
+            >
+              {batchHistoryMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <BookOpen className="h-4 w-4" />
+              )}
+              Generar {Math.min(batchLimit, stats.withoutHistory)} Historias
+              {stats.withoutHistory > 0 && (
+                <Badge variant="secondary" className="ml-1">{stats.withoutHistory}</Badge>
+              )}
+            </Button>
+
+            <Button
+              variant="outline"
+              onClick={() => batchPrayerMutation.mutate()}
+              disabled={isBatchRunning || stats.withoutPrayer === 0}
+              className="gap-2"
+            >
+              {batchPrayerMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Sparkles className="h-4 w-4" />
+              )}
+              Generar {Math.min(batchLimit, stats.withoutPrayer)} Oraciones
+              {stats.withoutPrayer > 0 && (
+                <Badge variant="secondary" className="ml-1">{stats.withoutPrayer}</Badge>
+              )}
+            </Button>
+
+            <Button
+              variant="outline"
+              onClick={() => batchImageMutation.mutate()}
+              disabled={isBatchRunning || stats.withoutImage === 0}
+              className="gap-2"
+            >
+              {batchImageMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <ImagePlus className="h-4 w-4" />
+              )}
+              Generar {Math.min(batchLimit, stats.withoutImage)} Imágenes
+              {stats.withoutImage > 0 && (
+                <Badge variant="secondary" className="ml-1">{stats.withoutImage}</Badge>
+              )}
+            </Button>
+          </div>
+
+          {/* Running indicator */}
+          {isBatchRunning && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground animate-pulse">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Procesando en segundo plano... Esto puede tomar varios minutos.
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Batch Progress */}
       {batchProgress && (
@@ -340,7 +566,7 @@ export default function AdminSantos() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center gap-2">
               <Loader2 className="h-4 w-4 animate-spin" />
-              Generando imágenes: {batchProgress.current} de {batchProgress.total}
+              Generando {batchProgress.type}: {batchProgress.current} de {batchProgress.total}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -416,19 +642,19 @@ export default function AdminSantos() {
               </SelectContent>
             </Select>
 
-            <Select value={imageFilter} onValueChange={(v) => { setImageFilter(v); setCurrentPage(1); }}>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Imagen" />
+            <Select value={historyFilter} onValueChange={(v) => { setHistoryFilter(v); setCurrentPage(1); }}>
+              <SelectTrigger className="w-[130px]">
+                <SelectValue placeholder="Historia" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todas</SelectItem>
-                <SelectItem value="with">Con imagen</SelectItem>
-                <SelectItem value="without">Sin imagen</SelectItem>
+                <SelectItem value="with">Con historia</SelectItem>
+                <SelectItem value="without">Sin historia</SelectItem>
               </SelectContent>
             </Select>
 
             <Select value={prayerFilter} onValueChange={(v) => { setPrayerFilter(v); setCurrentPage(1); }}>
-              <SelectTrigger className="w-[140px]">
+              <SelectTrigger className="w-[130px]">
                 <SelectValue placeholder="Oración" />
               </SelectTrigger>
               <SelectContent>
@@ -438,16 +664,16 @@ export default function AdminSantos() {
               </SelectContent>
             </Select>
 
-            <div className="flex gap-2 ml-auto">
-              <Button
-                variant="secondary"
-                onClick={() => generateBatchImagesMutation.mutate(true)}
-                disabled={generateBatchImagesMutation.isPending || stats.patronsWithoutImage === 0}
-              >
-                <ImagePlus className="h-4 w-4 mr-2" />
-                Generar {stats.patronsWithoutImage} patronos
-              </Button>
-            </div>
+            <Select value={imageFilter} onValueChange={(v) => { setImageFilter(v); setCurrentPage(1); }}>
+              <SelectTrigger className="w-[130px]">
+                <SelectValue placeholder="Imagen" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas</SelectItem>
+                <SelectItem value="with">Con imagen</SelectItem>
+                <SelectItem value="without">Sin imagen</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="mt-3 text-sm text-muted-foreground">
@@ -469,7 +695,7 @@ export default function AdminSantos() {
                 <TableHead className="w-[80px] text-center">Historia</TableHead>
                 <TableHead className="w-[80px] text-center">Oración</TableHead>
                 <TableHead className="w-[80px] text-center">Imagen</TableHead>
-                <TableHead className="w-[120px]">Acciones</TableHead>
+                <TableHead className="w-[160px]">Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -488,7 +714,7 @@ export default function AdminSantos() {
               ) : (
                 paginatedSaints.map((saint) => {
                   const hasHistory = saint.description && saint.description.length > 100;
-                  const isGenerating = generatingId === saint.id;
+                  const isGeneratingSaint = generatingId === saint.id;
 
                   return (
                     <TableRow key={saint.id}>
@@ -543,6 +769,7 @@ export default function AdminSantos() {
                             size="icon"
                             className="h-8 w-8"
                             onClick={() => setViewingSaint(saint)}
+                            title="Ver detalles"
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
@@ -554,6 +781,7 @@ export default function AdminSantos() {
                               setEditingSaint(saint);
                               setEditedDescription(saint.description || '');
                             }}
+                            title="Editar historia"
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -561,10 +789,39 @@ export default function AdminSantos() {
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8"
-                            onClick={() => generateImageMutation.mutate(saint.id)}
-                            disabled={isGenerating || !!saint.image_url}
+                            onClick={() => generateHistoryMutation.mutate(saint.id)}
+                            disabled={isGeneratingSaint || hasHistory}
+                            title="Generar historia"
                           >
-                            {isGenerating ? (
+                            {isGeneratingSaint && generatingType === 'history' ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <BookOpen className="h-4 w-4" />
+                            )}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => generatePrayerMutation.mutate(saint.id)}
+                            disabled={isGeneratingSaint || !!saint.prayer_id}
+                            title="Generar oración"
+                          >
+                            {isGeneratingSaint && generatingType === 'prayer' ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Sparkles className="h-4 w-4" />
+                            )}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => generateImageMutation.mutate(saint.id)}
+                            disabled={isGeneratingSaint || !!saint.image_url}
+                            title="Generar imagen"
+                          >
+                            {isGeneratingSaint && generatingType === 'image' ? (
                               <Loader2 className="h-4 w-4 animate-spin" />
                             ) : (
                               <ImagePlus className="h-4 w-4" />
@@ -732,7 +989,7 @@ export default function AdminSantos() {
               )}
             </div>
           )}
-          <DialogFooter>
+          <DialogFooter className="flex-wrap gap-2">
             <Button
               variant="outline"
               onClick={() => {
@@ -745,6 +1002,19 @@ export default function AdminSantos() {
             >
               <Edit className="h-4 w-4 mr-2" />
               Editar Historia
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (viewingSaint && !viewingSaint.prayer_id) {
+                  generatePrayerMutation.mutate(viewingSaint.id);
+                  setViewingSaint(null);
+                }
+              }}
+              disabled={!!viewingSaint?.prayer_id || generatePrayerMutation.isPending}
+            >
+              <Sparkles className="h-4 w-4 mr-2" />
+              {viewingSaint?.prayer_id ? 'Ya tiene oración' : 'Generar Oración'}
             </Button>
             <Button
               onClick={() => {

@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
+import { useEffect } from 'react';
 import { 
   ArrowLeft, 
   Calendar, 
@@ -116,6 +117,20 @@ export default function SantoPage() {
     enabled: !!saint && saint.category === 'patron_country',
   });
 
+  // Preload main image for faster LCP
+  useEffect(() => {
+    if (saint?.image_url) {
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.href = saint.image_url;
+      document.head.appendChild(link);
+      return () => {
+        document.head.removeChild(link);
+      };
+    }
+  }, [saint?.image_url]);
+
   const handleShare = async () => {
     if (navigator.share && saint) {
       try {
@@ -161,20 +176,68 @@ export default function SantoPage() {
     ? saint.description.slice(0, 155) + '...'
     : `${saint.name} - Fiesta: ${formatFeastDate(saint.feast_month, saint.feast_day)}. Conoce su historia y oración en ElRugido.`;
 
-  const schemaOrg = {
+  // Enhanced Schema.org markup for better AI and search engine understanding
+  const personSchema = {
     "@context": "https://schema.org",
-    "@type": "Thing",
+    "@type": "Person",
+    "@id": `https://elrugido.com/santo/${saint.slug}#person`,
     "name": saint.name,
-    "description": saint.description,
+    "description": saint.description || metaDescription,
     "image": saint.image_url,
     "url": `https://elrugido.com/santo/${saint.slug}`,
-    "sameAs": `https://elrugido.com/santo/${saint.slug}`,
     ...(isPatron && saint.country_code && {
-      "areaServed": {
+      "nationality": {
         "@type": "Country",
         "name": countryNames[saint.country_code]
       }
     })
+  };
+
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": `${saint.name} - Historia, Oración y Festividad`,
+    "description": metaDescription,
+    "image": saint.image_url,
+    "author": {
+      "@type": "Organization",
+      "name": "ElRugido"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "ElRugido",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://elrugido.com/logo-elrugido.svg"
+      }
+    },
+    "datePublished": saint.created_at,
+    "mainEntityOfPage": `https://elrugido.com/santo/${saint.slug}`
+  };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Inicio",
+        "item": "https://elrugido.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Santos",
+        "item": "https://elrugido.com/santos"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": saint.name,
+        "item": `https://elrugido.com/santo/${saint.slug}`
+      }
+    ]
   };
 
   const faqSchema = {
@@ -204,6 +267,14 @@ export default function SantoPage() {
           "@type": "Answer",
           "text": `Sí, existe una oración tradicional para pedir la intercesión de ${saint.name}. Puedes encontrarla en ElRugido.`
         }
+      }] : []),
+      ...(saint.description ? [{
+        "@type": "Question",
+        "name": `¿Cuál es la historia de ${saint.name}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": saint.description.slice(0, 300) + '...'
+        }
       }] : [])
     ]
   };
@@ -213,19 +284,39 @@ export default function SantoPage() {
       <Helmet>
         <title>{saint.name} - Historia, Oración y Festividad | ElRugido</title>
         <meta name="description" content={metaDescription} />
-        <meta name="keywords" content={`${saint.name}, santo, católico, oración, ${isPatron ? `patrono ${countryNames[saint.country_code || '']}` : ''}, ${saint.tags?.join(', ') || ''}`} />
+        <meta name="keywords" content={`${saint.name}, santo católico, oración ${saint.name}, historia ${saint.name}, ${isPatron ? `patrono ${countryNames[saint.country_code || '']}` : ''}, ${saint.tags?.join(', ') || ''}, santoral, fiesta ${formatFeastDate(saint.feast_month, saint.feast_day)}`} />
+        
+        {/* Open Graph */}
+        <meta property="og:type" content="article" />
         <meta property="og:title" content={`${saint.name} - Historia y Oración | ElRugido`} />
         <meta property="og:description" content={metaDescription} />
-        {saint.image_url && <meta property="og:image" content={saint.image_url} />}
-        <meta property="og:type" content="article" />
         <meta property="og:url" content={`https://elrugido.com/santo/${saint.slug}`} />
+        <meta property="og:site_name" content="ElRugido" />
+        <meta property="og:locale" content="es_ES" />
+        {saint.image_url && (
+          <>
+            <meta property="og:image" content={saint.image_url} />
+            <meta property="og:image:alt" content={`Imagen de ${saint.name}`} />
+            <meta property="og:image:width" content="1200" />
+            <meta property="og:image:height" content="630" />
+          </>
+        )}
+        
+        {/* Twitter Cards */}
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@elrugidoapp" />
         <meta name="twitter:title" content={`${saint.name} - ElRugido`} />
         <meta name="twitter:description" content={metaDescription} />
         {saint.image_url && <meta name="twitter:image" content={saint.image_url} />}
-        <link rel="canonical" href={`https://elrugido.com/santo/${saint.slug}`} />
         
-        <script type="application/ld+json">{JSON.stringify(schemaOrg)}</script>
+        {/* Canonical and Language */}
+        <link rel="canonical" href={`https://elrugido.com/santo/${saint.slug}`} />
+        <meta httpEquiv="content-language" content="es" />
+        
+        {/* Schema.org Structured Data */}
+        <script type="application/ld+json">{JSON.stringify(personSchema)}</script>
+        <script type="application/ld+json">{JSON.stringify(articleSchema)}</script>
+        <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
       </Helmet>
 
