@@ -273,16 +273,16 @@ export default function SantoPage() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5 }}
-                className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10 shadow-xl"
+                className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10 shadow-xl"
               >
                 {saint.image_url ? (
                   <img
                     src={saint.image_url}
                     alt={`Imagen de ${saint.name}`}
-                    className="w-full h-full object-cover"
+                    className="w-full h-auto max-h-[70vh] object-contain"
                   />
                 ) : (
-                  <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="aspect-[3/4] flex items-center justify-center">
                     <Church className="h-24 w-24 text-muted-foreground/30" />
                   </div>
                 )}
