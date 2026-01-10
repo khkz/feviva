@@ -1337,6 +1337,9 @@ export type Database = {
           cita_celebre: string | null
           created_at: string
           es_fundamental: boolean | null
+          es_tradicional: boolean | null
+          fuente: string | null
+          fuente_url: string | null
           historia: string | null
           id: string
           language: string | null
@@ -1354,6 +1357,9 @@ export type Database = {
           cita_celebre?: string | null
           created_at?: string
           es_fundamental?: boolean | null
+          es_tradicional?: boolean | null
+          fuente?: string | null
+          fuente_url?: string | null
           historia?: string | null
           id?: string
           language?: string | null
@@ -1371,6 +1377,9 @@ export type Database = {
           cita_celebre?: string | null
           created_at?: string
           es_fundamental?: boolean | null
+          es_tradicional?: boolean | null
+          fuente?: string | null
+          fuente_url?: string | null
           historia?: string | null
           id?: string
           language?: string | null
