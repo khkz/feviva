@@ -322,6 +322,26 @@ export default function AdminSantos() {
     },
   });
 
+  // Import traditional prayers mutation
+  const importTraditionalPrayersMutation = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke('import-traditional-prayers', {
+        body: { importAll: true, limit: 50 },
+      });
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-calendar-saints'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-oraciones-for-saints'] });
+      toast.success(`Importadas ${data?.summary?.created || 0} oraciones tradicionales, actualizadas ${data?.summary?.updated || 0}`);
+    },
+    onError: (error) => {
+      toast.error('Error al importar: ' + error.message);
+    },
+  });
+
   // Filter saints
   const filteredSaints = saints.filter(saint => {
     if (searchQuery && !saint.name.toLowerCase().includes(searchQuery.toLowerCase())) {
