@@ -59,3 +59,12 @@ verify_jwt = false
 
 [functions.regenerate-gratitude-content]
 verify_jwt = false
+
+[functions.generate-saint-history]
+verify_jwt = false
+
+[functions.generate-saint-prayer]
+verify_jwt = false
+
+[functions.batch-generate-saint-content]
+verify_jwt = false
