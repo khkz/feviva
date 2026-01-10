@@ -38,18 +38,16 @@ serve(async (req) => {
       query = query.eq('country_code', countryCode);
     }
 
-    // Filter based on what needs to be generated
-    if (contentType === 'history') {
-      query = query.or('description.is.null,description.eq.""');
-    } else if (contentType === 'prayer') {
+    // Note: We can't filter by description length in the query,
+    // so we'll fetch all and filter in code for history
+    if (contentType === 'prayer') {
       query = query.is('prayer_id', null);
-    } else if (contentType === 'both') {
-      query = query.or('description.is.null,description.eq."",prayer_id.is.null');
     }
+    // For 'history' and 'both', we need to check description length in code
 
     query = query.limit(limit);
 
-    const { data: saints, error: saintsError } = await query;
+    const { data: allSaints, error: saintsError } = await query;
 
     if (saintsError) {
       return new Response(
@@ -58,7 +56,20 @@ serve(async (req) => {
       );
     }
 
-    if (!saints || saints.length === 0) {
+    // Filter saints that need content based on type
+    let saints = allSaints || [];
+    
+    if (contentType === 'history' || contentType === 'both') {
+      // Filter to only saints with no/short description (< 100 chars)
+      saints = saints.filter(s => 
+        !s.description || s.description.length < 100
+      );
+    }
+    
+    // Apply limit after filtering
+    saints = saints.slice(0, limit);
+
+    if (saints.length === 0) {
       return new Response(
         JSON.stringify({ 
           success: true, 
