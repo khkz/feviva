@@ -51,6 +51,8 @@ import {
   FileText,
   AlertCircle,
   Play,
+  BookHeart,
+  Download,
 } from 'lucide-react';
 
 interface CalendarSaint {
@@ -410,7 +412,7 @@ export default function AdminSantos() {
     }
   };
 
-  const isBatchRunning = batchHistoryMutation.isPending || batchPrayerMutation.isPending || batchImageMutation.isPending;
+  const isBatchRunning = batchHistoryMutation.isPending || batchPrayerMutation.isPending || batchImageMutation.isPending || importTraditionalPrayersMutation.isPending;
 
   return (
     <div className="space-y-6">
@@ -568,6 +570,34 @@ export default function AdminSantos() {
                 <Badge variant="secondary" className="ml-1">{stats.withoutImage}</Badge>
               )}
             </Button>
+          </div>
+
+          {/* Sección Oraciones Tradicionales */}
+          <div className="border-t pt-4 mt-4">
+            <div className="flex items-center gap-2 mb-3">
+              <BookHeart className="h-5 w-5 text-amber-600" />
+              <span className="font-medium text-sm">Oraciones Tradicionales</span>
+              <Badge variant="outline" className="text-amber-600 border-amber-600">
+                Fuentes Católicas Oficiales
+              </Badge>
+            </div>
+            
+            <Button
+              onClick={() => importTraditionalPrayersMutation.mutate()}
+              disabled={isBatchRunning}
+              className="gap-2 bg-amber-600 hover:bg-amber-700"
+            >
+              {importTraditionalPrayersMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4" />
+              )}
+              Importar Oraciones de ACI Prensa
+            </Button>
+            
+            <p className="text-xs text-muted-foreground mt-2">
+              Importa oraciones tradicionales reales de santos importantes desde fuentes católicas oficiales
+            </p>
           </div>
 
           {/* Running indicator */}
