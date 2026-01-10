@@ -14,6 +14,7 @@ export interface CalendarSaint {
   prayer_id: string | null;
   tags: string[] | null;
   created_at: string | null;
+  slug: string | null;
 }
 
 interface UseSantosOptions {

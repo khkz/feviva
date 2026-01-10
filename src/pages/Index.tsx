@@ -9,6 +9,7 @@ import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
 import { TechFeaturesSection } from "@/components/landing/TechFeaturesSection";
 import { FinalCTASection } from "@/components/landing/FinalCTASection";
 import { FooterSection } from "@/components/landing/FooterSection";
+import { SaintsPreviewSection } from "@/components/landing/SaintsPreviewSection";
 import heroBackground from "@/assets/hero-background.jpg";
 import logoElRugido from "@/assets/logo-elrugido.svg";
 
@@ -167,6 +168,9 @@ const Index = () => {
 
       {/* Tech Features */}
       <TechFeaturesSection />
+
+      {/* Saints Preview - SEO */}
+      <SaintsPreviewSection />
 
       {/* Final CTA */}
       <FinalCTASection />

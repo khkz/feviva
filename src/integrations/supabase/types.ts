@@ -368,6 +368,7 @@ export type Database = {
           image_url: string | null
           name: string
           prayer_id: string | null
+          slug: string | null
           tags: string[] | null
         }
         Insert: {
@@ -381,6 +382,7 @@ export type Database = {
           image_url?: string | null
           name: string
           prayer_id?: string | null
+          slug?: string | null
           tags?: string[] | null
         }
         Update: {
@@ -394,6 +396,7 @@ export type Database = {
           image_url?: string | null
           name?: string
           prayer_id?: string | null
+          slug?: string | null
           tags?: string[] | null
         }
         Relationships: [
@@ -2222,6 +2225,7 @@ export type Database = {
           total_count: number
         }[]
       }
+      generate_saint_slug: { Args: { name_input: string }; Returns: string }
       get_processing_stats: {
         Args: { p_job_type?: string }
         Returns: {
