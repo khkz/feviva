@@ -30,6 +30,7 @@ import Novenas from "./pages/Novenas";
 import BiblePlan from "./pages/BiblePlan";
 import Santos from "./pages/Santos";
 import SantoPage from "./pages/SantoPage";
+import SantosPublic from "./pages/SantosPublic";
 import NotFound from "./pages/NotFound";
 import ApostlePath from "./pages/ApostlePath";
 import ApologeticsIntro from "./pages/ApologeticsIntro";
@@ -89,7 +90,8 @@ const App = () => (
               <Route path="/sleep" element={<SleepStories />} />
               <Route path="/novenas" element={<Novenas />} />
               <Route path="/bible-plan" element={<BiblePlan />} />
-              <Route path="/santos" element={<Santos />} />
+              <Route path="/santos" element={<SantosPublic />} />
+              <Route path="/santos/app" element={<Santos />} />
               <Route path="/santo/:slug" element={<SantoPage />} />
               <Route path="/apostle-path" element={<ApostlePath />} />
               <Route path="/apologetics-intro" element={<ApologeticsIntro />} />

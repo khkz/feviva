@@ -4,15 +4,16 @@ import { supabase } from '@/integrations/supabase/client';
 export interface CalendarSaint {
   id: string;
   name: string;
+  slug: string | null;
   feast_month: number;
   feast_day: number;
   country_code: string | null;
   category: string;
-  tags: string[];
+  tags: string[] | null;
   description: string | null;
   image_url: string | null;
   prayer_id: string | null;
-  created_at: string;
+  created_at: string | null;
 }
 
 interface UseSaintOfDayResult {

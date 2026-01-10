@@ -1,19 +1,39 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Heart, Church, BookOpen, Sparkles } from "lucide-react";
+import { Heart, Church, BookOpen, Sparkles, MapPin, Globe } from "lucide-react";
 import logoElRugido from "@/assets/logo-elrugido.svg";
+
+// Popular saints for SEO links
+const popularSaints = [
+  { name: "Virgen de Guadalupe", slug: "virgen-de-guadalupe" },
+  { name: "San Francisco de Asís", slug: "san-francisco-de-asis" },
+  { name: "Santa Teresa de Jesús", slug: "santa-teresa-de-jesus" },
+  { name: "San Juan Pablo II", slug: "san-juan-pablo-ii" },
+  { name: "San José", slug: "san-jose" },
+  { name: "Santa Rosa de Lima", slug: "santa-rosa-de-lima" },
+];
+
+// Patron saints by country for SEO
+const patronsByCountry = [
+  { name: "México", saint: "Virgen de Guadalupe", slug: "virgen-de-guadalupe" },
+  { name: "Argentina", saint: "Virgen de Luján", slug: "virgen-de-lujan" },
+  { name: "España", saint: "Santiago Apóstol", slug: "santiago-apostol" },
+  { name: "Perú", saint: "Santa Rosa de Lima", slug: "santa-rosa-de-lima" },
+  { name: "Colombia", saint: "Virgen del Rosario", slug: "nuestra-senora-del-rosario-de-chiquinquira" },
+  { name: "Brasil", saint: "Nuestra Señora Aparecida", slug: "nuestra-senora-aparecida" },
+];
 
 export const FooterSection = () => {
   return (
     <footer className="py-12 px-4 border-t border-border/50 bg-muted/30">
       <div className="container mx-auto max-w-6xl">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
           {/* Brand */}
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="space-y-4"
+            className="space-y-4 lg:col-span-1"
           >
             <div className="flex items-center gap-3">
               <img src={logoElRugido} alt="ElRugido" className="w-10 h-10" />
@@ -27,7 +47,7 @@ export const FooterSection = () => {
             </p>
           </motion.div>
 
-          {/* Santos del Calendario */}
+          {/* Santos Populares - SEO Links */}
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -36,13 +56,66 @@ export const FooterSection = () => {
             className="space-y-3"
           >
             <h4 className="font-semibold flex items-center gap-2">
-              <Church className="h-4 w-4 text-primary" />
-              Santos del Calendario
+              <Sparkles className="h-4 w-4 text-primary" />
+              Santos Populares
             </h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
+            <ul className="space-y-1.5 text-sm text-muted-foreground">
+              {popularSaints.map((saint) => (
+                <li key={saint.slug}>
+                  <Link 
+                    to={`/santo/${saint.slug}`} 
+                    className="hover:text-foreground transition-colors"
+                  >
+                    {saint.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+
+          {/* Patronos por País - SEO Links */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.15 }}
+            className="space-y-3"
+          >
+            <h4 className="font-semibold flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-primary" />
+              Patronos por País
+            </h4>
+            <ul className="space-y-1.5 text-sm text-muted-foreground">
+              {patronsByCountry.map((item) => (
+                <li key={item.slug}>
+                  <Link 
+                    to={`/santo/${item.slug}`} 
+                    className="hover:text-foreground transition-colors"
+                    title={`Santo patrono de ${item.name}`}
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+
+          {/* Calendario */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="space-y-3"
+          >
+            <h4 className="font-semibold flex items-center gap-2">
+              <Church className="h-4 w-4 text-primary" />
+              Calendario Litúrgico
+            </h4>
+            <ul className="space-y-1.5 text-sm text-muted-foreground">
               <li>
                 <Link to="/santos" className="hover:text-foreground transition-colors">
-                  Calendario completo
+                  Todos los santos
                 </Link>
               </li>
               <li>
@@ -55,22 +128,27 @@ export const FooterSection = () => {
                   Santos de hoy
                 </Link>
               </li>
+              <li>
+                <Link to="/santos?tab=month" className="hover:text-foreground transition-colors">
+                  Santos del mes
+                </Link>
+              </li>
             </ul>
           </motion.div>
 
-          {/* Recursos */}
+          {/* Recursos y Únete */}
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
+            transition={{ delay: 0.25 }}
             className="space-y-3"
           >
             <h4 className="font-semibold flex items-center gap-2">
               <BookOpen className="h-4 w-4 text-primary" />
               Recursos
             </h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
+            <ul className="space-y-1.5 text-sm text-muted-foreground">
               <li>
                 <Link to="/auth" className="hover:text-foreground transition-colors">
                   Oraciones guiadas
@@ -86,30 +164,9 @@ export const FooterSection = () => {
                   Novenas
                 </Link>
               </li>
-            </ul>
-          </motion.div>
-
-          {/* Comunidad */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.3 }}
-            className="space-y-3"
-          >
-            <h4 className="font-semibold flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-primary" />
-              Únete
-            </h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                <Link to="/auth" className="hover:text-foreground transition-colors">
-                  Crear cuenta gratis
-                </Link>
-              </li>
-              <li>
-                <Link to="/auth" className="hover:text-foreground transition-colors">
-                  Iniciar sesión
+                <Link to="/auth" className="hover:text-foreground transition-colors font-medium text-primary">
+                  Crear cuenta gratis →
                 </Link>
               </li>
             </ul>

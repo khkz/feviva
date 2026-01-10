@@ -10,6 +10,7 @@ import { TechFeaturesSection } from "@/components/landing/TechFeaturesSection";
 import { FinalCTASection } from "@/components/landing/FinalCTASection";
 import { FooterSection } from "@/components/landing/FooterSection";
 import { SaintsPreviewSection } from "@/components/landing/SaintsPreviewSection";
+import { SaintOfDayLanding } from "@/components/landing/SaintOfDayLanding";
 import heroBackground from "@/assets/hero-background.jpg";
 import logoElRugido from "@/assets/logo-elrugido.svg";
 
@@ -153,6 +154,9 @@ const Index = () => {
           </motion.div>
         </motion.button>
       </section>
+
+      {/* Saint of the Day - SEO */}
+      <SaintOfDayLanding />
 
       {/* User Needs Section */}
       <UserNeedsSection />
