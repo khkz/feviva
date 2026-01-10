@@ -126,6 +126,9 @@ export const continentCountries: Record<string, string[]> = {
   oceania: ['AU', 'NZ', 'PG', 'FJ', 'SB', 'VU', 'WS', 'TO', 'NC', 'PF', 'GU', 'FM', 'PW', 'MH', 'KI', 'NR', 'TV', 'CK', 'NU', 'TK'],
 };
 
+// Alias for compatibility
+export const countriesByContinent = continentCountries;
+
 export const monthNames = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
