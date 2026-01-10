@@ -53,6 +53,7 @@ import {
   Play,
   BookHeart,
   Download,
+  Cross,
 } from 'lucide-react';
 
 interface CalendarSaint {
@@ -344,6 +345,28 @@ export default function AdminSantos() {
     },
   });
 
+  // Fix fundamental prayers mutation
+  const fixFundamentalPrayersMutation = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke('fix-fundamental-prayers', {
+        body: { fixFundamental: true, fixMarian: true },
+      });
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-calendar-saints'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-oraciones-for-saints'] });
+      queryClient.invalidateQueries({ queryKey: ['oraciones'] });
+      const summary = data?.summary;
+      toast.success(`Corregidas ${summary?.fundamentalUpdated || 0} + ${summary?.fundamentalCreated || 0} fundamentales, ${summary?.marianUpdated || 0} + ${summary?.marianCreated || 0} marianas`);
+    },
+    onError: (error) => {
+      toast.error('Error al corregir: ' + error.message);
+    },
+  });
+
   // Filter saints
   const filteredSaints = saints.filter(saint => {
     if (searchQuery && !saint.name.toLowerCase().includes(searchQuery.toLowerCase())) {
@@ -412,7 +435,7 @@ export default function AdminSantos() {
     }
   };
 
-  const isBatchRunning = batchHistoryMutation.isPending || batchPrayerMutation.isPending || batchImageMutation.isPending || importTraditionalPrayersMutation.isPending;
+  const isBatchRunning = batchHistoryMutation.isPending || batchPrayerMutation.isPending || batchImageMutation.isPending || importTraditionalPrayersMutation.isPending || fixFundamentalPrayersMutation.isPending;
 
   return (
     <div className="space-y-6">
@@ -582,21 +605,40 @@ export default function AdminSantos() {
               </Badge>
             </div>
             
-            <Button
-              onClick={() => importTraditionalPrayersMutation.mutate()}
-              disabled={isBatchRunning}
-              className="gap-2 bg-amber-600 hover:bg-amber-700"
-            >
-              {importTraditionalPrayersMutation.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Download className="h-4 w-4" />
-              )}
-              Importar Oraciones de ACI Prensa
-            </Button>
+            <div className="flex flex-wrap gap-3">
+              {/* Botón Corregir Oraciones Fundamentales */}
+              <Button
+                onClick={() => fixFundamentalPrayersMutation.mutate()}
+                disabled={isBatchRunning}
+                className="gap-2 bg-rose-600 hover:bg-rose-700"
+              >
+                {fixFundamentalPrayersMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Cross className="h-4 w-4" />
+                )}
+                Corregir Oraciones Fundamentales
+              </Button>
+
+              {/* Botón Importar de ACI Prensa */}
+              <Button
+                onClick={() => importTraditionalPrayersMutation.mutate()}
+                disabled={isBatchRunning}
+                className="gap-2 bg-amber-600 hover:bg-amber-700"
+              >
+                {importTraditionalPrayersMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Download className="h-4 w-4" />
+                )}
+                Importar Oraciones de ACI Prensa
+              </Button>
+            </div>
             
             <p className="text-xs text-muted-foreground mt-2">
-              Importa oraciones tradicionales reales de santos importantes desde fuentes católicas oficiales
+              <strong>Corregir Fundamentales:</strong> Actualiza Padre Nuestro, Ave María, Gloria, Credo y otras oraciones básicas con textos litúrgicos oficiales + Advocaciones Marianas Latinoamericanas.
+              <br />
+              <strong>Importar ACI Prensa:</strong> Importa oraciones tradicionales de santos importantes desde fuentes católicas oficiales.
             </p>
           </div>
 
