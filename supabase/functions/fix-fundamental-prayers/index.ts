@@ -169,9 +169,20 @@ Amén.`,
     fuente_url: "https://www.aciprensa.com/recursos/angel-de-la-guarda-1558",
     categoria: "Oraciones a los Ángeles",
     tagline: "Oración tradicional al ángel custodio"
-  },
+  }
+};
+
+// Más oraciones fundamentales de Corazones.org y EWTN
+const MORE_FUNDAMENTAL_PRAYERS: Record<string, {
+  nombre: string;
+  texto: string;
+  fuente: string;
+  fuente_url: string;
+  categoria: string;
+  tagline: string;
+}> = {
   "Alma de Cristo": {
-    nombre: "Alma de Cristo",
+    nombre: "Alma de Cristo (Anima Christi)",
     texto: `Alma de Cristo, santifícame.
 Cuerpo de Cristo, sálvame.
 Sangre de Cristo, embriágame.
@@ -188,8 +199,8 @@ para que con tus santos te alabe
 por los siglos de los siglos.
 
 Amén.`,
-    fuente: "Oración del siglo XIV - Atribuida a San Ignacio de Loyola",
-    fuente_url: "https://www.aciprensa.com/recursos/anima-christi-1521",
+    fuente: "Oración del siglo XIV - Ejercicios Espirituales de San Ignacio",
+    fuente_url: "https://www.corazones.org/oraciones/anima_christi.htm",
     categoria: "Oraciones Eucarísticas",
     tagline: "Oración después de la Comunión"
   },
@@ -212,8 +223,8 @@ antes bien, inclinad a ellas vuestros oídos
 y dignaos atenderlas favorablemente.
 
 Amén.`,
-    fuente: "Oración de San Bernardo de Claraval",
-    fuente_url: "https://www.aciprensa.com/recursos/acordaos-memorare-1527",
+    fuente: "Oración atribuida a San Bernardo de Claraval (s. XII)",
+    fuente_url: "https://www.corazones.org/oraciones/memorare.htm",
     categoria: "Oraciones Marianas",
     tagline: "Súplica confiada a la Virgen"
   },
@@ -243,8 +254,8 @@ en favor de Abrahán y su descendencia por siempre.
 Gloria al Padre, y al Hijo, y al Espíritu Santo.
 Como era en el principio, ahora y siempre, 
 por los siglos de los siglos. Amén.`,
-    fuente: "Lucas 1,46-55 - Cántico de la Virgen María",
-    fuente_url: "https://www.vatican.va/special/rosary/documents/misteri_sp.html",
+    fuente: "Cántico de la Virgen María - Lucas 1,46-55 (Vísperas)",
+    fuente_url: "https://www.deiverbum.org/liturgia-de-las-horas/",
     categoria: "Oraciones Marianas",
     tagline: "Cántico de la Virgen María"
   },
@@ -264,8 +275,8 @@ Mírame con compasión,
 no me dejes, Madre mía.
 
 Amén.`,
-    fuente: "Oración Popular Mariana",
-    fuente_url: "https://www.aciprensa.com/recursos/bendita-sea-tu-pureza-1526",
+    fuente: "Oración Popular Mariana Tradicional",
+    fuente_url: "https://www.ewtn.com/es/catolicismo/devociones",
     categoria: "Oraciones Marianas",
     tagline: "Consagración sencilla a María"
   },
@@ -279,10 +290,60 @@ antes bien líbranos siempre de todo peligro,
 oh Virgen gloriosa y bendita.
 
 Amén.`,
-    fuente: "Antífona Mariana más antigua (s. III)",
-    fuente_url: "https://www.vatican.va/content/vatican/es.html",
+    fuente: "Antífona Mariana más antigua (s. III) - Papiro Rylands 470",
+    fuente_url: "https://www.corazones.org/oraciones/sub_tuum.htm",
     categoria: "Oraciones Marianas",
     tagline: "La oración mariana más antigua"
+  },
+  "Oración a San Miguel Arcángel": {
+    nombre: "Oración a San Miguel Arcángel",
+    texto: `San Miguel Arcángel, defiéndenos en la batalla.
+Sé nuestro amparo contra la perversidad y asechanzas del demonio.
+Reprímale Dios, pedimos suplicantes,
+y tú, Príncipe de la Milicia Celestial,
+arroja al infierno con el divino poder
+a Satanás y a los otros espíritus malignos
+que andan dispersos por el mundo
+para la perdición de las almas.
+
+Amén.`,
+    fuente: "Oración compuesta por el Papa León XIII (1886)",
+    fuente_url: "https://www.corazones.org/santos/miguel_arcangel.htm",
+    categoria: "Oraciones a los Ángeles",
+    tagline: "Oración de protección espiritual"
+  },
+  "Oración de la Mañana": {
+    nombre: "Oración de la Mañana (Ofrecimiento del Día)",
+    texto: `Oh Señor, en unión con el Corazón Inmaculado de María,
+te ofrezco las oraciones, obras, alegrías y sufrimientos de este día
+por todas las intenciones de tu Sagrado Corazón,
+en unión con el Santo Sacrificio de la Misa,
+en reparación de los pecados,
+por la salvación de las almas,
+la unión de todos los cristianos,
+nuestro Santo Padre el Papa,
+y por las intenciones de todos nuestros asociados.
+
+Amén.`,
+    fuente: "Apostolado de la Oración - Ofrecimiento tradicional",
+    fuente_url: "https://www.ewtn.com/es/catolicismo/devociones",
+    categoria: "Oraciones Básicas",
+    tagline: "Ofrecimiento del día al Señor"
+  },
+  "Oración de la Noche": {
+    nombre: "Oración antes de Dormir",
+    texto: `Visita, Señor, esta habitación:
+aleja de ella las insidias del enemigo;
+que tus santos ángeles habiten en ella
+y nos guarden en paz;
+y que tu bendición permanezca siempre sobre nosotros.
+Por Jesucristo, nuestro Señor.
+
+Amén.`,
+    fuente: "Completas - Liturgia de las Horas",
+    fuente_url: "https://www.deiverbum.org/liturgia-de-las-horas/",
+    categoria: "Oraciones Básicas",
+    tagline: "Oración de las Completas"
   }
 };
 
@@ -495,9 +556,11 @@ serve(async (req) => {
       marian: { updated: 0, created: 0, errors: [] as string[] }
     };
 
-    // Fix fundamental prayers
+    // Fix fundamental prayers (combine both dictionaries)
+    const allFundamentalPrayers = { ...FUNDAMENTAL_PRAYERS, ...MORE_FUNDAMENTAL_PRAYERS };
+    
     if (fixFundamental) {
-      for (const [key, prayer] of Object.entries(FUNDAMENTAL_PRAYERS)) {
+      for (const [key, prayer] of Object.entries(allFundamentalPrayers)) {
         try {
           // Check if prayer exists
           const { data: existing } = await supabase
@@ -536,7 +599,7 @@ serve(async (req) => {
                 fuente: prayer.fuente,
                 fuente_url: prayer.fuente_url,
                 tagline: prayer.tagline,
-                orden: Object.keys(FUNDAMENTAL_PRAYERS).indexOf(key) + 1
+                orden: Object.keys(allFundamentalPrayers).indexOf(key) + 1
               });
 
             if (error) throw error;
