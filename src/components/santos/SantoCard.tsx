@@ -55,14 +55,16 @@ export function SantoCard({ saint, onSelect, isToday = false }: SantoCardProps) 
         onClick={onSelect}
       >
         <CardContent className="p-0">
-          {/* Image section */}
+          {/* Image section with optimized loading */}
           <div className="relative h-32 bg-gradient-to-br from-primary/10 to-secondary/10">
             {hasImage ? (
               <img
                 src={saint.image_url!}
-                alt={saint.name}
+                alt={`Imagen de ${saint.name}`}
                 className="w-full h-full object-cover"
                 loading="lazy"
+                decoding="async"
+                fetchPriority="low"
               />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center">
