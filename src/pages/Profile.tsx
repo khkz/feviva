@@ -7,13 +7,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Save, User, Palette, Bell, ChevronRight, LogOut } from "lucide-react";
+import { ArrowLeft, Save, User, Palette, Bell, ChevronRight, LogOut, Gift } from "lucide-react";
 import { z } from "zod";
 import { ThemeSelector } from "@/components/ui/theme-toggle";
 import { motion } from "framer-motion";
 import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { useNotifications } from "@/hooks/useNotifications";
+import { ReferralCard } from "@/components/referrals/ReferralCard";
 
 const COUNTRY_OPTIONS = [
   { code: 'MX', name: 'México', flag: '🇲🇽' },
@@ -253,6 +254,9 @@ const Profile = () => {
               </Button>
             </CardContent>
           </Card>
+
+          {/* Referral Card */}
+          <ReferralCard />
         </motion.div>
 
         <motion.div

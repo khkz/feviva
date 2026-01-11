@@ -7,7 +7,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSaintOfDay, CalendarSaint } from '@/hooks/useSaintOfDay';
 import { useNavigate } from 'react-router-dom';
-import { Church, BookOpen, Sparkles, PartyPopper, Star, Calendar } from 'lucide-react';
+import { Church, BookOpen, Sparkles, PartyPopper, Star, Calendar, Share2, Image } from 'lucide-react';
+import { ShareSaintImage } from '@/components/saints/ShareSaintImage';
 
 interface SaintOfTheDayCardProps {
   userCountryCode?: string | null;
@@ -183,7 +184,7 @@ export const SaintOfTheDayCard = ({ userCountryCode }: SaintOfTheDayCardProps) =
             )}
 
             {/* Action buttons */}
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Button
                 size="sm"
                 className={
@@ -204,6 +205,16 @@ export const SaintOfTheDayCard = ({ userCountryCode }: SaintOfTheDayCardProps) =
                 <BookOpen className="h-4 w-4 mr-1" />
                 Ver historia
               </Button>
+              <ShareSaintImage 
+                saintId={saint.id} 
+                saintName={saint.name}
+                trigger={
+                  <Button size="sm" variant="ghost" className="text-primary">
+                    <Share2 className="h-4 w-4 mr-1" />
+                    Compartir
+                  </Button>
+                }
+              />
             </div>
 
             {/* Show more saints indicator */}

@@ -243,10 +243,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "argument_cards_autor_id_fkey"
+            columns: ["autor_id"]
+            isOneToOne: false
+            referencedRelation: "referral_leaderboard"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "argument_cards_revisor_id_fkey"
             columns: ["revisor_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "argument_cards_revisor_id_fkey"
+            columns: ["revisor_id"]
+            isOneToOne: false
+            referencedRelation: "referral_leaderboard"
             referencedColumns: ["id"]
           },
         ]
@@ -729,6 +743,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "debates_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "referral_leaderboard"
+            referencedColumns: ["id"]
+          },
         ]
       }
       evangelization_logs: {
@@ -1030,6 +1051,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "habits_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "referral_leaderboard"
             referencedColumns: ["id"]
           },
         ]
@@ -1435,6 +1463,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "post_comments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "referral_leaderboard"
+            referencedColumns: ["id"]
+          },
         ]
       }
       posts: {
@@ -1471,6 +1506,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "referral_leaderboard"
             referencedColumns: ["id"]
           },
         ]
@@ -1615,6 +1657,8 @@ export type Database = {
           perfil_doctrinal:
             | Database["public"]["Enums"]["perfil_doctrinal"]
             | null
+          referral_points: number | null
+          referred_by: string | null
           updated_at: string | null
         }
         Insert: {
@@ -1631,6 +1675,8 @@ export type Database = {
           perfil_doctrinal?:
             | Database["public"]["Enums"]["perfil_doctrinal"]
             | null
+          referral_points?: number | null
+          referred_by?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -1647,7 +1693,36 @@ export type Database = {
           perfil_doctrinal?:
             | Database["public"]["Enums"]["perfil_doctrinal"]
             | null
+          referral_points?: number | null
+          referred_by?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          code_used: string
+          created_at: string
+          id: string
+          points_awarded: number
+          referred_id: string
+          referrer_id: string
+        }
+        Insert: {
+          code_used: string
+          created_at?: string
+          id?: string
+          points_awarded?: number
+          referred_id: string
+          referrer_id: string
+        }
+        Update: {
+          code_used?: string
+          created_at?: string
+          id?: string
+          points_awarded?: number
+          referred_id?: string
+          referrer_id?: string
         }
         Relationships: []
       }
@@ -2038,6 +2113,27 @@ export type Database = {
           },
         ]
       }
+      user_referral_codes: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_rituals: {
         Row: {
           compartio_fe: boolean | null
@@ -2219,7 +2315,17 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      referral_leaderboard: {
+        Row: {
+          avatar_url: string | null
+          id: string | null
+          nombre: string | null
+          rank: number | null
+          referral_points: number | null
+          total_referrals: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       calculate_level: { Args: { puntos: number }; Returns: number }
@@ -2234,7 +2340,12 @@ export type Database = {
           total_count: number
         }[]
       }
+      generate_referral_code: { Args: never; Returns: string }
       generate_saint_slug: { Args: { name_input: string }; Returns: string }
+      get_or_create_referral_code: {
+        Args: { p_user_id: string }
+        Returns: string
+      }
       get_processing_stats: {
         Args: { p_job_type?: string }
         Returns: {
@@ -2254,6 +2365,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      process_referral: {
+        Args: { p_referral_code: string; p_referred_id: string }
+        Returns: Json
       }
     }
     Enums: {
