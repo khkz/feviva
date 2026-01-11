@@ -99,16 +99,16 @@ Ultra high resolution, cinematic lighting.`;
       headers: {
         "Authorization": `Bearer ${apiKey}`,
         "Content-Type": "application/json",
-        "x-provider": "google"
       },
       body: JSON.stringify({
-        model: "google/gemini-3-pro-image-preview",
+        model: "google/gemini-2.5-flash-image-preview",
         messages: [
           {
             role: "user",
             content: prompt
           }
-        ]
+        ],
+        modalities: ["image", "text"]
       })
     });
 
@@ -119,21 +119,23 @@ Ultra high resolution, cinematic lighting.`;
     }
 
     const result = await response.json();
+    console.log("AI response structure:", JSON.stringify(Object.keys(result)));
     
-    // Extraer imagen del resultado
+    // Extraer imagen del resultado - viene en message.images
     let imageData: string | null = null;
-    const messageContent = result.choices?.[0]?.message?.content;
+    const message = result.choices?.[0]?.message;
     
-    if (Array.isArray(messageContent)) {
-      for (const part of messageContent) {
-        if (part.type === 'image' && part.image_url?.url) {
-          imageData = part.image_url.url;
+    if (message?.images && Array.isArray(message.images)) {
+      for (const img of message.images) {
+        if (img.type === 'image_url' && img.image_url?.url) {
+          imageData = img.image_url.url;
           break;
         }
       }
     }
 
     if (!imageData) {
+      console.error("No image found in response. Message keys:", message ? Object.keys(message) : 'no message');
       throw new Error("No image generated");
     }
 
