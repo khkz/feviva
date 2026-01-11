@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Share2, Download, MessageCircle, Copy, Check, Loader2, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +21,135 @@ interface DailyShareButtonProps {
   size?: "default" | "sm" | "lg" | "icon";
 }
 
+// Compose Story (9:16) from Post (1:1) by centering with gradient background
+const ComposedStoryImage = ({ 
+  postUrl, 
+  alt,
+  onComposed 
+}: { 
+  postUrl: string; 
+  alt: string;
+  onComposed?: (dataUrl: string) => void;
+}) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [composedUrl, setComposedUrl] = useState<string | null>(null);
+  const [isComposing, setIsComposing] = useState(true);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !postUrl) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    
+    img.onload = () => {
+      // Story dimensions: 1080x1920 (9:16)
+      const storyWidth = 1080;
+      const storyHeight = 1920;
+      
+      canvas.width = storyWidth;
+      canvas.height = storyHeight;
+      
+      // Create gradient background (deep gold to burgundy)
+      const gradient = ctx.createLinearGradient(0, 0, 0, storyHeight);
+      gradient.addColorStop(0, '#1a1a2e');
+      gradient.addColorStop(0.3, '#16213e');
+      gradient.addColorStop(0.5, '#1a1a2e');
+      gradient.addColorStop(0.7, '#16213e');
+      gradient.addColorStop(1, '#0f0f1a');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, storyWidth, storyHeight);
+      
+      // Add subtle pattern overlay
+      ctx.fillStyle = 'rgba(212, 175, 55, 0.03)';
+      for (let i = 0; i < 50; i++) {
+        const x = Math.random() * storyWidth;
+        const y = Math.random() * storyHeight;
+        ctx.beginPath();
+        ctx.arc(x, y, Math.random() * 50 + 10, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      
+      // Draw the post image centered
+      const postSize = storyWidth; // 1080
+      const postY = (storyHeight - postSize) / 2; // Center vertically
+      
+      // Add soft shadow behind image
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+      ctx.shadowBlur = 40;
+      ctx.shadowOffsetY = 10;
+      ctx.drawImage(img, 0, postY, postSize, postSize);
+      ctx.shadowColor = 'transparent';
+      
+      // Add branding at top
+      ctx.fillStyle = '#D4AF37';
+      ctx.font = 'bold 48px Georgia, serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('ElRugido', storyWidth / 2, 80);
+      
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+      ctx.font = '28px Georgia, serif';
+      ctx.fillText('elrugido.com', storyWidth / 2, 120);
+      
+      // Add subtle decorative line
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.5)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(storyWidth / 2 - 100, 150);
+      ctx.lineTo(storyWidth / 2 + 100, 150);
+      ctx.stroke();
+      
+      // Add lion silhouette hint at bottom
+      ctx.fillStyle = 'rgba(212, 175, 55, 0.15)';
+      ctx.font = '200px Georgia, serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('🦁', storyWidth / 2, storyHeight - 80);
+      
+      // Convert to data URL
+      const dataUrl = canvas.toDataURL('image/png');
+      setComposedUrl(dataUrl);
+      setIsComposing(false);
+      onComposed?.(dataUrl);
+    };
+    
+    img.onerror = () => {
+      setIsComposing(false);
+      console.error('Failed to load post image for composition');
+    };
+    
+    img.src = postUrl;
+  }, [postUrl, onComposed]);
+
+  if (isComposing) {
+    return (
+      <div className="relative aspect-[9/16] max-h-[400px] mx-auto overflow-hidden rounded-lg border bg-muted flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <canvas ref={canvasRef} className="hidden" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative aspect-[9/16] max-h-[400px] mx-auto overflow-hidden rounded-lg border">
+      {composedUrl ? (
+        <img
+          src={composedUrl}
+          alt={alt}
+          className="w-full h-full object-contain bg-[#1a1a2e]"
+        />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center bg-muted">
+          <p className="text-muted-foreground">Error al componer imagen</p>
+        </div>
+      )}
+      <canvas ref={canvasRef} className="hidden" />
+    </div>
+  );
+};
+
 export const DailyShareButton = ({
   tipo,
   title = "Compartir",
@@ -29,28 +158,52 @@ export const DailyShareButton = ({
   variant = "outline",
   size = "default",
 }: DailyShareButtonProps) => {
-  const { storyUrl, postUrl, isLoading } = useDailyShareImages(tipo);
+  const { storyUrl, postUrl, isLoading, metadata } = useDailyShareImages(tipo);
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<'story' | 'post'>('story');
+  const [composedStoryUrl, setComposedStoryUrl] = useState<string | null>(null);
 
-  const currentImageUrl = activeTab === 'story' ? storyUrl : postUrl;
+  // Check if story is composed from post (santo type)
+  const isComposedStory = tipo === 'santo' && metadata?.composed_from_post === true;
+
+  const currentImageUrl = activeTab === 'story' 
+    ? (isComposedStory && composedStoryUrl ? composedStoryUrl : storyUrl)
+    : postUrl;
   const hasImages = storyUrl || postUrl;
 
   const handleDownload = async () => {
-    if (!currentImageUrl) return;
+    const urlToDownload = activeTab === 'story' && isComposedStory && composedStoryUrl 
+      ? composedStoryUrl 
+      : currentImageUrl;
+      
+    if (!urlToDownload) return;
 
     try {
-      const response = await fetch(currentImageUrl);
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `elrugido-${tipo}-${activeTab}-${new Date().toISOString().split('T')[0]}.png`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
+      // For composed images (data URL), create blob directly
+      if (urlToDownload.startsWith('data:')) {
+        const response = await fetch(urlToDownload);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `elrugido-${tipo}-${activeTab}-${new Date().toISOString().split('T')[0]}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      } else {
+        const response = await fetch(urlToDownload);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `elrugido-${tipo}-${activeTab}-${new Date().toISOString().split('T')[0]}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      }
       toast.success("Imagen descargada");
     } catch (error) {
       toast.error("Error al descargar la imagen");
@@ -58,18 +211,23 @@ export const DailyShareButton = ({
   };
 
   const handleWhatsAppShare = () => {
-    const text = fallbackText || `¡Mira el contenido de hoy en ElRugido! ${currentImageUrl || 'https://elrugido.com'}`;
+    const text = fallbackText || `¡Mira el contenido de hoy en ElRugido! https://elrugido.com`;
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
     window.open(whatsappUrl, '_blank');
   };
 
   const handleCopyLink = async () => {
-    if (!currentImageUrl) return;
+    // For composed images, we can't copy a link - copy the website instead
+    const urlToCopy = (activeTab === 'story' && isComposedStory) 
+      ? 'https://elrugido.com' 
+      : currentImageUrl;
+      
+    if (!urlToCopy) return;
 
     try {
-      await navigator.clipboard.writeText(currentImageUrl);
+      await navigator.clipboard.writeText(urlToCopy);
       setCopied(true);
-      toast.success("Enlace copiado");
+      toast.success(isComposedStory && activeTab === 'story' ? "Enlace web copiado" : "Enlace copiado");
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
       toast.error("Error al copiar el enlace");
@@ -77,12 +235,16 @@ export const DailyShareButton = ({
   };
 
   const handleNativeShare = async () => {
-    if (!currentImageUrl) return;
+    const urlToShare = activeTab === 'story' && isComposedStory && composedStoryUrl 
+      ? composedStoryUrl 
+      : currentImageUrl;
+      
+    if (!urlToShare) return;
 
     if (navigator.share) {
       try {
         // Try to share with image
-        const response = await fetch(currentImageUrl);
+        const response = await fetch(urlToShare);
         const blob = await response.blob();
         const file = new File([blob], `elrugido-${tipo}.png`, { type: 'image/png' });
 
@@ -97,7 +259,7 @@ export const DailyShareButton = ({
           await navigator.share({
             title: title,
             text: fallbackText || `Contenido de ElRugido`,
-            url: currentImageUrl,
+            url: 'https://elrugido.com',
           });
         } catch (e) {
           // User cancelled or error
@@ -146,13 +308,21 @@ export const DailyShareButton = ({
 
               <TabsContent value="story" className="mt-4">
                 {storyUrl && (
-                  <div className="relative aspect-[9/16] max-h-[400px] mx-auto overflow-hidden rounded-lg border">
-                    <img
-                      src={storyUrl}
+                  isComposedStory && postUrl ? (
+                    <ComposedStoryImage 
+                      postUrl={postUrl} 
                       alt={`${tipoLabels[tipo]} - Story`}
-                      className="w-full h-full object-cover"
+                      onComposed={setComposedStoryUrl}
                     />
-                  </div>
+                  ) : (
+                    <div className="relative aspect-[9/16] max-h-[400px] mx-auto overflow-hidden rounded-lg border">
+                      <img
+                        src={storyUrl}
+                        alt={`${tipoLabels[tipo]} - Story`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )
                 )}
               </TabsContent>
 

@@ -24,10 +24,10 @@ export const DailyImagesStatus = () => {
     return images?.find(img => img.tipo === tipo && img.formato === formato);
   };
 
-  const handleGenerate = async () => {
+  const handleGenerate = async (force = false) => {
     setGenerating(true);
     try {
-      const result = await triggerDailyImageGeneration();
+      const result = await triggerDailyImageGeneration(force);
       toast.success(`Generadas ${result.generated}/${result.total} imágenes`);
       refetch();
     } catch (error) {
@@ -55,19 +55,29 @@ export const DailyImagesStatus = () => {
             <Image className="h-4 w-4" />
             Imágenes Diarias Compartibles
           </CardTitle>
-          <Button 
-            size="sm" 
-            variant="outline" 
-            onClick={handleGenerate}
-            disabled={generating}
-          >
-            {generating ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            ) : (
-              <RefreshCw className="h-4 w-4 mr-2" />
-            )}
-            {generating ? 'Generando...' : 'Regenerar'}
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              size="sm" 
+              variant="outline" 
+              onClick={() => handleGenerate(false)}
+              disabled={generating}
+            >
+              {generating ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <RefreshCw className="h-4 w-4 mr-2" />
+              )}
+              {generating ? 'Generando...' : 'Generar faltantes'}
+            </Button>
+            <Button 
+              size="sm" 
+              variant="destructive" 
+              onClick={() => handleGenerate(true)}
+              disabled={generating}
+            >
+              Forzar regeneración
+            </Button>
+          </div>
         </div>
         <p className="text-sm text-muted-foreground capitalize">{today}</p>
       </CardHeader>

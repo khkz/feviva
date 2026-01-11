@@ -81,12 +81,29 @@ async function imageToBlob(imageData: string): Promise<Blob> {
   }
 }
 
+// Create Story (9:16) from Post (1:1) by extending with gradient
+async function createStoryFromPost(postImageBlob: Blob): Promise<Blob> {
+  // For Deno edge functions, we'll generate Story separately but with EXPLICIT consistency instructions
+  // Since we can't do canvas operations in Deno without additional libs
+  // Instead, we return null to signal frontend should handle this
+  return postImageBlob; // Fallback - frontend will compose
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // Parse request body for force parameter
+    let force = false;
+    try {
+      const body = await req.json();
+      force = body?.force === true;
+    } catch {
+      // No body or invalid JSON, default to false
+    }
+
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const apiKey = Deno.env.get("LOVABLE_API_KEY");
@@ -99,9 +116,32 @@ serve(async (req) => {
 
     const today = new Date().toISOString().split('T')[0];
     const formattedDate = formatDate();
-    console.log(`Generating daily images for ${today}`);
+    console.log(`Generating daily images for ${today}, force=${force}`);
 
-    // Check if images already exist for today
+    // If force=true, delete all existing images for today
+    if (force) {
+      console.log("Force mode: Deleting existing images for today...");
+      
+      // Get existing images to delete from storage
+      const { data: existingImages } = await supabase
+        .from('daily_share_images')
+        .select('tipo, formato')
+        .eq('fecha', today);
+      
+      if (existingImages && existingImages.length > 0) {
+        // Delete from storage
+        const filesToDelete = existingImages.map(
+          (img: { tipo: string; formato: string }) => `${today}/${img.tipo}-${img.formato}.png`
+        );
+        await supabase.storage.from('daily-share-images').remove(filesToDelete);
+        
+        // Delete from database
+        await supabase.from('daily_share_images').delete().eq('fecha', today);
+        console.log(`Deleted ${existingImages.length} existing images`);
+      }
+    }
+
+    // Check if images already exist for today (after potential deletion)
     const { data: existingImages } = await supabase
       .from('daily_share_images')
       .select('tipo, formato, image_url')
@@ -173,15 +213,13 @@ serve(async (req) => {
       if (dbError) throw new Error(`Database error: ${dbError.message}`);
     }
 
-    // ============ SANTO DEL DÍA - SEQUENTIAL FOR CONSISTENCY ============
+    // ============ SANTO DEL DÍA - ONLY GENERATE POST, STORY COMPOSED FROM POST ============
     if (saint) {
       const saintMetadata = { name: saint.name, category: saint.category, description: saint.description };
       const saintDescShort = saint.description ? saint.description.substring(0, 200) : '';
       
-      // Step 1: Generate POST (1:1) first - this is the "master" image
-      let postGenerated = existingKeys.has('santo-post');
-      
-      if (!postGenerated) {
+      // Only generate POST (1:1) - this is the SINGLE source of truth
+      if (!existingKeys.has('santo-post')) {
         try {
           console.log("Generating santo-post (master image)...");
           const postPrompt = `Create a STUNNING Catholic social media image.
@@ -208,7 +246,6 @@ FORMAT: Square 1:1 (1080x1080px)`;
           const imageUrl = await generateImage(postPrompt, apiKey);
           await uploadAndSave(imageUrl, 'santo', 'post', saintMetadata);
           results.push({ tipo: 'santo', formato: 'post', success: true });
-          postGenerated = true;
           console.log("✓ santo-post generated");
         } catch (error) {
           console.error("✗ Error santo-post:", error);
@@ -216,44 +253,36 @@ FORMAT: Square 1:1 (1080x1080px)`;
         }
       }
 
-      // Step 2: Generate STORY (9:16) - SAME SAINT, extended format
+      // For Story: Copy the Post image and mark it - frontend will compose the 9:16 version
+      // by centering the 1:1 image with gradient padding
       if (!existingKeys.has('santo-story')) {
-        try {
-          console.log("Generating santo-story (consistent with post)...");
-          const storyPrompt = `Create a 9:16 vertical Story image of ${saint.name}.
+        // Get the post image URL
+        const { data: postData } = await supabase
+          .from('daily_share_images')
+          .select('image_url')
+          .eq('fecha', today)
+          .eq('tipo', 'santo')
+          .eq('formato', 'post')
+          .maybeSingle();
 
-CRITICAL - VISUAL CONSISTENCY:
-This is the SAME saint as the 1:1 square version. Create with IDENTICAL:
-- Face features and expression
-- Clothing/vestments style
-- Lighting (chiaroscuro with golden rays)
-- Art style (Renaissance oil painting)
-- Color palette (royal blues, deep golds, sacred purples)
+        if (postData?.image_url) {
+          // Store the same URL for story - frontend will handle the composition
+          const { error: dbError } = await supabase
+            .from('daily_share_images')
+            .upsert({
+              fecha: today,
+              tipo: 'santo',
+              formato: 'story',
+              image_url: postData.image_url, // Same image - frontend composes
+              metadata: { ...saintMetadata, composed_from_post: true }
+            }, { onConflict: 'fecha,tipo,formato' });
 
-ONLY DIFFERENCE: Vertical 9:16 format with extended background above/below.
-
-LAYOUT:
-- Saint in CENTER (same pose)
-- Extended sacred clouds/rays ABOVE
-- Branding area BELOW
-- Decorative elements filling vertical space
-
-TEXT (COMPLETE - NO CUTTING):
-- Top: "Santo del día"
-- Center-bottom: "${saint.name}" - FULL NAME
-- Bottom: "${formattedDate}" + ElRugido branding
-
-${BRAND_DESCRIPTION}
-
-FORMAT: 9:16 vertical (1080x1920px)`;
-
-          const imageUrl = await generateImage(storyPrompt, apiKey);
-          await uploadAndSave(imageUrl, 'santo', 'story', saintMetadata);
-          results.push({ tipo: 'santo', formato: 'story', success: true });
-          console.log("✓ santo-story generated");
-        } catch (error) {
-          console.error("✗ Error santo-story:", error);
-          results.push({ tipo: 'santo', formato: 'story', success: false, error: String(error) });
+          if (!dbError) {
+            results.push({ tipo: 'santo', formato: 'story', success: true });
+            console.log("✓ santo-story linked to post (frontend will compose)");
+          } else {
+            results.push({ tipo: 'santo', formato: 'story', success: false, error: dbError.message });
+          }
         }
       }
     }

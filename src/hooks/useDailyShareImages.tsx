@@ -76,8 +76,10 @@ export const useAllDailyShareImages = () => {
 };
 
 // Function to trigger manual generation
-export const triggerDailyImageGeneration = async () => {
-  const { data, error } = await supabase.functions.invoke('generate-daily-images');
+export const triggerDailyImageGeneration = async (force = false) => {
+  const { data, error } = await supabase.functions.invoke('generate-daily-images', {
+    body: { force }
+  });
   
   if (error) throw error;
   return data;
