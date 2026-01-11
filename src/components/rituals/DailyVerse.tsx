@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { AudioPlayer } from "./AudioPlayer";
 import { BookOpen, Quote } from "lucide-react";
 import { motion } from "framer-motion";
+import { DailyShareButton } from "@/components/shared/DailyShareButton";
 
 interface DailyVerseProps {
   referencia: string;
@@ -40,16 +41,27 @@ export const DailyVerse = ({ referencia, texto, audioUrl }: DailyVerseProps) => 
           <Quote className="absolute -bottom-1 right-0 h-8 w-8 text-secondary/30" />
         </motion.div>
         
-        {/* Audio player */}
-        {audioUrl && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <AudioPlayer src={audioUrl} title="Escuchar versículo" compact />
-          </motion.div>
-        )}
+        {/* Audio player and share */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="flex items-center gap-3"
+        >
+          {audioUrl && (
+            <div className="flex-1">
+              <AudioPlayer src={audioUrl} title="Escuchar versículo" compact />
+            </div>
+          )}
+          <DailyShareButton 
+            tipo="versiculo"
+            title=""
+            fallbackText={`✝️ "${texto}" - ${referencia}. Encuentra más inspiración en ElRugido.`}
+            variant="ghost"
+            size="icon"
+            className="shrink-0"
+          />
+        </motion.div>
       </CardContent>
     </Card>
   );

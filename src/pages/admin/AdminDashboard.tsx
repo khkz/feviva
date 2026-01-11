@@ -23,6 +23,7 @@ import { Badge } from '@/components/ui/badge';
 import { StatCard } from '@/components/admin/StatCard';
 import { useAdminStats } from '@/hooks/useAdminStats';
 import { Skeleton } from '@/components/ui/skeleton';
+import { DailyImagesStatus } from '@/components/admin/DailyImagesStatus';
 
 export const AdminDashboard = () => {
   const { stats, loading } = useAdminStats();
@@ -213,8 +214,8 @@ export const AdminDashboard = () => {
         </Card>
       </div>
 
-      {/* Live Sessions & Bible Plan */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Live Sessions & Bible Plan & Daily Images */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
@@ -256,6 +257,9 @@ export const AdminDashboard = () => {
             </CardContent>
           </Card>
         </Link>
+
+        {/* Daily Images Status */}
+        <DailyImagesStatus />
       </div>
     </div>
   );

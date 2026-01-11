@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Play, Calendar, ChevronRight } from 'lucide-react';
+import { BookOpen, Play, Calendar, ChevronRight, Share2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useDailyGospel, DailyGospel } from '@/hooks/useDailyGospel';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import gospelFallback from '@/assets/feature-bible.jpg';
+import { DailyShareButton } from '@/components/shared/DailyShareButton';
 
 interface GospelCardProps {
   gospel?: DailyGospel | null;
@@ -146,13 +147,23 @@ export const GospelCard = ({ gospel: propGospel, title, subtitle, compact = fals
             </p>
           )}
           
-          <Button 
-            onClick={() => navigate('/evangelio')}
-            className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white"
-          >
-            <Play className="h-4 w-4 mr-2" />
-            Ver Reflexión
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              onClick={() => navigate('/evangelio')}
+              className="flex-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white"
+            >
+              <Play className="h-4 w-4 mr-2" />
+              Ver Reflexión
+            </Button>
+            <DailyShareButton 
+              tipo="evangelio"
+              title=""
+              fallbackText={`📖 Evangelio de hoy: ${gospel.referencia}. ¡Reflexiona con nosotros en ElRugido!`}
+              variant="outline"
+              size="default"
+              className="px-3"
+            />
+          </div>
         </div>
       </CardContent>
     </Card>
