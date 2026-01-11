@@ -29,7 +29,7 @@ const mainNavItems: NavItem[] = [
   { path: "/dashboard", icon: Home, label: "Inicio" },
   { path: "/apostle-path", icon: Route, label: "Ruta del Apóstol" },
   { path: "/bible-plan", icon: BookOpen, label: "Biblia 365" },
-  { path: "/oraciones", icon: Hand, label: "Oraciones" },
+  { path: "/oraciones/app", icon: Hand, label: "Oraciones" },
   { path: "/rosario", icon: Flower2, label: "Rosario" },
   { path: "/novenas", icon: Flame, label: "Novenas" },
   { path: "/sleep-stories", icon: Moon, label: "Dormir" },

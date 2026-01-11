@@ -13,6 +13,16 @@ const popularSaints = [
   { name: "Santa Rosa de Lima", slug: "santa-rosa-de-lima" },
 ];
 
+// Popular prayers for SEO links
+const popularPrayers = [
+  { name: "Padre Nuestro", slug: "padre-nuestro" },
+  { name: "Ave María", slug: "ave-maria" },
+  { name: "Gloria al Padre", slug: "gloria-al-padre" },
+  { name: "Credo de los Apóstoles", slug: "credo-de-los-apostoles" },
+  { name: "Salve Regina", slug: "salve-regina" },
+  { name: "Oración a San Miguel", slug: "oracion-a-san-miguel-arcangel" },
+];
+
 // Patron saints by country for SEO
 const patronsByCountry = [
   { name: "México", saint: "Virgen de Guadalupe", slug: "virgen-de-guadalupe" },
@@ -136,7 +146,7 @@ export const FooterSection = () => {
             </ul>
           </motion.div>
 
-          {/* Recursos y Únete */}
+          {/* Oraciones Populares - SEO Links */}
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -146,27 +156,22 @@ export const FooterSection = () => {
           >
             <h4 className="font-semibold flex items-center gap-2">
               <BookOpen className="h-4 w-4 text-primary" />
-              Recursos
+              Oraciones Populares
             </h4>
             <ul className="space-y-1.5 text-sm text-muted-foreground">
+              {popularPrayers.map((prayer) => (
+                <li key={prayer.slug}>
+                  <Link 
+                    to={`/oracion/${prayer.slug}`} 
+                    className="hover:text-foreground transition-colors"
+                  >
+                    {prayer.name}
+                  </Link>
+                </li>
+              ))}
               <li>
-                <Link to="/auth" className="hover:text-foreground transition-colors">
-                  Oraciones guiadas
-                </Link>
-              </li>
-              <li>
-                <Link to="/auth" className="hover:text-foreground transition-colors">
-                  Rosario interactivo
-                </Link>
-              </li>
-              <li>
-                <Link to="/auth" className="hover:text-foreground transition-colors">
-                  Novenas
-                </Link>
-              </li>
-              <li>
-                <Link to="/auth" className="hover:text-foreground transition-colors font-medium text-primary">
-                  Crear cuenta gratis →
+                <Link to="/oraciones" className="hover:text-foreground transition-colors font-medium text-primary">
+                  Ver todas →
                 </Link>
               </li>
             </ul>

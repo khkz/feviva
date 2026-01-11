@@ -75,9 +75,9 @@ export const SaintOfTheDayCard = ({ userCountryCode }: SaintOfTheDayCardProps) =
 
   const handlePrayNow = () => {
     if (saint.prayer_id) {
-      navigate(`/oraciones?oracion=${saint.prayer_id}`);
+      navigate(`/oraciones/app?oracion=${saint.prayer_id}`);
     } else {
-      navigate('/oraciones');
+      navigate('/oraciones/app');
     }
   };
 

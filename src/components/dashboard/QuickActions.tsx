@@ -13,7 +13,7 @@ const actions = [
   { 
     icon: Hand, 
     label: "Orar", 
-    path: "/oraciones",
+    path: "/oraciones/app",
     gradient: "from-amber-400 to-orange-500",
     bgGradient: "from-amber-500/20 to-orange-500/20"
   },
