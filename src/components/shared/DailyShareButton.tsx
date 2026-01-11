@@ -158,14 +158,16 @@ export const DailyShareButton = ({
   variant = "outline",
   size = "default",
 }: DailyShareButtonProps) => {
-  const { storyUrl, postUrl, isLoading, metadata } = useDailyShareImages(tipo);
+  const { storyUrl, postUrl, isLoading, storyMetadata } = useDailyShareImages(tipo);
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<'story' | 'post'>('story');
   const [composedStoryUrl, setComposedStoryUrl] = useState<string | null>(null);
 
   // Check if story is composed from post (santo type)
-  const isComposedStory = tipo === 'santo' && metadata?.composed_from_post === true;
+  const isComposedStory = tipo === 'santo' && storyMetadata?.composed_from_post === true;
+  
+  console.log('DailyShareButton:', { tipo, isComposedStory, storyMetadata });
 
   const currentImageUrl = activeTab === 'story' 
     ? (isComposedStory && composedStoryUrl ? composedStoryUrl : storyUrl)

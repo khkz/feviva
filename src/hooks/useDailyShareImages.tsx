@@ -18,6 +18,7 @@ interface UseDailyShareImagesResult {
   storyUrl: string | null;
   postUrl: string | null;
   metadata: Record<string, unknown> | null;
+  storyMetadata: Record<string, unknown> | null;
   isLoading: boolean;
   error: Error | null;
   refetch: () => void;
@@ -48,7 +49,8 @@ export const useDailyShareImages = (tipo: ShareImageType): UseDailyShareImagesRe
   return {
     storyUrl: storyImage?.image_url || null,
     postUrl: postImage?.image_url || null,
-    metadata: storyImage?.metadata || postImage?.metadata || null,
+    metadata: postImage?.metadata || storyImage?.metadata || null,
+    storyMetadata: storyImage?.metadata || null,
     isLoading,
     error: error as Error | null,
     refetch,
