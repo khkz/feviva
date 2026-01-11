@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { path: "/dashboard", icon: Home, label: "Inicio" },
-  { path: "/oraciones", icon: Compass, label: "Orar" },
+  { path: "/oraciones/app", icon: Compass, label: "Orar" },
   { path: "/apostle-path", icon: Route, label: "Ruta" },
   { path: "/library", icon: BookOpen, label: "Aprender" },
   { path: "/profile", icon: User, label: "Perfil" },
@@ -18,7 +18,7 @@ export function BottomNavigation() {
       <div className="flex items-center justify-around h-16 max-w-lg mx-auto px-2">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path || 
-            (item.path === "/oraciones" && ["/oraciones", "/rosario", "/novenas"].includes(location.pathname));
+            (item.path === "/oraciones/app" && ["/oraciones/app", "/rosario", "/novenas"].includes(location.pathname));
           
           return (
             <Link

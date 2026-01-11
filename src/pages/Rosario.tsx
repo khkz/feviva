@@ -225,7 +225,7 @@ export default function Rosario() {
           <Button 
             variant="ghost" 
             size="icon" 
-            onClick={() => navigate("/oraciones")}
+            onClick={() => navigate("/oraciones/app")}
             className="rounded-full"
           >
             <ArrowLeft className="h-5 w-5" />
@@ -611,7 +611,7 @@ export default function Rosario() {
                   <Share2 className="h-4 w-4" />
                 </Button>
                 <Button 
-                  onClick={() => navigate("/oraciones")} 
+                  onClick={() => navigate("/oraciones/app")} 
                   className="flex-1 h-12 rounded-xl bg-gradient-to-r from-primary to-primary-hover"
                 >
                   Terminar

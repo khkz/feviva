@@ -211,7 +211,7 @@ const Novenas = () => {
             >
               <div className="flex items-center gap-4">
                 <motion.button
-                  onClick={() => navigate("/oraciones")}
+                  onClick={() => navigate("/oraciones/app")}
                   className="glass-button p-2.5 rounded-full lg:hidden"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}

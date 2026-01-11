@@ -31,6 +31,8 @@ import BiblePlan from "./pages/BiblePlan";
 import Santos from "./pages/Santos";
 import SantoPage from "./pages/SantoPage";
 import SantosPublic from "./pages/SantosPublic";
+import OracionesPublic from "./pages/OracionesPublic";
+import OracionPage from "./pages/OracionPage";
 import NotFound from "./pages/NotFound";
 import ApostlePath from "./pages/ApostlePath";
 import ApologeticsIntro from "./pages/ApologeticsIntro";
@@ -84,7 +86,9 @@ const App = () => (
               <Route path="/evening" element={<Evening />} />
               <Route path="/prayer" element={<Prayer />} />
               <Route path="/mission" element={<Mission />} />
-              <Route path="/oraciones" element={<Oraciones />} />
+              <Route path="/oraciones" element={<OracionesPublic />} />
+              <Route path="/oraciones/app" element={<Oraciones />} />
+              <Route path="/oracion/:slug" element={<OracionPage />} />
               <Route path="/rosario" element={<Rosario />} />
               <Route path="/sleep-stories" element={<SleepStories />} />
               <Route path="/sleep" element={<SleepStories />} />
