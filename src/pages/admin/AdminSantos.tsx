@@ -367,6 +367,27 @@ export default function AdminSantos() {
     },
   });
 
+  // Scrape EWTN prayers mutation
+  const scrapeEWTNMutation = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke('scrape-ewtn-prayers', {
+        body: { batchMode: true, limit: batchLimit },
+      });
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-calendar-saints'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-oraciones-for-saints'] });
+      const summary = data?.summary;
+      toast.success(`EWTN: Creadas ${summary?.created || 0}, enlazadas ${summary?.linked || 0}, fallidas ${summary?.failed || 0}`);
+    },
+    onError: (error) => {
+      toast.error('Error EWTN: ' + error.message);
+    },
+  });
+
   // Filter saints
   const filteredSaints = saints.filter(saint => {
     if (searchQuery && !saint.name.toLowerCase().includes(searchQuery.toLowerCase())) {
@@ -435,7 +456,7 @@ export default function AdminSantos() {
     }
   };
 
-  const isBatchRunning = batchHistoryMutation.isPending || batchPrayerMutation.isPending || batchImageMutation.isPending || importTraditionalPrayersMutation.isPending || fixFundamentalPrayersMutation.isPending;
+  const isBatchRunning = batchHistoryMutation.isPending || batchPrayerMutation.isPending || batchImageMutation.isPending || importTraditionalPrayersMutation.isPending || fixFundamentalPrayersMutation.isPending || scrapeEWTNMutation.isPending;
 
   return (
     <div className="space-y-6">
@@ -633,12 +654,28 @@ export default function AdminSantos() {
                 )}
                 Importar Oraciones de ACI Prensa
               </Button>
+
+              {/* Botón Scrape EWTN */}
+              <Button
+                onClick={() => scrapeEWTNMutation.mutate()}
+                disabled={isBatchRunning}
+                className="gap-2 bg-blue-600 hover:bg-blue-700"
+              >
+                {scrapeEWTNMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <ExternalLink className="h-4 w-4" />
+                )}
+                Importar desde EWTN ({Math.min(batchLimit, stats.withoutPrayer)})
+              </Button>
             </div>
             
             <p className="text-xs text-muted-foreground mt-2">
-              <strong>Corregir Fundamentales:</strong> Actualiza Padre Nuestro, Ave María, Gloria, Credo y otras oraciones básicas con textos litúrgicos oficiales + Advocaciones Marianas Latinoamericanas.
+              <strong>Corregir Fundamentales:</strong> Padre Nuestro, Ave María, Gloria, Credo + Advocaciones Marianas.
               <br />
-              <strong>Importar ACI Prensa:</strong> Importa oraciones tradicionales de santos importantes desde fuentes católicas oficiales.
+              <strong>ACI Prensa:</strong> Oraciones tradicionales de santos importantes (80+ santos).
+              <br />
+              <strong>EWTN:</strong> Extrae oraciones de la biblioteca de EWTN (100+ santos con URL conocida).
             </p>
           </div>
 
