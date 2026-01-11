@@ -21,6 +21,9 @@ interface DailyShareButtonProps {
   size?: "default" | "sm" | "lg" | "icon";
 }
 
+// Logo URL for branding
+const LOGO_URL = '/logo-elrugido.svg';
+
 // Compose Story (9:16) from Post (1:1) by centering with gradient background
 const ComposedStoryImage = ({ 
   postUrl, 
@@ -42,10 +45,18 @@ const ComposedStoryImage = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
+    // Load both the post image and the logo
+    const postImg = new Image();
+    const logoImg = new Image();
+    postImg.crossOrigin = 'anonymous';
+    logoImg.crossOrigin = 'anonymous';
     
-    img.onload = () => {
+    let postLoaded = false;
+    let logoLoaded = false;
+
+    const tryCompose = () => {
+      if (!postLoaded || !logoLoaded) return;
+
       // Story dimensions: 1080x1920 (9:16)
       const storyWidth = 1080;
       const storyHeight = 1920;
@@ -72,41 +83,45 @@ const ComposedStoryImage = ({
         ctx.arc(x, y, Math.random() * 50 + 10, 0, Math.PI * 2);
         ctx.fill();
       }
+
+      // Draw logo at top center
+      const logoSize = 120;
+      const logoX = (storyWidth - logoSize) / 2;
+      const logoY = 40;
+      ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
       
-      // Draw the post image centered
-      const postSize = storyWidth; // 1080
-      const postY = (storyHeight - postSize) / 2; // Center vertically
-      
-      // Add soft shadow behind image
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-      ctx.shadowBlur = 40;
-      ctx.shadowOffsetY = 10;
-      ctx.drawImage(img, 0, postY, postSize, postSize);
-      ctx.shadowColor = 'transparent';
-      
-      // Add branding at top
+      // Add branding text below logo
       ctx.fillStyle = '#D4AF37';
       ctx.font = 'bold 48px Georgia, serif';
       ctx.textAlign = 'center';
-      ctx.fillText('ElRugido', storyWidth / 2, 80);
+      ctx.fillText('ElRugido', storyWidth / 2, logoY + logoSize + 50);
       
       ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
       ctx.font = '28px Georgia, serif';
-      ctx.fillText('elrugido.com', storyWidth / 2, 120);
+      ctx.fillText('elrugido.com', storyWidth / 2, logoY + logoSize + 90);
       
       // Add subtle decorative line
       ctx.strokeStyle = 'rgba(212, 175, 55, 0.5)';
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.moveTo(storyWidth / 2 - 100, 150);
-      ctx.lineTo(storyWidth / 2 + 100, 150);
+      ctx.moveTo(storyWidth / 2 - 100, logoY + logoSize + 115);
+      ctx.lineTo(storyWidth / 2 + 100, logoY + logoSize + 115);
       ctx.stroke();
       
-      // Add lion silhouette hint at bottom
-      ctx.fillStyle = 'rgba(212, 175, 55, 0.15)';
-      ctx.font = '200px Georgia, serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('🦁', storyWidth / 2, storyHeight - 80);
+      // Draw the post image centered (below branding)
+      const postSize = storyWidth; // 1080
+      const postY = (storyHeight - postSize) / 2 + 80; // Offset for header
+      
+      // Add soft shadow behind image
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+      ctx.shadowBlur = 40;
+      ctx.shadowOffsetY = 10;
+      ctx.drawImage(postImg, 0, postY, postSize, postSize);
+      ctx.shadowColor = 'transparent';
+      
+      // Draw small logo at bottom
+      const bottomLogoSize = 80;
+      ctx.drawImage(logoImg, (storyWidth - bottomLogoSize) / 2, storyHeight - bottomLogoSize - 40, bottomLogoSize, bottomLogoSize);
       
       // Convert to data URL
       const dataUrl = canvas.toDataURL('image/png');
@@ -114,13 +129,30 @@ const ComposedStoryImage = ({
       setIsComposing(false);
       onComposed?.(dataUrl);
     };
+
+    postImg.onload = () => {
+      postLoaded = true;
+      tryCompose();
+    };
     
-    img.onerror = () => {
+    logoImg.onload = () => {
+      logoLoaded = true;
+      tryCompose();
+    };
+    
+    postImg.onerror = () => {
       setIsComposing(false);
       console.error('Failed to load post image for composition');
     };
     
-    img.src = postUrl;
+    logoImg.onerror = () => {
+      // Continue without logo if it fails
+      logoLoaded = true;
+      tryCompose();
+    };
+    
+    postImg.src = postUrl;
+    logoImg.src = LOGO_URL;
   }, [postUrl, onComposed]);
 
   if (isComposing) {
