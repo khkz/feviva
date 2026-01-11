@@ -68,3 +68,6 @@ verify_jwt = false
 
 [functions.batch-generate-saint-content]
 verify_jwt = false
+
+[functions.generate-daily-images]
+verify_jwt = false

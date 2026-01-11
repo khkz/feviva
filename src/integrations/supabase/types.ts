@@ -695,6 +695,36 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_share_images: {
+        Row: {
+          created_at: string | null
+          fecha: string
+          formato: string
+          id: string
+          image_url: string
+          metadata: Json | null
+          tipo: string
+        }
+        Insert: {
+          created_at?: string | null
+          fecha: string
+          formato: string
+          id?: string
+          image_url: string
+          metadata?: Json | null
+          tipo: string
+        }
+        Update: {
+          created_at?: string | null
+          fecha?: string
+          formato?: string
+          id?: string
+          image_url?: string
+          metadata?: Json | null
+          tipo?: string
+        }
+        Relationships: []
+      }
       debates: {
         Row: {
           completed: boolean | null
