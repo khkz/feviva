@@ -65,8 +65,8 @@ export default function LibroNaturaleza() {
           `
         }
       ]}
-      videoId="L7uuH3hI1HY"
-      videoTitle="El Observatorio Vaticano: Fe y Ciencia"
+      videoId="1WnvxfiYTsA"
+      videoTitle="Galileo Galilei: Astronomía, Ciencia y Religión (Pasajes de la Historia)"
       reflection="Si el cosmos es un libro escrito por Dios, ¿qué página estás leyendo hoy? ¿Cómo puedes ver la huella del Creador en la naturaleza que te rodea?"
       relatedArticles={[
         { id: "punto-omega", title: "El Punto Omega", href: "/frontera-final/punto-omega" },
