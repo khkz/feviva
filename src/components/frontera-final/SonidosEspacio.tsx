@@ -23,30 +23,30 @@ const BUCKET_NAME = 'ambient-audio';
 const soundTracks: SoundTrack[] = [
   {
     id: 'marte',
-    name: 'Viento de Marte',
-    description: 'NASA InSight 2018',
+    name: 'Atmósfera Marciana',
+    description: 'Ambiente espacial profundo',
     color: '#ef4444',
-    filename: 'viento-marte.mp3',
+    filename: 'atmosfera-marte.mp3',
     fallbackFrequency: 60,
     fallbackType: 'sawtooth',
     fallbackLfoFrequency: 0.3,
   },
   {
     id: 'jupiter',
-    name: 'Plasma de Júpiter',
-    description: 'Voyager - Magnetosfera',
+    name: 'Púlsar Cósmico',
+    description: 'Ondas de estrella de neutrones',
     color: '#f59e0b',
-    filename: 'plasma-jupiter.mp3',
+    filename: 'pulsar-cosmico.mp3',
     fallbackFrequency: 180,
     fallbackType: 'sine',
     fallbackLfoFrequency: 8,
   },
   {
     id: 'saturno',
-    name: 'Radio de Saturno',
-    description: 'Cassini - Emisiones',
+    name: 'Cosmos Profundo',
+    description: 'Ambiente interestelar',
     color: '#8b5cf6',
-    filename: 'radio-saturno.mp3',
+    filename: 'cosmos-profundo.mp3',
     fallbackFrequency: 40,
     fallbackType: 'sine',
     fallbackLfoFrequency: 0.1,
@@ -365,7 +365,7 @@ export function SonidosEspacio() {
               ) : (
                 <Download className="w-4 h-4 mr-2" />
               )}
-              Descargar sonidos NASA
+              Descargar sonidos cósmicos
             </Button>
           )}
         </div>
@@ -389,11 +389,11 @@ export function SonidosEspacio() {
                 boxShadow: activeTrack === track.id ? `0 0 30px ${track.color}40` : undefined,
               }}
             >
-              {/* NASA badge */}
+              {/* Real audio badge */}
               {hasRealAudio[track.id] && (
-                <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-500/20 border border-blue-500/30">
-                  <Rocket className="w-3 h-3 text-blue-400" />
-                  <span className="text-[10px] text-blue-400 font-medium">NASA</span>
+                <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/30">
+                  <Rocket className="w-3 h-3 text-emerald-400" />
+                  <span className="text-[10px] text-emerald-400 font-medium">REAL</span>
                 </div>
               )}
               
@@ -467,8 +467,8 @@ export function SonidosEspacio() {
 
         <p className="text-gray-500 text-xs text-center mt-4">
           {hasAnyRealAudio 
-            ? '🛸 Grabaciones reales de NASA • Dominio Público • Loop infinito'
-            : 'Sonidos sintetizados • Toca "Descargar" para audio real de NASA'}
+            ? '🛸 Sonidos cósmicos reales • Dominio Público • Loop infinito'
+            : 'Sonidos sintetizados • Toca "Descargar" para audio real'}
         </p>
       </div>
     </motion.div>

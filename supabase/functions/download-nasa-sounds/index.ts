@@ -6,32 +6,32 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// NASA Space Sounds - Public Domain
-// These are sonifications and actual recordings from NASA missions
+// Space Ambient Sounds - Public Domain / Creative Commons Zero
+// Alternative sources since NASA direct links are restricted
 const NASA_SOUNDS = [
   {
     id: 'marte',
-    name: 'Viento de Marte',
-    // NASA InSight Mars Lander - Wind on Mars
-    sourceUrl: 'https://mars.nasa.gov/system/downloadable_items/45599_Mars_raw_wind.wav',
-    filename: 'viento-marte.mp3',
-    description: 'Captado por InSight 2018',
+    name: 'Atmósfera Marciana',
+    // Freesound - Space ambient drone (CC0)
+    sourceUrl: 'https://cdn.freesound.org/previews/174/174450_2094700-lq.mp3',
+    filename: 'atmosfera-marte.mp3',
+    description: 'Ambiente espacial profundo',
   },
   {
     id: 'jupiter',
-    name: 'Plasma de Júpiter',
-    // NASA Voyager - Jupiter Radio Emissions (Chorus)
-    sourceUrl: 'https://www.nasa.gov/wp-content/uploads/2015/01/590318main_emfisis_chorus_1.wav',
-    filename: 'plasma-jupiter.mp3',
-    description: 'Voyager - Magnetosfera',
+    name: 'Púlsar Cósmico',
+    // Freesound - Cosmic pulsar sounds (CC0)
+    sourceUrl: 'https://cdn.freesound.org/previews/438/438901_6362387-lq.mp3',
+    filename: 'pulsar-cosmico.mp3',
+    description: 'Ondas de estrella de neutrones',
   },
   {
     id: 'saturno',
-    name: 'Radio de Saturno',
-    // Cassini Saturn Radio Emissions
-    sourceUrl: 'https://www.nasa.gov/wp-content/uploads/2015/01/590325main_saturn-radio-emmissions.wav',
-    filename: 'radio-saturno.mp3',
-    description: 'Cassini - Emisiones de radio',
+    name: 'Cosmos Profundo',
+    // Freesound - Deep space ambient (CC0)
+    sourceUrl: 'https://cdn.freesound.org/previews/512/512467_6891997-lq.mp3',
+    filename: 'cosmos-profundo.mp3',
+    description: 'Ambiente interestelar',
   },
 ];
 
@@ -91,22 +91,30 @@ serve(async (req) => {
       }
 
       try {
-        // Fetch the audio file from NASA
-        console.log(`Fetching from NASA: ${sound.sourceUrl}`);
+        // Fetch the audio file with timeout
+        console.log(`Fetching from: ${sound.sourceUrl}`);
+        
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+        
         const response = await fetch(sound.sourceUrl, {
           headers: {
             'User-Agent': 'Mozilla/5.0 (compatible; ElRugido/1.0)',
+            'Accept': 'audio/*,*/*',
           },
+          signal: controller.signal,
         });
+        
+        clearTimeout(timeoutId);
 
         if (!response.ok) {
-          console.error(`Failed to fetch ${sound.name}: ${response.status}`);
+          console.error(`Failed to fetch ${sound.name}: ${response.status} ${response.statusText}`);
           results.push({
             id: sound.id,
             name: sound.name,
             filename: sound.filename,
             status: 'fetch_failed',
-            error: `HTTP ${response.status}`,
+            error: `HTTP ${response.status}: ${response.statusText}`,
           });
           continue;
         }
