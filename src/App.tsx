@@ -37,6 +37,7 @@ import SantosPublic from "./pages/SantosPublic";
 import OracionesPublic from "./pages/OracionesPublic";
 import OracionPage from "./pages/OracionPage";
 import NotFound from "./pages/NotFound";
+import Onboarding from "./pages/Onboarding";
 import ApostlePath from "./pages/ApostlePath";
 import ApologeticsIntro from "./pages/ApologeticsIntro";
 import Gratitude from "./pages/Gratitude";
@@ -84,6 +85,7 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/onboarding" element={<Onboarding />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/coach" element={<Coach />} />
                 <Route path="/cards" element={<Cards />} />

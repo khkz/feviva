@@ -245,7 +245,8 @@ const Auth = () => {
           : "Ya puedes comenzar tu entrenamiento de fe.",
       });
       
-      navigate("/dashboard");
+      // Redirect to onboarding for new users
+      navigate("/onboarding");
     } catch (error: any) {
       toast({
         title: "Error al registrarse",

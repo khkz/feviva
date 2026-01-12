@@ -25,6 +25,7 @@ const ExploreGrid = lazy(() => import("@/components/dashboard/ExploreGrid").then
 const DailyChallenge = lazy(() => import("@/components/dashboard/DailyChallenge").then(m => ({ default: m.DailyChallenge })));
 const FeaturedContent = lazy(() => import("@/components/dashboard/FeaturedContent").then(m => ({ default: m.FeaturedContent })));
 const GratitudePrompt = lazy(() => import("@/components/dashboard/GratitudePrompt").then(m => ({ default: m.GratitudePrompt })));
+const DailyMission = lazy(() => import("@/components/dashboard/DailyMission").then(m => ({ default: m.DailyMission })));
 
 interface Profile {
   nombre: string;
@@ -136,6 +137,11 @@ const Dashboard = () => {
               </Button>
             </div>
           )}
+
+          {/* Daily Mission - Tu Misión del Momento */}
+          <Suspense fallback={<CardSkeleton height="h-48" />}>
+            <DailyMission />
+          </Suspense>
 
           {/* Quick Actions */}
           <QuickActions />
