@@ -62,7 +62,7 @@ const ambientFrequencies = [
 ];
 
 export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProps) {
-  const [currentMysteryType, setCurrentMysteryType] = useState<TipoMisterio>(getMisterioDelDia);
+  const [currentMysteryType, setCurrentMysteryType] = useState<TipoMisterio>(getMisterioDelDia());
   const [currentMysteryIndex, setCurrentMysteryIndex] = useState(0);
   const [currentPrayer, setCurrentPrayer] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
