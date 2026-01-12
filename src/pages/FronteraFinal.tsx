@@ -60,28 +60,28 @@ const categories: Category[] = [
     color: "cyan",
     cards: [
       {
+        id: "logos-cosmico",
+        title: "El Logos Cósmico",
+        description: "Jesús: La Lógica que sostiene el Universo (Juan 1).",
+        icon: BookOpen,
+        size: "normal",
+        href: "/frontera-final/logos-cosmico",
+      },
+      {
+        id: "genesis-big-bang",
+        title: "Génesis y Big Bang",
+        description: "¿Hubo una explosión o un 'Hágase la luz'?",
+        icon: Atom,
+        size: "normal",
+        href: "/frontera-final/genesis-big-bang",
+      },
+      {
         id: "libro-naturaleza",
         title: "El Libro de la Naturaleza",
         description: "Por qué estudiar galaxias es leer la mente de Dios.",
         icon: BookOpen,
         size: "normal",
         href: "/frontera-final/libro-naturaleza",
-      },
-      {
-        id: "punto-omega",
-        title: "El Punto Omega",
-        description: "La teoría de Teilhard de Chardin: El universo evoluciona hacia Cristo.",
-        icon: InfinityIcon,
-        size: "normal",
-        href: "/frontera-final/punto-omega",
-      },
-      {
-        id: "bautizar-extraterrestre",
-        title: "¿Bautizaríamos a un Extraterrestre?",
-        description: "La postura del Vaticano sobre vida inteligente no humana.",
-        icon: HelpCircle,
-        size: "normal",
-        href: "/frontera-final/bautizar-extraterrestre",
       },
     ]
   },
@@ -91,20 +91,20 @@ const categories: Category[] = [
     color: "amber",
     cards: [
       {
+        id: "gigantes-fe",
+        title: "Newton, Kepler, Mendel y Pasteur",
+        description: "Creyentes que cambiaron la ciencia para siempre.",
+        icon: Telescope,
+        size: "normal",
+        href: "/frontera-final/gigantes-fe",
+      },
+      {
         id: "padre-big-bang",
         title: "El Padre del Big Bang",
         description: "Georges Lemaître: El sacerdote que corrigió a Einstein.",
         icon: Atom,
         size: "normal",
         href: "/frontera-final/padre-big-bang",
-      },
-      {
-        id: "observatorio-vaticano",
-        title: "El Observatorio Vaticano",
-        description: "400 años mirando al cielo antes que la NASA.",
-        icon: Telescope,
-        size: "normal",
-        href: "/frontera-final/observatorio-vaticano",
       },
     ]
   },
@@ -116,15 +116,15 @@ const categories: Category[] = [
       {
         id: "colonizar-conquistar",
         title: "Colonizar sin Conquistar",
-        description: "Cómo evitar el pecado del colonialismo en Marte.",
+        description: "Ética espacial basada en mayordomía bíblica.",
         icon: Flag,
         size: "normal",
         href: "/frontera-final/colonizar-conquistar",
       },
       {
         id: "ia-alma",
-        title: "IA y Alma",
-        description: "La diferencia entre inteligencia computacional y espíritu.",
+        title: "Imago Dei en la IA",
+        description: "Dignidad humana en la era de los robots.",
         icon: Cpu,
         size: "normal",
         href: "/frontera-final/ia-alma",
@@ -284,7 +284,7 @@ export default function FronteraFinal() {
               transition={{ delay: 0.4, duration: 0.6 }}
               className="text-xl md:text-2xl text-gray-300 font-light tracking-wide"
             >
-              Donde la Fe conquista el Vacío
+              Los Cielos Cuentan Su Gloria — Salmo 19:1
             </motion.p>
           </motion.div>
 
