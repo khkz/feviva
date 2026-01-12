@@ -47,7 +47,7 @@ const exploreItems: ExploreItem[] = [
   {
     icon: BookOpen,
     label: "Biblioteca",
-    description: "40+ lecciones en audio sobre doctrina cristiana",
+    description: "40+ lecciones en audio sobre doctrina católica",
     path: "/library",
     image: libraryImage,
     stats: "40+ lecciones"
@@ -55,7 +55,7 @@ const exploreItems: ExploreItem[] = [
   {
     icon: Users,
     label: "Comunidad",
-    description: "Conecta con otros cristianos en tu camino",
+    description: "Conecta con otros católicos en tu camino",
     path: "/community",
     image: communityImage,
     stats: "Activa"

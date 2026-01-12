@@ -34,7 +34,6 @@ import { SpaceShareModal } from '@/components/frontera-final/SpaceShareModal';
 import { getDailyContent, getContentLabel, DailyContent } from '@/lib/fronteraFactsData';
 import { Button } from '@/components/ui/button';
 import { useRosario } from '@/contexts/RosarioContext';
-import { useSalmos } from '@/contexts/SalmosContext';
 import { useFronteraProgress } from '@/hooks/useFronteraProgress';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -61,28 +60,28 @@ const categories: Category[] = [
     color: "cyan",
     cards: [
       {
-        id: "logos-cosmico",
-        title: "El Logos Cósmico",
-        description: "Jesús: La Lógica que sostiene el Universo (Juan 1).",
-        icon: BookOpen,
-        size: "normal",
-        href: "/frontera-final/logos-cosmico",
-      },
-      {
-        id: "genesis-big-bang",
-        title: "Génesis y Big Bang",
-        description: "¿Hubo una explosión o un 'Hágase la luz'?",
-        icon: Atom,
-        size: "normal",
-        href: "/frontera-final/genesis-big-bang",
-      },
-      {
         id: "libro-naturaleza",
         title: "El Libro de la Naturaleza",
         description: "Por qué estudiar galaxias es leer la mente de Dios.",
         icon: BookOpen,
         size: "normal",
         href: "/frontera-final/libro-naturaleza",
+      },
+      {
+        id: "punto-omega",
+        title: "El Punto Omega",
+        description: "La teoría de Teilhard de Chardin: El universo evoluciona hacia Cristo.",
+        icon: InfinityIcon,
+        size: "normal",
+        href: "/frontera-final/punto-omega",
+      },
+      {
+        id: "bautizar-extraterrestre",
+        title: "¿Bautizaríamos a un Extraterrestre?",
+        description: "La postura del Vaticano sobre vida inteligente no humana.",
+        icon: HelpCircle,
+        size: "normal",
+        href: "/frontera-final/bautizar-extraterrestre",
       },
     ]
   },
@@ -92,20 +91,20 @@ const categories: Category[] = [
     color: "amber",
     cards: [
       {
-        id: "gigantes-fe",
-        title: "Newton, Kepler, Mendel y Pasteur",
-        description: "Creyentes que cambiaron la ciencia para siempre.",
-        icon: Telescope,
-        size: "normal",
-        href: "/frontera-final/gigantes-fe",
-      },
-      {
         id: "padre-big-bang",
         title: "El Padre del Big Bang",
         description: "Georges Lemaître: El sacerdote que corrigió a Einstein.",
         icon: Atom,
         size: "normal",
         href: "/frontera-final/padre-big-bang",
+      },
+      {
+        id: "observatorio-vaticano",
+        title: "El Observatorio Vaticano",
+        description: "400 años mirando al cielo antes que la NASA.",
+        icon: Telescope,
+        size: "normal",
+        href: "/frontera-final/observatorio-vaticano",
       },
     ]
   },
@@ -117,15 +116,15 @@ const categories: Category[] = [
       {
         id: "colonizar-conquistar",
         title: "Colonizar sin Conquistar",
-        description: "Ética espacial basada en mayordomía bíblica.",
+        description: "Cómo evitar el pecado del colonialismo en Marte.",
         icon: Flag,
         size: "normal",
         href: "/frontera-final/colonizar-conquistar",
       },
       {
         id: "ia-alma",
-        title: "Imago Dei en la IA",
-        description: "Dignidad humana en la era de los robots.",
+        title: "IA y Alma",
+        description: "La diferencia entre inteligencia computacional y espíritu.",
         icon: Cpu,
         size: "normal",
         href: "/frontera-final/ia-alma",
@@ -148,7 +147,6 @@ export default function FronteraFinal() {
   const [puntosCósmicos, setPuntosCósmicos] = useState(0);
   
   const { open: openRosario } = useRosario();
-  const { open: openSalmos } = useSalmos();
   const { markQuizCompleted, progress } = useFronteraProgress();
 
   // Fetch user stats
@@ -286,7 +284,7 @@ export default function FronteraFinal() {
               transition={{ delay: 0.4, duration: 0.6 }}
               className="text-xl md:text-2xl text-gray-300 font-light tracking-wide"
             >
-              Los Cielos Cuentan Su Gloria — Salmo 19:1
+              Donde la Fe conquista el Vacío
             </motion.p>
           </motion.div>
 
@@ -351,7 +349,7 @@ export default function FronteraFinal() {
 
         {/* MISSION BANNER */}
         <section className="relative z-10 px-4 md:px-8 max-w-3xl mx-auto -mt-4 mb-8">
-          <MissionBanner onSalmosClick={openSalmos} />
+          <MissionBanner onRosarioClick={openRosario} />
         </section>
 
         {/* BENTO GRID DASHBOARD */}
@@ -411,7 +409,7 @@ export default function FronteraFinal() {
             </div>
 
             <motion.button
-              onClick={openSalmos}
+              onClick={openRosario}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className="w-full md:w-auto glass-cyber rounded-2xl p-8 border-amber-400/40 hover:border-amber-400/60 transition-all duration-300 group cursor-pointer text-left"
@@ -434,10 +432,10 @@ export default function FronteraFinal() {
                 </div>
                 <div>
                   <h3 className="font-orbitron text-2xl font-bold text-white mb-2 group-hover:text-amber-400 transition-colors">
-                    Salmos Orbitales
+                    Rosario Interestelar
                   </h3>
                   <p className="text-gray-300 text-lg">
-                    Medita en Su Palabra Cósmica. Una experiencia de meditación bíblica.
+                    Reza contemplando la creación. Una experiencia de oración cósmica.
                   </p>
                 </div>
               </div>
@@ -529,7 +527,7 @@ export default function FronteraFinal() {
               </div>
               <div className="flex justify-between mt-3 text-xs text-gray-500">
                 <span>{progress.articlesRead.length}/7 artículos</span>
-                <span>{progress.meditacionCompleted ? '✓' : '○'} Meditación</span>
+                <span>{progress.rosarioCompleted ? '✓' : '○'} Rosario</span>
                 <span>{progress.quizCompleted ? '✓' : '○'} Quiz</span>
               </div>
               

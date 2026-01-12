@@ -14,7 +14,6 @@ import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { GospelCard } from "@/components/gospel/GospelCard";
 import { FronteraFinalCard } from "@/components/dashboard/FronteraFinalCard";
-import { CaminoDelLeonCard } from "@/components/dashboard/CaminoDelLeonCard";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -138,9 +137,6 @@ const Dashboard = () => {
               </Button>
             </div>
           )}
-
-          {/* === EL CAMINO DEL LEÓN - Hero Journey === */}
-          <CaminoDelLeonCard streakDays={stats?.racha_actual_dias || 0} />
 
           {/* Daily Mission - Tu Misión del Momento */}
           <Suspense fallback={<CardSkeleton height="h-48" />}>

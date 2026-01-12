@@ -53,7 +53,7 @@ export const FooterSection = () => {
               </div>
             </div>
             <p className="text-sm text-muted-foreground">
-              Tu compañero diario para crecer en la fe cristiana.
+              Tu compañero diario para crecer en la fe católica.
             </p>
           </motion.div>
 

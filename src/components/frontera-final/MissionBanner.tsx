@@ -14,21 +14,21 @@ interface Mission {
 }
 
 interface MissionBannerProps {
-  onSalmosClick?: () => void;
+  onRosarioClick?: () => void;
 }
 
 const ARTICLES_READ_KEY = 'frontera-final-articles-read';
-const MEDITACION_COMPLETED_KEY = 'frontera-final-meditacion-completed';
+const ROSARIO_COMPLETED_KEY = 'frontera-final-rosario-completed';
 const QUIZ_COMPLETED_KEY = 'frontera-final-quiz-completed';
 
-export function MissionBanner({ onSalmosClick }: MissionBannerProps) {
+export function MissionBanner({ onRosarioClick }: MissionBannerProps) {
   const [currentMission, setCurrentMission] = useState<Mission | null>(null);
   const [isDismissed, setIsDismissed] = useState(false);
 
   useEffect(() => {
     // Determine the next mission based on user progress
     const articlesRead = JSON.parse(localStorage.getItem(ARTICLES_READ_KEY) || '[]');
-    const meditacionCompleted = localStorage.getItem(MEDITACION_COMPLETED_KEY);
+    const rosarioCompleted = localStorage.getItem(ROSARIO_COMPLETED_KEY);
     const quizCompleted = localStorage.getItem(QUIZ_COMPLETED_KEY);
 
     let mission: Mission;
@@ -39,22 +39,22 @@ export function MissionBanner({ onSalmosClick }: MissionBannerProps) {
         id: 'first-article',
         icon: BookOpen,
         title: 'Lee tu primer artículo',
-        action: 'El Logos Cósmico',
-        href: '/frontera-final/logos-cosmico',
+        action: 'El Libro de la Naturaleza',
+        href: '/frontera-final/libro-naturaleza',
         color: 'cyan',
       };
-    } else if (!meditacionCompleted && articlesRead.length >= 1) {
-      // Has read articles but hasn't tried meditation
+    } else if (!rosarioCompleted && articlesRead.length >= 1) {
+      // Has read articles but hasn't tried rosario
       mission = {
-        id: 'try-salmos',
+        id: 'try-rosario',
         icon: PlayCircle,
-        title: 'Prueba los Salmos Orbitales',
-        action: 'Medita con el cosmos',
-        onClick: onSalmosClick,
+        title: 'Prueba el Rosario Interestelar',
+        action: 'Reza con el cosmos',
+        onClick: onRosarioClick,
         color: 'amber',
       };
     } else if (!quizCompleted && articlesRead.length >= 3) {
-      // Has done meditation, read articles, try quiz
+      // Has done rosario, read articles, try quiz
       mission = {
         id: 'try-quiz',
         icon: Brain,
@@ -66,11 +66,11 @@ export function MissionBanner({ onSalmosClick }: MissionBannerProps) {
     } else {
       // Advanced user - suggest next unread article
       const allArticles = [
-        'logos-cosmico',
-        'genesis-big-bang',
         'libro-naturaleza',
-        'gigantes-fe',
+        'punto-omega',
+        'bautizar-extraterrestre',
         'padre-big-bang',
+        'observatorio-vaticano',
         'colonizar-conquistar',
         'ia-alma',
       ];
@@ -98,7 +98,7 @@ export function MissionBanner({ onSalmosClick }: MissionBannerProps) {
     }
 
     setCurrentMission(mission);
-  }, [onSalmosClick]);
+  }, [onRosarioClick]);
 
   if (!currentMission || isDismissed) {
     return null;
@@ -203,11 +203,8 @@ export function useArticleTracking() {
     return JSON.parse(localStorage.getItem(ARTICLES_READ_KEY) || '[]');
   };
 
-  const markMeditacionCompleted = () => {
-    localStorage.setItem(MEDITACION_COMPLETED_KEY, 'true');
-    // Also track for gamification
-    const current = parseInt(localStorage.getItem('frontera_meditations_completed') || '0');
-    localStorage.setItem('frontera_meditations_completed', String(current + 1));
+  const markRosarioCompleted = () => {
+    localStorage.setItem(ROSARIO_COMPLETED_KEY, 'true');
   };
 
   const markQuizCompleted = () => {
@@ -218,7 +215,7 @@ export function useArticleTracking() {
     markArticleRead,
     isArticleRead,
     getReadArticles,
-    markMeditacionCompleted,
+    markRosarioCompleted,
     markQuizCompleted,
   };
 }
