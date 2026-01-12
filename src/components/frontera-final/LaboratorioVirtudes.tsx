@@ -1,37 +1,40 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Microscope, Code2, CheckSquare, Sparkles, Share2 } from 'lucide-react';
+import { Filter, Code2, CheckSquare, Sparkles, Share2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { PrayerShareModal } from './PrayerShareModal';
+
 interface ExamenItem {
   id: string;
   text: string;
-  category: 'crear' | 'destruir';
+  category: 'verdadero' | 'noble' | 'justo' | 'puro' | 'amable' | 'honorable';
 }
 
+// Basado en Filipenses 4:8 - "Todo lo que es verdadero, noble, justo, puro, amable, honorable"
 const examenItems: ExamenItem[] = [
-  { id: '1', text: '¿Usé las redes sociales para animar a alguien?', category: 'crear' },
-  { id: '2', text: '¿Compartí contenido que edifica o destruye?', category: 'crear' },
-  { id: '3', text: '¿Dediqué tiempo excesivo a pantallas en lugar de personas?', category: 'destruir' },
-  { id: '4', text: '¿Usé la tecnología para aprender algo nuevo?', category: 'crear' },
-  { id: '5', text: '¿Contribuí a algún proyecto que ayuda a otros?', category: 'crear' },
-  { id: '6', text: '¿Caí en la pereza digital (scroll infinito)?', category: 'destruir' },
-  { id: '7', text: '¿Oré o medité usando alguna app o contenido digital?', category: 'crear' },
-  { id: '8', text: '¿Participé en discusiones destructivas online?', category: 'destruir' },
+  { id: '1', text: '¿Lo que voy a publicar es VERDADERO? (No rumores ni fake news)', category: 'verdadero' },
+  { id: '2', text: '¿Es NOBLE? (Eleva a otros en lugar de degradarlos)', category: 'noble' },
+  { id: '3', text: '¿Es JUSTO? (Trata a las personas con equidad)', category: 'justo' },
+  { id: '4', text: '¿Es PURO? (Libre de intenciones ocultas o dañinas)', category: 'puro' },
+  { id: '5', text: '¿Es AMABLE? (Construye en lugar de destruir)', category: 'amable' },
+  { id: '6', text: '¿Es HONORABLE? (Te enorgullecerías si lo viera tu familia)', category: 'honorable' },
 ];
 
-const oracionCoder = `Arquitecto Supremo,
-Tú que compilaste el universo con la Palabra (Logos):
+const codigoDelReino = `Señor del Universo,
+Tú que escribiste el ADN de la vida
+y programaste las leyes de la física:
 
-Dame claridad para escribir código limpio y útil.
-Que elimine los "bugs" del egoísmo en mi vida
-y que cada línea que escriba sirva para 
-conectar, ayudar y elevar la dignidad humana.
+Dame sabiduría para crear tecnología 
+que sirva a tu propósito.
+Que mi trabajo sea luz en la red,
+y que todo lo que construya
+glorifique tu nombre.
 
-San Isidoro de Sevilla y Beato Carlo Acutis,
-rueguen por mi red.
+"Hagan lo que hagan, trabajen de buena gana,
+como para el Señor y no para los hombres."
+— Colosenses 3:23
 
 Amén.`;
 
@@ -54,13 +57,8 @@ export function LaboratorioVirtudes() {
     setIsExamenOpen(false);
   };
 
-  const crearCount = checkedItems.filter(id => 
-    examenItems.find(item => item.id === id)?.category === 'crear'
-  ).length;
-
-  const destruirCount = checkedItems.filter(id => 
-    examenItems.find(item => item.id === id)?.category === 'destruir'
-  ).length;
+  const passedCount = checkedItems.length;
+  const totalCount = examenItems.length;
 
   return (
     <>
@@ -77,12 +75,12 @@ export function LaboratorioVirtudes() {
             <h2 className="font-orbitron text-2xl font-bold text-white">
               Laboratorio de Virtudes
             </h2>
-            <p className="text-gray-400 text-sm">Prácticas</p>
+            <p className="text-gray-400 text-sm">Carácter Digital</p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Examen Digital Card */}
+          {/* Filtro de Santidad Card */}
           <motion.button
             whileHover={{ scale: 1.02, y: -4 }}
             whileTap={{ scale: 0.98 }}
@@ -91,20 +89,23 @@ export function LaboratorioVirtudes() {
           >
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 rounded-xl bg-emerald-400/20 flex items-center justify-center group-hover:bg-emerald-400/30 transition-colors">
-                <Microscope className="w-6 h-6 text-emerald-400" />
+                <Filter className="w-6 h-6 text-emerald-400" />
               </div>
               <div className="flex-1">
                 <h3 className="font-orbitron text-lg font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors">
-                  Examen Digital
+                  Filtro de Santidad
                 </h3>
                 <p className="text-gray-400 text-sm">
-                  ¿Usaste tu tecnología para crear o destruir hoy?
+                  ¿Lo que vas a publicar glorifica a Dios o alimenta tu ego?
+                </p>
+                <p className="text-emerald-400/70 text-xs mt-2">
+                  Basado en Filipenses 4:8
                 </p>
               </div>
             </div>
           </motion.button>
 
-          {/* Oración del Coder Card */}
+          {/* Código del Reino Card */}
           <motion.button
             whileHover={{ scale: 1.02, y: -4 }}
             whileTap={{ scale: 0.98 }}
@@ -117,10 +118,13 @@ export function LaboratorioVirtudes() {
               </div>
               <div className="flex-1">
                 <h3 className="font-orbitron text-lg font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">
-                  Oración del Programador
+                  Código del Reino
                 </h3>
                 <p className="text-gray-400 text-sm">
-                  Santificando el algoritmo.
+                  Oración para creadores y programadores.
+                </p>
+                <p className="text-cyan-400/70 text-xs mt-2">
+                  Basado en Colosenses 3:23
                 </p>
               </div>
             </div>
@@ -128,19 +132,30 @@ export function LaboratorioVirtudes() {
         </div>
       </motion.div>
 
-      {/* Examen Digital Modal */}
+      {/* Filtro de Santidad Modal */}
       <Dialog open={isExamenOpen} onOpenChange={setIsExamenOpen}>
         <DialogContent className="glass-cyber border-emerald-400/30 max-w-md">
           <DialogHeader>
             <DialogTitle className="font-orbitron text-xl text-white flex items-center gap-2">
-              <Microscope className="w-5 h-5 text-emerald-400" />
-              Examen Digital
+              <Filter className="w-5 h-5 text-emerald-400" />
+              Filtro de Santidad
             </DialogTitle>
           </DialogHeader>
           
           <div className="space-y-4 py-4">
+            <div className="glass-cyber rounded-xl p-4 border-amber-400/20">
+              <p className="text-amber-400 text-xs font-semibold uppercase tracking-wider mb-2">
+                Filipenses 4:8
+              </p>
+              <p className="text-gray-300 text-sm italic">
+                "Por lo demás, hermanos, todo lo que es verdadero, todo lo honorable, 
+                todo lo justo, todo lo puro, todo lo amable, todo lo digno de alabanza, 
+                en esto pensad."
+              </p>
+            </div>
+            
             <p className="text-gray-400 text-sm">
-              Reflexiona sobre tu uso de la tecnología hoy:
+              Antes de publicar, pregúntate:
             </p>
             
             <div className="space-y-3">
@@ -149,9 +164,7 @@ export function LaboratorioVirtudes() {
                   key={item.id}
                   className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all ${
                     checkedItems.includes(item.id)
-                      ? item.category === 'crear'
-                        ? 'bg-emerald-400/20 border border-emerald-400/40'
-                        : 'bg-red-400/20 border border-red-400/40'
+                      ? 'bg-emerald-400/20 border border-emerald-400/40'
                       : 'bg-white/5 hover:bg-white/10'
                   }`}
                 >
@@ -167,17 +180,30 @@ export function LaboratorioVirtudes() {
 
             {checkedItems.length > 0 && (
               <div className="glass-cyber rounded-xl p-4 border-amber-400/20">
-                <p className="text-sm text-gray-400 mb-2">Tu balance de hoy:</p>
-                <div className="flex gap-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-emerald-400" />
-                    <span className="text-emerald-400 font-medium">{crearCount} crear</span>
+                <p className="text-sm text-gray-400 mb-2">Tu evaluación:</p>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-amber-400 to-emerald-400 rounded-full transition-all"
+                      style={{ width: `${(passedCount / totalCount) * 100}%` }}
+                    />
                   </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-red-400" />
-                    <span className="text-red-400 font-medium">{destruirCount} destruir</span>
-                  </div>
+                  <span className={`text-sm font-medium ${
+                    passedCount === totalCount ? 'text-emerald-400' : 'text-amber-400'
+                  }`}>
+                    {passedCount}/{totalCount}
+                  </span>
                 </div>
+                {passedCount === totalCount && (
+                  <p className="text-emerald-400 text-xs mt-2">
+                    ✓ ¡Pasa el filtro! Adelante con tu publicación.
+                  </p>
+                )}
+                {passedCount > 0 && passedCount < totalCount && (
+                  <p className="text-amber-400 text-xs mt-2">
+                    ⚠ Considera revisar los puntos que faltan antes de publicar.
+                  </p>
+                )}
               </div>
             )}
 
@@ -186,34 +212,34 @@ export function LaboratorioVirtudes() {
               className="w-full bg-emerald-500 hover:bg-emerald-600"
             >
               <CheckSquare className="w-4 h-4 mr-2" />
-              Completar Examen
+              Completar Reflexión
             </Button>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* Oración del Coder Modal */}
+      {/* Código del Reino Modal */}
       <Dialog open={isOracionOpen} onOpenChange={setIsOracionOpen}>
         <DialogContent className="glass-cyber border-cyan-400/30 max-w-md">
           <DialogHeader>
             <DialogTitle className="font-orbitron text-xl text-white flex items-center gap-2">
               <Code2 className="w-5 h-5 text-cyan-400" />
-              Oración del Programador
+              Código del Reino
             </DialogTitle>
           </DialogHeader>
           
           <div className="py-4">
             <div className="glass-cyber rounded-xl p-6 border-amber-400/20 mb-4">
               <pre className="text-gray-200 text-sm whitespace-pre-wrap font-sans leading-relaxed">
-                {oracionCoder}
+                {codigoDelReino}
               </pre>
             </div>
 
             <div className="flex items-start gap-2 text-xs text-gray-500 mb-4">
               <Sparkles className="w-4 h-4 text-amber-400 flex-shrink-0" />
               <p>
-                San Isidoro de Sevilla, patrón de internet. Beato Carlo Acutis, 
-                joven programador que usó la tecnología para evangelizar.
+                Una oración para todos los que trabajan con tecnología: 
+                programadores, diseñadores, creadores de contenido, y emprendedores digitales.
               </p>
             </div>
 
@@ -235,9 +261,9 @@ export function LaboratorioVirtudes() {
       <PrayerShareModal
         isOpen={isPrayerShareOpen}
         onClose={() => setIsPrayerShareOpen(false)}
-        title="Oración del Programador"
-        prayer={oracionCoder}
-        saints="San Isidoro de Sevilla y Beato Carlo Acutis"
+        title="Código del Reino"
+        prayer={codigoDelReino}
+        saints="Oración del Creador Digital"
       />
     </>
   );
