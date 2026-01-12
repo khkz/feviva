@@ -37,9 +37,9 @@ const Index = () => {
     <>
       <Helmet>
         <title>ElRugido - Ruge tu fe. Defiende tu esperanza.</title>
-        <meta name="description" content="Fortalece tu fe católica con rituales de oración, estudio bíblico, coach de apologética, sleep stories y más. Únete a miles de cristianos." />
+        <meta name="description" content="Fortalece tu fe cristiana con El Camino del León: rituales de oración, estudio bíblico, coach de apologética, sleep stories y más. Únete a miles de cristianos." />
         <meta property="og:title" content="ElRugido - Tu compañero de fe digital" />
-        <meta property="og:description" content="Rituales de oración, estudio bíblico, apologética y más para fortalecer tu vida espiritual." />
+        <meta property="og:description" content="El Camino del León: rituales de oración, estudio bíblico, apologética y más para fortalecer tu vida espiritual." />
         <meta property="og:type" content="website" />
         <link rel="canonical" href="https://elrugido.com" />
       </Helmet>

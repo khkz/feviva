@@ -142,11 +142,11 @@ const showcaseData: FeatureShowcaseProps[] = [
     icon: Rocket,
     title: "Frontera Final",
     problem: "¿Puede la ciencia y la fe coexistir?",
-    solution: "Descubre cómo la ciencia moderna confirma la fe católica. Explora el Big Bang, la IA, el cosmos y más desde una perspectiva de fe.",
+    solution: "Descubre cómo la ciencia moderna confirma la fe cristiana. Explora el Big Bang, la IA, el cosmos y más desde una perspectiva de fe.",
     features: [
       "El Padre del Big Bang: Georges Lemaître",
       "¿Puede una IA tener alma?",
-      "El Observatorio Vaticano",
+      "Fe y ciencia en armonía",
       "El Libro de la Naturaleza"
     ],
     ctaText: "Explorar el cosmos",
