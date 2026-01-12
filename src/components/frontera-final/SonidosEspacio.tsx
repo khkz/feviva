@@ -1,45 +1,55 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Volume2, VolumeX, Waves, Play, Square } from 'lucide-react';
+import { Volume2, VolumeX, Waves, Play, Square, Rocket, Download, Loader2 } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
+import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface SoundTrack {
   id: string;
   name: string;
   description: string;
   color: string;
-  frequency: number;
-  type: OscillatorType;
-  lfoFrequency: number;
+  filename: string;
+  fallbackFrequency: number;
+  fallbackType: OscillatorType;
+  fallbackLfoFrequency: number;
 }
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const BUCKET_NAME = 'ambient-audio';
 
 const soundTracks: SoundTrack[] = [
   {
     id: 'marte',
     name: 'Viento de Marte',
-    description: 'Captado por InSight',
+    description: 'NASA InSight 2018',
     color: '#ef4444',
-    frequency: 60,
-    type: 'sawtooth',
-    lfoFrequency: 0.3,
+    filename: 'viento-marte.mp3',
+    fallbackFrequency: 60,
+    fallbackType: 'sawtooth',
+    fallbackLfoFrequency: 0.3,
   },
   {
-    id: 'pulsar',
-    name: 'Púlsares',
-    description: 'Estrellas de neutrones',
+    id: 'jupiter',
+    name: 'Plasma de Júpiter',
+    description: 'Voyager - Magnetosfera',
+    color: '#f59e0b',
+    filename: 'plasma-jupiter.mp3',
+    fallbackFrequency: 180,
+    fallbackType: 'sine',
+    fallbackLfoFrequency: 8,
+  },
+  {
+    id: 'saturno',
+    name: 'Radio de Saturno',
+    description: 'Cassini - Emisiones',
     color: '#8b5cf6',
-    frequency: 180,
-    type: 'sine',
-    lfoFrequency: 8,
-  },
-  {
-    id: 'vacio',
-    name: 'Silencio Cósmico',
-    description: 'El vacío entre galaxias',
-    color: '#06b6d4',
-    frequency: 40,
-    type: 'sine',
-    lfoFrequency: 0.1,
+    filename: 'radio-saturno.mp3',
+    fallbackFrequency: 40,
+    fallbackType: 'sine',
+    fallbackLfoFrequency: 0.1,
   },
 ];
 
@@ -54,12 +64,44 @@ export function SonidosEspacio() {
   const [activeTrack, setActiveTrack] = useState<string | null>(null);
   const [volume, setVolume] = useState(50);
   const [isMuted, setIsMuted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [hasRealAudio, setHasRealAudio] = useState<Record<string, boolean>>({});
+  
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const audioNodesRef = useRef<AudioNode | null>(null);
+
+  // Check which audio files exist
+  useEffect(() => {
+    const checkAudioFiles = async () => {
+      const availability: Record<string, boolean> = {};
+      
+      for (const track of soundTracks) {
+        try {
+          const { data } = await supabase.storage
+            .from(BUCKET_NAME)
+            .list('', { search: track.filename });
+          
+          availability[track.id] = data && data.length > 0;
+        } catch {
+          availability[track.id] = false;
+        }
+      }
+      
+      setHasRealAudio(availability);
+    };
+
+    checkAudioFiles();
+  }, []);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
       if (audioNodesRef.current) {
         try {
           audioNodesRef.current.oscillator.stop();
@@ -76,6 +118,9 @@ export function SonidosEspacio() {
 
   // Update volume when it changes
   useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = isMuted ? 0 : volume / 100;
+    }
     if (audioNodesRef.current && !isMuted) {
       audioNodesRef.current.gainNode.gain.setValueAtTime(
         (volume / 100) * 0.15,
@@ -84,13 +129,53 @@ export function SonidosEspacio() {
     }
   }, [volume, isMuted]);
 
+  const downloadNasaSounds = async () => {
+    setIsDownloading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('download-nasa-sounds');
+      
+      if (error) throw error;
+      
+      if (data.success) {
+        toast.success('¡Sonidos de NASA descargados!', {
+          description: data.message,
+        });
+        
+        // Update availability
+        const availability: Record<string, boolean> = { ...hasRealAudio };
+        for (const result of data.results) {
+          if (result.status === 'success' || result.status === 'already_exists') {
+            availability[result.id] = true;
+          }
+        }
+        setHasRealAudio(availability);
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (err) {
+      console.error('Error downloading NASA sounds:', err);
+      toast.error('Error al descargar sonidos', {
+        description: 'Los sonidos sintéticos siguen disponibles',
+      });
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   const stopCurrentSound = () => {
+    // Stop HTML5 audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      audioRef.current = null;
+    }
+    
+    // Stop Web Audio API oscillators
     if (audioNodesRef.current) {
       try {
         const { gainNode } = audioNodesRef.current;
         const ctx = audioContextRef.current;
         if (ctx) {
-          // Fade out
           gainNode.gain.setValueAtTime(gainNode.gain.value, ctx.currentTime);
           gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
           
@@ -110,25 +195,35 @@ export function SonidosEspacio() {
     }
   };
 
-  const playAmbientSound = (trackId: string) => {
-    // If clicking same track, stop it
-    if (activeTrack === trackId) {
-      stopCurrentSound();
-      setActiveTrack(null);
-      return;
+  const playRealAudio = async (track: SoundTrack) => {
+    const audioUrl = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET_NAME}/${track.filename}`;
+    
+    setIsLoading(true);
+    
+    try {
+      const audio = new Audio(audioUrl);
+      audio.loop = true;
+      audio.volume = isMuted ? 0 : volume / 100;
+      
+      await audio.play();
+      audioRef.current = audio;
+      setActiveTrack(track.id);
+    } catch (err) {
+      console.error('Error playing audio:', err);
+      // Fallback to synthesized sound
+      playSynthesizedSound(track);
+    } finally {
+      setIsLoading(false);
     }
+  };
 
-    // Stop current sound if any
-    stopCurrentSound();
-
+  const playSynthesizedSound = (track: SoundTrack) => {
     // Initialize AudioContext if needed
     if (!audioContextRef.current || audioContextRef.current.state === 'closed') {
       audioContextRef.current = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
     }
 
     const ctx = audioContextRef.current;
-    const track = soundTracks.find(t => t.id === trackId);
-    if (!track) return;
 
     // Resume context if suspended (browser autoplay policy)
     if (ctx.state === 'suspended') {
@@ -143,13 +238,13 @@ export function SonidosEspacio() {
     const filter = ctx.createBiquadFilter();
 
     // Configure oscillator
-    oscillator.type = track.type;
-    oscillator.frequency.value = track.frequency;
+    oscillator.type = track.fallbackType;
+    oscillator.frequency.value = track.fallbackFrequency;
 
     // Configure LFO for pulsing effect
     lfo.type = 'sine';
-    lfo.frequency.value = track.lfoFrequency;
-    lfoGain.gain.value = track.frequency * 0.1;
+    lfo.frequency.value = track.fallbackLfoFrequency;
+    lfoGain.gain.value = track.fallbackFrequency * 0.1;
 
     // Connect LFO to oscillator frequency for modulation
     lfo.connect(lfoGain);
@@ -185,12 +280,38 @@ export function SonidosEspacio() {
       lfoGain,
     };
 
-    setActiveTrack(trackId);
+    setActiveTrack(track.id);
+  };
+
+  const playSound = async (trackId: string) => {
+    // If clicking same track, stop it
+    if (activeTrack === trackId) {
+      stopCurrentSound();
+      setActiveTrack(null);
+      return;
+    }
+
+    // Stop current sound if any
+    stopCurrentSound();
+
+    const track = soundTracks.find(t => t.id === trackId);
+    if (!track) return;
+
+    // Use real audio if available, otherwise synthesized
+    if (hasRealAudio[trackId]) {
+      await playRealAudio(track);
+    } else {
+      playSynthesizedSound(track);
+    }
   };
 
   const toggleMute = () => {
     const newMuted = !isMuted;
     setIsMuted(newMuted);
+    
+    if (audioRef.current) {
+      audioRef.current.volume = newMuted ? 0 : volume / 100;
+    }
     
     if (audioNodesRef.current && audioContextRef.current) {
       const targetVolume = newMuted ? 0.001 : (volume / 100) * 0.15;
@@ -204,6 +325,8 @@ export function SonidosEspacio() {
       );
     }
   };
+
+  const hasAnyRealAudio = Object.values(hasRealAudio).some(v => v);
 
   return (
     <motion.div
@@ -219,14 +342,33 @@ export function SonidosEspacio() {
           <h2 className="font-orbitron text-2xl font-bold text-white">
             Sonidos del Espacio
           </h2>
-          <p className="text-gray-400 text-sm">Audio Ambiental</p>
+          <p className="text-gray-400 text-sm">Audio Ambiental NASA</p>
         </div>
       </div>
 
       <div className="glass-cyber rounded-2xl p-6 border-purple-400/30">
-        <p className="text-gray-400 text-sm mb-6 text-center">
-          🌌 Reza con el sonido real de la creación de Dios
-        </p>
+        <div className="flex items-center justify-between mb-6">
+          <p className="text-gray-400 text-sm">
+            🌌 Reza con el sonido real de la creación de Dios
+          </p>
+          
+          {!hasAnyRealAudio && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={downloadNasaSounds}
+              disabled={isDownloading}
+              className="border-purple-500/50 hover:bg-purple-500/20 text-purple-300"
+            >
+              {isDownloading ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Download className="w-4 h-4 mr-2" />
+              )}
+              Descargar sonidos NASA
+            </Button>
+          )}
+        </div>
 
         {/* Sound Tracks */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
@@ -235,7 +377,8 @@ export function SonidosEspacio() {
               key={track.id}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => playAmbientSound(track.id)}
+              onClick={() => playSound(track.id)}
+              disabled={isLoading}
               className={`relative glass-cyber rounded-xl p-4 transition-all duration-300 ${
                 activeTrack === track.id
                   ? 'border-2'
@@ -246,9 +389,19 @@ export function SonidosEspacio() {
                 boxShadow: activeTrack === track.id ? `0 0 30px ${track.color}40` : undefined,
               }}
             >
+              {/* NASA badge */}
+              {hasRealAudio[track.id] && (
+                <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-500/20 border border-blue-500/30">
+                  <Rocket className="w-3 h-3 text-blue-400" />
+                  <span className="text-[10px] text-blue-400 font-medium">NASA</span>
+                </div>
+              )}
+              
               {/* Play/Stop indicator */}
               <div className="absolute top-3 right-3">
-                {activeTrack === track.id ? (
+                {isLoading && activeTrack !== track.id ? (
+                  <Loader2 className="w-4 h-4 text-gray-500 animate-spin" />
+                ) : activeTrack === track.id ? (
                   <Square className="w-4 h-4" style={{ color: track.color }} />
                 ) : (
                   <Play className="w-4 h-4 text-gray-500" />
@@ -256,7 +409,7 @@ export function SonidosEspacio() {
               </div>
 
               {/* Waveform visualization */}
-              <div className="flex justify-center gap-0.5 h-12 items-end mb-3">
+              <div className="flex justify-center gap-0.5 h-12 items-end mb-3 mt-4">
                 {[...Array(8)].map((_, i) => (
                   <motion.div
                     key={i}
@@ -313,7 +466,9 @@ export function SonidosEspacio() {
         </div>
 
         <p className="text-gray-500 text-xs text-center mt-4">
-          Sonidos sintetizados inspirados en datos de NASA • Toca para reproducir en loop
+          {hasAnyRealAudio 
+            ? '🛸 Grabaciones reales de NASA • Dominio Público • Loop infinito'
+            : 'Sonidos sintetizados • Toca "Descargar" para audio real de NASA'}
         </p>
       </div>
     </motion.div>
