@@ -44,12 +44,14 @@ import Gratitude from "./pages/Gratitude";
 import DailyGospel from "./pages/DailyGospel";
 import FronteraFinal from "./pages/FronteraFinal";
 import LibroNaturaleza from "./pages/frontera-final/LibroNaturaleza";
-import PuntoOmega from "./pages/frontera-final/PuntoOmega";
-import BautizarExtraterrestre from "./pages/frontera-final/BautizarExtraterrestre";
 import PadreBigBang from "./pages/frontera-final/PadreBigBang";
-import ObservatorioVaticano from "./pages/frontera-final/ObservatorioVaticano";
 import ColonizarConquistar from "./pages/frontera-final/ColonizarConquistar";
 import IaAlma from "./pages/frontera-final/IaAlma";
+import LogosCosmico from "./pages/frontera-final/LogosCosmico";
+import GenesisYBigBang from "./pages/frontera-final/GenesisYBigBang";
+import GigantesDeLaFe from "./pages/frontera-final/GigantesDeLaFe";
+import { SalmosProvider } from "./contexts/SalmosContext";
+import { SalmosOrbitales, SalmosMiniPlayer } from "./components/frontera-final/SalmosOrbitales";
 import { AdminLayout } from "./layouts/AdminLayout";
 import {
   AdminDashboard,
@@ -78,8 +80,9 @@ const App = () => (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <AudioPlayerProvider>
         <RosarioProvider>
-          <TooltipProvider>
-            <Toaster />
+          <SalmosProvider>
+            <TooltipProvider>
+              <Toaster />
             <Sonner />
             <BrowserRouter>
               <Routes>
@@ -118,10 +121,10 @@ const App = () => (
                 <Route path="/evangelio/:fecha" element={<DailyGospel />} />
                 <Route path="/frontera-final" element={<FronteraFinal />} />
                 <Route path="/frontera-final/libro-naturaleza" element={<LibroNaturaleza />} />
-                <Route path="/frontera-final/punto-omega" element={<PuntoOmega />} />
-                <Route path="/frontera-final/bautizar-extraterrestre" element={<BautizarExtraterrestre />} />
+                <Route path="/frontera-final/logos-cosmico" element={<LogosCosmico />} />
+                <Route path="/frontera-final/genesis-big-bang" element={<GenesisYBigBang />} />
+                <Route path="/frontera-final/gigantes-fe" element={<GigantesDeLaFe />} />
                 <Route path="/frontera-final/padre-big-bang" element={<PadreBigBang />} />
-                <Route path="/frontera-final/observatorio-vaticano" element={<ObservatorioVaticano />} />
                 <Route path="/frontera-final/colonizar-conquistar" element={<ColonizarConquistar />} />
                 <Route path="/frontera-final/ia-alma" element={<IaAlma />} />
                 
@@ -150,13 +153,16 @@ const App = () => (
                 <Route path="*" element={<NotFound />} />
               </Routes>
               
-              {/* Global Players */}
-              <OracionPlayer />
-              <MiniPlayer />
-              <RosarioMiniPlayer />
-              <RosarioInterstellar />
-            </BrowserRouter>
-          </TooltipProvider>
+                {/* Global Players */}
+                <OracionPlayer />
+                <MiniPlayer />
+                <RosarioMiniPlayer />
+                <RosarioInterstellar />
+                <SalmosOrbitales />
+                <SalmosMiniPlayer />
+              </BrowserRouter>
+            </TooltipProvider>
+          </SalmosProvider>
         </RosarioProvider>
       </AudioPlayerProvider>
     </ThemeProvider>
