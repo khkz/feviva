@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { LucideIcon } from 'lucide-react';
@@ -16,7 +16,8 @@ import {
   Rocket,
   Trophy,
   Brain,
-  ArrowLeft
+  ArrowLeft,
+  Share2
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { BentoCard } from '@/components/frontera-final/BentoCard';
@@ -28,9 +29,11 @@ import { SonidosEspacio } from '@/components/frontera-final/SonidosEspacio';
 import { ComunidadEspacial } from '@/components/frontera-final/ComunidadEspacial';
 import { WelcomeModal } from '@/components/frontera-final/WelcomeModal';
 import { MissionBanner } from '@/components/frontera-final/MissionBanner';
+import { SpaceShareModal } from '@/components/frontera-final/SpaceShareModal';
 import { Button } from '@/components/ui/button';
 import { useRosario } from '@/contexts/RosarioContext';
 import { useFronteraProgress } from '@/hooks/useFronteraProgress';
+import { supabase } from '@/integrations/supabase/client';
 
 interface CategoryCard {
   id: string;
@@ -137,12 +140,59 @@ const floatingFacts = [
 
 export default function FronteraFinal() {
   const [isQuizOpen, setIsQuizOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [currentFact] = useState(() => 
     floatingFacts[Math.floor(Math.random() * floatingFacts.length)]
   );
   
+  // Stats for sharing
+  const [rosariosCompletados, setRosariosCompletados] = useState(0);
+  const [logrosDesbloqueados, setLogrosDesbloqueados] = useState(0);
+  const [puntosCósmicos, setPuntosCósmicos] = useState(0);
+  
   const { open: openRosario } = useRosario();
   const { markQuizCompleted, progress } = useFronteraProgress();
+
+  // Fetch user stats
+  useEffect(() => {
+    const fetchStats = async () => {
+      const { data: userData } = await supabase.auth.getUser();
+      const user = userData?.user;
+      if (!user) return;
+
+      try {
+        // Count rosarios - use rpc or simple fetch to avoid deep type issue
+        const { data: rosarios } = await (supabase
+          .from('user_rosario_progress') as any)
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('completed', true);
+        
+        setRosariosCompletados(rosarios?.length || 0);
+
+        // Count achievements
+        const { data: achievements } = await supabase
+          .from('user_achievements')
+          .select('id')
+          .eq('user_id', user.id);
+        
+        setLogrosDesbloqueados(achievements?.length || 0);
+
+        // Get points
+        const { data: stats } = await supabase
+          .from('user_stats')
+          .select('puntos_totales')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        
+        setPuntosCósmicos(stats?.puntos_totales || 0);
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   return (
     <>
@@ -452,6 +502,15 @@ export default function FronteraFinal() {
                 <span>{progress.rosarioCompleted ? '✓' : '○'} Rosario</span>
                 <span>{progress.quizCompleted ? '✓' : '○'} Quiz</span>
               </div>
+              
+              {/* Share button */}
+              <Button
+                onClick={() => setIsShareModalOpen(true)}
+                className="w-full mt-4 bg-gradient-to-r from-amber-500 to-cyan-500 hover:from-amber-600 hover:to-cyan-600 text-white font-orbitron"
+              >
+                <Share2 className="w-4 h-4 mr-2" />
+                Compartir mi Viaje Cósmico
+              </Button>
             </motion.div>
           </section>
         )}
@@ -470,6 +529,17 @@ export default function FronteraFinal() {
           setIsQuizOpen(false);
           markQuizCompleted();
         }}
+      />
+
+      {/* Space Share Modal */}
+      <SpaceShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        rosariosCompletados={rosariosCompletados}
+        logrosDesbloqueados={logrosDesbloqueados}
+        totalLogros={6}
+        puntosCósmicos={puntosCósmicos}
+        articulosLeidos={progress.articlesRead.length}
       />
     </>
   );
