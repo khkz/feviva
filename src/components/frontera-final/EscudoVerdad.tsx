@@ -20,6 +20,14 @@ interface FaqItem {
 
 const faqItems: FaqItem[] = [
   {
+    id: "caso-galileo",
+    category: "ciencia",
+    question: "¿La Iglesia no odiaba la ciencia por lo de Galileo?",
+    answer: "Es un mito histórico. La Iglesia fundó las universidades y financió a Galileo. El conflicto no fue por 'hacer ciencia', sino porque Galileo enseñó su teoría como verdad absoluta sin tener pruebas físicas (que llegaron años después) y ridiculizó al Papa en sus escritos. Fue un error de personas, no de la fe. Juan Pablo II pidió perdón por el proceso en 1992, reconociendo que la fe y la ciencia se necesitan mutuamente.",
+    source: "Juan Pablo II, Discurso 1992",
+    sourceUrl: "https://www.vatican.va",
+  },
+  {
     id: "gasto-espacio",
     category: "espacio",
     question: "¿Por qué gastar dinero en el espacio y no en los pobres?",
