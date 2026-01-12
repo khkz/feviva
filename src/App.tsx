@@ -38,6 +38,7 @@ import ApostlePath from "./pages/ApostlePath";
 import ApologeticsIntro from "./pages/ApologeticsIntro";
 import Gratitude from "./pages/Gratitude";
 import DailyGospel from "./pages/DailyGospel";
+import FronteraFinal from "./pages/FronteraFinal";
 import { AdminLayout } from "./layouts/AdminLayout";
 import {
   AdminDashboard,
@@ -102,6 +103,7 @@ const App = () => (
               <Route path="/gratitude" element={<Gratitude />} />
               <Route path="/evangelio" element={<DailyGospel />} />
               <Route path="/evangelio/:fecha" element={<DailyGospel />} />
+              <Route path="/frontera-final" element={<FronteraFinal />} />
               
               {/* Admin Routes */}
               <Route path="/admin" element={<AdminLayout />}>

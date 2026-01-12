@@ -16,6 +16,7 @@ export default {
       fontFamily: {
         sans: ['Nunito', 'sans-serif'],
         heading: ['Montserrat', 'sans-serif'],
+        orbitron: ['Orbitron', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
