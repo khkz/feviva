@@ -1,6 +1,5 @@
-import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { LucideIcon, CheckCircle } from 'lucide-react';
 import { useFronteraProgress } from '@/hooks/useFronteraProgress';
 
@@ -25,16 +24,8 @@ export function BentoCard({
   delay = 0,
   href 
 }: BentoCardProps) {
-  const { isArticleRead, markArticleRead } = useFronteraProgress();
-  const location = useLocation();
+  const { isArticleRead } = useFronteraProgress();
   const isRead = isArticleRead(id);
-
-  // Mark article as read when navigating to it
-  useEffect(() => {
-    if (href && location.pathname === href) {
-      markArticleRead(id);
-    }
-  }, [location.pathname, href, id, markArticleRead]);
 
   const colorClasses = {
     cyan: {
@@ -109,7 +100,7 @@ export function BentoCard({
 
   if (href) {
     return (
-      <Link to={href} className="block" onClick={() => markArticleRead(id)}>
+      <Link to={href} className="block">
         {cardContent}
       </Link>
     );

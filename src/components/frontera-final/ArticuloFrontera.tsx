@@ -1,8 +1,9 @@
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { LucideIcon, ArrowLeft, Share2, ExternalLink, Quote, Lightbulb } from 'lucide-react';
+import { LucideIcon, ArrowLeft, Share2, ExternalLink, Quote, Lightbulb, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useFronteraProgress } from '@/hooks/useFronteraProgress';
 
 interface ChurchQuote {
   text: string;
@@ -38,6 +39,7 @@ interface ArticuloFronteraProps {
 }
 
 export function ArticuloFrontera({
+  id,
   title,
   subtitle,
   icon: Icon,
@@ -50,6 +52,8 @@ export function ArticuloFrontera({
   reflection,
   relatedArticles,
 }: ArticuloFronteraProps) {
+  const { isArticleRead, markArticleRead } = useFronteraProgress();
+  const isRead = isArticleRead(id);
   const colorClasses = {
     cyan: {
       accent: 'text-cyan-400',
@@ -277,6 +281,32 @@ export function ArticuloFrontera({
               </div>
             </div>
           </motion.section>
+
+          {/* Completion button */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-12 flex justify-center"
+          >
+            {isRead ? (
+              <div className={`flex items-center gap-3 px-6 py-4 rounded-xl ${classes.bg} ${classes.border} border`}>
+                <CheckCircle className={`w-6 h-6 ${classes.accent}`} />
+                <span className={`font-orbitron font-bold ${classes.accent}`}>
+                  Artículo completado
+                </span>
+              </div>
+            ) : (
+              <Button
+                onClick={() => markArticleRead(id)}
+                size="lg"
+                className={`font-orbitron ${classes.bg} ${classes.border} border hover:opacity-90 transition-all`}
+              >
+                <CheckCircle className="w-5 h-5 mr-2" />
+                Marcar como completado
+              </Button>
+            )}
+          </motion.div>
 
           {/* Related articles */}
           {relatedArticles.length > 0 && (
