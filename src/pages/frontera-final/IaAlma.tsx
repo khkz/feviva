@@ -75,8 +75,8 @@ export default function IaAlma() {
           `
         }
       ]}
-      videoId="qxPBB6MCn8o"
-      videoTitle="Inteligencia Artificial y Fe Cristiana"
+      videoId="aHUtfUy4LuE"
+      videoTitle="La Inteligencia Artificial y la Fe"
       reflection="¿Qué te hace único e irrepetible ante Dios? ¿Cómo puedes usar la tecnología para servir al bien común sin perder tu humanidad?"
       relatedArticles={[
         { id: "punto-omega", title: "El Punto Omega", href: "/frontera-final/punto-omega" },

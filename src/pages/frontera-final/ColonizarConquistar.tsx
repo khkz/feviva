@@ -73,8 +73,8 @@ export default function ColonizarConquistar() {
           `
         }
       ]}
-      videoId="aSz5BjExs1s"
-      videoTitle="Ética de la Colonización Espacial"
+      videoId="SzA8ZitP2T4"
+      videoTitle="Laudato Si': El Cuidado de la Casa Común"
       reflection="¿Cómo puedes ser un 'custodio' de la creación en tu vida diaria, aquí en la Tierra? ¿Qué lecciones del pasado debemos recordar para el futuro espacial?"
       relatedArticles={[
         { id: "bautizar-extraterrestre", title: "¿Bautizaríamos a un Extraterrestre?", href: "/frontera-final/bautizar-extraterrestre" },

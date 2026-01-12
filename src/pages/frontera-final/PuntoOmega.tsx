@@ -65,8 +65,8 @@ export default function PuntoOmega() {
           `
         }
       ]}
-      videoId="EJPGJhWmqNM"
-      videoTitle="Teilhard de Chardin: Fe y Evolución"
+      videoId="Svae6oIIfDw"
+      videoTitle="¿Quién fue Teilhard de Chardin?"
       reflection="Si el universo evoluciona hacia Cristo, ¿hacia dónde evoluciona tu propia alma? ¿Qué pasos puedes dar hoy para acercarte más al Punto Omega?"
       relatedArticles={[
         { id: "libro-naturaleza", title: "El Libro de la Naturaleza", href: "/frontera-final/libro-naturaleza" },
