@@ -65,8 +65,8 @@ export default function LibroNaturaleza() {
           `
         }
       ]}
-      videoId="1WnvxfiYTsA"
-      videoTitle="Galileo Galilei: Astronomía, Ciencia y Religión (Pasajes de la Historia)"
+      videoId="2eWrQBf6WqE"
+      videoTitle="El Origen del Universo y la Creación - Universidad de Navarra"
       reflection="Si el cosmos es un libro escrito por Dios, ¿qué página estás leyendo hoy? ¿Cómo puedes ver la huella del Creador en la naturaleza que te rodea?"
       relatedArticles={[
         { id: "punto-omega", title: "El Punto Omega", href: "/frontera-final/punto-omega" },
