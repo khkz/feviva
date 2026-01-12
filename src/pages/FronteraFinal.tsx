@@ -31,6 +31,7 @@ import { WelcomeModal } from '@/components/frontera-final/WelcomeModal';
 import { MissionBanner } from '@/components/frontera-final/MissionBanner';
 import { FactShareModal } from '@/components/frontera-final/FactShareModal';
 import { SpaceShareModal } from '@/components/frontera-final/SpaceShareModal';
+import { getDailyContent, getContentLabel, DailyContent } from '@/lib/fronteraFactsData';
 import { Button } from '@/components/ui/button';
 import { useRosario } from '@/contexts/RosarioContext';
 import { useFronteraProgress } from '@/hooks/useFronteraProgress';
@@ -132,20 +133,13 @@ const categories: Category[] = [
   },
 ];
 
-const floatingFacts = [
-  "¿Sabías que un sacerdote católico propuso el Big Bang? - Georges Lemaître",
-  "El Observatorio Vaticano fue fundado en 1891, décadas antes que la NASA",
-  "35 cráteres lunares llevan nombres de científicos jesuitas",
-  "Nicolás Copérnico era canónigo de la Iglesia Católica",
-];
-
 export default function FronteraFinal() {
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isFactShareOpen, setIsFactShareOpen] = useState(false);
-  const [currentFact] = useState(() => 
-    floatingFacts[Math.floor(Math.random() * floatingFacts.length)]
-  );
+  
+  // Contenido del día basado en la fecha actual
+  const [dailyContent] = useState<DailyContent>(() => getDailyContent());
   
   // Stats for sharing
   const [rosariosCompletados, setRosariosCompletados] = useState(0);
@@ -318,14 +312,35 @@ export default function FronteraFinal() {
               </motion.button>
               
               <div className="flex items-start gap-3 pr-8">
-                <Sparkles className="w-5 h-5 text-amber-400 flex-shrink-0 mt-1" />
+                {dailyContent.icon === 'heart' ? (
+                  <span className="text-amber-400 flex-shrink-0 mt-1 text-lg">❤️</span>
+                ) : dailyContent.icon === 'star' ? (
+                  <span className="text-amber-400 flex-shrink-0 mt-1 text-lg">⭐</span>
+                ) : dailyContent.icon === 'book' ? (
+                  <span className="text-amber-400 flex-shrink-0 mt-1 text-lg">📖</span>
+                ) : (
+                  <Sparkles className="w-5 h-5 text-amber-400 flex-shrink-0 mt-1" />
+                )}
                 <div>
                   <p className="text-amber-400 text-xs font-semibold uppercase tracking-wider mb-2">
-                    Dato del Día
+                    {getContentLabel(dailyContent.type)}
                   </p>
-                  <p className="text-gray-200 text-sm leading-relaxed">
-                    {currentFact}
-                  </p>
+                  {dailyContent.type === 'quote' ? (
+                    <>
+                      <p className="text-gray-200 text-sm leading-relaxed italic">
+                        "{dailyContent.content}"
+                      </p>
+                      {dailyContent.author && (
+                        <p className="text-amber-400/80 text-xs mt-2">
+                          — {dailyContent.author}
+                        </p>
+                      )}
+                    </>
+                  ) : (
+                    <p className="text-gray-200 text-sm leading-relaxed">
+                      {dailyContent.content}
+                    </p>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -559,7 +574,7 @@ export default function FronteraFinal() {
       <FactShareModal
         isOpen={isFactShareOpen}
         onClose={() => setIsFactShareOpen(false)}
-        fact={currentFact}
+        content={dailyContent}
       />
     </>
   );
