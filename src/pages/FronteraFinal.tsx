@@ -15,8 +15,10 @@ import {
   Shield,
   Rocket,
   Trophy,
-  Brain
+  Brain,
+  ArrowLeft
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { BentoCard } from '@/components/frontera-final/BentoCard';
 import { EscudoVerdad } from '@/components/frontera-final/EscudoVerdad';
 import { RosarioInterstellar } from '@/components/frontera-final/RosarioInterstellar';
@@ -142,6 +144,15 @@ export default function FronteraFinal() {
       </Helmet>
 
       <div className="min-h-screen cyber-sacra-bg relative overflow-hidden">
+        {/* Back button */}
+        <Link 
+          to="/dashboard" 
+          className="fixed top-4 left-4 z-50 flex items-center gap-2 px-4 py-2 rounded-full bg-background/80 backdrop-blur-sm border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20 hover:text-cyan-300 transition-all group"
+        >
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+          <span className="text-sm font-medium">Inicio</span>
+        </Link>
+        
         {/* Noise overlay */}
         <div className="noise-overlay absolute inset-0 pointer-events-none" />
         
