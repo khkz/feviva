@@ -29,6 +29,7 @@ import { SonidosEspacio } from '@/components/frontera-final/SonidosEspacio';
 import { ComunidadEspacial } from '@/components/frontera-final/ComunidadEspacial';
 import { WelcomeModal } from '@/components/frontera-final/WelcomeModal';
 import { MissionBanner } from '@/components/frontera-final/MissionBanner';
+import { FactShareModal } from '@/components/frontera-final/FactShareModal';
 import { SpaceShareModal } from '@/components/frontera-final/SpaceShareModal';
 import { Button } from '@/components/ui/button';
 import { useRosario } from '@/contexts/RosarioContext';
@@ -141,6 +142,7 @@ const floatingFacts = [
 export default function FronteraFinal() {
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isFactShareOpen, setIsFactShareOpen] = useState(false);
   const [currentFact] = useState(() => 
     floatingFacts[Math.floor(Math.random() * floatingFacts.length)]
   );
@@ -302,9 +304,20 @@ export default function FronteraFinal() {
             <motion.div
               animate={{ y: [-5, 5, -5] }}
               transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              className="glass-cyber rounded-2xl p-6 max-w-md mx-auto border-amber-400/30"
+              className="glass-cyber rounded-2xl p-6 max-w-md mx-auto border-amber-400/30 relative"
             >
-              <div className="flex items-start gap-3">
+              {/* Share button */}
+              <motion.button
+                onClick={() => setIsFactShareOpen(true)}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className="absolute top-3 right-3 p-2 rounded-full bg-amber-400/20 hover:bg-amber-400/30 transition-colors"
+                title="Compartir dato"
+              >
+                <Share2 className="w-4 h-4 text-amber-400" />
+              </motion.button>
+              
+              <div className="flex items-start gap-3 pr-8">
                 <Sparkles className="w-5 h-5 text-amber-400 flex-shrink-0 mt-1" />
                 <div>
                   <p className="text-amber-400 text-xs font-semibold uppercase tracking-wider mb-2">
@@ -540,6 +553,13 @@ export default function FronteraFinal() {
         totalLogros={6}
         puntosCósmicos={puntosCósmicos}
         articulosLeidos={progress.articlesRead.length}
+      />
+
+      {/* Fact Share Modal */}
+      <FactShareModal
+        isOpen={isFactShareOpen}
+        onClose={() => setIsFactShareOpen(false)}
+        fact={currentFact}
       />
     </>
   );
