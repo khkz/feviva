@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Rocket, Target, Sparkles, ArrowRight, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import fronteraHero from "@/assets/frontera-final-hero.jpg";
 
 const newFeatures = [
   {
@@ -12,7 +13,8 @@ const newFeatures = [
     description: "Descubre cómo la ciencia moderna confirma la fe católica. Explora el Big Bang, la IA, y más desde una perspectiva de fe.",
     gradient: "from-violet-600 via-purple-600 to-indigo-600",
     link: "/frontera-final",
-    highlight: true
+    highlight: true,
+    image: fronteraHero
   },
   {
     icon: Target,
@@ -81,40 +83,55 @@ export const WhatsNewSection = () => {
               className={`group relative ${feature.highlight ? 'md:row-span-1' : ''}`}
             >
               <div 
-                className={`relative h-full p-6 rounded-3xl border transition-all duration-300 cursor-pointer
+                className={`relative h-full rounded-3xl border transition-all duration-300 cursor-pointer overflow-hidden
                   ${feature.highlight 
                     ? 'bg-gradient-to-br from-violet-900/40 via-purple-900/30 to-indigo-900/40 border-violet-500/30 hover:border-violet-400/50 hover:shadow-xl hover:shadow-violet-500/10' 
                     : 'bg-card/50 border-border/50 hover:border-primary/30 hover:bg-card/80'
                   }`}
                 onClick={() => navigate(feature.link)}
               >
-                {/* Badge */}
-                <span className={`absolute top-4 right-4 px-2 py-1 rounded-full text-xs font-bold
-                  ${feature.badge === 'NUEVO' ? 'bg-violet-500 text-white animate-pulse' : 'bg-emerald-500/20 text-emerald-400'}`}
-                >
-                  {feature.badge}
-                </span>
+                {/* Image for highlighted feature */}
+                {feature.image && (
+                  <div className="relative h-40 overflow-hidden">
+                    <img 
+                      src={feature.image} 
+                      alt={feature.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-violet-900/90 via-violet-900/40 to-transparent" />
+                  </div>
+                )}
 
-                {/* Icon */}
-                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg`}>
-                  <feature.icon className="w-7 h-7 text-white" />
-                </div>
+                <div className="p-6">
+                  {/* Badge */}
+                  <span className={`absolute top-4 right-4 px-2 py-1 rounded-full text-xs font-bold
+                    ${feature.badge === 'NUEVO' ? 'bg-primary text-primary-foreground animate-pulse' : 'bg-emerald-500/20 text-emerald-400'}`}
+                  >
+                    {feature.badge}
+                  </span>
 
-                {/* Content */}
-                <h3 className="text-xl font-bold mb-1 group-hover:text-primary transition-colors">
-                  {feature.title}
-                </h3>
-                <p className="text-sm text-primary/80 font-medium mb-3">
-                  {feature.subtitle}
-                </p>
-                <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                  {feature.description}
-                </p>
+                  {/* Icon */}
+                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg`}>
+                    <feature.icon className="w-7 h-7 text-white" />
+                  </div>
 
-                {/* CTA */}
-                <div className="flex items-center gap-2 text-sm font-medium text-primary group-hover:gap-3 transition-all">
-                  <span>Explorar</span>
-                  <ArrowRight className="w-4 h-4" />
+                  {/* Content */}
+                  <h3 className="text-xl font-bold mb-1 group-hover:text-primary transition-colors">
+                    {feature.title}
+                  </h3>
+                  <p className="text-sm text-primary/80 font-medium mb-3">
+                    {feature.subtitle}
+                  </p>
+                  <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+                    {feature.description}
+                  </p>
+
+                  {/* CTA */}
+                  <div className="flex items-center gap-2 text-sm font-medium text-primary group-hover:gap-3 transition-all">
+                    <span>Explorar</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </div>
                 </div>
 
                 {/* Highlight glow effect */}
