@@ -1,18 +1,30 @@
+import { lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, ChevronDown, Star, Users } from "lucide-react";
+import { ArrowRight, ChevronDown, Star, Users, Rocket } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { UserNeedsSection } from "@/components/landing/UserNeedsSection";
-import { DailyJourneySection } from "@/components/landing/DailyJourneySection";
-import { FeatureShowcase } from "@/components/landing/FeatureShowcase";
-import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
-import { TechFeaturesSection } from "@/components/landing/TechFeaturesSection";
-import { FinalCTASection } from "@/components/landing/FinalCTASection";
-import { FooterSection } from "@/components/landing/FooterSection";
-import { SaintsPreviewSection } from "@/components/landing/SaintsPreviewSection";
-import { SaintOfDayLanding } from "@/components/landing/SaintOfDayLanding";
+import { Helmet } from "react-helmet-async";
 import heroBackground from "@/assets/hero-background.jpg";
 import logoElRugido from "@/assets/logo-elrugido.svg";
+
+// Lazy load below-the-fold sections for performance
+const WhatsNewSection = lazy(() => import("@/components/landing/WhatsNewSection").then(m => ({ default: m.WhatsNewSection })));
+const UserNeedsSection = lazy(() => import("@/components/landing/UserNeedsSection").then(m => ({ default: m.UserNeedsSection })));
+const DailyJourneySection = lazy(() => import("@/components/landing/DailyJourneySection").then(m => ({ default: m.DailyJourneySection })));
+const FeatureShowcase = lazy(() => import("@/components/landing/FeatureShowcase").then(m => ({ default: m.FeatureShowcase })));
+const ImpactStatsSection = lazy(() => import("@/components/landing/ImpactStatsSection").then(m => ({ default: m.ImpactStatsSection })));
+const TestimonialsSection = lazy(() => import("@/components/landing/TestimonialsSection").then(m => ({ default: m.TestimonialsSection })));
+const SaintOfDayLanding = lazy(() => import("@/components/landing/SaintOfDayLanding").then(m => ({ default: m.SaintOfDayLanding })));
+const SaintsPreviewSection = lazy(() => import("@/components/landing/SaintsPreviewSection").then(m => ({ default: m.SaintsPreviewSection })));
+const FinalCTASection = lazy(() => import("@/components/landing/FinalCTASection").then(m => ({ default: m.FinalCTASection })));
+const FooterSection = lazy(() => import("@/components/landing/FooterSection").then(m => ({ default: m.FooterSection })));
+
+// Simple loading placeholder
+const SectionLoader = () => (
+  <div className="py-20 flex justify-center">
+    <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+  </div>
+);
 
 const Index = () => {
   const navigate = useNavigate();
@@ -22,166 +34,187 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Background Image with Overlay */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${heroBackground})` }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/70 to-background" />
-        
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <motion.div
-            animate={{ 
-              scale: [1, 1.2, 1],
-              opacity: [0.3, 0.5, 0.3]
-            }}
-            transition={{ duration: 8, repeat: Infinity }}
-            className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl"
-          />
-          <motion.div
-            animate={{ 
-              scale: [1.2, 1, 1.2],
-              opacity: [0.2, 0.4, 0.2]
-            }}
-            transition={{ duration: 10, repeat: Infinity }}
-            className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-secondary/15 rounded-full blur-3xl"
-          />
-        </div>
+    <>
+      <Helmet>
+        <title>ElRugido - Ruge tu fe. Defiende tu esperanza.</title>
+        <meta name="description" content="Fortalece tu fe católica con rituales de oración, estudio bíblico, coach de apologética, sleep stories y más. Únete a miles de cristianos." />
+        <meta property="og:title" content="ElRugido - Tu compañero de fe digital" />
+        <meta property="og:description" content="Rituales de oración, estudio bíblico, apologética y más para fortalecer tu vida espiritual." />
+        <meta property="og:type" content="website" />
+        <link rel="canonical" href="https://elrugido.com" />
+      </Helmet>
 
-        {/* Main Content */}
-        <div className="relative z-10 container mx-auto px-4 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="max-w-4xl mx-auto"
-          >
-            {/* Logo */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2 }}
-              className="flex flex-col items-center mb-8"
-            >
-              <img 
-                src={logoElRugido} 
-                alt="ElRugido" 
-                className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 mb-4"
-              />
-              <span className="text-sm md:text-base font-medium text-primary tracking-wider">elrugido.com</span>
-            </motion.div>
-            
-            <p className="text-xl md:text-2xl text-muted-foreground font-medium mb-4">
-              Ruge tu fe. Defiende tu esperanza.
-            </p>
-            
-            {/* Empathetic Subtitle */}
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-              className="text-lg md:text-xl text-foreground/80 max-w-2xl mx-auto mb-10"
-            >
-              ¿Buscas paz interior? ¿Quieres fortalecer tu fe? ¿Necesitas respuestas?
-              <br />
-              <span className="text-primary font-medium">Estás en el lugar correcto.</span>
-            </motion.p>
+      <div className="min-h-screen bg-background">
+        {/* Hero Section - Critical, not lazy loaded */}
+        <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+          {/* Background Image with Overlay */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ backgroundImage: `url(${heroBackground})` }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/70 to-background" />
+          
+          {/* Simplified animated background */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '8s' }} />
+            <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-secondary/15 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '10s', animationDelay: '1s' }} />
+          </div>
 
-            {/* CTA Buttons */}
+          {/* Main Content */}
+          <div className="relative z-10 container mx-auto px-4 text-center">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center mb-12"
+              transition={{ duration: 0.6 }}
+              className="max-w-4xl mx-auto"
             >
-              <Button
-                onClick={() => navigate("/auth")}
-                size="lg"
-                className="text-lg px-8 py-6 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-xl shadow-primary/25 group"
+              {/* Logo */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.1 }}
+                className="flex flex-col items-center mb-6"
               >
-                Comenzar Gratis
-                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
-              <Button
-                onClick={scrollToContent}
-                variant="outline"
-                size="lg"
-                className="text-lg px-8 py-6 border-primary/30 hover:bg-primary/5"
+                <img 
+                  src={logoElRugido} 
+                  alt="ElRugido - Tu compañero de fe digital" 
+                  className="w-28 h-28 md:w-36 md:h-36 lg:w-44 lg:h-44 mb-3"
+                  loading="eager"
+                  decoding="async"
+                />
+                <span className="text-sm md:text-base font-medium text-primary tracking-wider">elrugido.com</span>
+              </motion.div>
+
+              {/* Frontera Final Badge */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="mb-4"
               >
-                Descubrir más
-              </Button>
-            </motion.div>
+                <button 
+                  onClick={() => navigate("/frontera-final")}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-violet-500/20 to-purple-500/20 border border-violet-500/30 hover:border-violet-400/50 transition-colors"
+                >
+                  <Rocket className="w-4 h-4 text-violet-400" />
+                  <span className="text-sm font-medium text-violet-300">NUEVO: Frontera Final — Fe y Cosmos</span>
+                </button>
+              </motion.div>
+              
+              <h1 className="text-xl md:text-2xl text-muted-foreground font-medium mb-3">
+                Ruge tu fe. Defiende tu esperanza.
+              </h1>
+              
+              {/* Emotional question */}
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="text-lg md:text-xl text-foreground/80 max-w-2xl mx-auto mb-8"
+              >
+                ¿Sientes que tu fe necesita más? ¿Buscas paz interior? ¿Quieres respuestas?
+                <br />
+                <span className="text-primary font-medium">Estás en el lugar correcto.</span>
+              </motion.p>
 
-            {/* Social Proof */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.8 }}
-              className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground"
-            >
-              <div className="flex items-center gap-2">
-                <Users className="w-5 h-5 text-primary" />
-                <span><strong className="text-foreground">5,000+</strong> usuarios activos</span>
-              </div>
-              <div className="flex items-center gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-primary text-primary" />
-                ))}
-                <span className="ml-2"><strong className="text-foreground">4.9</strong> valoración</span>
-              </div>
-            </motion.div>
-          </motion.div>
-        </div>
+              {/* CTA Buttons */}
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="flex flex-col sm:flex-row gap-3 justify-center mb-10"
+              >
+                <Button
+                  onClick={() => navigate("/auth")}
+                  size="lg"
+                  className="text-lg px-8 py-6 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-xl shadow-primary/25 group"
+                >
+                  Comenzar Gratis
+                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </Button>
+                <Button
+                  onClick={scrollToContent}
+                  variant="outline"
+                  size="lg"
+                  className="text-lg px-8 py-6 border-primary/30 hover:bg-primary/5"
+                >
+                  Descubrir más
+                </Button>
+              </motion.div>
 
-        {/* Scroll Indicator */}
-        <motion.button
-          onClick={scrollToContent}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
-        >
-          <span className="text-xs uppercase tracking-wider">Descubre más</span>
-          <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
+              {/* Social Proof */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground"
+              >
+                <div className="flex items-center gap-2">
+                  <Users className="w-5 h-5 text-primary" />
+                  <span><strong className="text-foreground">5,000+</strong> usuarios activos</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 fill-primary text-primary" />
+                  ))}
+                  <span className="ml-2"><strong className="text-foreground">4.9</strong> valoración</span>
+                </div>
+              </motion.div>
+            </motion.div>
+          </div>
+
+          {/* Scroll Indicator */}
+          <button
+            onClick={scrollToContent}
+            className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
           >
-            <ChevronDown className="w-6 h-6" />
-          </motion.div>
-        </motion.button>
-      </section>
+            <span className="text-xs uppercase tracking-wider">Descubre más</span>
+            <ChevronDown className="w-5 h-5 animate-bounce" />
+          </button>
+        </section>
 
-      {/* Saint of the Day - SEO */}
-      <SaintOfDayLanding />
+        {/* Lazy loaded sections with Suspense */}
+        <Suspense fallback={<SectionLoader />}>
+          <WhatsNewSection />
+        </Suspense>
 
-      {/* User Needs Section */}
-      <UserNeedsSection />
+        <Suspense fallback={<SectionLoader />}>
+          <UserNeedsSection />
+        </Suspense>
 
-      {/* Daily Journey Section */}
-      <DailyJourneySection />
+        <Suspense fallback={<SectionLoader />}>
+          <DailyJourneySection />
+        </Suspense>
 
-      {/* Feature Showcases */}
-      <FeatureShowcase />
+        <Suspense fallback={<SectionLoader />}>
+          <FeatureShowcase />
+        </Suspense>
 
-      {/* Testimonials & Stats */}
-      <TestimonialsSection />
+        <Suspense fallback={<SectionLoader />}>
+          <ImpactStatsSection />
+        </Suspense>
 
-      {/* Tech Features */}
-      <TechFeaturesSection />
+        <Suspense fallback={<SectionLoader />}>
+          <TestimonialsSection />
+        </Suspense>
 
-      {/* Saints Preview - SEO */}
-      <SaintsPreviewSection />
+        <Suspense fallback={<SectionLoader />}>
+          <SaintOfDayLanding />
+        </Suspense>
 
-      {/* Final CTA */}
-      <FinalCTASection />
+        <Suspense fallback={<SectionLoader />}>
+          <SaintsPreviewSection />
+        </Suspense>
 
-      {/* Footer */}
-      <FooterSection />
-    </div>
+        <Suspense fallback={<SectionLoader />}>
+          <FinalCTASection />
+        </Suspense>
+
+        <Suspense fallback={<SectionLoader />}>
+          <FooterSection />
+        </Suspense>
+      </div>
+    </>
   );
 };
 
