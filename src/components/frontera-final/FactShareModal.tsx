@@ -11,23 +11,25 @@ import {
   MessageCircle,
   Facebook,
   Twitter,
-  Mail
+  Mail,
+  Heart
 } from 'lucide-react';
 import { toast } from 'sonner';
 import logoElRugido from '@/assets/logo-elrugido.svg';
+import { DailyContent, getContentLabel } from '@/lib/fronteraFactsData';
 
 interface FactShareModalProps {
   isOpen: boolean;
   onClose: () => void;
-  fact: string;
+  content: DailyContent;
 }
 
 // Generate Post Image (1:1)
 const FactPostImage = ({ 
-  fact,
+  content,
   onGenerated 
 }: { 
-  fact: string;
+  content: DailyContent;
   onGenerated: (dataUrl: string) => void;
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -90,9 +92,10 @@ const FactPostImage = ({
       ctx.textAlign = 'center';
       ctx.fillText('FRONTERA FINAL', width / 2, 190);
 
-      // Badge "Dato del Día"
+      // Badge based on content type
       const badgeY = 260;
-      const badgeWidth = 200;
+      const badgeLabel = content.type === 'quote' ? '❤️ REFLEXIÓN DEL DÍA' : '✨ DATO DEL DÍA';
+      const badgeWidth = content.type === 'quote' ? 260 : 200;
       const badgeHeight = 40;
       const badgeX = (width - badgeWidth) / 2;
       
@@ -106,16 +109,19 @@ const FactPostImage = ({
       
       ctx.font = 'bold 18px Arial, sans-serif';
       ctx.fillStyle = '#fbbf24';
-      ctx.fillText('✨ DATO DEL DÍA', width / 2, badgeY + 27);
+      ctx.fillText(badgeLabel, width / 2, badgeY + 27);
 
-      // Fact text - with word wrapping
-      ctx.font = '32px Arial, sans-serif';
+      // Content text - with word wrapping
+      const isQuote = content.type === 'quote';
+      const displayText = isQuote ? `"${content.content}"` : content.content;
+      
+      ctx.font = isQuote ? 'italic 30px Georgia, serif' : '32px Arial, sans-serif';
       ctx.fillStyle = '#ffffff';
       ctx.textAlign = 'center';
       
       const maxWidth = width - 140;
       const lineHeight = 48;
-      const words = fact.split(' ');
+      const words = displayText.split(' ');
       let line = '';
       const lines: string[] = [];
       
@@ -131,10 +137,20 @@ const FactPostImage = ({
       }
       lines.push(line.trim());
       
-      const startY = (height / 2) - ((lines.length - 1) * lineHeight / 2) + 40;
+      // Calculate vertical position
+      const authorOffset = isQuote && content.author ? 50 : 0;
+      const startY = (height / 2) - ((lines.length - 1) * lineHeight / 2) + 20;
+      
       lines.forEach((l, i) => {
         ctx.fillText(l, width / 2, startY + i * lineHeight);
       });
+
+      // Author (for quotes)
+      if (isQuote && content.author) {
+        ctx.font = 'bold 24px Arial, sans-serif';
+        ctx.fillStyle = '#fbbf24';
+        ctx.fillText(`— ${content.author}`, width / 2, startY + lines.length * lineHeight + 30);
+      }
 
       // Decorative line
       ctx.strokeStyle = 'rgba(34, 211, 238, 0.3)';
@@ -153,7 +169,7 @@ const FactPostImage = ({
       onGenerated(canvas.toDataURL('image/png'));
     };
     logo.src = logoElRugido;
-  }, [fact, onGenerated]);
+  }, [content, onGenerated]);
 
   return (
     <div className="relative">
@@ -173,10 +189,10 @@ const FactPostImage = ({
 
 // Generate Story Image (9:16)
 const FactStoryImage = ({ 
-  fact,
+  content,
   onGenerated 
 }: { 
-  fact: string;
+  content: DailyContent;
   onGenerated: (dataUrl: string) => void;
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -254,9 +270,10 @@ const FactStoryImage = ({
       ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
       ctx.fillText('Donde la Fe conquista el Vacío', width / 2, 380);
 
-      // Badge "Dato del Día"
+      // Badge based on content type
       const badgeY = height / 2 - 200;
-      const badgeWidth = 280;
+      const badgeLabel = content.type === 'quote' ? '❤️ REFLEXIÓN DEL DÍA' : '✨ DATO DEL DÍA';
+      const badgeWidth = content.type === 'quote' ? 340 : 280;
       const badgeHeight = 56;
       const badgeX = (width - badgeWidth) / 2;
       
@@ -270,16 +287,19 @@ const FactStoryImage = ({
       
       ctx.font = 'bold 24px Arial, sans-serif';
       ctx.fillStyle = '#fbbf24';
-      ctx.fillText('✨ DATO DEL DÍA', width / 2, badgeY + 38);
+      ctx.fillText(badgeLabel, width / 2, badgeY + 38);
 
-      // Fact text - with word wrapping
-      ctx.font = '44px Arial, sans-serif';
+      // Content text - with word wrapping
+      const isQuote = content.type === 'quote';
+      const displayText = isQuote ? `"${content.content}"` : content.content;
+      
+      ctx.font = isQuote ? 'italic 40px Georgia, serif' : '44px Arial, sans-serif';
       ctx.fillStyle = '#ffffff';
       ctx.textAlign = 'center';
       
       const maxWidth = width - 160;
       const lineHeight = 64;
-      const words = fact.split(' ');
+      const words = displayText.split(' ');
       let line = '';
       const lines: string[] = [];
       
@@ -299,6 +319,13 @@ const FactStoryImage = ({
       lines.forEach((l, i) => {
         ctx.fillText(l, width / 2, startY + i * lineHeight);
       });
+
+      // Author (for quotes)
+      if (isQuote && content.author) {
+        ctx.font = 'bold 32px Arial, sans-serif';
+        ctx.fillStyle = '#fbbf24';
+        ctx.fillText(`— ${content.author}`, width / 2, startY + lines.length * lineHeight + 40);
+      }
 
       // Decorative orbital rings
       ctx.strokeStyle = 'rgba(34, 211, 238, 0.15)';
@@ -320,7 +347,7 @@ const FactStoryImage = ({
       onGenerated(canvas.toDataURL('image/png'));
     };
     logo.src = logoElRugido;
-  }, [fact, onGenerated]);
+  }, [content, onGenerated]);
 
   return (
     <div className="relative">
@@ -338,13 +365,19 @@ const FactStoryImage = ({
   );
 };
 
-export const FactShareModal = ({ isOpen, onClose, fact }: FactShareModalProps) => {
+export const FactShareModal = ({ isOpen, onClose, content }: FactShareModalProps) => {
   const [activeTab, setActiveTab] = useState<'story' | 'post'>('story');
   const [storyDataUrl, setStoryDataUrl] = useState<string | null>(null);
   const [postDataUrl, setPostDataUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const shareText = `✨ ${fact}\n\n🚀 Descubre más en Frontera Final - Donde la Fe conquista el Vacío\n\n👉 elrugido.com/frontera-final`;
+  const isQuote = content.type === 'quote';
+  const contentLabel = getContentLabel(content.type);
+  
+  const shareText = isQuote 
+    ? `❤️ "${content.content}" — ${content.author || ''}\n\n🚀 Descubre más reflexiones en Frontera Final\n\n👉 elrugido.com/frontera-final`
+    : `✨ ${content.content}\n\n🚀 Descubre más en Frontera Final - Donde la Fe conquista el Vacío\n\n👉 elrugido.com/frontera-final`;
+    
   const shareUrl = 'https://elrugido.com/frontera-final';
 
   const handleDownload = () => {
@@ -352,7 +385,7 @@ export const FactShareModal = ({ isOpen, onClose, fact }: FactShareModalProps) =
     if (!dataUrl) return;
 
     const link = document.createElement('a');
-    link.download = `frontera-final-dato-${activeTab}.png`;
+    link.download = `frontera-final-${content.type}-${activeTab}.png`;
     link.href = dataUrl;
     link.click();
     toast.success('Imagen descargada');
@@ -373,7 +406,7 @@ export const FactShareModal = ({ isOpen, onClose, fact }: FactShareModalProps) =
       whatsapp: `https://wa.me/?text=${encodedText}`,
       twitter: `https://twitter.com/intent/tweet?text=${encodedText}`,
       facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`,
-      email: `mailto:?subject=${encodeURIComponent('Dato del Día - Frontera Final')}&body=${encodedText}`,
+      email: `mailto:?subject=${encodeURIComponent(`${contentLabel} - Frontera Final`)}&body=${encodedText}`,
     };
 
     window.open(urls[platform], '_blank');
@@ -387,16 +420,16 @@ export const FactShareModal = ({ isOpen, onClose, fact }: FactShareModalProps) =
         if (dataUrl) {
           const response = await fetch(dataUrl);
           const blob = await response.blob();
-          const file = new File([blob], `frontera-final-dato.png`, { type: 'image/png' });
+          const file = new File([blob], `frontera-final-${content.type}.png`, { type: 'image/png' });
           
           await navigator.share({
-            title: 'Dato del Día - Frontera Final',
+            title: `${contentLabel} - Frontera Final`,
             text: shareText,
             files: [file],
           });
         } else {
           await navigator.share({
-            title: 'Dato del Día - Frontera Final',
+            title: `${contentLabel} - Frontera Final`,
             text: shareText,
             url: shareUrl,
           });
@@ -414,8 +447,12 @@ export const FactShareModal = ({ isOpen, onClose, fact }: FactShareModalProps) =
       <DialogContent className="sm:max-w-md bg-slate-900 border-cyan-500/30 text-white">
         <DialogHeader>
           <DialogTitle className="text-center flex items-center justify-center gap-2 font-orbitron text-cyan-400">
-            <Sparkles className="w-5 h-5 text-amber-400" />
-            Compartir Dato del Día
+            {isQuote ? (
+              <Heart className="w-5 h-5 text-amber-400" />
+            ) : (
+              <Sparkles className="w-5 h-5 text-amber-400" />
+            )}
+            Compartir {contentLabel}
           </DialogTitle>
         </DialogHeader>
 
@@ -430,11 +467,11 @@ export const FactShareModal = ({ isOpen, onClose, fact }: FactShareModalProps) =
           </TabsList>
 
           <TabsContent value="story" className="mt-4">
-            <FactStoryImage fact={fact} onGenerated={setStoryDataUrl} />
+            <FactStoryImage content={content} onGenerated={setStoryDataUrl} />
           </TabsContent>
 
           <TabsContent value="post" className="mt-4">
-            <FactPostImage fact={fact} onGenerated={setPostDataUrl} />
+            <FactPostImage content={content} onGenerated={setPostDataUrl} />
           </TabsContent>
         </Tabs>
 
