@@ -5,8 +5,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { AudioPlayerProvider } from "@/contexts/AudioPlayerContext";
+import { RosarioProvider } from "@/contexts/RosarioContext";
 import { MiniPlayer } from "@/components/audio/MiniPlayer";
 import { OracionPlayer } from "@/components/oraciones/OracionPlayer";
+import { RosarioMiniPlayer } from "@/components/rosario/RosarioMiniPlayer";
+import { RosarioInterstellar } from "@/components/frontera-final/RosarioInterstellar";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -73,82 +76,86 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <AudioPlayerProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/coach" element={<Coach />} />
-              <Route path="/cards" element={<Cards />} />
-              <Route path="/habits" element={<Habits />} />
-              <Route path="/community" element={<Community />} />
-              <Route path="/library" element={<Library />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/profile/reminders" element={<ProfileReminders />} />
-              <Route path="/debate-history" element={<DebateHistory />} />
-              <Route path="/gamification" element={<Gamification />} />
-              <Route path="/morning" element={<Morning />} />
-              <Route path="/evening" element={<Evening />} />
-              <Route path="/prayer" element={<Prayer />} />
-              <Route path="/mission" element={<Mission />} />
-              <Route path="/oraciones" element={<OracionesPublic />} />
-              <Route path="/oraciones/app" element={<Oraciones />} />
-              <Route path="/oracion/:slug" element={<OracionPage />} />
-              <Route path="/rosario" element={<Rosario />} />
-              <Route path="/sleep-stories" element={<SleepStories />} />
-              <Route path="/sleep" element={<SleepStories />} />
-              <Route path="/novenas" element={<Novenas />} />
-              <Route path="/bible-plan" element={<BiblePlan />} />
-              <Route path="/santos" element={<SantosPublic />} />
-              <Route path="/santos/app" element={<Santos />} />
-              <Route path="/santo/:slug" element={<SantoPage />} />
-              <Route path="/apostle-path" element={<ApostlePath />} />
-              <Route path="/apologetics-intro" element={<ApologeticsIntro />} />
-              <Route path="/gratitude" element={<Gratitude />} />
-              <Route path="/evangelio" element={<DailyGospel />} />
-              <Route path="/evangelio/:fecha" element={<DailyGospel />} />
-              <Route path="/frontera-final" element={<FronteraFinal />} />
-              <Route path="/frontera-final/libro-naturaleza" element={<LibroNaturaleza />} />
-              <Route path="/frontera-final/punto-omega" element={<PuntoOmega />} />
-              <Route path="/frontera-final/bautizar-extraterrestre" element={<BautizarExtraterrestre />} />
-              <Route path="/frontera-final/padre-big-bang" element={<PadreBigBang />} />
-              <Route path="/frontera-final/observatorio-vaticano" element={<ObservatorioVaticano />} />
-              <Route path="/frontera-final/colonizar-conquistar" element={<ColonizarConquistar />} />
-              <Route path="/frontera-final/ia-alma" element={<IaAlma />} />
+        <RosarioProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/coach" element={<Coach />} />
+                <Route path="/cards" element={<Cards />} />
+                <Route path="/habits" element={<Habits />} />
+                <Route path="/community" element={<Community />} />
+                <Route path="/library" element={<Library />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/profile/reminders" element={<ProfileReminders />} />
+                <Route path="/debate-history" element={<DebateHistory />} />
+                <Route path="/gamification" element={<Gamification />} />
+                <Route path="/morning" element={<Morning />} />
+                <Route path="/evening" element={<Evening />} />
+                <Route path="/prayer" element={<Prayer />} />
+                <Route path="/mission" element={<Mission />} />
+                <Route path="/oraciones" element={<OracionesPublic />} />
+                <Route path="/oraciones/app" element={<Oraciones />} />
+                <Route path="/oracion/:slug" element={<OracionPage />} />
+                <Route path="/rosario" element={<Rosario />} />
+                <Route path="/sleep-stories" element={<SleepStories />} />
+                <Route path="/sleep" element={<SleepStories />} />
+                <Route path="/novenas" element={<Novenas />} />
+                <Route path="/bible-plan" element={<BiblePlan />} />
+                <Route path="/santos" element={<SantosPublic />} />
+                <Route path="/santos/app" element={<Santos />} />
+                <Route path="/santo/:slug" element={<SantoPage />} />
+                <Route path="/apostle-path" element={<ApostlePath />} />
+                <Route path="/apologetics-intro" element={<ApologeticsIntro />} />
+                <Route path="/gratitude" element={<Gratitude />} />
+                <Route path="/evangelio" element={<DailyGospel />} />
+                <Route path="/evangelio/:fecha" element={<DailyGospel />} />
+                <Route path="/frontera-final" element={<FronteraFinal />} />
+                <Route path="/frontera-final/libro-naturaleza" element={<LibroNaturaleza />} />
+                <Route path="/frontera-final/punto-omega" element={<PuntoOmega />} />
+                <Route path="/frontera-final/bautizar-extraterrestre" element={<BautizarExtraterrestre />} />
+                <Route path="/frontera-final/padre-big-bang" element={<PadreBigBang />} />
+                <Route path="/frontera-final/observatorio-vaticano" element={<ObservatorioVaticano />} />
+                <Route path="/frontera-final/colonizar-conquistar" element={<ColonizarConquistar />} />
+                <Route path="/frontera-final/ia-alma" element={<IaAlma />} />
+                
+                {/* Admin Routes */}
+                <Route path="/admin" element={<AdminLayout />}>
+                  <Route index element={<AdminDashboard />} />
+                  <Route path="users" element={<AdminUsers />} />
+                  <Route path="community" element={<AdminCommunity />} />
+                  <Route path="content" element={<AdminContent />} />
+                  <Route path="daily-content" element={<AdminDailyContent />} />
+                  <Route path="oraciones" element={<AdminOraciones />} />
+                  <Route path="feedback" element={<AdminFeedback />} />
+                  <Route path="processing" element={<AdminProcessing />} />
+                  <Route path="analytics" element={<AdminAnalytics />} />
+                  <Route path="media" element={<AdminMedia />} />
+                  <Route path="courses" element={<AdminCourses />} />
+                  <Route path="live" element={<AdminLiveSessions />} />
+                  <Route path="movies" element={<AdminMovies />} />
+                  <Route path="bible-plan" element={<AdminBiblePlan />} />
+                  <Route path="gratitude" element={<AdminGratitude />} />
+                  <Route path="invitations" element={<AdminInvitations />} />
+                  <Route path="santos" element={<AdminSantos />} />
+                </Route>
+                
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
               
-              {/* Admin Routes */}
-              <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<AdminDashboard />} />
-                <Route path="users" element={<AdminUsers />} />
-                <Route path="community" element={<AdminCommunity />} />
-                <Route path="content" element={<AdminContent />} />
-                <Route path="daily-content" element={<AdminDailyContent />} />
-                <Route path="oraciones" element={<AdminOraciones />} />
-                <Route path="feedback" element={<AdminFeedback />} />
-                <Route path="processing" element={<AdminProcessing />} />
-                <Route path="analytics" element={<AdminAnalytics />} />
-                <Route path="media" element={<AdminMedia />} />
-                <Route path="courses" element={<AdminCourses />} />
-                <Route path="live" element={<AdminLiveSessions />} />
-                <Route path="movies" element={<AdminMovies />} />
-                <Route path="bible-plan" element={<AdminBiblePlan />} />
-                <Route path="gratitude" element={<AdminGratitude />} />
-                <Route path="invitations" element={<AdminInvitations />} />
-                <Route path="santos" element={<AdminSantos />} />
-              </Route>
-              
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            
-            {/* Global Players */}
-            <OracionPlayer />
-            <MiniPlayer />
-          </BrowserRouter>
-        </TooltipProvider>
+              {/* Global Players */}
+              <OracionPlayer />
+              <MiniPlayer />
+              <RosarioMiniPlayer />
+              <RosarioInterstellar />
+            </BrowserRouter>
+          </TooltipProvider>
+        </RosarioProvider>
       </AudioPlayerProvider>
     </ThemeProvider>
   </QueryClientProvider>

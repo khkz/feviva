@@ -21,10 +21,10 @@ import {
 import { Link } from 'react-router-dom';
 import { BentoCard } from '@/components/frontera-final/BentoCard';
 import { EscudoVerdad } from '@/components/frontera-final/EscudoVerdad';
-import { RosarioInterstellar } from '@/components/frontera-final/RosarioInterstellar';
 import { SpaceGamification } from '@/components/frontera-final/SpaceGamification';
 import { ApologeticsQuiz } from '@/components/frontera-final/ApologeticsQuiz';
 import { Button } from '@/components/ui/button';
+import { useRosario } from '@/contexts/RosarioContext';
 
 interface CategoryCard {
   id: string;
@@ -130,11 +130,12 @@ const floatingFacts = [
 ];
 
 export default function FronteraFinal() {
-  const [isRosarioOpen, setIsRosarioOpen] = useState(false);
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   const [currentFact] = useState(() => 
     floatingFacts[Math.floor(Math.random() * floatingFacts.length)]
   );
+  
+  const { open: openRosario } = useRosario();
 
   return (
     <>
@@ -318,7 +319,7 @@ export default function FronteraFinal() {
             </div>
 
             <motion.button
-              onClick={() => setIsRosarioOpen(true)}
+              onClick={openRosario}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className="w-full md:w-auto glass-cyber rounded-2xl p-8 border-amber-400/40 hover:border-amber-400/60 transition-all duration-300 group cursor-pointer text-left"
@@ -405,12 +406,6 @@ export default function FronteraFinal() {
         {/* Bottom spacing */}
         <div className="h-24" />
       </div>
-
-      {/* Rosario Modal */}
-      <RosarioInterstellar 
-        isOpen={isRosarioOpen} 
-        onClose={() => setIsRosarioOpen(false)} 
-      />
 
       {/* Quiz Modal */}
       <ApologeticsQuiz
