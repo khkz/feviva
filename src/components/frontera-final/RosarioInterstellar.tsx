@@ -1,17 +1,11 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Play, Pause, RotateCcw, Volume2, VolumeX, ChevronRight, ChevronLeft, Star, Sparkles, Maximize2, Minimize2, Mic, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { MISTERIOS, ORACIONES_ROSARIO, getMisterioDelDia, TipoMisterio } from '@/lib/rosarioData';
-import { supabase } from '@/integrations/supabase/client';
+import { MISTERIOS, TipoMisterio } from '@/lib/rosarioData';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Slider } from '@/components/ui/slider';
-import { useRosarioTTS } from '@/hooks/useRosarioTTS';
-
-interface RosarioInterstellarProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
+import { useRosario } from '@/contexts/RosarioContext';
 
 const mysteryConfig = {
   gozosos: { color: "#22d3ee", planet: "Mercurio", gradient: "from-cyan-400 to-cyan-600" },
@@ -54,254 +48,41 @@ const spaceReflections: Record<TipoMisterio, string[]> = {
   ],
 };
 
-// Ambient space sounds frequencies
-const ambientFrequencies = [
-  { freq: 60, type: 'sine' as OscillatorType, gain: 0.03 },
-  { freq: 120, type: 'sine' as OscillatorType, gain: 0.02 },
-  { freq: 180, type: 'sine' as OscillatorType, gain: 0.015 },
-];
+export function RosarioInterstellar() {
+  const {
+    isOpen,
+    currentMysteryType,
+    currentMysteryIndex,
+    currentPrayer,
+    isPlaying,
+    isMuted,
+    ttsEnabled,
+    ambientVolume,
+    rosariosCompletados,
+    isTtsGenerating,
+    totalProgress,
+    mysteryData,
+    currentMystery,
+    close,
+    minimize,
+    togglePlay,
+    next,
+    previous,
+    reset,
+    setMysteryType,
+    setMysteryIndex,
+    toggleMute,
+    toggleTts,
+    setAmbientVolume,
+    getCurrentPrayerName,
+    getCurrentPrayerText,
+  } = useRosario();
 
-export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProps) {
-  const [currentMysteryType, setCurrentMysteryType] = useState<TipoMisterio>(getMisterioDelDia());
-  const [currentMysteryIndex, setCurrentMysteryIndex] = useState(0);
-  const [currentPrayer, setCurrentPrayer] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
   const [showPrayerText, setShowPrayerText] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [ambientVolume, setAmbientVolume] = useState(30);
-  const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
-  const [rosariosCompletados, setRosariosCompletados] = useState(0);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [ttsEnabled, setTtsEnabled] = useState(true);
-  
-  const ambientOscillators = useRef<OscillatorNode[]>([]);
-  const ambientGains = useRef<GainNode[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // TTS Hook
-  const { 
-    isGenerating: isTtsGenerating, 
-    generatingPrayer,
-    isPlaying: isTtsPlaying, 
-    playPrayer, 
-    stop: stopTts,
-    getPrayerTypeFromIndex,
-    hasAllAudios,
-    preGenerateAll,
-  } = useRosarioTTS();
-
-  const mysteryData = MISTERIOS[currentMysteryType];
-  const currentMystery = mysteryData.misterios[currentMysteryIndex];
   const config = mysteryConfig[currentMysteryType];
-
-  // Load user and stats
-  useEffect(() => {
-    const loadUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUserId(user.id);
-        const { count } = await supabase
-          .from('user_rosario_progress')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id)
-          .eq('completado', true);
-        setRosariosCompletados(count || 0);
-      }
-    };
-    if (isOpen) loadUser();
-  }, [isOpen]);
-
-  // Initialize audio context and ambient sounds
-  useEffect(() => {
-    if (isOpen && !audioContext) {
-      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      setAudioContext(ctx);
-    }
-  }, [isOpen, audioContext]);
-
-  // Start/stop ambient sounds
-  useEffect(() => {
-    if (!audioContext || isMuted) {
-      stopAmbient();
-      return;
-    }
-
-    if (isPlaying) {
-      startAmbient();
-    } else {
-      stopAmbient();
-    }
-
-    return () => stopAmbient();
-  }, [audioContext, isPlaying, isMuted]);
-
-  // Update ambient volume
-  useEffect(() => {
-    ambientGains.current.forEach((gain, i) => {
-      if (gain) {
-        gain.gain.setValueAtTime(
-          ambientFrequencies[i].gain * (ambientVolume / 100),
-          audioContext?.currentTime || 0
-        );
-      }
-    });
-  }, [ambientVolume, audioContext]);
-
-  const startAmbient = () => {
-    if (!audioContext) return;
-    stopAmbient();
-
-    ambientFrequencies.forEach((config, i) => {
-      const osc = audioContext.createOscillator();
-      const gain = audioContext.createGain();
-      
-      osc.type = config.type;
-      osc.frequency.value = config.freq;
-      gain.gain.value = config.gain * (ambientVolume / 100);
-      
-      osc.connect(gain);
-      gain.connect(audioContext.destination);
-      osc.start();
-      
-      ambientOscillators.current[i] = osc;
-      ambientGains.current[i] = gain;
-    });
-  };
-
-  const stopAmbient = () => {
-    ambientOscillators.current.forEach(osc => {
-      try { osc?.stop(); } catch {}
-    });
-    ambientOscillators.current = [];
-    ambientGains.current = [];
-  };
-
-  // Play cosmic bell sound
-  const playBellSound = useCallback(() => {
-    if (!audioContext || isMuted) return;
-
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-    const filter = audioContext.createBiquadFilter();
-
-    oscillator.connect(filter);
-    filter.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-
-    filter.type = "lowpass";
-    filter.frequency.value = 2000;
-    
-    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-    oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.5);
-
-    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.8);
-
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.8);
-  }, [audioContext, isMuted]);
-
-  // Play completion chord
-  const playCompletionChord = useCallback(() => {
-    if (!audioContext || isMuted) return;
-
-    const notes = [261.63, 329.63, 392.00, 523.25];
-    
-    notes.forEach((freq, i) => {
-      const osc = audioContext.createOscillator();
-      const gain = audioContext.createGain();
-      
-      osc.connect(gain);
-      gain.connect(audioContext.destination);
-      
-      osc.frequency.value = freq;
-      osc.type = "sine";
-      
-      const startTime = audioContext.currentTime + i * 0.1;
-      gain.gain.setValueAtTime(0.15, startTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, startTime + 1.5);
-      
-      osc.start(startTime);
-      osc.stop(startTime + 1.5);
-    });
-  }, [audioContext, isMuted]);
-
-  // Auto-advance
-  useEffect(() => {
-    if (!isPlaying) return;
-    const interval = setInterval(() => handleNext(), 4000);
-    return () => clearInterval(interval);
-  }, [isPlaying, currentPrayer, currentMysteryIndex]);
-
-  const handleNext = () => {
-    playBellSound();
-    stopTts(); // Stop current TTS
-
-    if (currentPrayer < 11) {
-      setCurrentPrayer(prev => prev + 1);
-    } else if (currentMysteryIndex < 4) {
-      playCompletionChord();
-      setCurrentMysteryIndex(prev => prev + 1);
-      setCurrentPrayer(0);
-    } else {
-      playCompletionChord();
-      setIsPlaying(false);
-      saveProgress();
-    }
-  };
-
-  const handlePrevious = () => {
-    stopTts();
-    if (currentPrayer > 0) {
-      setCurrentPrayer(prev => prev - 1);
-    } else if (currentMysteryIndex > 0) {
-      setCurrentMysteryIndex(prev => prev - 1);
-      setCurrentPrayer(11);
-    }
-  };
-
-  const handleReset = () => {
-    setCurrentMysteryIndex(0);
-    setCurrentPrayer(0);
-    setIsPlaying(false);
-    stopTts();
-  };
-
-  // Play TTS when prayer changes (if TTS is enabled)
-  useEffect(() => {
-    if (ttsEnabled && !isTtsPlaying && !isTtsGenerating) {
-      const prayerType = getPrayerTypeFromIndex(currentPrayer);
-      playPrayer(prayerType);
-    }
-  }, [currentPrayer, ttsEnabled]);
-
-  const handleTtsToggle = async () => {
-    if (!ttsEnabled) {
-      setTtsEnabled(true);
-      // Play current prayer
-      const prayerType = getPrayerTypeFromIndex(currentPrayer);
-      await playPrayer(prayerType);
-    } else {
-      setTtsEnabled(false);
-      stopTts();
-    }
-  };
-
-  const saveProgress = async () => {
-    if (!userId) return;
-    try {
-      await supabase.from('user_rosario_progress').insert({
-        user_id: userId,
-        misterio_tipo: currentMysteryType,
-        completado: true,
-        decenas_completadas: 5,
-      });
-      setRosariosCompletados(prev => prev + 1);
-    } catch (error) {
-      console.error('Error saving rosary progress:', error);
-    }
-  };
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -313,19 +94,16 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
     }
   };
 
-  const getCurrentPrayerText = () => {
-    if (currentPrayer === 0) return ORACIONES_ROSARIO.padreNuestro;
-    if (currentPrayer >= 1 && currentPrayer <= 10) return ORACIONES_ROSARIO.aveMaria;
-    return ORACIONES_ROSARIO.gloria;
-  };
-
-  const getCurrentPrayerName = () => {
-    if (currentPrayer === 0) return "Padre Nuestro";
-    if (currentPrayer >= 1 && currentPrayer <= 10) return `Ave María (${currentPrayer}/10)`;
-    return "Gloria";
-  };
-
-  const totalProgress = (currentMysteryIndex * 12 + currentPrayer) / (5 * 12);
+  // Handle fullscreen change from escape key
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        setIsFullscreen(false);
+      }
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
 
   if (!isOpen) return null;
 
@@ -344,7 +122,7 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="absolute inset-0 bg-slate-950/98 backdrop-blur-sm"
-          onClick={onClose}
+          onClick={minimize}
         >
           {[...Array(150)].map((_, i) => (
             <motion.div
@@ -382,12 +160,21 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
             <button
               onClick={toggleFullscreen}
               className="text-gray-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/10"
+              title={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
             >
               {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
             </button>
             <button
-              onClick={onClose}
+              onClick={minimize}
               className="text-gray-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/10"
+              title="Minimizar (seguir rezando en segundo plano)"
+            >
+              <Minimize2 className="w-5 h-5" />
+            </button>
+            <button
+              onClick={close}
+              className="text-gray-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/10"
+              title="Cerrar rosario"
             >
               <X className="w-5 h-5" />
             </button>
@@ -414,11 +201,7 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
             {mysteryOrder.map((type) => (
               <button
                 key={type}
-                onClick={() => {
-                  setCurrentMysteryType(type);
-                  setCurrentMysteryIndex(0);
-                  setCurrentPrayer(0);
-                }}
+                onClick={() => setMysteryType(type)}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                   currentMysteryType === type
                     ? `bg-gradient-to-r ${mysteryConfig[type].gradient} text-white`
@@ -520,10 +303,7 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
                       }}
                       animate={isActive ? { scale: [1, 1.2, 1] } : {}}
                       transition={{ duration: 1.5, repeat: Infinity }}
-                      onClick={() => {
-                        setCurrentMysteryIndex(index);
-                        setCurrentPrayer(0);
-                      }}
+                      onClick={() => setMysteryIndex(index)}
                     />
                   </div>
                 );
@@ -600,7 +380,7 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
 
           {/* Controls */}
           <div className="flex items-center justify-center gap-3 p-6 border-t border-white/10">
-            <Button variant="ghost" size="icon" onClick={() => setIsMuted(!isMuted)} className="text-gray-400 hover:text-white">
+            <Button variant="ghost" size="icon" onClick={toggleMute} className="text-gray-400 hover:text-white">
               {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
             </Button>
             
@@ -608,7 +388,7 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
             <Button 
               variant="ghost" 
               size="icon" 
-              onClick={handleTtsToggle}
+              onClick={toggleTts}
               className={`relative ${ttsEnabled ? 'text-amber-400' : 'text-gray-400'} hover:text-white`}
               disabled={isTtsGenerating}
             >
@@ -626,22 +406,22 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
               )}
             </Button>
             
-            <Button variant="ghost" size="icon" onClick={handleReset} className="text-gray-400 hover:text-white">
+            <Button variant="ghost" size="icon" onClick={reset} className="text-gray-400 hover:text-white">
               <RotateCcw className="w-5 h-5" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={handlePrevious} className="text-gray-400 hover:text-white">
+            <Button variant="ghost" size="icon" onClick={previous} className="text-gray-400 hover:text-white">
               <ChevronLeft className="w-5 h-5" />
             </Button>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => setIsPlaying(!isPlaying)}
+              onClick={togglePlay}
               className={`w-16 h-16 rounded-full bg-gradient-to-br ${config.gradient} flex items-center justify-center shadow-lg`}
               style={{ boxShadow: `0 0 20px ${config.color}40` }}
             >
               {isPlaying ? <Pause className="w-7 h-7 text-white" /> : <Play className="w-7 h-7 text-white ml-1" />}
             </motion.button>
-            <Button variant="ghost" size="icon" onClick={handleNext} className="text-gray-400 hover:text-white">
+            <Button variant="ghost" size="icon" onClick={next} className="text-gray-400 hover:text-white">
               <ChevronRight className="w-5 h-5" />
             </Button>
           </div>
