@@ -23,6 +23,7 @@ export function useRosarioTTS() {
   const [currentPrayer, setCurrentPrayer] = useState<PrayerType | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const generatingRef = useRef<Set<PrayerType>>(new Set());
+  const onEndedCallbackRef = useRef<(() => void) | null>(null);
 
   // Check for existing audio URLs from localStorage cache
   useEffect(() => {
@@ -135,6 +136,10 @@ export function useRosarioTTS() {
       audioRef.current.onended = () => {
         setIsPlaying(false);
         setCurrentPrayer(null);
+        // Call the onEnded callback if set (for auto-advance)
+        if (onEndedCallbackRef.current) {
+          onEndedCallbackRef.current();
+        }
       };
 
       audioRef.current.onerror = () => {
@@ -186,6 +191,11 @@ export function useRosarioTTS() {
     return 'gloria';
   }, []);
 
+  // Set callback for when audio ends (for auto-advance)
+  const setOnEnded = useCallback((callback: (() => void) | null) => {
+    onEndedCallbackRef.current = callback;
+  }, []);
+
   return {
     audioUrls,
     isGenerating,
@@ -199,6 +209,7 @@ export function useRosarioTTS() {
     pause,
     resume,
     getPrayerTypeFromIndex,
+    setOnEnded,
     hasAllAudios: !!(audioUrls.padreNuestro && audioUrls.aveMaria && audioUrls.gloria),
   };
 }

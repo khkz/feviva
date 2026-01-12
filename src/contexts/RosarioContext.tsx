@@ -92,7 +92,11 @@ export function RosarioProvider({ children }: { children: ReactNode }) {
     playPrayer, 
     stop: stopTts,
     getPrayerTypeFromIndex,
+    setOnEnded,
   } = useRosarioTTS();
+
+  // Ref to track if we should auto-advance after TTS ends
+  const shouldAutoAdvanceRef = useRef(false);
 
   // Computed values
   const mysteryData = MISTERIOS[currentMysteryType];
@@ -239,12 +243,6 @@ export function RosarioProvider({ children }: { children: ReactNode }) {
     });
   }, [ambientVolume, audioContext]);
 
-  // Auto-advance when playing
-  useEffect(() => {
-    if (!isPlaying) return;
-    const interval = setInterval(() => next(), 4000);
-    return () => clearInterval(interval);
-  }, [isPlaying, currentPrayer, currentMysteryIndex]);
 
   // Play TTS when prayer changes
   useEffect(() => {
@@ -318,6 +316,19 @@ export function RosarioProvider({ children }: { children: ReactNode }) {
       saveProgress();
     }
   }, [currentPrayer, currentMysteryIndex, playBellSound, playCompletionChord, stopTts]);
+
+  // Set up TTS onEnded callback for auto-advance (after next is defined)
+  useEffect(() => {
+    if (ttsEnabled && isPlaying) {
+      setOnEnded(() => {
+        // Auto-advance to next prayer when TTS finishes
+        shouldAutoAdvanceRef.current = true;
+        next();
+      });
+    } else {
+      setOnEnded(null);
+    }
+  }, [ttsEnabled, isPlaying, setOnEnded, next]);
 
   const previous = useCallback(() => {
     stopTts();
