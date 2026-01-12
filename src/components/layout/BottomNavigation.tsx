@@ -1,11 +1,11 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Compass, BookOpen, Route, User } from "lucide-react";
+import { Home, Compass, BookOpen, Rocket, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { path: "/dashboard", icon: Home, label: "Inicio" },
   { path: "/oraciones/app", icon: Compass, label: "Orar" },
-  { path: "/apostle-path", icon: Route, label: "Ruta" },
+  { path: "/frontera-final", icon: Rocket, label: "Cosmos" },
   { path: "/library", icon: BookOpen, label: "Aprender" },
   { path: "/profile", icon: User, label: "Perfil" },
 ];
