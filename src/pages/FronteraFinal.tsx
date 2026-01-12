@@ -25,6 +25,7 @@ interface CategoryCard {
   description: string;
   icon: LucideIcon;
   size: 'normal' | 'large';
+  href?: string;
 }
 
 interface Category {
@@ -46,6 +47,7 @@ const categories: Category[] = [
         description: "Por qué estudiar galaxias es leer la mente de Dios.",
         icon: BookOpen,
         size: "normal",
+        href: "/frontera-final/libro-naturaleza",
       },
       {
         id: "punto-omega",
@@ -53,6 +55,7 @@ const categories: Category[] = [
         description: "La teoría de Teilhard de Chardin: El universo evoluciona hacia Cristo.",
         icon: InfinityIcon,
         size: "normal",
+        href: "/frontera-final/punto-omega",
       },
       {
         id: "bautizar-extraterrestre",
@@ -60,6 +63,7 @@ const categories: Category[] = [
         description: "La postura del Vaticano sobre vida inteligente no humana.",
         icon: HelpCircle,
         size: "normal",
+        href: "/frontera-final/bautizar-extraterrestre",
       },
     ]
   },
@@ -74,6 +78,7 @@ const categories: Category[] = [
         description: "Georges Lemaître: El sacerdote que corrigió a Einstein.",
         icon: Atom,
         size: "normal",
+        href: "/frontera-final/padre-big-bang",
       },
       {
         id: "observatorio-vaticano",
@@ -81,6 +86,7 @@ const categories: Category[] = [
         description: "400 años mirando al cielo antes que la NASA.",
         icon: Telescope,
         size: "normal",
+        href: "/frontera-final/observatorio-vaticano",
       },
     ]
   },
@@ -95,6 +101,7 @@ const categories: Category[] = [
         description: "Cómo evitar el pecado del colonialismo en Marte.",
         icon: Flag,
         size: "normal",
+        href: "/frontera-final/colonizar-conquistar",
       },
       {
         id: "ia-alma",
@@ -102,6 +109,7 @@ const categories: Category[] = [
         description: "La diferencia entre inteligencia computacional y espíritu.",
         icon: Cpu,
         size: "normal",
+        href: "/frontera-final/ia-alma",
       },
     ]
   },
