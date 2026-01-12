@@ -67,8 +67,8 @@ export default function BautizarExtraterrestre() {
           `
         }
       ]}
-      videoId="NFPtWXGz5DE"
-      videoTitle="Guy Consolmagno: Fe y Vida Extraterrestre"
+      videoId="kmU2gDbP_Tk"
+      videoTitle="Guy Consolmagno: Del MIT al Vaticano (TEDx)"
       reflection="Si Dios creó un universo tan vasto, ¿qué nos dice eso sobre su amor? ¿Cómo cambiaría tu fe si supieras que no estamos solos en el cosmos?"
       relatedArticles={[
         { id: "libro-naturaleza", title: "El Libro de la Naturaleza", href: "/frontera-final/libro-naturaleza" },
