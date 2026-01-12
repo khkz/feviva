@@ -2,8 +2,9 @@ import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
-import { useEffect } from 'react';
-import { 
+import { useEffect, useState } from 'react';
+import { ShareModal } from '@/components/shared/ShareModal';
+import {
   ArrowLeft, 
   Calendar, 
   MapPin, 
@@ -27,6 +28,7 @@ import { countryFlags, countryNames, formatFeastDate, getCountryContinent, conti
 
 export default function SantoPage() {
   const { slug } = useParams<{ slug: string }>();
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   // Fetch saint by slug
   const { data: saint, isLoading, error } = useQuery({
@@ -131,18 +133,8 @@ export default function SantoPage() {
     }
   }, [saint?.image_url]);
 
-  const handleShare = async () => {
-    if (navigator.share && saint) {
-      try {
-        await navigator.share({
-          title: `${saint.name} - ElRugido`,
-          text: saint.description || `Conoce la historia de ${saint.name}`,
-          url: window.location.href,
-        });
-      } catch (err) {
-        // User cancelled or error
-      }
-    }
+  const handleShare = () => {
+    setIsShareModalOpen(true);
   };
 
   if (isLoading) {
@@ -717,6 +709,15 @@ export default function SantoPage() {
           </div>
         </footer>
       </div>
+
+      {/* Share Modal */}
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        title={saint?.name || 'Santo'}
+        text={saint?.description?.substring(0, 300) || `Conoce la historia de ${saint?.name || 'este santo'}`}
+        reference={saint?.name}
+      />
     </>
   );
 }
