@@ -34,6 +34,7 @@ import { SpaceShareModal } from '@/components/frontera-final/SpaceShareModal';
 import { getDailyContent, getContentLabel, DailyContent } from '@/lib/fronteraFactsData';
 import { Button } from '@/components/ui/button';
 import { useRosario } from '@/contexts/RosarioContext';
+import { useSalmos } from '@/contexts/SalmosContext';
 import { useFronteraProgress } from '@/hooks/useFronteraProgress';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -147,6 +148,7 @@ export default function FronteraFinal() {
   const [puntosCósmicos, setPuntosCósmicos] = useState(0);
   
   const { open: openRosario } = useRosario();
+  const { open: openSalmos } = useSalmos();
   const { markQuizCompleted, progress } = useFronteraProgress();
 
   // Fetch user stats
@@ -349,7 +351,7 @@ export default function FronteraFinal() {
 
         {/* MISSION BANNER */}
         <section className="relative z-10 px-4 md:px-8 max-w-3xl mx-auto -mt-4 mb-8">
-          <MissionBanner onRosarioClick={openRosario} />
+          <MissionBanner onSalmosClick={openSalmos} />
         </section>
 
         {/* BENTO GRID DASHBOARD */}
@@ -409,7 +411,7 @@ export default function FronteraFinal() {
             </div>
 
             <motion.button
-              onClick={openRosario}
+              onClick={openSalmos}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className="w-full md:w-auto glass-cyber rounded-2xl p-8 border-amber-400/40 hover:border-amber-400/60 transition-all duration-300 group cursor-pointer text-left"
@@ -432,10 +434,10 @@ export default function FronteraFinal() {
                 </div>
                 <div>
                   <h3 className="font-orbitron text-2xl font-bold text-white mb-2 group-hover:text-amber-400 transition-colors">
-                    Rosario Interestelar
+                    Salmos Orbitales
                   </h3>
                   <p className="text-gray-300 text-lg">
-                    Reza contemplando la creación. Una experiencia de oración cósmica.
+                    Medita en Su Palabra Cósmica. Una experiencia de meditación bíblica.
                   </p>
                 </div>
               </div>
@@ -527,7 +529,7 @@ export default function FronteraFinal() {
               </div>
               <div className="flex justify-between mt-3 text-xs text-gray-500">
                 <span>{progress.articlesRead.length}/7 artículos</span>
-                <span>{progress.rosarioCompleted ? '✓' : '○'} Rosario</span>
+                <span>{progress.meditacionCompleted ? '✓' : '○'} Meditación</span>
                 <span>{progress.quizCompleted ? '✓' : '○'} Quiz</span>
               </div>
               
