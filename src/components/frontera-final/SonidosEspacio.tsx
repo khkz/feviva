@@ -1,10 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Volume2, VolumeX, Waves, Play, Square, Rocket, Download, Loader2 } from 'lucide-react';
+import { Volume2, VolumeX, Waves, Play, Square, Rocket, ExternalLink } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
-import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
 
 interface SoundTrack {
   id: string;
@@ -17,36 +14,34 @@ interface SoundTrack {
   fallbackLfoFrequency: number;
 }
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const BUCKET_NAME = 'ambient-audio';
-
+// NASA Sonification audio files - stored in public/audio/
 const soundTracks: SoundTrack[] = [
   {
-    id: 'marte',
-    name: 'Atmósfera Marciana',
-    description: 'Ambiente espacial profundo',
-    color: '#ef4444',
-    filename: 'atmosfera-marte.mp3',
+    id: 'galaxia-m51',
+    name: 'Galaxia M51',
+    description: 'La Galaxia del Remolino a 31 millones de años luz',
+    color: '#a855f7',
+    filename: 'galaxia-m51.mp3',
     fallbackFrequency: 60,
     fallbackType: 'sawtooth',
     fallbackLfoFrequency: 0.3,
   },
   {
-    id: 'jupiter',
-    name: 'Púlsar Cósmico',
-    description: 'Ondas de estrella de neutrones',
+    id: 'cosmic-cliffs',
+    name: 'Acantilados Cósmicos',
+    description: 'Nebulosa de Carina capturada por el Telescopio Webb',
     color: '#f59e0b',
-    filename: 'pulsar-cosmico.mp3',
+    filename: 'cosmic-cliffs.mp3',
     fallbackFrequency: 180,
     fallbackType: 'sine',
     fallbackLfoFrequency: 8,
   },
   {
-    id: 'saturno',
-    name: 'Cosmos Profundo',
-    description: 'Ambiente interestelar',
-    color: '#8b5cf6',
-    filename: 'cosmos-profundo.mp3',
+    id: 'southern-ring',
+    name: 'Nebulosa del Anillo Sur',
+    description: 'Infrarrojo cercano del Telescopio James Webb',
+    color: '#06b6d4',
+    filename: 'southern-ring-nebula.mp3',
     fallbackFrequency: 40,
     fallbackType: 'sine',
     fallbackLfoFrequency: 0.1,
@@ -65,35 +60,10 @@ export function SonidosEspacio() {
   const [volume, setVolume] = useState(50);
   const [isMuted, setIsMuted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isDownloading, setIsDownloading] = useState(false);
-  const [hasRealAudio, setHasRealAudio] = useState<Record<string, boolean>>({});
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const audioNodesRef = useRef<AudioNode | null>(null);
-
-  // Check which audio files exist
-  useEffect(() => {
-    const checkAudioFiles = async () => {
-      const availability: Record<string, boolean> = {};
-      
-      for (const track of soundTracks) {
-        try {
-          const { data } = await supabase.storage
-            .from(BUCKET_NAME)
-            .list('', { search: track.filename });
-          
-          availability[track.id] = data && data.length > 0;
-        } catch {
-          availability[track.id] = false;
-        }
-      }
-      
-      setHasRealAudio(availability);
-    };
-
-    checkAudioFiles();
-  }, []);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -129,39 +99,6 @@ export function SonidosEspacio() {
     }
   }, [volume, isMuted]);
 
-  const downloadNasaSounds = async () => {
-    setIsDownloading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('download-nasa-sounds');
-      
-      if (error) throw error;
-      
-      if (data.success) {
-        toast.success('¡Sonidos ambient descargados!', {
-          description: data.message,
-        });
-        
-        // Update availability
-        const availability: Record<string, boolean> = { ...hasRealAudio };
-        for (const result of data.results) {
-          if (result.status === 'success' || result.status === 'already_exists') {
-            availability[result.id] = true;
-          }
-        }
-        setHasRealAudio(availability);
-      } else {
-        throw new Error(data.error);
-      }
-    } catch (err) {
-      console.error('Error downloading NASA sounds:', err);
-      toast.error('Error al descargar sonidos', {
-        description: 'Los sonidos sintéticos siguen disponibles',
-      });
-    } finally {
-      setIsDownloading(false);
-    }
-  };
-
   const stopCurrentSound = () => {
     // Stop HTML5 audio
     if (audioRef.current) {
@@ -196,7 +133,7 @@ export function SonidosEspacio() {
   };
 
   const playRealAudio = async (track: SoundTrack) => {
-    const audioUrl = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET_NAME}/${track.filename}`;
+    const audioUrl = `/audio/${track.filename}`;
     
     setIsLoading(true);
     
@@ -297,12 +234,8 @@ export function SonidosEspacio() {
     const track = soundTracks.find(t => t.id === trackId);
     if (!track) return;
 
-    // Use real audio if available, otherwise synthesized
-    if (hasRealAudio[trackId]) {
-      await playRealAudio(track);
-    } else {
-      playSynthesizedSound(track);
-    }
+    // Always try real audio first
+    await playRealAudio(track);
   };
 
   const toggleMute = () => {
@@ -326,8 +259,6 @@ export function SonidosEspacio() {
     }
   };
 
-  const hasAnyRealAudio = Object.values(hasRealAudio).some(v => v);
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -342,33 +273,32 @@ export function SonidosEspacio() {
           <h2 className="font-orbitron text-2xl font-bold text-white">
             Sonidos del Espacio
           </h2>
-          <p className="text-gray-400 text-sm">Música Ambient Espacial</p>
+          <p className="text-gray-400 text-sm">Sonificación NASA • Datos convertidos en sonido</p>
         </div>
       </div>
 
       <div className="glass-cyber rounded-2xl p-6 border-purple-400/30">
-        <div className="flex items-center justify-between mb-6">
-          <p className="text-gray-400 text-sm">
-            🌌 Reza con el sonido real de la creación de Dios
+        {/* Sonification explanation */}
+        <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4 mb-6">
+          <p className="text-purple-200 text-sm mb-2">
+            <span className="font-semibold text-purple-100">¿Qué es la sonificación?</span> NASA traduce 
+            datos de luz (rayos X, infrarrojo, óptico) a frecuencias audibles. Cada nota representa 
+            datos reales del universo captados por telescopios como el James Webb.
           </p>
-          
-          {!hasAnyRealAudio && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={downloadNasaSounds}
-              disabled={isDownloading}
-              className="border-purple-500/50 hover:bg-purple-500/20 text-purple-300"
-            >
-              {isDownloading ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              ) : (
-                <Download className="w-4 h-4 mr-2" />
-              )}
-              Descargar sonidos cósmicos
-            </Button>
-          )}
+          <a 
+            href="https://soundcloud.com/nasa" 
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-purple-400 text-sm hover:text-purple-300 transition-colors"
+          >
+            <ExternalLink className="w-3 h-3" />
+            NASA SoundCloud
+          </a>
         </div>
+
+        <p className="text-gray-400 text-sm mb-4">
+          🌌 Reza con el sonido real de la creación de Dios
+        </p>
 
         {/* Sound Tracks */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
@@ -389,19 +319,15 @@ export function SonidosEspacio() {
                 boxShadow: activeTrack === track.id ? `0 0 30px ${track.color}40` : undefined,
               }}
             >
-              {/* Real audio badge */}
-              {hasRealAudio[track.id] && (
-                <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/30">
-                  <Rocket className="w-3 h-3 text-emerald-400" />
-                  <span className="text-[10px] text-emerald-400 font-medium">REAL</span>
-                </div>
-              )}
+              {/* NASA badge */}
+              <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-500/20 border border-purple-500/30">
+                <Rocket className="w-3 h-3 text-purple-400" />
+                <span className="text-[10px] text-purple-400 font-medium">NASA</span>
+              </div>
               
               {/* Play/Stop indicator */}
               <div className="absolute top-3 right-3">
-                {isLoading && activeTrack !== track.id ? (
-                  <Loader2 className="w-4 h-4 text-gray-500 animate-spin" />
-                ) : activeTrack === track.id ? (
+                {activeTrack === track.id ? (
                   <Square className="w-4 h-4" style={{ color: track.color }} />
                 ) : (
                   <Play className="w-4 h-4 text-gray-500" />
@@ -466,9 +392,7 @@ export function SonidosEspacio() {
         </div>
 
         <p className="text-gray-500 text-xs text-center mt-4">
-          {hasAnyRealAudio 
-            ? '🛸 Música Ambient Espacial • Licencia Libre • Loop infinito'
-            : 'Sonidos sintetizados • Toca "Descargar" para audio real'}
+          🛸 Sonificación oficial de NASA • Datos astronómicos reales • Loop infinito
         </p>
       </div>
     </motion.div>
