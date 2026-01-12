@@ -94,10 +94,10 @@ const Index = () => {
               >
                 <button 
                   onClick={() => navigate("/frontera-final")}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-violet-500/20 to-purple-500/20 border border-violet-500/30 hover:border-violet-400/50 transition-colors"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-primary/20 via-secondary/20 to-primary/20 border border-primary/40 hover:border-primary/60 hover:bg-primary/10 transition-all shadow-lg shadow-primary/10"
                 >
-                  <Rocket className="w-4 h-4 text-violet-400" />
-                  <span className="text-sm font-medium text-violet-300">NUEVO: Frontera Final — Fe y Cosmos</span>
+                  <Rocket className="w-4 h-4 text-primary animate-pulse" />
+                  <span className="text-sm font-semibold text-foreground">✨ NUEVO: Frontera Final — Fe y Cosmos</span>
                 </button>
               </motion.div>
               
