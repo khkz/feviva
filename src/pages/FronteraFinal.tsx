@@ -13,11 +13,13 @@ import {
   PlayCircle,
   Sparkles,
   Shield,
-  Rocket
+  Rocket,
+  Trophy
 } from 'lucide-react';
 import { BentoCard } from '@/components/frontera-final/BentoCard';
 import { EscudoVerdad } from '@/components/frontera-final/EscudoVerdad';
 import { RosarioInterstellar } from '@/components/frontera-final/RosarioInterstellar';
+import { SpaceGamification } from '@/components/frontera-final/SpaceGamification';
 
 interface CategoryCard {
   id: string;
@@ -333,6 +335,25 @@ export default function FronteraFinal() {
               </div>
             </motion.button>
           </motion.div>
+        </section>
+
+        {/* GAMIFICACIÓN ESPACIAL */}
+        <section className="relative z-10 px-4 md:px-8 py-12 max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-8"
+          >
+            <Trophy className="w-12 h-12 mx-auto text-amber-400 mb-4" />
+            <h2 className="font-orbitron text-3xl font-bold text-white mb-2">
+              Logros Espaciales
+            </h2>
+            <p className="text-gray-400">Tu progreso en la conquista cósmica</p>
+          </motion.div>
+
+          <SpaceGamification />
         </section>
 
         {/* ESCUDO DE LA VERDAD - FAQ */}
