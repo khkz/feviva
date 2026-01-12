@@ -1,6 +1,6 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Volume2, VolumeX, Play, Pause, Waves } from 'lucide-react';
+import { Volume2, VolumeX, Waves, Play, Square } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 
 interface SoundTrack {
@@ -8,8 +8,9 @@ interface SoundTrack {
   name: string;
   description: string;
   color: string;
-  // URLs de sonidos de NASA (public domain) - placeholder
-  url?: string;
+  frequency: number;
+  type: OscillatorType;
+  lfoFrequency: number;
 }
 
 const soundTracks: SoundTrack[] = [
@@ -18,76 +19,190 @@ const soundTracks: SoundTrack[] = [
     name: 'Viento de Marte',
     description: 'Captado por InSight',
     color: '#ef4444',
-    // Estos URLs serían reemplazados por sonidos reales de NASA
-    url: undefined,
+    frequency: 60,
+    type: 'sawtooth',
+    lfoFrequency: 0.3,
   },
   {
     id: 'pulsar',
     name: 'Púlsares',
     description: 'Estrellas de neutrones',
     color: '#8b5cf6',
-    url: undefined,
+    frequency: 180,
+    type: 'sine',
+    lfoFrequency: 8,
   },
   {
     id: 'vacio',
     name: 'Silencio Cósmico',
     description: 'El vacío entre galaxias',
     color: '#06b6d4',
-    url: undefined,
+    frequency: 40,
+    type: 'sine',
+    lfoFrequency: 0.1,
   },
 ];
+
+interface AudioNode {
+  oscillator: OscillatorNode;
+  lfo: OscillatorNode;
+  gainNode: GainNode;
+  lfoGain: GainNode;
+}
 
 export function SonidosEspacio() {
   const [activeTrack, setActiveTrack] = useState<string | null>(null);
   const [volume, setVolume] = useState(50);
   const [isMuted, setIsMuted] = useState(false);
-  const audioRefs = useRef<Record<string, HTMLAudioElement | null>>({});
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const audioNodesRef = useRef<AudioNode | null>(null);
 
-  // Generar sonido ambiente con Web Audio API
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (audioNodesRef.current) {
+        try {
+          audioNodesRef.current.oscillator.stop();
+          audioNodesRef.current.lfo.stop();
+        } catch {
+          // Already stopped
+        }
+      }
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+      }
+    };
+  }, []);
+
+  // Update volume when it changes
+  useEffect(() => {
+    if (audioNodesRef.current && !isMuted) {
+      audioNodesRef.current.gainNode.gain.setValueAtTime(
+        (volume / 100) * 0.15,
+        audioContextRef.current?.currentTime || 0
+      );
+    }
+  }, [volume, isMuted]);
+
+  const stopCurrentSound = () => {
+    if (audioNodesRef.current) {
+      try {
+        const { gainNode } = audioNodesRef.current;
+        const ctx = audioContextRef.current;
+        if (ctx) {
+          // Fade out
+          gainNode.gain.setValueAtTime(gainNode.gain.value, ctx.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+          
+          setTimeout(() => {
+            try {
+              audioNodesRef.current?.oscillator.stop();
+              audioNodesRef.current?.lfo.stop();
+            } catch {
+              // Already stopped
+            }
+            audioNodesRef.current = null;
+          }, 600);
+        }
+      } catch {
+        audioNodesRef.current = null;
+      }
+    }
+  };
+
   const playAmbientSound = (trackId: string) => {
+    // If clicking same track, stop it
     if (activeTrack === trackId) {
+      stopCurrentSound();
       setActiveTrack(null);
       return;
     }
 
-    setActiveTrack(trackId);
-    
-    // Si no hay URL de audio real, usar Web Audio API para generar sonido ambiente
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-    
-    // Crear un oscilador simple como placeholder
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-    
-    // Configurar según el tipo de sonido
-    switch (trackId) {
-      case 'marte':
-        oscillator.frequency.value = 80; // Bajo profundo
-        oscillator.type = 'sawtooth';
-        break;
-      case 'pulsar':
-        oscillator.frequency.value = 200;
-        oscillator.type = 'sine';
-        break;
-      case 'vacio':
-        oscillator.frequency.value = 40;
-        oscillator.type = 'sine';
-        break;
+    // Stop current sound if any
+    stopCurrentSound();
+
+    // Initialize AudioContext if needed
+    if (!audioContextRef.current || audioContextRef.current.state === 'closed') {
+      audioContextRef.current = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
     }
-    
-    gainNode.gain.value = (volume / 100) * 0.1; // Volumen bajo
-    
-    // Auto-stop después de demostración (5 segundos)
+
+    const ctx = audioContextRef.current;
+    const track = soundTracks.find(t => t.id === trackId);
+    if (!track) return;
+
+    // Resume context if suspended (browser autoplay policy)
+    if (ctx.state === 'suspended') {
+      ctx.resume();
+    }
+
+    // Create nodes for ambient drone sound
+    const oscillator = ctx.createOscillator();
+    const lfo = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+    const lfoGain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+
+    // Configure oscillator
+    oscillator.type = track.type;
+    oscillator.frequency.value = track.frequency;
+
+    // Configure LFO for pulsing effect
+    lfo.type = 'sine';
+    lfo.frequency.value = track.lfoFrequency;
+    lfoGain.gain.value = track.frequency * 0.1;
+
+    // Connect LFO to oscillator frequency for modulation
+    lfo.connect(lfoGain);
+    lfoGain.connect(oscillator.frequency);
+
+    // Configure filter for warmth
+    filter.type = 'lowpass';
+    filter.frequency.value = 800;
+    filter.Q.value = 1;
+
+    // Connect: oscillator -> filter -> gain -> output
+    oscillator.connect(filter);
+    filter.connect(gainNode);
+    gainNode.connect(ctx.destination);
+
+    // Set initial volume with fade in
+    const targetVolume = isMuted ? 0 : (volume / 100) * 0.15;
+    gainNode.gain.setValueAtTime(0.001, ctx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(
+      Math.max(targetVolume, 0.001),
+      ctx.currentTime + 1
+    );
+
+    // Start oscillators
     oscillator.start();
-    setTimeout(() => {
-      oscillator.stop();
-      if (activeTrack === trackId) {
-        setActiveTrack(null);
-      }
-    }, 5000);
+    lfo.start();
+
+    // Store references
+    audioNodesRef.current = {
+      oscillator,
+      lfo,
+      gainNode,
+      lfoGain,
+    };
+
+    setActiveTrack(trackId);
+  };
+
+  const toggleMute = () => {
+    const newMuted = !isMuted;
+    setIsMuted(newMuted);
+    
+    if (audioNodesRef.current && audioContextRef.current) {
+      const targetVolume = newMuted ? 0.001 : (volume / 100) * 0.15;
+      audioNodesRef.current.gainNode.gain.setValueAtTime(
+        audioNodesRef.current.gainNode.gain.value,
+        audioContextRef.current.currentTime
+      );
+      audioNodesRef.current.gainNode.gain.exponentialRampToValueAtTime(
+        Math.max(targetVolume, 0.001),
+        audioContextRef.current.currentTime + 0.3
+      );
+    }
   };
 
   return (
@@ -114,12 +229,12 @@ export function SonidosEspacio() {
         </p>
 
         {/* Sound Tracks */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           {soundTracks.map((track) => (
             <motion.button
               key={track.id}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => playAmbientSound(track.id)}
               className={`relative glass-cyber rounded-xl p-4 transition-all duration-300 ${
                 activeTrack === track.id
@@ -128,9 +243,18 @@ export function SonidosEspacio() {
               }`}
               style={{
                 borderColor: activeTrack === track.id ? track.color : undefined,
-                boxShadow: activeTrack === track.id ? `0 0 20px ${track.color}40` : undefined,
+                boxShadow: activeTrack === track.id ? `0 0 30px ${track.color}40` : undefined,
               }}
             >
+              {/* Play/Stop indicator */}
+              <div className="absolute top-3 right-3">
+                {activeTrack === track.id ? (
+                  <Square className="w-4 h-4" style={{ color: track.color }} />
+                ) : (
+                  <Play className="w-4 h-4 text-gray-500" />
+                )}
+              </div>
+
               {/* Waveform visualization */}
               <div className="flex justify-center gap-0.5 h-12 items-end mb-3">
                 {[...Array(8)].map((_, i) => (
@@ -139,10 +263,10 @@ export function SonidosEspacio() {
                     className="w-1 rounded-full"
                     style={{ backgroundColor: track.color }}
                     animate={activeTrack === track.id ? {
-                      height: [8, 24 + Math.random() * 16, 8],
+                      height: [8, 20 + Math.random() * 20, 8],
                     } : { height: 8 }}
                     transition={{
-                      duration: 0.5 + Math.random() * 0.3,
+                      duration: 0.4 + Math.random() * 0.4,
                       repeat: activeTrack === track.id ? Infinity : 0,
                       delay: i * 0.05,
                     }}
@@ -153,12 +277,12 @@ export function SonidosEspacio() {
               <p className="font-orbitron text-sm text-white mb-1">{track.name}</p>
               <p className="text-gray-500 text-xs">{track.description}</p>
 
-              {/* Play indicator */}
+              {/* Active indicator */}
               {activeTrack === track.id && (
                 <motion.div
-                  className="absolute top-2 right-2"
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 1, repeat: Infinity }}
+                  className="absolute bottom-2 left-1/2 -translate-x-1/2"
+                  animate={{ opacity: [0.5, 1, 0.5] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
                 >
                   <Waves className="w-4 h-4" style={{ color: track.color }} />
                 </motion.div>
@@ -170,7 +294,7 @@ export function SonidosEspacio() {
         {/* Volume Control */}
         <div className="flex items-center gap-4">
           <button
-            onClick={() => setIsMuted(!isMuted)}
+            onClick={toggleMute}
             className="text-gray-400 hover:text-white transition-colors"
           >
             {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
@@ -185,11 +309,11 @@ export function SonidosEspacio() {
             step={1}
             className="flex-1"
           />
-          <span className="text-gray-400 text-sm w-10">{volume}%</span>
+          <span className="text-gray-400 text-sm w-10 text-right">{volume}%</span>
         </div>
 
         <p className="text-gray-500 text-xs text-center mt-4">
-          Sonidos basados en datos de NASA. Sube tus propios MP3 para personalizar.
+          Sonidos sintetizados inspirados en datos de NASA • Toca para reproducir en loop
         </p>
       </div>
     </motion.div>

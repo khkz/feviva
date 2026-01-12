@@ -26,8 +26,11 @@ import { ApologeticsQuiz } from '@/components/frontera-final/ApologeticsQuiz';
 import { LaboratorioVirtudes } from '@/components/frontera-final/LaboratorioVirtudes';
 import { SonidosEspacio } from '@/components/frontera-final/SonidosEspacio';
 import { ComunidadEspacial } from '@/components/frontera-final/ComunidadEspacial';
+import { WelcomeModal } from '@/components/frontera-final/WelcomeModal';
+import { MissionBanner } from '@/components/frontera-final/MissionBanner';
 import { Button } from '@/components/ui/button';
 import { useRosario } from '@/contexts/RosarioContext';
+import { useFronteraProgress } from '@/hooks/useFronteraProgress';
 
 interface CategoryCard {
   id: string;
@@ -139,6 +142,7 @@ export default function FronteraFinal() {
   );
   
   const { open: openRosario } = useRosario();
+  const { markQuizCompleted, progress } = useFronteraProgress();
 
   return (
     <>
@@ -263,6 +267,11 @@ export default function FronteraFinal() {
               </div>
             </motion.div>
           </motion.div>
+        </section>
+
+        {/* MISSION BANNER */}
+        <section className="relative z-10 px-4 md:px-8 max-w-3xl mx-auto -mt-4 mb-8">
+          <MissionBanner onRosarioClick={openRosario} />
         </section>
 
         {/* BENTO GRID DASHBOARD */}
@@ -417,14 +426,50 @@ export default function FronteraFinal() {
           </div>
         </section>
 
+        {/* Progress indicator */}
+        {progress.progressPercentage > 0 && (
+          <section className="relative z-10 px-4 md:px-8 py-6 max-w-4xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="glass-cyber rounded-2xl p-6 border-cyan-400/20"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-gray-400 text-sm">Tu progreso espacial</span>
+                <span className="text-cyan-400 font-orbitron text-sm">{progress.progressPercentage}%</span>
+              </div>
+              <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+                <motion.div
+                  className="h-full bg-gradient-to-r from-cyan-500 to-purple-500"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progress.progressPercentage}%` }}
+                  transition={{ duration: 1, delay: 0.5 }}
+                />
+              </div>
+              <div className="flex justify-between mt-3 text-xs text-gray-500">
+                <span>{progress.articlesRead.length}/7 artículos</span>
+                <span>{progress.rosarioCompleted ? '✓' : '○'} Rosario</span>
+                <span>{progress.quizCompleted ? '✓' : '○'} Quiz</span>
+              </div>
+            </motion.div>
+          </section>
+        )}
+
         {/* Bottom spacing */}
         <div className="h-24" />
       </div>
 
+      {/* Welcome Modal - First time visitors */}
+      <WelcomeModal />
+
       {/* Quiz Modal */}
       <ApologeticsQuiz
         isOpen={isQuizOpen}
-        onClose={() => setIsQuizOpen(false)}
+        onClose={() => {
+          setIsQuizOpen(false);
+          markQuizCompleted();
+        }}
       />
     </>
   );
