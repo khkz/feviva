@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Play, Pause, RotateCcw, Volume2, VolumeX, ChevronRight, ChevronLeft, Star, Sparkles, Maximize2, Minimize2 } from 'lucide-react';
+import { X, Play, Pause, RotateCcw, Volume2, VolumeX, ChevronRight, ChevronLeft, Star, Sparkles, Maximize2, Minimize2, Mic, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { MISTERIOS, ORACIONES_ROSARIO, getMisterioDelDia, TipoMisterio } from '@/lib/rosarioData';
 import { supabase } from '@/integrations/supabase/client';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Slider } from '@/components/ui/slider';
+import { useRosarioTTS } from '@/hooks/useRosarioTTS';
 
 interface RosarioInterstellarProps {
   isOpen: boolean;
@@ -72,10 +73,23 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [rosariosCompletados, setRosariosCompletados] = useState(0);
   const [userId, setUserId] = useState<string | null>(null);
+  const [ttsEnabled, setTtsEnabled] = useState(false);
   
   const ambientOscillators = useRef<OscillatorNode[]>([]);
   const ambientGains = useRef<GainNode[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // TTS Hook
+  const { 
+    isGenerating: isTtsGenerating, 
+    generatingPrayer,
+    isPlaying: isTtsPlaying, 
+    playPrayer, 
+    stop: stopTts,
+    getPrayerTypeFromIndex,
+    hasAllAudios,
+    preGenerateAll,
+  } = useRosarioTTS();
 
   const mysteryData = MISTERIOS[currentMysteryType];
   const currentMystery = mysteryData.misterios[currentMysteryIndex];
@@ -222,6 +236,7 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
 
   const handleNext = () => {
     playBellSound();
+    stopTts(); // Stop current TTS
 
     if (currentPrayer < 11) {
       setCurrentPrayer(prev => prev + 1);
@@ -237,6 +252,7 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
   };
 
   const handlePrevious = () => {
+    stopTts();
     if (currentPrayer > 0) {
       setCurrentPrayer(prev => prev - 1);
     } else if (currentMysteryIndex > 0) {
@@ -249,6 +265,27 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
     setCurrentMysteryIndex(0);
     setCurrentPrayer(0);
     setIsPlaying(false);
+    stopTts();
+  };
+
+  // Play TTS when prayer changes (if TTS is enabled)
+  useEffect(() => {
+    if (ttsEnabled && !isTtsPlaying && !isTtsGenerating) {
+      const prayerType = getPrayerTypeFromIndex(currentPrayer);
+      playPrayer(prayerType);
+    }
+  }, [currentPrayer, ttsEnabled]);
+
+  const handleTtsToggle = async () => {
+    if (!ttsEnabled) {
+      setTtsEnabled(true);
+      // Play current prayer
+      const prayerType = getPrayerTypeFromIndex(currentPrayer);
+      await playPrayer(prayerType);
+    } else {
+      setTtsEnabled(false);
+      stopTts();
+    }
   };
 
   const saveProgress = async () => {
@@ -562,10 +599,33 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
           </div>
 
           {/* Controls */}
-          <div className="flex items-center justify-center gap-4 p-6 border-t border-white/10">
+          <div className="flex items-center justify-center gap-3 p-6 border-t border-white/10">
             <Button variant="ghost" size="icon" onClick={() => setIsMuted(!isMuted)} className="text-gray-400 hover:text-white">
               {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
             </Button>
+            
+            {/* TTS Button */}
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={handleTtsToggle}
+              className={`relative ${ttsEnabled ? 'text-amber-400' : 'text-gray-400'} hover:text-white`}
+              disabled={isTtsGenerating}
+            >
+              {isTtsGenerating ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <Mic className="w-5 h-5" />
+              )}
+              {ttsEnabled && (
+                <motion.span 
+                  className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full"
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                />
+              )}
+            </Button>
+            
             <Button variant="ghost" size="icon" onClick={handleReset} className="text-gray-400 hover:text-white">
               <RotateCcw className="w-5 h-5" />
             </Button>
