@@ -39,6 +39,13 @@ import ApologeticsIntro from "./pages/ApologeticsIntro";
 import Gratitude from "./pages/Gratitude";
 import DailyGospel from "./pages/DailyGospel";
 import FronteraFinal from "./pages/FronteraFinal";
+import LibroNaturaleza from "./pages/frontera-final/LibroNaturaleza";
+import PuntoOmega from "./pages/frontera-final/PuntoOmega";
+import BautizarExtraterrestre from "./pages/frontera-final/BautizarExtraterrestre";
+import PadreBigBang from "./pages/frontera-final/PadreBigBang";
+import ObservatorioVaticano from "./pages/frontera-final/ObservatorioVaticano";
+import ColonizarConquistar from "./pages/frontera-final/ColonizarConquistar";
+import IaAlma from "./pages/frontera-final/IaAlma";
 import { AdminLayout } from "./layouts/AdminLayout";
 import {
   AdminDashboard,
@@ -104,6 +111,13 @@ const App = () => (
               <Route path="/evangelio" element={<DailyGospel />} />
               <Route path="/evangelio/:fecha" element={<DailyGospel />} />
               <Route path="/frontera-final" element={<FronteraFinal />} />
+              <Route path="/frontera-final/libro-naturaleza" element={<LibroNaturaleza />} />
+              <Route path="/frontera-final/punto-omega" element={<PuntoOmega />} />
+              <Route path="/frontera-final/bautizar-extraterrestre" element={<BautizarExtraterrestre />} />
+              <Route path="/frontera-final/padre-big-bang" element={<PadreBigBang />} />
+              <Route path="/frontera-final/observatorio-vaticano" element={<ObservatorioVaticano />} />
+              <Route path="/frontera-final/colonizar-conquistar" element={<ColonizarConquistar />} />
+              <Route path="/frontera-final/ia-alma" element={<IaAlma />} />
               
               {/* Admin Routes */}
               <Route path="/admin" element={<AdminLayout />}>
