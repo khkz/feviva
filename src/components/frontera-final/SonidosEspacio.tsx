@@ -137,7 +137,7 @@ export function SonidosEspacio() {
       if (error) throw error;
       
       if (data.success) {
-        toast.success('¡Sonidos de NASA descargados!', {
+        toast.success('¡Sonidos ambient descargados!', {
           description: data.message,
         });
         
@@ -342,7 +342,7 @@ export function SonidosEspacio() {
           <h2 className="font-orbitron text-2xl font-bold text-white">
             Sonidos del Espacio
           </h2>
-          <p className="text-gray-400 text-sm">Audio Ambiental NASA</p>
+          <p className="text-gray-400 text-sm">Música Ambient Espacial</p>
         </div>
       </div>
 
@@ -467,7 +467,7 @@ export function SonidosEspacio() {
 
         <p className="text-gray-500 text-xs text-center mt-4">
           {hasAnyRealAudio 
-            ? '🛸 Sonidos cósmicos reales • Dominio Público • Loop infinito'
+            ? '🛸 Música Ambient Espacial • Licencia Libre • Loop infinito'
             : 'Sonidos sintetizados • Toca "Descargar" para audio real'}
         </p>
       </div>

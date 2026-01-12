@@ -6,30 +6,30 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Space Ambient Sounds - Public Domain / Creative Commons Zero
-// Alternative sources since NASA direct links are restricted
-const NASA_SOUNDS = [
+// Space Ambient Music - Archive.org Public Domain / Creative Commons
+// Using Legowelt's "Ambient Trip Commander" soundtrack (freely available)
+const SPACE_SOUNDS = [
   {
     id: 'marte',
     name: 'Atmósfera Marciana',
-    // Freesound - Space ambient drone (CC0)
-    sourceUrl: 'https://cdn.freesound.org/previews/174/174450_2094700-lq.mp3',
+    // Archive.org - Ambient Trip Commander OST Track 1
+    sourceUrl: 'https://archive.org/download/ambient-trip-commander-original-soundtrack-pl6dbk/Legowelt%20-%20Ambient%20Trip%20Commander%20Original%20Soundtrack%20-%2001%20Earth%20that%20Useless%20Place.mp3',
     filename: 'atmosfera-marte.mp3',
     description: 'Ambiente espacial profundo',
   },
   {
     id: 'jupiter',
     name: 'Púlsar Cósmico',
-    // Freesound - Cosmic pulsar sounds (CC0)
-    sourceUrl: 'https://cdn.freesound.org/previews/438/438901_6362387-lq.mp3',
+    // Archive.org - Ambient Trip Commander OST Track 2
+    sourceUrl: 'https://archive.org/download/ambient-trip-commander-original-soundtrack-pl6dbk/Legowelt%20-%20Ambient%20Trip%20Commander%20Original%20Soundtrack%20-%2002%20My%20Life%20Empty%20and%20Barren.mp3',
     filename: 'pulsar-cosmico.mp3',
     description: 'Ondas de estrella de neutrones',
   },
   {
     id: 'saturno',
     name: 'Cosmos Profundo',
-    // Freesound - Deep space ambient (CC0)
-    sourceUrl: 'https://cdn.freesound.org/previews/512/512467_6891997-lq.mp3',
+    // Archive.org - Ambient Trip Commander OST Track 3
+    sourceUrl: 'https://archive.org/download/ambient-trip-commander-original-soundtrack-pl6dbk/Legowelt%20-%20Ambient%20Trip%20Commander%20Original%20Soundtrack%20-%2003%20Botanical%20Garden%20Follow%20a%20Strange%20Illusion.mp3',
     filename: 'cosmos-profundo.mp3',
     description: 'Ambiente interestelar',
   },
@@ -69,7 +69,7 @@ serve(async (req) => {
 
     const results = [];
 
-    for (const sound of NASA_SOUNDS) {
+    for (const sound of SPACE_SOUNDS) {
       console.log(`Processing: ${sound.name} from ${sound.sourceUrl}`);
 
       // Check if file already exists
@@ -95,7 +95,7 @@ serve(async (req) => {
         console.log(`Fetching from: ${sound.sourceUrl}`);
         
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+        const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout for large files
         
         const response = await fetch(sound.sourceUrl, {
           headers: {
@@ -171,7 +171,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: true,
-        message: `Processed ${successCount}/${NASA_SOUNDS.length} NASA sounds`,
+        message: `Processed ${successCount}/${SPACE_SOUNDS.length} space ambient sounds`,
         results,
       }),
       {
