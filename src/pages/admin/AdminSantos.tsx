@@ -54,6 +54,7 @@ import {
   BookHeart,
   Download,
   Cross,
+  Globe,
 } from 'lucide-react';
 
 interface CalendarSaint {
@@ -388,6 +389,28 @@ export default function AdminSantos() {
     },
   });
 
+  // Batch fetch Wikipedia images mutation
+  const batchWikipediaImageMutation = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke('batch-fetch-saint-images', {
+        body: { 
+          onlyPatrons: batchCategory === 'patron_country',
+          limit: batchLimit 
+        },
+      });
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-calendar-saints'] });
+      toast.success(`Wikipedia: Encontradas ${data?.success_count || 0} de ${data?.total_processed || 0} imágenes`);
+    },
+    onError: (error) => {
+      toast.error('Error Wikipedia: ' + error.message);
+    },
+  });
+
   // Filter saints
   const filteredSaints = saints.filter(saint => {
     if (searchQuery && !saint.name.toLowerCase().includes(searchQuery.toLowerCase())) {
@@ -456,7 +479,7 @@ export default function AdminSantos() {
     }
   };
 
-  const isBatchRunning = batchHistoryMutation.isPending || batchPrayerMutation.isPending || batchImageMutation.isPending || importTraditionalPrayersMutation.isPending || fixFundamentalPrayersMutation.isPending || scrapeEWTNMutation.isPending;
+  const isBatchRunning = batchHistoryMutation.isPending || batchPrayerMutation.isPending || batchImageMutation.isPending || importTraditionalPrayersMutation.isPending || fixFundamentalPrayersMutation.isPending || scrapeEWTNMutation.isPending || batchWikipediaImageMutation.isPending;
 
   return (
     <div className="space-y-6">
@@ -612,6 +635,23 @@ export default function AdminSantos() {
               Generar {Math.min(batchLimit, stats.withoutImage)} Imágenes
               {stats.withoutImage > 0 && (
                 <Badge variant="secondary" className="ml-1">{stats.withoutImage}</Badge>
+              )}
+            </Button>
+
+            {/* Wikipedia Images Button - NEW */}
+            <Button
+              onClick={() => batchWikipediaImageMutation.mutate()}
+              disabled={isBatchRunning || stats.withoutImage === 0}
+              className="gap-2 bg-emerald-600 hover:bg-emerald-700"
+            >
+              {batchWikipediaImageMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Globe className="h-4 w-4" />
+              )}
+              🌐 Buscar en Wikipedia ({Math.min(batchLimit, stats.withoutImage)})
+              {stats.withoutImage > 0 && (
+                <Badge variant="secondary" className="ml-1 bg-emerald-100 text-emerald-800">{stats.withoutImage}</Badge>
               )}
             </Button>
           </div>
