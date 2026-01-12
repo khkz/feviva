@@ -23,6 +23,9 @@ import { BentoCard } from '@/components/frontera-final/BentoCard';
 import { EscudoVerdad } from '@/components/frontera-final/EscudoVerdad';
 import { SpaceGamification } from '@/components/frontera-final/SpaceGamification';
 import { ApologeticsQuiz } from '@/components/frontera-final/ApologeticsQuiz';
+import { LaboratorioVirtudes } from '@/components/frontera-final/LaboratorioVirtudes';
+import { SonidosEspacio } from '@/components/frontera-final/SonidosEspacio';
+import { ComunidadEspacial } from '@/components/frontera-final/ComunidadEspacial';
 import { Button } from '@/components/ui/button';
 import { useRosario } from '@/contexts/RosarioContext';
 
@@ -351,6 +354,17 @@ export default function FronteraFinal() {
               </div>
             </motion.button>
           </motion.div>
+
+          {/* LABORATORIO DE VIRTUDES */}
+          <LaboratorioVirtudes />
+
+          {/* SONIDOS DEL ESPACIO */}
+          <SonidosEspacio />
+        </section>
+
+        {/* COMUNIDAD GALÁCTICA */}
+        <section className="relative z-10 px-4 md:px-8 py-12 max-w-5xl mx-auto">
+          <ComunidadEspacial />
         </section>
 
         {/* GAMIFICACIÓN ESPACIAL */}
