@@ -14,12 +14,15 @@ import {
   Sparkles,
   Shield,
   Rocket,
-  Trophy
+  Trophy,
+  Brain
 } from 'lucide-react';
 import { BentoCard } from '@/components/frontera-final/BentoCard';
 import { EscudoVerdad } from '@/components/frontera-final/EscudoVerdad';
 import { RosarioInterstellar } from '@/components/frontera-final/RosarioInterstellar';
 import { SpaceGamification } from '@/components/frontera-final/SpaceGamification';
+import { ApologeticsQuiz } from '@/components/frontera-final/ApologeticsQuiz';
+import { Button } from '@/components/ui/button';
 
 interface CategoryCard {
   id: string;
@@ -126,6 +129,7 @@ const floatingFacts = [
 
 export default function FronteraFinal() {
   const [isRosarioOpen, setIsRosarioOpen] = useState(false);
+  const [isQuizOpen, setIsQuizOpen] = useState(false);
   const [currentFact] = useState(() => 
     floatingFacts[Math.floor(Math.random() * floatingFacts.length)]
   );
@@ -373,6 +377,18 @@ export default function FronteraFinal() {
           </motion.div>
 
           <EscudoVerdad />
+
+          {/* Quiz Button */}
+          <div className="mt-8 text-center">
+            <Button
+              onClick={() => setIsQuizOpen(true)}
+              className="bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600 text-white font-orbitron"
+              size="lg"
+            >
+              <Brain className="w-5 h-5 mr-2" />
+              Probar Quiz de Apologética
+            </Button>
+          </div>
         </section>
 
         {/* Bottom spacing */}
@@ -383,6 +399,12 @@ export default function FronteraFinal() {
       <RosarioInterstellar 
         isOpen={isRosarioOpen} 
         onClose={() => setIsRosarioOpen(false)} 
+      />
+
+      {/* Quiz Modal */}
+      <ApologeticsQuiz
+        isOpen={isQuizOpen}
+        onClose={() => setIsQuizOpen(false)}
       />
     </>
   );

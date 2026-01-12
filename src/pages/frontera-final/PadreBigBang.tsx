@@ -67,8 +67,8 @@ export default function PadreBigBang() {
           `
         }
       ]}
-      videoId="xMsHj5GBVec"
-      videoTitle="Georges Lemaître: El Sacerdote del Big Bang"
+      videoId="qym7ZuGdCsU"
+      videoTitle="Georges Lemaître: El Sacerdote del Big Bang (Aquinas 101)"
       reflection="La humildad de Lemaître al separar ciencia y fe, ¿cómo puede inspirarte a buscar la verdad sin imponer tus conclusiones?"
       relatedArticles={[
         { id: "observatorio-vaticano", title: "El Observatorio Vaticano", href: "/frontera-final/observatorio-vaticano" },

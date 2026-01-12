@@ -13,6 +13,7 @@ import { ProgressCard } from "@/components/dashboard/ProgressCard";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { GospelCard } from "@/components/gospel/GospelCard";
+import { FronteraFinalCard } from "@/components/dashboard/FronteraFinalCard";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -174,6 +175,11 @@ const Dashboard = () => {
           <div className="lg:grid lg:grid-cols-3 lg:gap-6">
             {/* Columna izquierda - Contenido principal (2/3) */}
             <div className="lg:col-span-2 space-y-6">
+              {/* Frontera Final - Featured */}
+              <section className="px-5 lg:px-0">
+                <FronteraFinalCard />
+              </section>
+
               {/* Daily Challenge */}
               <Suspense fallback={<CardSkeleton height="h-48" />}>
                 <DailyChallenge />

@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Play, Pause, RotateCcw, Volume2, VolumeX, ChevronRight, ChevronLeft, Star, Sparkles } from 'lucide-react';
+import { X, Play, Pause, RotateCcw, Volume2, VolumeX, ChevronRight, ChevronLeft, Star, Sparkles, Maximize2, Minimize2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { MISTERIOS, ORACIONES_ROSARIO, getMisterioDelDia, TipoMisterio } from '@/lib/rosarioData';
 import { supabase } from '@/integrations/supabase/client';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Slider } from '@/components/ui/slider';
 
 interface RosarioInterstellarProps {
   isOpen: boolean;
@@ -52,16 +53,29 @@ const spaceReflections: Record<TipoMisterio, string[]> = {
   ],
 };
 
+// Ambient space sounds frequencies
+const ambientFrequencies = [
+  { freq: 60, type: 'sine' as OscillatorType, gain: 0.03 },
+  { freq: 120, type: 'sine' as OscillatorType, gain: 0.02 },
+  { freq: 180, type: 'sine' as OscillatorType, gain: 0.015 },
+];
+
 export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProps) {
   const [currentMysteryType, setCurrentMysteryType] = useState<TipoMisterio>(getMisterioDelDia);
   const [currentMysteryIndex, setCurrentMysteryIndex] = useState(0);
-  const [currentPrayer, setCurrentPrayer] = useState(0); // 0: Padre Nuestro, 1-10: Ave María, 11: Gloria
+  const [currentPrayer, setCurrentPrayer] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [showPrayerText, setShowPrayerText] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [ambientVolume, setAmbientVolume] = useState(30);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [rosariosCompletados, setRosariosCompletados] = useState(0);
   const [userId, setUserId] = useState<string | null>(null);
+  
+  const ambientOscillators = useRef<OscillatorNode[]>([]);
+  const ambientGains = useRef<GainNode[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const mysteryData = MISTERIOS[currentMysteryType];
   const currentMystery = mysteryData.misterios[currentMysteryIndex];
@@ -73,7 +87,6 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         setUserId(user.id);
-        // Load rosary count
         const { count } = await supabase
           .from('user_rosario_progress')
           .select('*', { count: 'exact', head: true })
@@ -85,13 +98,70 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
     if (isOpen) loadUser();
   }, [isOpen]);
 
-  // Initialize audio context
+  // Initialize audio context and ambient sounds
   useEffect(() => {
     if (isOpen && !audioContext) {
       const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
       setAudioContext(ctx);
     }
   }, [isOpen, audioContext]);
+
+  // Start/stop ambient sounds
+  useEffect(() => {
+    if (!audioContext || isMuted) {
+      stopAmbient();
+      return;
+    }
+
+    if (isPlaying) {
+      startAmbient();
+    } else {
+      stopAmbient();
+    }
+
+    return () => stopAmbient();
+  }, [audioContext, isPlaying, isMuted]);
+
+  // Update ambient volume
+  useEffect(() => {
+    ambientGains.current.forEach((gain, i) => {
+      if (gain) {
+        gain.gain.setValueAtTime(
+          ambientFrequencies[i].gain * (ambientVolume / 100),
+          audioContext?.currentTime || 0
+        );
+      }
+    });
+  }, [ambientVolume, audioContext]);
+
+  const startAmbient = () => {
+    if (!audioContext) return;
+    stopAmbient();
+
+    ambientFrequencies.forEach((config, i) => {
+      const osc = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      
+      osc.type = config.type;
+      osc.frequency.value = config.freq;
+      gain.gain.value = config.gain * (ambientVolume / 100);
+      
+      osc.connect(gain);
+      gain.connect(audioContext.destination);
+      osc.start();
+      
+      ambientOscillators.current[i] = osc;
+      ambientGains.current[i] = gain;
+    });
+  };
+
+  const stopAmbient = () => {
+    ambientOscillators.current.forEach(osc => {
+      try { osc?.stop(); } catch {}
+    });
+    ambientOscillators.current = [];
+    ambientGains.current = [];
+  };
 
   // Play cosmic bell sound
   const playBellSound = useCallback(() => {
@@ -105,7 +175,6 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
     filter.connect(gainNode);
     gainNode.connect(audioContext.destination);
 
-    // Cosmic reverb-like sound
     filter.type = "lowpass";
     filter.frequency.value = 2000;
     
@@ -123,7 +192,7 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
   const playCompletionChord = useCallback(() => {
     if (!audioContext || isMuted) return;
 
-    const notes = [261.63, 329.63, 392.00, 523.25]; // C4, E4, G4, C5
+    const notes = [261.63, 329.63, 392.00, 523.25];
     
     notes.forEach((freq, i) => {
       const osc = audioContext.createOscillator();
@@ -144,14 +213,10 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
     });
   }, [audioContext, isMuted]);
 
-  // Auto-advance when playing
+  // Auto-advance
   useEffect(() => {
     if (!isPlaying) return;
-
-    const interval = setInterval(() => {
-      handleNext();
-    }, 4000);
-
+    const interval = setInterval(() => handleNext(), 4000);
     return () => clearInterval(interval);
   }, [isPlaying, currentPrayer, currentMysteryIndex]);
 
@@ -159,15 +224,12 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
     playBellSound();
 
     if (currentPrayer < 11) {
-      // Still in current decade
       setCurrentPrayer(prev => prev + 1);
     } else if (currentMysteryIndex < 4) {
-      // Move to next mystery
       playCompletionChord();
       setCurrentMysteryIndex(prev => prev + 1);
       setCurrentPrayer(0);
     } else {
-      // Completed all mysteries
       playCompletionChord();
       setIsPlaying(false);
       saveProgress();
@@ -191,7 +253,6 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
 
   const saveProgress = async () => {
     if (!userId) return;
-    
     try {
       await supabase.from('user_rosario_progress').insert({
         user_id: userId,
@@ -202,6 +263,16 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
       setRosariosCompletados(prev => prev + 1);
     } catch (error) {
       console.error('Error saving rosary progress:', error);
+    }
+  };
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      containerRef.current?.requestFullscreen();
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullscreen(false);
     }
   };
 
@@ -224,55 +295,66 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
   return (
     <AnimatePresence>
       <motion.div
+        ref={containerRef}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-50 flex items-center justify-center p-4"
       >
-        {/* Backdrop with stars */}
+        {/* Backdrop with animated stars */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="absolute inset-0 bg-slate-950/95 backdrop-blur-sm"
+          className="absolute inset-0 bg-slate-950/98 backdrop-blur-sm"
           onClick={onClose}
         >
-          {[...Array(100)].map((_, i) => (
+          {[...Array(150)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute w-0.5 h-0.5 bg-white rounded-full"
+              className="absolute rounded-full bg-white"
               style={{
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
+                width: Math.random() > 0.9 ? '2px' : '1px',
+                height: Math.random() > 0.9 ? '2px' : '1px',
               }}
               animate={{
-                opacity: [0.2, 1, 0.2],
-                scale: [1, 1.5, 1],
+                opacity: [0.1, 0.8, 0.1],
+                scale: [1, Math.random() > 0.9 ? 1.5 : 1.2, 1],
               }}
               transition={{
-                duration: 2 + Math.random() * 3,
+                duration: 2 + Math.random() * 4,
                 repeat: Infinity,
-                delay: Math.random() * 2,
+                delay: Math.random() * 3,
               }}
             />
           ))}
         </motion.div>
 
-        {/* Modal Content */}
+        {/* Modal */}
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
-          className="relative w-full max-w-2xl max-h-[90vh] glass-cyber rounded-3xl border-amber-400/30 overflow-hidden flex flex-col"
+          className={`relative w-full ${isFullscreen ? 'max-w-none h-full' : 'max-w-2xl max-h-[90vh]'} glass-cyber rounded-3xl border-amber-400/30 overflow-hidden flex flex-col`}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Close button */}
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 z-10 text-gray-400 hover:text-white transition-colors"
-          >
-            <X className="w-6 h-6" />
-          </button>
+          {/* Top controls */}
+          <div className="absolute top-4 right-4 z-10 flex gap-2">
+            <button
+              onClick={toggleFullscreen}
+              className="text-gray-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/10"
+            >
+              {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
+            </button>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/10"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
 
           {/* Header */}
           <div className="p-6 text-center border-b border-white/10">
@@ -354,7 +436,6 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
 
             {/* Solar System Visualization */}
             <div className="relative h-48 mb-6">
-              {/* Sun (center) */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                 <motion.div
                   animate={{
@@ -369,7 +450,6 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
                 />
               </div>
 
-              {/* Orbits and Planets for 5 mysteries */}
               {[0, 1, 2, 3, 4].map((index) => {
                 const orbitSize = 50 + index * 20;
                 const isActive = index === currentMysteryIndex;
@@ -377,7 +457,6 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
 
                 return (
                   <div key={index} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                    {/* Orbit ring */}
                     <motion.div
                       className="rounded-full border"
                       style={{
@@ -387,13 +466,9 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
                         marginTop: -orbitSize,
                         borderColor: isActive ? config.color : 'rgba(100, 116, 139, 0.2)',
                       }}
-                      animate={isActive ? { 
-                        borderColor: [config.color, `${config.color}80`, config.color] 
-                      } : {}}
+                      animate={isActive ? { borderColor: [config.color, `${config.color}80`, config.color] } : {}}
                       transition={{ duration: 2, repeat: Infinity }}
                     />
-
-                    {/* Planet */}
                     <motion.div
                       className="absolute rounded-full cursor-pointer transition-all duration-300"
                       style={{
@@ -406,9 +481,7 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
                         marginTop: -orbitSize - (isActive ? 10 : 7),
                         boxShadow: isActive ? `0 0 15px ${config.color}` : 'none',
                       }}
-                      animate={isActive ? {
-                        scale: [1, 1.2, 1],
-                      } : {}}
+                      animate={isActive ? { scale: [1, 1.2, 1] } : {}}
                       transition={{ duration: 1.5, repeat: Infinity }}
                       onClick={() => {
                         setCurrentMysteryIndex(index);
@@ -427,19 +500,13 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
                   <motion.div
                     key={index}
                     className="w-3 h-3 rounded-full"
-                    style={{
-                      backgroundColor: index <= currentPrayer ? config.color : '#334155',
-                    }}
-                    animate={index === currentPrayer ? {
-                      scale: [1, 1.3, 1],
-                    } : {}}
+                    style={{ backgroundColor: index <= currentPrayer ? config.color : '#334155' }}
+                    animate={index === currentPrayer ? { scale: [1, 1.3, 1] } : {}}
                     transition={{ duration: 0.5, repeat: index === currentPrayer ? Infinity : 0 }}
                   />
                 ))}
               </div>
-              <p className="font-orbitron text-lg text-white">
-                {getCurrentPrayerName()}
-              </p>
+              <p className="font-orbitron text-lg text-white">{getCurrentPrayerName()}</p>
             </div>
 
             {/* Prayer Text */}
@@ -455,13 +522,27 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
               </motion.div>
             )}
 
-            {/* Toggle prayer text */}
             <button
               onClick={() => setShowPrayerText(!showPrayerText)}
               className="w-full text-center text-gray-400 text-sm hover:text-white transition-colors mb-4"
             >
               {showPrayerText ? 'Ocultar texto' : 'Mostrar texto de la oración'}
             </button>
+
+            {/* Ambient Volume Control */}
+            <div className="glass-cyber rounded-xl p-4 border-white/10 mb-4">
+              <div className="flex items-center gap-4">
+                <span className="text-gray-400 text-sm whitespace-nowrap">🌌 Ambiente</span>
+                <Slider
+                  value={[ambientVolume]}
+                  onValueChange={(v) => setAmbientVolume(v[0])}
+                  max={100}
+                  step={1}
+                  className="flex-1"
+                />
+                <span className="text-gray-400 text-sm w-8">{ambientVolume}%</span>
+              </div>
+            </div>
           </ScrollArea>
 
           {/* Progress Bar */}
@@ -482,33 +563,15 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
 
           {/* Controls */}
           <div className="flex items-center justify-center gap-4 p-6 border-t border-white/10">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsMuted(!isMuted)}
-              className="text-gray-400 hover:text-white"
-            >
+            <Button variant="ghost" size="icon" onClick={() => setIsMuted(!isMuted)} className="text-gray-400 hover:text-white">
               {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
             </Button>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleReset}
-              className="text-gray-400 hover:text-white"
-            >
+            <Button variant="ghost" size="icon" onClick={handleReset} className="text-gray-400 hover:text-white">
               <RotateCcw className="w-5 h-5" />
             </Button>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handlePrevious}
-              className="text-gray-400 hover:text-white"
-            >
+            <Button variant="ghost" size="icon" onClick={handlePrevious} className="text-gray-400 hover:text-white">
               <ChevronLeft className="w-5 h-5" />
             </Button>
-
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -516,19 +579,9 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
               className={`w-16 h-16 rounded-full bg-gradient-to-br ${config.gradient} flex items-center justify-center shadow-lg`}
               style={{ boxShadow: `0 0 20px ${config.color}40` }}
             >
-              {isPlaying ? (
-                <Pause className="w-7 h-7 text-white" />
-              ) : (
-                <Play className="w-7 h-7 text-white ml-1" />
-              )}
+              {isPlaying ? <Pause className="w-7 h-7 text-white" /> : <Play className="w-7 h-7 text-white ml-1" />}
             </motion.button>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleNext}
-              className="text-gray-400 hover:text-white"
-            >
+            <Button variant="ghost" size="icon" onClick={handleNext} className="text-gray-400 hover:text-white">
               <ChevronRight className="w-5 h-5" />
             </Button>
           </div>

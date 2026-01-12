@@ -80,8 +80,8 @@ export default function ObservatorioVaticano() {
           `
         }
       ]}
-      videoId="5oQe7gLodIg"
-      videoTitle="Dentro del Observatorio Vaticano"
+      videoId="o3eqYbKVYC0"
+      videoTitle="El Astrónomo del Papa: Guy Consolmagno (EWTN)"
       reflection="¿Por qué crees que la Iglesia invierte en ciencia? ¿Cómo puede el conocimiento del cosmos acercarte a Dios?"
       relatedArticles={[
         { id: "padre-big-bang", title: "El Padre del Big Bang", href: "/frontera-final/padre-big-bang" },
