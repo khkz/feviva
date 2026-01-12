@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 // Import feature images
 import featurePrayer from "@/assets/feature-prayer.jpg";
 import featureDebate from "@/assets/feature-debate.jpg";
+import fronteraHero from "@/assets/frontera-final-hero.jpg";
 
 interface FeatureShowcaseProps {
   icon: LucideIcon;
@@ -150,7 +151,8 @@ const showcaseData: FeatureShowcaseProps[] = [
     ],
     ctaText: "Explorar el cosmos",
     ctaLink: "/frontera-final",
-    gradient: "from-violet-600 to-purple-600"
+    gradient: "from-violet-600 to-purple-600",
+    image: fronteraHero
   }
 ];
 
