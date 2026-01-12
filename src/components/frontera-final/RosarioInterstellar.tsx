@@ -66,14 +66,14 @@ export function RosarioInterstellar({ isOpen, onClose }: RosarioInterstellarProp
   const [currentMysteryIndex, setCurrentMysteryIndex] = useState(0);
   const [currentPrayer, setCurrentPrayer] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
   const [showPrayerText, setShowPrayerText] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [ambientVolume, setAmbientVolume] = useState(30);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [rosariosCompletados, setRosariosCompletados] = useState(0);
   const [userId, setUserId] = useState<string | null>(null);
-  const [ttsEnabled, setTtsEnabled] = useState(false);
+  const [ttsEnabled, setTtsEnabled] = useState(true);
   
   const ambientOscillators = useRef<OscillatorNode[]>([]);
   const ambientGains = useRef<GainNode[]>([]);
