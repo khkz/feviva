@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Microscope, Code2, CheckSquare, Sparkles, X } from 'lucide-react';
+import { Microscope, Code2, CheckSquare, Sparkles, Share2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
-
+import { PrayerShareModal } from './PrayerShareModal';
 interface ExamenItem {
   id: string;
   text: string;
@@ -38,6 +38,7 @@ Amén.`;
 export function LaboratorioVirtudes() {
   const [isExamenOpen, setIsExamenOpen] = useState(false);
   const [isOracionOpen, setIsOracionOpen] = useState(false);
+  const [isPrayerShareOpen, setIsPrayerShareOpen] = useState(false);
   const [checkedItems, setCheckedItems] = useState<string[]>([]);
 
   const handleCheck = (itemId: string) => {
@@ -208,16 +209,36 @@ export function LaboratorioVirtudes() {
               </pre>
             </div>
 
-            <div className="flex items-start gap-2 text-xs text-gray-500">
+            <div className="flex items-start gap-2 text-xs text-gray-500 mb-4">
               <Sparkles className="w-4 h-4 text-amber-400 flex-shrink-0" />
               <p>
                 San Isidoro de Sevilla, patrón de internet. Beato Carlo Acutis, 
                 joven programador que usó la tecnología para evangelizar.
               </p>
             </div>
+
+            <Button 
+              onClick={() => {
+                setIsOracionOpen(false);
+                setIsPrayerShareOpen(true);
+              }}
+              className="w-full bg-cyan-500 hover:bg-cyan-600"
+            >
+              <Share2 className="w-4 h-4 mr-2" />
+              Compartir Oración
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Prayer Share Modal */}
+      <PrayerShareModal
+        isOpen={isPrayerShareOpen}
+        onClose={() => setIsPrayerShareOpen(false)}
+        title="Oración del Programador"
+        prayer={oracionCoder}
+        saints="San Isidoro de Sevilla y Beato Carlo Acutis"
+      />
     </>
   );
 }
