@@ -9,8 +9,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useDailyShareImages, ShareImageType } from "@/hooks/useDailyShareImages";
+import { ShareImageType } from "@/hooks/useDailyShareImages";
+import { useDailyContent } from "@/hooks/useDailyContent";
+import { useDailyGospel } from "@/hooks/useDailyGospel";
+import { useSaintOfDay } from "@/hooks/useSaintOfDay";
 import { toast } from "sonner";
+import logoElRugido from '@/assets/logo-elrugido.svg';
 
 interface DailyShareButtonProps {
   tipo: ShareImageType;
@@ -21,163 +25,590 @@ interface DailyShareButtonProps {
   size?: "default" | "sm" | "lg" | "icon";
 }
 
-// Logo URL for branding
-const LOGO_URL = '/logo-elrugido.svg';
+interface ContentData {
+  mainText: string;
+  reference?: string;
+  subtitle?: string;
+}
 
-// Compose Story (9:16) from Post (1:1) by centering with gradient background
-const ComposedStoryImage = ({ 
-  postUrl, 
-  alt,
-  onComposed 
-}: { 
-  postUrl: string; 
-  alt: string;
-  onComposed?: (dataUrl: string) => void;
+// Helper to wrap text into lines
+const wrapText = (ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] => {
+  const words = text.split(' ');
+  const lines: string[] = [];
+  let line = '';
+  
+  for (const word of words) {
+    const testLine = line + word + ' ';
+    const metrics = ctx.measureText(testLine);
+    if (metrics.width > maxWidth && line !== '') {
+      lines.push(line.trim());
+      line = word + ' ';
+    } else {
+      line = testLine;
+    }
+  }
+  lines.push(line.trim());
+  return lines;
+};
+
+// Canvas component for generating Post (1:1) images
+const DailyPostImage = ({
+  tipo,
+  content,
+  onGenerated,
+}: {
+  tipo: ShareImageType;
+  content: ContentData;
+  onGenerated: (dataUrl: string) => void;
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [composedUrl, setComposedUrl] = useState<string | null>(null);
-  const [isComposing, setIsComposing] = useState(true);
+  const [isGenerating, setIsGenerating] = useState(true);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas || !postUrl) return;
+    if (!canvas || !content.mainText) return;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Load both the post image and the logo
-    const postImg = new Image();
-    const logoImg = new Image();
-    postImg.crossOrigin = 'anonymous';
-    logoImg.crossOrigin = 'anonymous';
-    
-    let postLoaded = false;
+    const size = 1080;
+    canvas.width = size;
+    canvas.height = size;
+
+    // Load logo
+    const logo = new Image();
+    logo.crossOrigin = 'anonymous';
+    logo.onload = () => {
+      // Background gradient based on type
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      if (tipo === 'versiculo') {
+        gradient.addColorStop(0, '#1a1a2e');
+        gradient.addColorStop(0.5, '#2d1b4e');
+        gradient.addColorStop(1, '#1a2e3b');
+      } else if (tipo === 'evangelio') {
+        gradient.addColorStop(0, '#1a1a2e');
+        gradient.addColorStop(0.5, '#2e2a1a');
+        gradient.addColorStop(1, '#1a1a2e');
+      } else if (tipo === 'reflexion') {
+        gradient.addColorStop(0, '#1e1b2e');
+        gradient.addColorStop(0.5, '#2e1b2a');
+        gradient.addColorStop(1, '#1a2e2e');
+      } else {
+        gradient.addColorStop(0, '#1a1a2e');
+        gradient.addColorStop(0.5, '#16213e');
+        gradient.addColorStop(1, '#0f0f1a');
+      }
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, size, size);
+
+      // Add stars
+      for (let i = 0; i < 60; i++) {
+        const x = Math.random() * size;
+        const y = Math.random() * size;
+        const radius = Math.random() * 1.5 + 0.5;
+        const opacity = Math.random() * 0.6 + 0.2;
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+        ctx.fill();
+      }
+
+      // Subtle nebula effect
+      const nebulaGradient = ctx.createRadialGradient(
+        size * 0.7, size * 0.3, 0,
+        size * 0.7, size * 0.3, size * 0.5
+      );
+      nebulaGradient.addColorStop(0, 'rgba(139, 92, 246, 0.1)');
+      nebulaGradient.addColorStop(1, 'rgba(139, 92, 246, 0)');
+      ctx.fillStyle = nebulaGradient;
+      ctx.fillRect(0, 0, size, size);
+
+      // Draw logo at top center
+      const logoSize = 80;
+      ctx.drawImage(logo, (size - logoSize) / 2, 50, logoSize, logoSize);
+
+      // Brand name
+      ctx.fillStyle = '#D4AF37';
+      ctx.font = 'bold 36px Georgia, serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('ElRugido', size / 2, 160);
+
+      // Type badge
+      const badgeLabels: Record<ShareImageType, string> = {
+        versiculo: '📖 VERSÍCULO DEL DÍA',
+        evangelio: '✝️ EVANGELIO DEL DÍA',
+        reflexion: '💭 REFLEXIÓN DEL DÍA',
+        santo: '🙏 SANTO DEL DÍA',
+      };
+
+      const badgeLabel = badgeLabels[tipo];
+      const badgeWidth = 340;
+      const badgeHeight = 44;
+      const badgeX = (size - badgeWidth) / 2;
+      const badgeY = 190;
+
+      ctx.fillStyle = 'rgba(212, 175, 55, 0.2)';
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.5)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(badgeX, badgeY, badgeWidth, badgeHeight, 22);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#D4AF37';
+      ctx.font = 'bold 20px Arial, sans-serif';
+      ctx.fillText(badgeLabel, size / 2, badgeY + 30);
+
+      // Main content text
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+      ctx.font = tipo === 'versiculo' ? 'italic 28px Georgia, serif' : '26px Georgia, serif';
+      ctx.textAlign = 'center';
+
+      const maxWidth = size - 120;
+      const lineHeight = 40;
+      
+      // Limit text length to fit in canvas
+      const displayText = content.mainText.length > 400 
+        ? content.mainText.substring(0, 400) + '...'
+        : content.mainText;
+      
+      const lines = wrapText(ctx, displayText, maxWidth);
+      
+      // Calculate vertical position to center the text block
+      const totalTextHeight = lines.length * lineHeight;
+      const availableSpace = size - 280 - 180; // Space between badge and footer
+      const startY = 280 + (availableSpace - totalTextHeight) / 2;
+
+      lines.slice(0, 12).forEach((textLine, index) => {
+        ctx.fillText(textLine, size / 2, startY + index * lineHeight);
+      });
+
+      // Reference (if available)
+      if (content.reference) {
+        ctx.fillStyle = '#D4AF37';
+        ctx.font = 'bold 22px Georgia, serif';
+        ctx.fillText(`— ${content.reference}`, size / 2, size - 140);
+      }
+
+      // Decorative line
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.4)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(size * 0.3, size - 100);
+      ctx.lineTo(size * 0.7, size - 100);
+      ctx.stroke();
+
+      // Draw small logo at bottom
+      const bottomLogoSize = 40;
+      ctx.drawImage(logo, (size - bottomLogoSize) / 2, size - 85, bottomLogoSize, bottomLogoSize);
+
+      // Footer
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+      ctx.font = '18px Arial, sans-serif';
+      ctx.fillText('elrugido.com', size / 2, size - 30);
+
+      setIsGenerating(false);
+      onGenerated(canvas.toDataURL('image/png'));
+    };
+
+    logo.onerror = () => {
+      setIsGenerating(false);
+      console.error('Failed to load logo');
+    };
+
+    logo.src = logoElRugido;
+  }, [tipo, content, onGenerated]);
+
+  return (
+    <div className="relative">
+      <canvas
+        ref={canvasRef}
+        className="w-full max-w-[300px] mx-auto rounded-lg shadow-lg"
+        style={{ aspectRatio: '1/1' }}
+      />
+      {isGenerating && (
+        <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-lg">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Canvas component for generating Story (9:16) images
+const DailyStoryImage = ({
+  tipo,
+  content,
+  onGenerated,
+}: {
+  tipo: ShareImageType;
+  content: ContentData;
+  onGenerated: (dataUrl: string) => void;
+}) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isGenerating, setIsGenerating] = useState(true);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !content.mainText) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const width = 1080;
+    const height = 1920;
+    canvas.width = width;
+    canvas.height = height;
+
+    // Load logo
+    const logo = new Image();
+    logo.crossOrigin = 'anonymous';
+    logo.onload = () => {
+      // Background gradient based on type
+      const gradient = ctx.createLinearGradient(0, 0, 0, height);
+      if (tipo === 'versiculo') {
+        gradient.addColorStop(0, '#1a1a2e');
+        gradient.addColorStop(0.3, '#2d1b4e');
+        gradient.addColorStop(0.7, '#1a2e3b');
+        gradient.addColorStop(1, '#0f0f1a');
+      } else if (tipo === 'evangelio') {
+        gradient.addColorStop(0, '#1a1a2e');
+        gradient.addColorStop(0.3, '#2e2a1a');
+        gradient.addColorStop(0.7, '#1a1a2e');
+        gradient.addColorStop(1, '#0f0f1a');
+      } else if (tipo === 'reflexion') {
+        gradient.addColorStop(0, '#1e1b2e');
+        gradient.addColorStop(0.3, '#2e1b2a');
+        gradient.addColorStop(0.7, '#1a2e2e');
+        gradient.addColorStop(1, '#0f0f1a');
+      } else {
+        gradient.addColorStop(0, '#1a1a2e');
+        gradient.addColorStop(0.3, '#16213e');
+        gradient.addColorStop(0.5, '#1a1a2e');
+        gradient.addColorStop(0.7, '#16213e');
+        gradient.addColorStop(1, '#0f0f1a');
+      }
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, width, height);
+
+      // Add stars
+      for (let i = 0; i < 120; i++) {
+        const x = Math.random() * width;
+        const y = Math.random() * height;
+        const radius = Math.random() * 2 + 0.5;
+        const opacity = Math.random() * 0.7 + 0.2;
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+        ctx.fill();
+      }
+
+      // Nebula effects
+      const nebulaGradient1 = ctx.createRadialGradient(
+        width * 0.2, height * 0.3, 0,
+        width * 0.2, height * 0.3, width * 0.6
+      );
+      nebulaGradient1.addColorStop(0, 'rgba(139, 92, 246, 0.12)');
+      nebulaGradient1.addColorStop(1, 'rgba(139, 92, 246, 0)');
+      ctx.fillStyle = nebulaGradient1;
+      ctx.fillRect(0, 0, width, height);
+
+      const nebulaGradient2 = ctx.createRadialGradient(
+        width * 0.8, height * 0.7, 0,
+        width * 0.8, height * 0.7, width * 0.5
+      );
+      nebulaGradient2.addColorStop(0, 'rgba(212, 175, 55, 0.08)');
+      nebulaGradient2.addColorStop(1, 'rgba(212, 175, 55, 0)');
+      ctx.fillStyle = nebulaGradient2;
+      ctx.fillRect(0, 0, width, height);
+
+      // Draw logo at top center
+      const logoSize = 120;
+      ctx.drawImage(logo, (width - logoSize) / 2, 80, logoSize, logoSize);
+
+      // Brand name
+      ctx.fillStyle = '#D4AF37';
+      ctx.font = 'bold 52px Georgia, serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('ElRugido', width / 2, 250);
+
+      // Tagline
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+      ctx.font = '28px Georgia, serif';
+      ctx.fillText('elrugido.com', width / 2, 300);
+
+      // Decorative line
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.5)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(width / 2 - 100, 340);
+      ctx.lineTo(width / 2 + 100, 340);
+      ctx.stroke();
+
+      // Type badge
+      const badgeLabels: Record<ShareImageType, string> = {
+        versiculo: '📖 VERSÍCULO DEL DÍA',
+        evangelio: '✝️ EVANGELIO DEL DÍA',
+        reflexion: '💭 REFLEXIÓN DEL DÍA',
+        santo: '🙏 SANTO DEL DÍA',
+      };
+
+      const badgeLabel = badgeLabels[tipo];
+      const badgeWidth = 420;
+      const badgeHeight = 56;
+      const badgeX = (width - badgeWidth) / 2;
+      const badgeY = 420;
+
+      ctx.fillStyle = 'rgba(212, 175, 55, 0.2)';
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.5)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(badgeX, badgeY, badgeWidth, badgeHeight, 28);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#D4AF37';
+      ctx.font = 'bold 26px Arial, sans-serif';
+      ctx.fillText(badgeLabel, width / 2, badgeY + 38);
+
+      // Main content text
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+      ctx.font = tipo === 'versiculo' ? 'italic 36px Georgia, serif' : '34px Georgia, serif';
+      ctx.textAlign = 'center';
+
+      const maxWidth = width - 140;
+      const lineHeight = 54;
+      
+      // Limit text length to fit in canvas
+      const displayText = content.mainText.length > 500 
+        ? content.mainText.substring(0, 500) + '...'
+        : content.mainText;
+      
+      const lines = wrapText(ctx, displayText, maxWidth);
+
+      // Calculate vertical position (center in available space)
+      const startY = 580;
+      const maxLines = Math.min(lines.length, 15);
+
+      lines.slice(0, maxLines).forEach((textLine, index) => {
+        ctx.fillText(textLine, width / 2, startY + index * lineHeight);
+      });
+
+      // Reference (if available)
+      if (content.reference) {
+        const refY = startY + maxLines * lineHeight + 40;
+        ctx.fillStyle = '#D4AF37';
+        ctx.font = 'bold 28px Georgia, serif';
+        ctx.fillText(`— ${content.reference}`, width / 2, Math.min(refY, height - 280));
+      }
+
+      // Bottom decorative line
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.4)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(width * 0.2, height - 200);
+      ctx.lineTo(width * 0.8, height - 200);
+      ctx.stroke();
+
+      // Draw logo at bottom
+      const bottomLogoSize = 70;
+      ctx.drawImage(logo, (width - bottomLogoSize) / 2, height - 170, bottomLogoSize, bottomLogoSize);
+
+      // Footer
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+      ctx.font = '24px Arial, sans-serif';
+      ctx.fillText('elrugido.com', width / 2, height - 60);
+
+      setIsGenerating(false);
+      onGenerated(canvas.toDataURL('image/png'));
+    };
+
+    logo.onerror = () => {
+      setIsGenerating(false);
+      console.error('Failed to load logo');
+    };
+
+    logo.src = logoElRugido;
+  }, [tipo, content, onGenerated]);
+
+  return (
+    <div className="relative">
+      <canvas
+        ref={canvasRef}
+        className="w-full max-w-[180px] mx-auto rounded-lg shadow-lg"
+        style={{ aspectRatio: '9/16' }}
+      />
+      {isGenerating && (
+        <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-lg">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Compose Story for Santo (from saint image)
+const ComposedSantoStoryImage = ({
+  saintName,
+  saintImageUrl,
+  onGenerated,
+}: {
+  saintName: string;
+  saintImageUrl?: string;
+  onGenerated: (dataUrl: string) => void;
+}) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isGenerating, setIsGenerating] = useState(true);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const width = 1080;
+    const height = 1920;
+    canvas.width = width;
+    canvas.height = height;
+
+    const logo = new Image();
+    logo.crossOrigin = 'anonymous';
+
+    const saintImg = saintImageUrl ? new Image() : null;
+    if (saintImg) {
+      saintImg.crossOrigin = 'anonymous';
+    }
+
     let logoLoaded = false;
+    let saintLoaded = !saintImageUrl; // true if no image to load
 
-    const tryCompose = () => {
-      if (!postLoaded || !logoLoaded) return;
+    const drawCanvas = () => {
+      if (!logoLoaded || !saintLoaded) return;
 
-      // Story dimensions: 1080x1920 (9:16)
-      const storyWidth = 1080;
-      const storyHeight = 1920;
-      
-      canvas.width = storyWidth;
-      canvas.height = storyHeight;
-      
-      // Create gradient background (deep gold to burgundy)
-      const gradient = ctx.createLinearGradient(0, 0, 0, storyHeight);
+      // Background gradient
+      const gradient = ctx.createLinearGradient(0, 0, 0, height);
       gradient.addColorStop(0, '#1a1a2e');
       gradient.addColorStop(0.3, '#16213e');
       gradient.addColorStop(0.5, '#1a1a2e');
       gradient.addColorStop(0.7, '#16213e');
       gradient.addColorStop(1, '#0f0f1a');
       ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, storyWidth, storyHeight);
-      
-      // Add subtle pattern overlay
-      ctx.fillStyle = 'rgba(212, 175, 55, 0.03)';
-      for (let i = 0; i < 50; i++) {
-        const x = Math.random() * storyWidth;
-        const y = Math.random() * storyHeight;
+      ctx.fillRect(0, 0, width, height);
+
+      // Stars
+      for (let i = 0; i < 80; i++) {
+        const x = Math.random() * width;
+        const y = Math.random() * height;
         ctx.beginPath();
-        ctx.arc(x, y, Math.random() * 50 + 10, 0, Math.PI * 2);
+        ctx.arc(x, y, Math.random() * 2 + 0.5, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.6 + 0.2})`;
         ctx.fill();
       }
 
-      // Draw logo at top center
+      // Draw logo at top
       const logoSize = 120;
-      const logoX = (storyWidth - logoSize) / 2;
-      const logoY = 40;
-      ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
-      
-      // Add branding text below logo
+      ctx.drawImage(logo, (width - logoSize) / 2, 60, logoSize, logoSize);
+
+      // Brand text
       ctx.fillStyle = '#D4AF37';
       ctx.font = 'bold 48px Georgia, serif';
       ctx.textAlign = 'center';
-      ctx.fillText('ElRugido', storyWidth / 2, logoY + logoSize + 50);
-      
+      ctx.fillText('ElRugido', width / 2, 230);
+
       ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
       ctx.font = '28px Georgia, serif';
-      ctx.fillText('elrugido.com', storyWidth / 2, logoY + logoSize + 90);
-      
-      // Add subtle decorative line
+      ctx.fillText('elrugido.com', width / 2, 280);
+
+      // Decorative line
       ctx.strokeStyle = 'rgba(212, 175, 55, 0.5)';
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.moveTo(storyWidth / 2 - 100, logoY + logoSize + 115);
-      ctx.lineTo(storyWidth / 2 + 100, logoY + logoSize + 115);
+      ctx.moveTo(width / 2 - 100, 310);
+      ctx.lineTo(width / 2 + 100, 310);
       ctx.stroke();
-      
-      // Draw the post image centered (below branding)
-      const postSize = storyWidth; // 1080
-      const postY = (storyHeight - postSize) / 2 + 80; // Offset for header
-      
-      // Add soft shadow behind image
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-      ctx.shadowBlur = 40;
-      ctx.shadowOffsetY = 10;
-      ctx.drawImage(postImg, 0, postY, postSize, postSize);
-      ctx.shadowColor = 'transparent';
-      
-      // Draw small logo at bottom
-      const bottomLogoSize = 80;
-      ctx.drawImage(logoImg, (storyWidth - bottomLogoSize) / 2, storyHeight - bottomLogoSize - 40, bottomLogoSize, bottomLogoSize);
-      
-      // Convert to data URL
-      const dataUrl = canvas.toDataURL('image/png');
-      setComposedUrl(dataUrl);
-      setIsComposing(false);
-      onComposed?.(dataUrl);
+
+      // Draw saint image if available
+      if (saintImg && saintImageUrl) {
+        const imgSize = width - 80;
+        const imgY = 400;
+        
+        // Shadow
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+        ctx.shadowBlur = 40;
+        ctx.shadowOffsetY = 10;
+        ctx.drawImage(saintImg, 40, imgY, imgSize, imgSize);
+        ctx.shadowColor = 'transparent';
+      }
+
+      // Badge
+      const badgeY = saintImageUrl ? 1500 : 500;
+      const badgeWidth = 420;
+      const badgeHeight = 56;
+      const badgeX = (width - badgeWidth) / 2;
+
+      ctx.fillStyle = 'rgba(212, 175, 55, 0.2)';
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.5)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(badgeX, badgeY, badgeWidth, badgeHeight, 28);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#D4AF37';
+      ctx.font = 'bold 26px Arial, sans-serif';
+      ctx.fillText('🙏 SANTO DEL DÍA', width / 2, badgeY + 38);
+
+      // Saint name
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+      ctx.font = 'bold 42px Georgia, serif';
+      ctx.fillText(saintName, width / 2, badgeY + 100);
+
+      // Bottom logo
+      const bottomLogoSize = 70;
+      ctx.drawImage(logo, (width - bottomLogoSize) / 2, height - 140, bottomLogoSize, bottomLogoSize);
+
+      // Footer
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+      ctx.font = '24px Arial, sans-serif';
+      ctx.fillText('elrugido.com', width / 2, height - 50);
+
+      setIsGenerating(false);
+      onGenerated(canvas.toDataURL('image/png'));
     };
 
-    postImg.onload = () => {
-      postLoaded = true;
-      tryCompose();
-    };
-    
-    logoImg.onload = () => {
+    logo.onload = () => {
       logoLoaded = true;
-      tryCompose();
+      drawCanvas();
     };
-    
-    postImg.onerror = () => {
-      setIsComposing(false);
-      console.error('Failed to load post image for composition');
-    };
-    
-    logoImg.onerror = () => {
-      // Continue without logo if it fails
-      logoLoaded = true;
-      tryCompose();
-    };
-    
-    postImg.src = postUrl;
-    logoImg.src = LOGO_URL;
-  }, [postUrl, onComposed]);
 
-  if (isComposing) {
-    return (
-      <div className="relative aspect-[9/16] max-h-[400px] mx-auto overflow-hidden rounded-lg border bg-muted flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        <canvas ref={canvasRef} className="hidden" />
-      </div>
-    );
-  }
+    if (saintImg) {
+      saintImg.onload = () => {
+        saintLoaded = true;
+        drawCanvas();
+      };
+      saintImg.onerror = () => {
+        saintLoaded = true;
+        drawCanvas();
+      };
+      saintImg.src = saintImageUrl!;
+    }
+
+    logo.src = logoElRugido;
+  }, [saintName, saintImageUrl, onGenerated]);
 
   return (
-    <div className="relative aspect-[9/16] max-h-[400px] mx-auto overflow-hidden rounded-lg border">
-      {composedUrl ? (
-        <img
-          src={composedUrl}
-          alt={alt}
-          className="w-full h-full object-contain bg-[#1a1a2e]"
-        />
-      ) : (
-        <div className="w-full h-full flex items-center justify-center bg-muted">
-          <p className="text-muted-foreground">Error al componer imagen</p>
+    <div className="relative">
+      <canvas
+        ref={canvasRef}
+        className="w-full max-w-[180px] mx-auto rounded-lg shadow-lg"
+        style={{ aspectRatio: '9/16' }}
+      />
+      {isGenerating && (
+        <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-lg">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       )}
-      <canvas ref={canvasRef} className="hidden" />
     </div>
   );
 };
@@ -190,54 +621,72 @@ export const DailyShareButton = ({
   variant = "outline",
   size = "default",
 }: DailyShareButtonProps) => {
-  const { storyUrl, postUrl, isLoading, storyMetadata } = useDailyShareImages(tipo);
   const [open, setOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<'story' | 'post'>('story');
-  const [composedStoryUrl, setComposedStoryUrl] = useState<string | null>(null);
+  const [storyDataUrl, setStoryDataUrl] = useState<string | null>(null);
+  const [postDataUrl, setPostDataUrl] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
-  // Check if story is composed from post (santo type)
-  const isComposedStory = tipo === 'santo' && storyMetadata?.composed_from_post === true;
-  
-  console.log('DailyShareButton:', { tipo, isComposedStory, storyMetadata });
+  // Fetch content based on type
+  const { content: dailyContent, loading: isLoadingContent } = useDailyContent();
+  const { gospel, isLoading: isLoadingGospel } = useDailyGospel();
+  const { saint, loading: isLoadingSaint } = useSaintOfDay();
 
-  const currentImageUrl = activeTab === 'story' 
-    ? (isComposedStory && composedStoryUrl ? composedStoryUrl : storyUrl)
-    : postUrl;
-  const hasImages = storyUrl || postUrl;
+  // Determine loading state and content
+  const isLoading = tipo === 'versiculo' || tipo === 'reflexion' 
+    ? isLoadingContent 
+    : tipo === 'evangelio' 
+      ? isLoadingGospel 
+      : isLoadingSaint;
+
+  // Build content data based on type
+  const getContentData = (): ContentData | null => {
+    if (tipo === 'versiculo' && dailyContent) {
+      return {
+        mainText: dailyContent.versiculo_texto,
+        reference: dailyContent.versiculo_referencia,
+      };
+    }
+    if (tipo === 'reflexion' && dailyContent) {
+      return {
+        mainText: dailyContent.reflexion_ia,
+      };
+    }
+    if (tipo === 'evangelio' && gospel) {
+      return {
+        mainText: gospel.titulo || 'Evangelio del día',
+        reference: gospel.referencia,
+        subtitle: gospel.tiempo_liturgico || undefined,
+      };
+    }
+    if (tipo === 'santo' && saint) {
+      return {
+        mainText: saint.name,
+        subtitle: saint.description || undefined,
+      };
+    }
+    return null;
+  };
+
+  const contentData = getContentData();
+  const hasContent = !!contentData;
+
+  const currentImageUrl = activeTab === 'story' ? storyDataUrl : postDataUrl;
 
   const handleDownload = async () => {
-    const urlToDownload = activeTab === 'story' && isComposedStory && composedStoryUrl 
-      ? composedStoryUrl 
-      : currentImageUrl;
-      
-    if (!urlToDownload) return;
+    if (!currentImageUrl) return;
 
     try {
-      // For composed images (data URL), create blob directly
-      if (urlToDownload.startsWith('data:')) {
-        const response = await fetch(urlToDownload);
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `elrugido-${tipo}-${activeTab}-${new Date().toISOString().split('T')[0]}.png`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-      } else {
-        const response = await fetch(urlToDownload);
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `elrugido-${tipo}-${activeTab}-${new Date().toISOString().split('T')[0]}.png`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-      }
+      const response = await fetch(currentImageUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `elrugido-${tipo}-${activeTab}-${new Date().toISOString().split('T')[0]}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
       toast.success("Imagen descargada");
     } catch (error) {
       toast.error("Error al descargar la imagen");
@@ -251,17 +700,10 @@ export const DailyShareButton = ({
   };
 
   const handleCopyLink = async () => {
-    // For composed images, we can't copy a link - copy the website instead
-    const urlToCopy = (activeTab === 'story' && isComposedStory) 
-      ? 'https://elrugido.com' 
-      : currentImageUrl;
-      
-    if (!urlToCopy) return;
-
     try {
-      await navigator.clipboard.writeText(urlToCopy);
+      await navigator.clipboard.writeText('https://elrugido.com');
       setCopied(true);
-      toast.success(isComposedStory && activeTab === 'story' ? "Enlace web copiado" : "Enlace copiado");
+      toast.success("Enlace copiado");
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
       toast.error("Error al copiar el enlace");
@@ -269,16 +711,11 @@ export const DailyShareButton = ({
   };
 
   const handleNativeShare = async () => {
-    const urlToShare = activeTab === 'story' && isComposedStory && composedStoryUrl 
-      ? composedStoryUrl 
-      : currentImageUrl;
-      
-    if (!urlToShare) return;
+    if (!currentImageUrl) return;
 
     if (navigator.share) {
       try {
-        // Try to share with image
-        const response = await fetch(urlToShare);
+        const response = await fetch(currentImageUrl);
         const blob = await response.blob();
         const file = new File([blob], `elrugido-${tipo}.png`, { type: 'image/png' });
 
@@ -288,7 +725,6 @@ export const DailyShareButton = ({
           files: [file],
         });
       } catch (error) {
-        // Fallback to URL share
         try {
           await navigator.share({
             title: title,
@@ -296,7 +732,7 @@ export const DailyShareButton = ({
             url: 'https://elrugido.com',
           });
         } catch (e) {
-          // User cancelled or error
+          // User cancelled
         }
       }
     } else {
@@ -328,62 +764,50 @@ export const DailyShareButton = ({
           <div className="flex items-center justify-center py-8">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
-        ) : hasImages ? (
+        ) : hasContent && contentData ? (
           <div className="space-y-4">
             <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'story' | 'post')}>
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="story" disabled={!storyUrl}>
-                  Story (9:16)
-                </TabsTrigger>
-                <TabsTrigger value="post" disabled={!postUrl}>
-                  Post (1:1)
-                </TabsTrigger>
+                <TabsTrigger value="story">Story (9:16)</TabsTrigger>
+                <TabsTrigger value="post">Post (1:1)</TabsTrigger>
               </TabsList>
 
               <TabsContent value="story" className="mt-4">
-                {storyUrl && (
-                  isComposedStory && postUrl ? (
-                    <ComposedStoryImage 
-                      postUrl={postUrl} 
-                      alt={`${tipoLabels[tipo]} - Story`}
-                      onComposed={setComposedStoryUrl}
-                    />
-                  ) : (
-                    <div className="relative aspect-[9/16] max-h-[400px] mx-auto overflow-hidden rounded-lg border">
-                      <img
-                        src={storyUrl}
-                        alt={`${tipoLabels[tipo]} - Story`}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )
+                {tipo === 'santo' && saint ? (
+                  <ComposedSantoStoryImage
+                    saintName={saint.name}
+                    saintImageUrl={saint.image_url || undefined}
+                    onGenerated={setStoryDataUrl}
+                  />
+                ) : (
+                  <DailyStoryImage
+                    tipo={tipo}
+                    content={contentData}
+                    onGenerated={setStoryDataUrl}
+                  />
                 )}
               </TabsContent>
 
               <TabsContent value="post" className="mt-4">
-                {postUrl && (
-                  <div className="relative aspect-square max-h-[400px] mx-auto overflow-hidden rounded-lg border">
-                    <img
-                      src={postUrl}
-                      alt={`${tipoLabels[tipo]} - Post`}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                )}
+                <DailyPostImage
+                  tipo={tipo}
+                  content={contentData}
+                  onGenerated={setPostDataUrl}
+                />
               </TabsContent>
             </Tabs>
 
             <div className="flex flex-wrap gap-2 justify-center pt-2">
-              <Button onClick={handleDownload} variant="outline" size="sm">
+              <Button onClick={handleDownload} variant="outline" size="sm" disabled={!currentImageUrl}>
                 <Download className="h-4 w-4 mr-2" />
                 Descargar
               </Button>
-              
+
               <Button onClick={handleWhatsAppShare} variant="outline" size="sm" className="text-green-600">
                 <MessageCircle className="h-4 w-4 mr-2" />
                 WhatsApp
               </Button>
-              
+
               <Button onClick={handleCopyLink} variant="outline" size="sm">
                 {copied ? (
                   <Check className="h-4 w-4 mr-2" />
@@ -394,7 +818,7 @@ export const DailyShareButton = ({
               </Button>
 
               {navigator.share && (
-                <Button onClick={handleNativeShare} variant="default" size="sm">
+                <Button onClick={handleNativeShare} variant="default" size="sm" disabled={!currentImageUrl}>
                   <Share2 className="h-4 w-4 mr-2" />
                   Compartir
                 </Button>
@@ -404,8 +828,8 @@ export const DailyShareButton = ({
         ) : (
           <div className="text-center py-8 text-muted-foreground">
             <ImageIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p>Las imágenes de hoy aún no están disponibles.</p>
-            <p className="text-sm mt-2">Se generan automáticamente cada día.</p>
+            <p>El contenido de hoy aún no está disponible.</p>
+            <p className="text-sm mt-2">Se genera automáticamente cada día.</p>
           </div>
         )}
       </DialogContent>

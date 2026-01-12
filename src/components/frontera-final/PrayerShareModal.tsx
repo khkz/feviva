@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Download, Copy, Check, Share2, Code2 } from "lucide-react";
 import { toast } from "sonner";
+import logoElRugido from '@/assets/logo-elrugido.svg';
 
 interface PrayerShareModalProps {
   isOpen: boolean;
@@ -78,86 +79,99 @@ function PrayerStoryImage({
       ctx.fill();
     }
 
-    // Logo placeholder area
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-    ctx.font = 'bold 36px system-ui, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('FRONTERA FINAL', width / 2, 120);
+    // Load and draw logo
+    const logo = new Image();
+    logo.crossOrigin = 'anonymous';
+    logo.onload = () => {
+      // Draw logo at top center
+      const logoSize = 100;
+      ctx.drawImage(logo, (width - logoSize) / 2, 50, logoSize, logoSize);
 
-    // Badge with icon
-    const badgeWidth = 500;
-    const badgeHeight = 60;
-    const badgeX = (width - badgeWidth) / 2;
-    const badgeY = 200;
+      // "FRONTERA FINAL" title below logo
+      ctx.fillStyle = '#22d3ee';
+      ctx.font = 'bold 40px system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('FRONTERA FINAL', width / 2, 190);
 
-    ctx.fillStyle = 'rgba(34, 211, 238, 0.2)';
-    ctx.strokeStyle = 'rgba(34, 211, 238, 0.5)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.roundRect(badgeX, badgeY, badgeWidth, badgeHeight, 30);
-    ctx.fill();
-    ctx.stroke();
+      // Badge with icon
+      const badgeWidth = 500;
+      const badgeHeight = 60;
+      const badgeX = (width - badgeWidth) / 2;
+      const badgeY = 230;
 
-    // Badge text
-    ctx.fillStyle = '#22d3ee';
-    ctx.font = 'bold 26px system-ui, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('🙏 ' + title.toUpperCase(), width / 2, badgeY + 40);
+      ctx.fillStyle = 'rgba(34, 211, 238, 0.2)';
+      ctx.strokeStyle = 'rgba(34, 211, 238, 0.5)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(badgeX, badgeY, badgeWidth, badgeHeight, 30);
+      ctx.fill();
+      ctx.stroke();
 
-    // Prayer text - split into lines
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-    ctx.font = 'italic 32px Georgia, serif';
-    ctx.textAlign = 'center';
-    
-    const maxWidth = width - 120;
-    const lineHeight = 48;
-    const words = prayer.split(' ');
-    let line = '';
-    let y = 380;
-    const lines: string[] = [];
+      // Badge text
+      ctx.fillStyle = '#22d3ee';
+      ctx.font = 'bold 26px system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('🙏 ' + title.toUpperCase(), width / 2, badgeY + 40);
 
-    for (const word of words) {
-      const testLine = line + word + ' ';
-      const metrics = ctx.measureText(testLine);
-      if (metrics.width > maxWidth && line !== '') {
-        lines.push(line.trim());
-        line = word + ' ';
-      } else {
-        line = testLine;
+      // Prayer text - split into lines
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+      ctx.font = 'italic 32px Georgia, serif';
+      ctx.textAlign = 'center';
+      
+      const maxWidth = width - 120;
+      const lineHeight = 48;
+      const words = prayer.split(' ');
+      let line = '';
+      const lines: string[] = [];
+
+      for (const word of words) {
+        const testLine = line + word + ' ';
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && line !== '') {
+          lines.push(line.trim());
+          line = word + ' ';
+        } else {
+          line = testLine;
+        }
       }
-    }
-    lines.push(line.trim());
+      lines.push(line.trim());
 
-    // Center the text block vertically
-    const totalTextHeight = lines.length * lineHeight;
-    const startY = (height - totalTextHeight) / 2 - 50;
+      // Center the text block vertically
+      const totalTextHeight = lines.length * lineHeight;
+      const startY = (height - totalTextHeight) / 2 - 50;
 
-    lines.forEach((textLine, index) => {
-      ctx.fillText(textLine, width / 2, startY + (index * lineHeight));
-    });
+      lines.forEach((textLine, index) => {
+        ctx.fillText(textLine, width / 2, startY + (index * lineHeight));
+      });
 
-    // Saints note
-    if (saints) {
-      const saintsY = startY + totalTextHeight + 80;
-      ctx.fillStyle = 'rgba(251, 191, 36, 0.9)';
+      // Saints note
+      if (saints) {
+        const saintsY = startY + totalTextHeight + 80;
+        ctx.fillStyle = 'rgba(251, 191, 36, 0.9)';
+        ctx.font = '24px system-ui, sans-serif';
+        ctx.fillText('Patronos: ' + saints, width / 2, saintsY);
+      }
+
+      // Draw logo at bottom
+      const bottomLogoSize = 60;
+      ctx.drawImage(logo, (width - bottomLogoSize) / 2, height - 160, bottomLogoSize, bottomLogoSize);
+
+      // Footer branding
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
       ctx.font = '24px system-ui, sans-serif';
-      ctx.fillText('Patronos: ' + saints, width / 2, saintsY);
-    }
+      ctx.fillText('elrugido.com', width / 2, height - 80);
 
-    // Footer branding
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-    ctx.font = '24px system-ui, sans-serif';
-    ctx.fillText('elrugido.com', width / 2, height - 80);
+      // Decorative line
+      ctx.strokeStyle = 'rgba(34, 211, 238, 0.4)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(width / 2 - 100, height - 180);
+      ctx.lineTo(width / 2 + 100, height - 180);
+      ctx.stroke();
 
-    // Decorative line
-    ctx.strokeStyle = 'rgba(34, 211, 238, 0.4)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(width / 2 - 100, height - 120);
-    ctx.lineTo(width / 2 + 100, height - 120);
-    ctx.stroke();
-
-    onGenerated(canvas.toDataURL('image/png'));
+      onGenerated(canvas.toDataURL('image/png'));
+    };
+    logo.src = logoElRugido;
   }, [title, prayer, saints, onGenerated]);
 
   return <canvas ref={canvasRef} className="hidden" />;
@@ -216,72 +230,86 @@ function PrayerPostImage({
       ctx.fill();
     }
 
-    // Logo
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-    ctx.font = 'bold 28px system-ui, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('FRONTERA FINAL', size / 2, 70);
+    // Load and draw logo
+    const logo = new Image();
+    logo.crossOrigin = 'anonymous';
+    logo.onload = () => {
+      // Draw logo at top center
+      const logoSize = 70;
+      ctx.drawImage(logo, (size - logoSize) / 2, 30, logoSize, logoSize);
 
-    // Badge
-    const badgeWidth = 420;
-    const badgeHeight = 50;
-    const badgeX = (size - badgeWidth) / 2;
-    const badgeY = 110;
+      // "FRONTERA FINAL" title below logo
+      ctx.fillStyle = '#22d3ee';
+      ctx.font = 'bold 28px system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('FRONTERA FINAL', size / 2, 130);
 
-    ctx.fillStyle = 'rgba(34, 211, 238, 0.2)';
-    ctx.strokeStyle = 'rgba(34, 211, 238, 0.5)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.roundRect(badgeX, badgeY, badgeWidth, badgeHeight, 25);
-    ctx.fill();
-    ctx.stroke();
+      // Badge
+      const badgeWidth = 420;
+      const badgeHeight = 50;
+      const badgeX = (size - badgeWidth) / 2;
+      const badgeY = 160;
 
-    ctx.fillStyle = '#22d3ee';
-    ctx.font = 'bold 22px system-ui, sans-serif';
-    ctx.fillText('🙏 ' + title.toUpperCase(), size / 2, badgeY + 34);
+      ctx.fillStyle = 'rgba(34, 211, 238, 0.2)';
+      ctx.strokeStyle = 'rgba(34, 211, 238, 0.5)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(badgeX, badgeY, badgeWidth, badgeHeight, 25);
+      ctx.fill();
+      ctx.stroke();
 
-    // Prayer text
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-    ctx.font = 'italic 26px Georgia, serif';
-    
-    const maxWidth = size - 100;
-    const lineHeight = 38;
-    const words = prayer.split(' ');
-    let line = '';
-    const lines: string[] = [];
+      ctx.fillStyle = '#22d3ee';
+      ctx.font = 'bold 22px system-ui, sans-serif';
+      ctx.fillText('🙏 ' + title.toUpperCase(), size / 2, badgeY + 34);
 
-    for (const word of words) {
-      const testLine = line + word + ' ';
-      const metrics = ctx.measureText(testLine);
-      if (metrics.width > maxWidth && line !== '') {
-        lines.push(line.trim());
-        line = word + ' ';
-      } else {
-        line = testLine;
+      // Prayer text
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+      ctx.font = 'italic 26px Georgia, serif';
+      
+      const maxWidth = size - 100;
+      const lineHeight = 38;
+      const words = prayer.split(' ');
+      let line = '';
+      const lines: string[] = [];
+
+      for (const word of words) {
+        const testLine = line + word + ' ';
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && line !== '') {
+          lines.push(line.trim());
+          line = word + ' ';
+        } else {
+          line = testLine;
+        }
       }
-    }
-    lines.push(line.trim());
+      lines.push(line.trim());
 
-    const totalTextHeight = lines.length * lineHeight;
-    const startY = (size - totalTextHeight) / 2 + 40;
+      const totalTextHeight = lines.length * lineHeight;
+      const startY = (size - totalTextHeight) / 2 + 60;
 
-    lines.forEach((textLine, index) => {
-      ctx.fillText(textLine, size / 2, startY + (index * lineHeight));
-    });
+      lines.forEach((textLine, index) => {
+        ctx.fillText(textLine, size / 2, startY + (index * lineHeight));
+      });
 
-    // Saints
-    if (saints) {
-      ctx.fillStyle = 'rgba(251, 191, 36, 0.9)';
+      // Saints
+      if (saints) {
+        ctx.fillStyle = 'rgba(251, 191, 36, 0.9)';
+        ctx.font = '20px system-ui, sans-serif';
+        ctx.fillText('Patronos: ' + saints, size / 2, size - 100);
+      }
+
+      // Draw logo at bottom
+      const bottomLogoSize = 40;
+      ctx.drawImage(logo, (size - bottomLogoSize) / 2, size - 85, bottomLogoSize, bottomLogoSize);
+
+      // Footer
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
       ctx.font = '20px system-ui, sans-serif';
-      ctx.fillText('Patronos: ' + saints, size / 2, size - 100);
-    }
+      ctx.fillText('elrugido.com', size / 2, size - 30);
 
-    // Footer
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-    ctx.font = '20px system-ui, sans-serif';
-    ctx.fillText('elrugido.com', size / 2, size - 50);
-
-    onGenerated(canvas.toDataURL('image/png'));
+      onGenerated(canvas.toDataURL('image/png'));
+    };
+    logo.src = logoElRugido;
   }, [title, prayer, saints, onGenerated]);
 
   return <canvas ref={canvasRef} className="hidden" />;
