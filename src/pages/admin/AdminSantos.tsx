@@ -418,6 +418,7 @@ export default function AdminSantos() {
         body: { 
           onlyPatrons: batchCategory === 'patron_country',
           limit: batchLimit,
+          minDescriptionLength: 100,
           onlyWithoutBio: true
         },
       });
