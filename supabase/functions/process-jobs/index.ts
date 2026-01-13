@@ -27,6 +27,19 @@ interface ProcessingJob {
   result_data: Record<string, unknown> | null;
 }
 
+interface EnrichedLessonResponse {
+  contenido_verificado: string;
+  verificacion?: {
+    datos_correctos?: boolean;
+    correcciones_hechas?: string[];
+    nivel_confianza?: string;
+    fuentes_implicitas?: string[];
+    notas_adicionales?: string;
+  };
+  resumen_audio?: string;
+  puntos_clave?: string[];
+}
+
 // Instrucciones de estilo para TTS
 const SLEEP_INSTRUCTIONS = `Habla con un tono muy cálido, suave y profundamente relajante. 
 Tu voz debe ser como un abrazo auditivo que invite al descanso.
@@ -239,6 +252,68 @@ async function processLessonTTSPremium(targetId: string, voice: string = 'sage')
   return { audioUrl: urlData.publicUrl, voice, model: 'gpt-4o-mini-tts', premium: true };
 }
 
+// ============= SANITIZACIÓN ROBUSTA DE JSON =============
+
+function sanitizeAndParseJsonResponse(rawContent: string): Record<string, unknown> {
+  // Paso 1: Limpiar markdown wrappers
+  let cleaned = rawContent
+    .replace(/```json\s*/g, '')
+    .replace(/```\s*/g, '')
+    .trim();
+  
+  // Paso 2: Intentar parsear directamente
+  try {
+    return JSON.parse(cleaned);
+  } catch (e) {
+    console.log('[JSON Parse] Primer intento fallido, aplicando sanitización...');
+  }
+  
+  // Paso 3: Extraer solo el objeto JSON
+  const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) {
+    throw new Error('No se encontró objeto JSON en la respuesta');
+  }
+  cleaned = jsonMatch[0];
+  
+  // Paso 4: Sanitizar caracteres de control problemáticos
+  cleaned = cleaned.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, '');
+  
+  // Paso 5: Intentar parsear sanitizado
+  try {
+    return JSON.parse(cleaned);
+  } catch (e) {
+    console.log('[JSON Parse] Segundo intento fallido, intentando reparación de comillas en HTML...');
+  }
+  
+  // Paso 6: Reparar comillas dentro de atributos HTML
+  // Reemplazar comillas dobles dentro de tags HTML con comillas simples
+  cleaned = cleaned.replace(/<([^>]*)>/g, (match) => {
+    // Dentro de tags HTML, cambiar " a ' para atributos
+    return match.replace(/(?<=\s\w+=)"([^"]*)"/g, "'$1'");
+  });
+  
+  // Paso 7: Intentar parsear después de reparar HTML
+  try {
+    return JSON.parse(cleaned);
+  } catch (e) {
+    console.log('[JSON Parse] Tercer intento fallido, aplicando escape de comillas manual...');
+  }
+  
+  // Paso 8: Intento más agresivo - escapar comillas dentro de valores string
+  // Buscar patrones problemáticos como "class="algo"" y escaparlos
+  cleaned = cleaned
+    .replace(/="([^"\\]*)"([^"\\]*)"([^"\\]*)"/g, '=\\"$1\\"$2\\"$3\\"')
+    .replace(/"([^"]*)<([^>]*)class="([^"]*)"([^>]*)>([^"]*)"/g, '"$1<$2class=\'$3\'$4>$5"');
+  
+  try {
+    return JSON.parse(cleaned);
+  } catch (e) {
+    console.error('[JSON Parse] Todos los intentos fallaron. Últimos 200 chars:', cleaned.substring(cleaned.length - 200));
+  }
+  
+  throw new Error('No se pudo parsear la respuesta de Gemini después de múltiples intentos de sanitización');
+}
+
 // ============= ENRIQUECIMIENTO DE CONTENIDO CON GEMINI 3 PRO =============
 
 async function processLessonContentEnrich(targetId: string): Promise<Record<string, unknown>> {
@@ -261,8 +336,14 @@ async function processLessonContentEnrich(targetId: string): Promise<Record<stri
   
   console.log(`[Content Enrich] Procesando: ${lesson.titulo}`);
   
-  const systemPrompt = `Eres un teólogo católico experto con doctorado en historia de la Iglesia, patrología y sagradas escrituras.
+const systemPrompt = `Eres un teólogo católico experto con doctorado en historia de la Iglesia, patrología y sagradas escrituras.
 Tu misión es VERIFICAR y ENRIQUECER contenido teológico asegurando:
+
+REGLAS CRÍTICAS DE FORMATO JSON:
+- Responde ÚNICAMENTE con JSON válido parseble
+- En el HTML, usa COMILLAS SIMPLES (') para atributos como class='algo', NUNCA comillas dobles
+- Escapa correctamente cualquier comilla doble necesaria dentro de strings con \\
+- NO uses caracteres de control ni saltos de línea sin escapar dentro de valores string
 
 REGLAS CRÍTICAS DE VERIFICACIÓN:
 1. Verificar CADA cita bíblica - debe ser exacta (libro, capítulo, versículo)
@@ -351,19 +432,15 @@ FORMATO DE RESPUESTA JSON:
     throw new Error('Respuesta vacía de Gemini');
   }
   
-  console.log(`[Content Enrich] Respuesta recibida, parseando JSON...`);
+  console.log(`[Content Enrich] Respuesta recibida (${rawContent.length} chars), parseando JSON...`);
   
-  // Limpiar posible markdown del JSON
-  let cleanedJson = rawContent
-    .replace(/```json\s*/g, '')
-    .replace(/```\s*/g, '')
-    .trim();
-  
-  let enrichedData;
+  let enrichedData: EnrichedLessonResponse;
   try {
-    enrichedData = JSON.parse(cleanedJson);
+    enrichedData = sanitizeAndParseJsonResponse(rawContent) as unknown as EnrichedLessonResponse;
+    console.log('[Content Enrich] JSON parseado exitosamente');
   } catch (parseError) {
-    console.error('[Content Enrich] Error parseando JSON:', cleanedJson.substring(0, 500));
+    console.error('[Content Enrich] Error parseando JSON. Primeros 500 chars:', rawContent.substring(0, 500));
+    console.error('[Content Enrich] Últimos 500 chars:', rawContent.substring(rawContent.length - 500));
     throw new Error(`Error parseando respuesta de Gemini: ${parseError}`);
   }
   
