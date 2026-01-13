@@ -376,6 +376,7 @@ export type Database = {
           country_code: string | null
           created_at: string | null
           description: string | null
+          description_source: string | null
           feast_day: number
           feast_month: number
           id: string
@@ -390,6 +391,7 @@ export type Database = {
           country_code?: string | null
           created_at?: string | null
           description?: string | null
+          description_source?: string | null
           feast_day: number
           feast_month: number
           id?: string
@@ -404,6 +406,7 @@ export type Database = {
           country_code?: string | null
           created_at?: string | null
           description?: string | null
+          description_source?: string | null
           feast_day?: number
           feast_month?: number
           id?: string

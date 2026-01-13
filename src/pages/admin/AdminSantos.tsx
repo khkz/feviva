@@ -411,6 +411,29 @@ export default function AdminSantos() {
     },
   });
 
+  // Batch fetch Wikipedia biographies mutation
+  const batchWikipediaBioMutation = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke('batch-fetch-saint-bios', {
+        body: { 
+          onlyPatrons: batchCategory === 'patron_country',
+          limit: batchLimit,
+          onlyWithoutBio: true
+        },
+      });
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-calendar-saints'] });
+      toast.success(`Wikipedia Biografías: ${data?.success || 0} encontradas de ${data?.processed || 0} procesadas`);
+    },
+    onError: (error) => {
+      toast.error('Error Wikipedia Biografías: ' + error.message);
+    },
+  });
+
   // Filter saints
   const filteredSaints = saints.filter(saint => {
     if (searchQuery && !saint.name.toLowerCase().includes(searchQuery.toLowerCase())) {
@@ -479,7 +502,7 @@ export default function AdminSantos() {
     }
   };
 
-  const isBatchRunning = batchHistoryMutation.isPending || batchPrayerMutation.isPending || batchImageMutation.isPending || importTraditionalPrayersMutation.isPending || fixFundamentalPrayersMutation.isPending || scrapeEWTNMutation.isPending || batchWikipediaImageMutation.isPending;
+  const isBatchRunning = batchHistoryMutation.isPending || batchPrayerMutation.isPending || batchImageMutation.isPending || importTraditionalPrayersMutation.isPending || fixFundamentalPrayersMutation.isPending || scrapeEWTNMutation.isPending || batchWikipediaImageMutation.isPending || batchWikipediaBioMutation.isPending;
 
   return (
     <div className="space-y-6">
@@ -653,6 +676,23 @@ export default function AdminSantos() {
               🌐 Buscar en Wikipedia ({Math.min(batchLimit, stats.withoutImage)})
               {stats.withoutImage > 0 && (
                 <Badge variant="secondary" className="ml-1 bg-emerald-100 text-emerald-800">{stats.withoutImage}</Badge>
+              )}
+            </Button>
+
+            {/* Wikipedia Biographies Button - NEW */}
+            <Button
+              onClick={() => batchWikipediaBioMutation.mutate()}
+              disabled={isBatchRunning || stats.withoutHistory === 0}
+              className="gap-2 bg-blue-600 hover:bg-blue-700"
+            >
+              {batchWikipediaBioMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <BookOpen className="h-4 w-4" />
+              )}
+              📖 Buscar Biografías Wikipedia ({Math.min(batchLimit, stats.withoutHistory)})
+              {stats.withoutHistory > 0 && (
+                <Badge variant="secondary" className="ml-1 bg-blue-100 text-blue-800">{stats.withoutHistory}</Badge>
               )}
             </Button>
           </div>
