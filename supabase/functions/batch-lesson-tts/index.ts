@@ -131,7 +131,8 @@ Transmite la profundidad del mensaje con reverencia y cercanía.`;
 async function generateAndUploadAudio(
   lesson: Lesson, 
   openaiApiKey: string, 
-  supabase: any
+  supabase: any,
+  voice: string = 'sage'
 ): Promise<ProcessResult> {
   const { id, titulo, contenido_enriquecido, contenido } = lesson;
   
@@ -146,7 +147,7 @@ async function generateAndUploadAudio(
     
     // Split into chunks for long content
     const chunks = splitTextIntoChunks(audioText);
-    console.log(`Generating premium TTS for: ${titulo} (${audioText.length} chars, ${chunks.length} chunks)`);
+    console.log(`Generating premium TTS for: ${titulo} with voice ${voice} (${audioText.length} chars, ${chunks.length} chunks)`);
 
     const audioBuffers: ArrayBuffer[] = [];
 
@@ -163,7 +164,7 @@ async function generateAndUploadAudio(
         body: JSON.stringify({
           model: 'gpt-4o-mini-tts',
           input: chunk,
-          voice: 'sage', // Contemplative, wise voice for lessons
+          voice: voice,
           instructions: lessonInstructions,
           response_format: 'mp3',
         }),
@@ -242,16 +243,20 @@ serve(async (req) => {
   }
 
   try {
-    // Parse request body for limit and forceRegenerate parameters
+    // Parse request body for limit, forceRegenerate, and voice parameters
     let limit = 1; // Default to 1 lesson per batch (TTS takes longer)
     let forceRegenerate = false;
+    let voice = 'sage'; // Default voice for lessons
     try {
       const body = await req.json();
       limit = body.limit || 1;
       forceRegenerate = body.forceRegenerate || false;
+      voice = body.voice || 'sage';
     } catch {
       // Use default if no body
     }
+
+    console.log(`Starting batch-lesson-tts with limit: ${limit}, forceRegenerate: ${forceRegenerate}, voice: ${voice}`);
 
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
     if (!openaiApiKey) {
@@ -323,7 +328,7 @@ serve(async (req) => {
     
     // Process lessons sequentially (TTS API can be slow)
     for (const lesson of lessons) {
-      const result = await generateAndUploadAudio(lesson, openaiApiKey, supabase);
+      const result = await generateAndUploadAudio(lesson, openaiApiKey, supabase, voice);
       results.push(result);
       
       // Delay between lessons to avoid rate limits
@@ -346,8 +351,8 @@ serve(async (req) => {
         remaining,
         hasMore: remaining > 0,
         model: 'gpt-4o-mini-tts',
-        voice: 'sage',
-        results 
+        voice,
+        results
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

@@ -13,9 +13,41 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useProcessingJobs } from '@/hooks/useProcessingJobs';
+
+// Available voices for gpt-4o-mini-tts
+const VOICES = [
+  { value: 'shimmer', label: 'Shimmer', description: 'Cálida, suave (ideal para sueño)' },
+  { value: 'nova', label: 'Nova', description: 'Clara, expresiva' },
+  { value: 'sage', label: 'Sage', description: 'Contemplativa, sabia (ideal para lecciones)' },
+  { value: 'alloy', label: 'Alloy', description: 'Neutral, versátil' },
+  { value: 'echo', label: 'Echo', description: 'Profunda, resonante' },
+  { value: 'fable', label: 'Fable', description: 'Narrativa, expresiva' },
+  { value: 'onyx', label: 'Onyx', description: 'Grave, autoritaria' },
+  { value: 'coral', label: 'Coral', description: 'Brillante, amigable' },
+  { value: 'ash', label: 'Ash', description: 'Suave, tranquila' },
+  { value: 'ballad', label: 'Ballad', description: 'Melódica, emotiva' },
+  { value: 'verse', label: 'Verse', description: 'Artística, dramática' },
+];
 
 interface ContentItem {
   id: string;
@@ -32,6 +64,10 @@ export const AdminContent = () => {
   const [lessons, setLessons] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [regenerating, setRegenerating] = useState<'sleep' | 'lessons' | null>(null);
+  const [showRegenDialog, setShowRegenDialog] = useState(false);
+  const [regenType, setRegenType] = useState<'sleep' | 'lessons'>('sleep');
+  const [selectedVoice, setSelectedVoice] = useState('shimmer');
+  const [regenCount, setRegenCount] = useState(5);
   const { toast } = useToast();
   const { queueJobs, triggerProcessing } = useProcessingJobs();
 
@@ -78,48 +114,59 @@ export const AdminContent = () => {
     });
   };
 
-  const regeneratePremiumAudio = async (type: 'sleep' | 'lessons') => {
-    setRegenerating(type);
+  const openRegenDialog = (type: 'sleep' | 'lessons') => {
+    setRegenType(type);
+    setSelectedVoice(type === 'sleep' ? 'shimmer' : 'sage');
+    const items = type === 'sleep' ? sleepStories : lessons;
+    setRegenCount(Math.min(5, items.length));
+    setShowRegenDialog(true);
+  };
+
+  const regeneratePremiumAudio = async () => {
+    setShowRegenDialog(false);
+    setRegenerating(regenType);
     
     try {
-      const functionName = type === 'sleep' ? 'batch-sleep-tts' : 'batch-lesson-tts';
-      const items = type === 'sleep' ? sleepStories : lessons;
+      const functionName = regenType === 'sleep' ? 'batch-sleep-tts' : 'batch-lesson-tts';
+      const items = regenType === 'sleep' ? sleepStories : lessons;
+      const totalToProcess = Math.min(regenCount, items.length);
       
       toast({
         title: "Regenerando Audio Premium",
-        description: `Procesando ${items.length} ${type === 'sleep' ? 'historias' : 'lecciones'} con gpt-4o-mini-tts...`,
+        description: `Procesando ${totalToProcess} ${regenType === 'sleep' ? 'historias' : 'lecciones'} con voz ${selectedVoice}...`,
       });
 
       let processed = 0;
-      let hasMore = true;
 
-      while (hasMore && processed < items.length) {
+      while (processed < totalToProcess) {
+        const batchSize = Math.min(2, totalToProcess - processed);
+        
         const { data, error } = await supabase.functions.invoke(functionName, {
           body: { 
-            limit: 2, // Process 2 at a time
-            forceRegenerate: true 
+            limit: batchSize,
+            forceRegenerate: true,
+            voice: selectedVoice
           }
         });
 
         if (error) throw error;
 
         processed += data.processed || 0;
-        hasMore = data.hasMore;
 
         toast({
           title: "Progreso",
-          description: `${processed}/${items.length} procesados con modelo premium`,
+          description: `${processed}/${totalToProcess} procesados con voz ${selectedVoice}`,
         });
 
         // Small delay between batches
-        if (hasMore) {
+        if (processed < totalToProcess) {
           await new Promise(resolve => setTimeout(resolve, 1000));
         }
       }
 
       toast({
         title: "¡Completado!",
-        description: `${processed} archivos regenerados con calidad premium (gpt-4o-mini-tts)`,
+        description: `${processed} archivos regenerados con voz ${selectedVoice}`,
       });
 
       // Refresh content list
@@ -249,7 +296,7 @@ export const AdminContent = () => {
                 Generar Faltante
               </Button>
               <Button 
-                onClick={() => regeneratePremiumAudio('sleep')}
+                onClick={() => openRegenDialog('sleep')}
                 size="sm"
                 variant="default"
                 disabled={regenerating === 'sleep'}
@@ -317,7 +364,7 @@ export const AdminContent = () => {
                 Generar Faltante
               </Button>
               <Button 
-                onClick={() => regeneratePremiumAudio('lessons')}
+                onClick={() => openRegenDialog('lessons')}
                 size="sm"
                 variant="default"
                 disabled={regenerating === 'lessons'}
@@ -344,6 +391,70 @@ export const AdminContent = () => {
         </TabsContent>
 
       </Tabs>
+
+      {/* Dialog for regeneration options */}
+      <Dialog open={showRegenDialog} onOpenChange={setShowRegenDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-amber-500" />
+              Regenerar Audio Premium
+            </DialogTitle>
+            <DialogDescription>
+              Configura las opciones para regenerar {regenType === 'sleep' ? 'historias de sueño' : 'lecciones'} con calidad premium.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="voice">Voz</Label>
+              <Select value={selectedVoice} onValueChange={setSelectedVoice}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona una voz" />
+                </SelectTrigger>
+                <SelectContent>
+                  {VOICES.map((voice) => (
+                    <SelectItem key={voice.value} value={voice.value}>
+                      <div className="flex flex-col">
+                        <span className="font-medium">{voice.label}</span>
+                        <span className="text-xs text-muted-foreground">{voice.description}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="count">Cantidad a regenerar</Label>
+              <Input
+                id="count"
+                type="number"
+                min={1}
+                max={regenType === 'sleep' ? sleepStories.length : lessons.length}
+                value={regenCount}
+                onChange={(e) => setRegenCount(Math.max(1, parseInt(e.target.value) || 1))}
+              />
+              <p className="text-xs text-muted-foreground">
+                Máximo: {regenType === 'sleep' ? sleepStories.length : lessons.length} {regenType === 'sleep' ? 'historias' : 'lecciones'}
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowRegenDialog(false)}>
+              Cancelar
+            </Button>
+            <Button 
+              onClick={regeneratePremiumAudio}
+              className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
+            >
+              <Sparkles className="h-4 w-4 mr-2" />
+              Regenerar {regenCount}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
