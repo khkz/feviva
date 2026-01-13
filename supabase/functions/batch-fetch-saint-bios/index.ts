@@ -23,10 +23,12 @@ serve(async (req) => {
       onlyPatrons = false, 
       countryCode = null,
       onlyWithoutBio = true,
+      minDescriptionLength = 100,
+      forceOverwrite = false,
       dryRun = false 
     } = await req.json();
 
-    console.log(`Batch fetch saint bios - limit: ${limit}, onlyPatrons: ${onlyPatrons}, countryCode: ${countryCode}, onlyWithoutBio: ${onlyWithoutBio}`);
+    console.log(`Batch fetch saint bios - limit: ${limit}, onlyPatrons: ${onlyPatrons}, countryCode: ${countryCode}, minDescLength: ${minDescriptionLength}, forceOverwrite: ${forceOverwrite}`);
 
     // Build query to get saints that need biographies
     let query = supabase
@@ -36,9 +38,35 @@ serve(async (req) => {
       .order("feast_day", { ascending: true })
       .limit(limit);
 
-    // Filter by those without a good description
-    if (onlyWithoutBio) {
-      query = query.or("description.is.null,description.eq.");
+    // Filter by those needing better descriptions
+    if (forceOverwrite) {
+      // Overwrite all that don't have Wikipedia as source
+      query = query.or("description_source.is.null,description_source.not.ilike.wikipedia%");
+    } else if (onlyWithoutBio) {
+      // Use RPC to get saints with short or missing descriptions
+      const { data: saintsNeedingBio, error: rpcError } = await supabase
+        .rpc('get_saints_needing_bio', { min_length: minDescriptionLength });
+      
+      if (rpcError) {
+        console.error("Error calling get_saints_needing_bio:", rpcError);
+        // Fallback to simple filter
+        query = query.or("description.is.null,description.eq.");
+      } else if (saintsNeedingBio && saintsNeedingBio.length > 0) {
+        // Get IDs from RPC result and filter main query
+        const ids = saintsNeedingBio.slice(0, limit).map((s: { id: string }) => s.id);
+        query = supabase
+          .from("calendar_saints")
+          .select("id, name, description, description_source, category, country_code")
+          .in("id", ids);
+        
+        // Apply additional filters
+        if (onlyPatrons) {
+          query = query.eq("category", "patron_country");
+        }
+        if (countryCode) {
+          query = query.eq("country_code", countryCode);
+        }
+      }
     }
 
     // Filter by patron saints only
