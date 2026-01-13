@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Moon, Church, BookOpen, HandHeart, Volume2, Image, RefreshCw } from 'lucide-react';
+import { Moon, Church, BookOpen, Volume2, Image, RefreshCw, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -31,6 +31,7 @@ export const AdminContent = () => {
   const [novenas, setNovenas] = useState<ContentItem[]>([]);
   const [lessons, setLessons] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [regenerating, setRegenerating] = useState<'sleep' | 'lessons' | null>(null);
   const { toast } = useToast();
   const { queueJobs, triggerProcessing } = useProcessingJobs();
 
@@ -75,6 +76,65 @@ export const AdminContent = () => {
       title: "Éxito", 
       description: `${jobItems.length} trabajos de audio encolados` 
     });
+  };
+
+  const regeneratePremiumAudio = async (type: 'sleep' | 'lessons') => {
+    setRegenerating(type);
+    
+    try {
+      const functionName = type === 'sleep' ? 'batch-sleep-tts' : 'batch-lesson-tts';
+      const items = type === 'sleep' ? sleepStories : lessons;
+      
+      toast({
+        title: "Regenerando Audio Premium",
+        description: `Procesando ${items.length} ${type === 'sleep' ? 'historias' : 'lecciones'} con gpt-4o-mini-tts...`,
+      });
+
+      let processed = 0;
+      let hasMore = true;
+
+      while (hasMore && processed < items.length) {
+        const { data, error } = await supabase.functions.invoke(functionName, {
+          body: { 
+            limit: 2, // Process 2 at a time
+            forceRegenerate: true 
+          }
+        });
+
+        if (error) throw error;
+
+        processed += data.processed || 0;
+        hasMore = data.hasMore;
+
+        toast({
+          title: "Progreso",
+          description: `${processed}/${items.length} procesados con modelo premium`,
+        });
+
+        // Small delay between batches
+        if (hasMore) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+
+      toast({
+        title: "¡Completado!",
+        description: `${processed} archivos regenerados con calidad premium (gpt-4o-mini-tts)`,
+      });
+
+      // Refresh content list
+      await fetchContent();
+
+    } catch (error) {
+      console.error('Error regenerating premium audio:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Error al regenerar audio",
+        variant: "destructive"
+      });
+    } finally {
+      setRegenerating(null);
+    }
   };
 
   const queueImageGeneration = async () => {
@@ -172,27 +232,47 @@ export const AdminContent = () => {
         </TabsList>
 
         <TabsContent value="sleep" className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <div>
               <h2 className="text-lg font-semibold">Historias de Sueño</h2>
               <p className="text-sm text-muted-foreground">
                 {sleepStories.filter(s => s.audio_url).length}/{sleepStories.length} con audio
               </p>
             </div>
-            <Button 
-              onClick={() => queueAudioGeneration('sleep_tts', sleepStories)}
-              size="sm"
-              variant="outline"
-            >
-              <Volume2 className="h-4 w-4 mr-2" />
-              Generar Audio Faltante
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                onClick={() => queueAudioGeneration('sleep_tts', sleepStories)}
+                size="sm"
+                variant="outline"
+              >
+                <Volume2 className="h-4 w-4 mr-2" />
+                Generar Faltante
+              </Button>
+              <Button 
+                onClick={() => regeneratePremiumAudio('sleep')}
+                size="sm"
+                variant="default"
+                disabled={regenerating === 'sleep'}
+                className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
+              >
+                {regenerating === 'sleep' ? (
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Sparkles className="h-4 w-4 mr-2" />
+                )}
+                Regenerar Premium
+              </Button>
+            </div>
           </div>
           <Card>
             <CardContent className="p-0">
               {renderContentTable(sleepStories, 'audio', 'audio_url')}
             </CardContent>
           </Card>
+          <p className="text-xs text-muted-foreground">
+            <Sparkles className="h-3 w-3 inline mr-1" />
+            Premium usa gpt-4o-mini-tts con voz shimmer y estilo relajante
+          </p>
         </TabsContent>
 
         <TabsContent value="novenas" className="space-y-4">
@@ -220,27 +300,47 @@ export const AdminContent = () => {
         </TabsContent>
 
         <TabsContent value="lessons" className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <div>
               <h2 className="text-lg font-semibold">Lecciones</h2>
               <p className="text-sm text-muted-foreground">
                 {lessons.filter(l => l.audio_url).length}/{lessons.length} con audio
               </p>
             </div>
-            <Button 
-              onClick={() => queueAudioGeneration('lesson_tts', lessons)}
-              size="sm"
-              variant="outline"
-            >
-              <Volume2 className="h-4 w-4 mr-2" />
-              Generar Audio Faltante
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                onClick={() => queueAudioGeneration('lesson_tts', lessons)}
+                size="sm"
+                variant="outline"
+              >
+                <Volume2 className="h-4 w-4 mr-2" />
+                Generar Faltante
+              </Button>
+              <Button 
+                onClick={() => regeneratePremiumAudio('lessons')}
+                size="sm"
+                variant="default"
+                disabled={regenerating === 'lessons'}
+                className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
+              >
+                {regenerating === 'lessons' ? (
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Sparkles className="h-4 w-4 mr-2" />
+                )}
+                Regenerar Premium
+              </Button>
+            </div>
           </div>
           <Card>
             <CardContent className="p-0">
               {renderContentTable(lessons, 'audio', 'audio_url')}
             </CardContent>
           </Card>
+          <p className="text-xs text-muted-foreground">
+            <Sparkles className="h-3 w-3 inline mr-1" />
+            Premium usa gpt-4o-mini-tts con voz sage y estilo educativo
+          </p>
         </TabsContent>
 
       </Tabs>

@@ -182,7 +182,8 @@ function cleanTextForSpanishTTS(text: string): string {
   return cleaned;
 }
 
-async function generateSpeech(text: string, voice: string = 'nova'): Promise<ArrayBuffer> {
+// Premium TTS with gpt-4o-mini-tts model and style instructions
+async function generateSpeechPremium(text: string, voice: string = 'shimmer'): Promise<ArrayBuffer> {
   // Clean text for Spanish pronunciation
   const cleanedText = cleanTextForSpanishTTS(text);
   
@@ -221,11 +222,18 @@ async function generateSpeech(text: string, voice: string = 'nova'): Promise<Arr
   
   console.log(`Text split into ${chunks.length} chunks`);
   
-  // Generate audio for each chunk
+  // Style instructions for sleep stories - warm, calming, meditative
+  const sleepInstructions = `Habla con un tono cálido, suave y profundamente relajante. 
+Tu voz debe ser como un susurro reconfortante que invita al descanso. 
+Usa pausas naturales entre oraciones, respirando suavemente. 
+El ritmo debe ser lento y meditativo, como una brisa suave que arrulla. 
+Transmite paz, serenidad y seguridad en cada palabra.`;
+
+  // Generate audio for each chunk using gpt-4o-mini-tts
   const audioBuffers: ArrayBuffer[] = [];
   
   for (let i = 0; i < chunks.length; i++) {
-    console.log(`Generating audio for chunk ${i + 1}/${chunks.length} (${chunks[i].length} chars)`);
+    console.log(`Generating premium audio for chunk ${i + 1}/${chunks.length} (${chunks[i].length} chars)`);
     
     const response = await fetch('https://api.openai.com/v1/audio/speech', {
       method: 'POST',
@@ -234,10 +242,10 @@ async function generateSpeech(text: string, voice: string = 'nova'): Promise<Arr
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'tts-1-hd',
+        model: 'gpt-4o-mini-tts',
         input: chunks[i],
         voice: voice,
-        speed: 0.9, // Slower for sleep stories
+        instructions: sleepInstructions,
         response_format: 'mp3',
       }),
     });
@@ -249,6 +257,11 @@ async function generateSpeech(text: string, voice: string = 'nova'): Promise<Arr
     
     const buffer = await response.arrayBuffer();
     audioBuffers.push(buffer);
+    
+    // Small delay between chunks to avoid rate limits
+    if (i < chunks.length - 1) {
+      await new Promise(resolve => setTimeout(resolve, 300));
+    }
   }
   
   // Concatenate all audio buffers
@@ -270,7 +283,7 @@ serve(async (req) => {
   }
 
   try {
-    const { limit = 1 } = await req.json();
+    const { limit = 1, forceRegenerate = false } = await req.json();
     
     if (!OPENAI_API_KEY) {
       throw new Error("OPENAI_API_KEY is not configured");
@@ -280,26 +293,31 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Get stories without audio
-    const { data: stories, error: fetchError } = await supabase
+    // Get stories - either without audio or all if forceRegenerate
+    let query = supabase
       .from('sleep_stories')
       .select('id, titulo, contenido, duracion_estimada')
-      .is('audio_url', null)
       .order('orden')
       .limit(limit);
+    
+    if (!forceRegenerate) {
+      query = query.is('audio_url', null);
+    }
+    
+    const { data: stories, error: fetchError } = await query;
 
     if (fetchError) throw fetchError;
 
-    console.log(`Found ${stories?.length || 0} stories without audio`);
+    console.log(`Found ${stories?.length || 0} stories to process (forceRegenerate: ${forceRegenerate})`);
 
     const results: any[] = [];
 
     for (const story of stories || []) {
       try {
-        console.log(`Generating audio for: ${story.titulo}`);
+        console.log(`Generating premium audio for: ${story.titulo}`);
         
-        // Generate speech
-        const audioBuffer = await generateSpeech(story.contenido, 'nova');
+        // Generate premium speech with shimmer voice (warm and calming)
+        const audioBuffer = await generateSpeechPremium(story.contenido, 'shimmer');
         
         // Upload to storage
         const fileName = `sleep-story-${story.id}.mp3`;
@@ -330,7 +348,7 @@ serve(async (req) => {
 
         if (updateError) throw updateError;
 
-        console.log(`✅ Generated audio for: ${story.titulo}`);
+        console.log(`✅ Generated premium audio for: ${story.titulo}`);
         results.push({
           titulo: story.titulo,
           status: 'success',
@@ -359,6 +377,8 @@ serve(async (req) => {
       processed: results.length,
       remaining: remainingCount || 0,
       hasMore: (remainingCount || 0) > 0,
+      model: 'gpt-4o-mini-tts',
+      voice: 'shimmer',
       results
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

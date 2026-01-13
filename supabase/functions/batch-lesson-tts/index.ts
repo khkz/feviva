@@ -120,6 +120,14 @@ interface ProcessResult {
   error?: string;
 }
 
+// Style instructions for educational content - clear, empathetic, contemplative
+const lessonInstructions = `Habla con un tono educativo, claro y empático. 
+Tu voz debe transmitir sabiduría y calidez pastoral. 
+Enfatiza las palabras importantes con sutiles cambios de entonación. 
+Mantén un ritmo pausado pero dinámico, facilitando la comprensión y la reflexión. 
+Haz pequeñas pausas antes de conceptos clave para que el oyente pueda asimilar la enseñanza.
+Transmite la profundidad del mensaje con reverencia y cercanía.`;
+
 async function generateAndUploadAudio(
   lesson: Lesson, 
   openaiApiKey: string, 
@@ -138,7 +146,7 @@ async function generateAndUploadAudio(
     
     // Split into chunks for long content
     const chunks = splitTextIntoChunks(audioText);
-    console.log(`Generating TTS for: ${titulo} (${audioText.length} chars, ${chunks.length} chunks)`);
+    console.log(`Generating premium TTS for: ${titulo} (${audioText.length} chars, ${chunks.length} chunks)`);
 
     const audioBuffers: ArrayBuffer[] = [];
 
@@ -153,11 +161,11 @@ async function generateAndUploadAudio(
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'tts-1-hd',
+          model: 'gpt-4o-mini-tts',
           input: chunk,
-          voice: 'nova',
+          voice: 'sage', // Contemplative, wise voice for lessons
+          instructions: lessonInstructions,
           response_format: 'mp3',
-          speed: 0.95,
         }),
       });
 
@@ -170,13 +178,13 @@ async function generateAndUploadAudio(
       
       // Small delay between chunks to avoid rate limits
       if (i < chunks.length - 1) {
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise(resolve => setTimeout(resolve, 300));
       }
     }
 
     // Concatenate all audio buffers
     const finalAudio = concatenateAudioBuffers(audioBuffers);
-    console.log(`Generated audio for ${titulo}: ${finalAudio.byteLength} bytes from ${chunks.length} chunks`);
+    console.log(`Generated premium audio for ${titulo}: ${finalAudio.byteLength} bytes from ${chunks.length} chunks`);
 
     // Clean filename
     const cleanTitulo = titulo
@@ -214,7 +222,7 @@ async function generateAndUploadAudio(
       console.error(`Database update error for ${titulo}:`, updateError);
     }
 
-    console.log(`Audio uploaded successfully for ${titulo}: ${urlData.publicUrl}`);
+    console.log(`Premium audio uploaded successfully for ${titulo}: ${urlData.publicUrl}`);
 
     return { lessonId: id, titulo, success: true };
   } catch (error) {
@@ -227,17 +235,20 @@ async function generateAndUploadAudio(
     };
   }
 }
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // Parse request body for limit parameter
+    // Parse request body for limit and forceRegenerate parameters
     let limit = 1; // Default to 1 lesson per batch (TTS takes longer)
+    let forceRegenerate = false;
     try {
       const body = await req.json();
       limit = body.limit || 1;
+      forceRegenerate = body.forceRegenerate || false;
     } catch {
       // Use default if no body
     }
@@ -251,16 +262,20 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    console.log(`Fetching lessons without audio (limit: ${limit})...`);
+    console.log(`Fetching lessons (limit: ${limit}, forceRegenerate: ${forceRegenerate})...`);
 
-    // Get lessons that have enriched content but no audio
-    const { data: lessons, error: fetchError } = await supabase
+    // Build query based on forceRegenerate
+    let query = supabase
       .from('library_lessons')
       .select('id, titulo, contenido_enriquecido, contenido')
-      .is('audio_url', null)
-      .not('contenido_enriquecido', 'is', null)
       .order('orden')
       .limit(limit);
+    
+    if (!forceRegenerate) {
+      query = query.is('audio_url', null).not('contenido_enriquecido', 'is', null);
+    }
+
+    const { data: lessons, error: fetchError } = await query;
 
     if (fetchError) {
       throw new Error(`Failed to fetch lessons: ${fetchError.message}`);
@@ -281,19 +296,21 @@ serve(async (req) => {
           success: true, 
           message: needsEnrichmentFirst > 0 
             ? `${needsEnrichmentFirst} lecciones necesitan ser enriquecidas primero`
-            : 'Todas las lecciones enriquecidas ya tienen audio',
+            : 'Todas las lecciones ya tienen audio premium',
           successCount: 0, 
           errorCount: 0, 
           remaining: 0,
           needsEnrichmentFirst,
           hasMore: false,
+          model: 'gpt-4o-mini-tts',
+          voice: 'sage',
           results: [] 
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log(`Processing ${lessons.length} lessons for TTS...`);
+    console.log(`Processing ${lessons.length} lessons for premium TTS...`);
 
     // Get total count of pending audio generation
     const { count: totalPending } = await supabase
@@ -317,9 +334,9 @@ serve(async (req) => {
 
     const successCount = results.filter(r => r.success).length;
     const errorCount = results.filter(r => !r.success).length;
-    const remaining = (totalPending || 0) - successCount;
+    const remaining = forceRegenerate ? 0 : (totalPending || 0) - successCount;
 
-    console.log(`Batch TTS complete: ${successCount} success, ${errorCount} errors, ${remaining} remaining`);
+    console.log(`Batch premium TTS complete: ${successCount} success, ${errorCount} errors, ${remaining} remaining`);
 
     return new Response(
       JSON.stringify({ 
@@ -328,6 +345,8 @@ serve(async (req) => {
         errorCount, 
         remaining,
         hasMore: remaining > 0,
+        model: 'gpt-4o-mini-tts',
+        voice: 'sage',
         results 
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

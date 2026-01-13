@@ -104,7 +104,15 @@ serve(async (req) => {
   }
 
   try {
-    const { text, filename, voice = 'shimmer', targetTable, targetId } = await req.json();
+    const { 
+      text, 
+      filename, 
+      voice = 'nova', 
+      targetTable, 
+      targetId,
+      instructions,
+      usePremium = true  // Default to premium model
+    } = await req.json();
 
     if (!text) {
       throw new Error('Text is required');
@@ -117,7 +125,7 @@ serve(async (req) => {
 
     // Clean text for Spanish pronunciation
     const cleanedText = cleanTextForSpanishTTS(text);
-    console.log(`Generating TTS for text (${cleanedText.length} chars) with voice: ${voice}`);
+    console.log(`Generating TTS for text (${cleanedText.length} chars) with voice: ${voice}, premium: ${usePremium}`);
 
     // Split text into chunks if too long
     const chunks = splitTextIntoChunks(cleanedText);
@@ -125,10 +133,26 @@ serve(async (req) => {
 
     const audioBuffers: ArrayBuffer[] = [];
 
+    // Select model based on usePremium flag
+    const model = usePremium ? 'gpt-4o-mini-tts' : 'tts-1-hd';
+    const responseFormat = usePremium ? 'mp3' : 'opus';
+
     // Generate audio for each chunk
     for (let i = 0; i < chunks.length; i++) {
       const chunk = chunks[i];
       console.log(`Processing chunk ${i + 1}/${chunks.length} (${chunk.length} chars)`);
+
+      const requestBody: any = {
+        model,
+        input: chunk,
+        voice: voice,
+        response_format: responseFormat,
+      };
+
+      // Add instructions for premium model
+      if (usePremium && instructions) {
+        requestBody.instructions = instructions;
+      }
 
       const response = await fetch('https://api.openai.com/v1/audio/speech', {
         method: 'POST',
@@ -136,12 +160,7 @@ serve(async (req) => {
           'Authorization': `Bearer ${openaiApiKey}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          model: 'tts-1-hd',
-          input: chunk,
-          voice: voice,
-          response_format: 'opus', // Compressed format for faster loading
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
@@ -169,12 +188,14 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const filePath = `${filename}.opus`;
+    const fileExtension = responseFormat === 'opus' ? 'opus' : 'mp3';
+    const contentType = responseFormat === 'opus' ? 'audio/opus' : 'audio/mpeg';
+    const filePath = `${filename}.${fileExtension}`;
     
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('teachings-audio')
       .upload(filePath, finalAudio, {
-        contentType: 'audio/opus',
+        contentType,
         upsert: true
       });
 
@@ -205,7 +226,11 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ audioUrl: urlData.publicUrl }),
+      JSON.stringify({ 
+        audioUrl: urlData.publicUrl,
+        model,
+        voice
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
