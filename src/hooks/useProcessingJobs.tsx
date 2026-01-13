@@ -97,10 +97,10 @@ export const useProcessingJobs = (options: UseProcessingJobsOptions = {}) => {
     }
   }, [jobType]);
 
-  // Encolar nuevos jobs
+  // Encolar nuevos jobs (con soporte para metadata como voz, premium, etc.)
   const queueJobs = async (
     type: string, 
-    items: { id: string; title?: string; table: string }[]
+    items: { id: string; title?: string; table: string; metadata?: Record<string, unknown> }[]
   ): Promise<number> => {
     try {
       const jobsToInsert = items.map(item => ({
@@ -109,13 +109,15 @@ export const useProcessingJobs = (options: UseProcessingJobsOptions = {}) => {
         target_id: item.id,
         target_title: item.title || null,
         status: 'pending' as const,
+        // Guardar metadata (voice, premium, etc.) en result_data para que process-jobs lo lea
+        result_data: item.metadata ? JSON.parse(JSON.stringify(item.metadata)) : null,
       }));
 
       const { error } = await supabase
         .from('processing_jobs')
         .upsert(jobsToInsert, { 
           onConflict: 'job_type,target_id',
-          ignoreDuplicates: true 
+          ignoreDuplicates: false // Permitir actualizar metadata
         });
 
       if (error) throw error;

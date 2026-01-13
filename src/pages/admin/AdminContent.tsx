@@ -33,6 +33,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useProcessingJobs } from '@/hooks/useProcessingJobs';
+import { JobProgressPanel } from '@/components/processing/JobProgressPanel';
 
 // Available voices for gpt-4o-mini-tts
 const VOICES = [
@@ -63,13 +64,19 @@ export const AdminContent = () => {
   const [novenas, setNovenas] = useState<ContentItem[]>([]);
   const [lessons, setLessons] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [regenerating, setRegenerating] = useState<'sleep' | 'lessons' | null>(null);
   const [showRegenDialog, setShowRegenDialog] = useState(false);
   const [regenType, setRegenType] = useState<'sleep' | 'lessons'>('sleep');
   const [selectedVoice, setSelectedVoice] = useState('shimmer');
   const [regenCount, setRegenCount] = useState(5);
+  const [activeJobType, setActiveJobType] = useState<string | null>(null);
   const { toast } = useToast();
-  const { queueJobs, triggerProcessing } = useProcessingJobs();
+  
+  // Hook para jobs generales
+  const { queueJobs, triggerProcessing, stats } = useProcessingJobs();
+  
+  // Hook para jobs premium (sleep o lessons)
+  const sleepPremiumJobs = useProcessingJobs({ jobType: 'sleep_tts_premium' });
+  const lessonPremiumJobs = useProcessingJobs({ jobType: 'lesson_tts_premium' });
 
   const fetchContent = async () => {
     try {
@@ -124,63 +131,39 @@ export const AdminContent = () => {
 
   const regeneratePremiumAudio = async () => {
     setShowRegenDialog(false);
-    setRegenerating(regenType);
     
     try {
-      const functionName = regenType === 'sleep' ? 'batch-sleep-tts' : 'batch-lesson-tts';
       const items = regenType === 'sleep' ? sleepStories : lessons;
       const totalToProcess = Math.min(regenCount, items.length);
+      const jobType = regenType === 'sleep' ? 'sleep_tts_premium' : 'lesson_tts_premium';
+      const tableName = regenType === 'sleep' ? 'sleep_stories' : 'library_lessons';
+      
+      // Preparar items con metadata (voz seleccionada)
+      const jobItems = items.slice(0, totalToProcess).map(item => ({
+        id: item.id,
+        title: item.titulo,
+        table: tableName,
+        metadata: { voice: selectedVoice, premium: true }
+      }));
+
+      // Encolar jobs
+      await queueJobs(jobType, jobItems);
+      
+      // Establecer el tipo de job activo para mostrar el panel de progreso
+      setActiveJobType(jobType);
       
       toast({
-        title: "Regenerando Audio Premium",
-        description: `Procesando ${totalToProcess} ${regenType === 'sleep' ? 'historias' : 'lecciones'} con voz ${selectedVoice}...`,
+        title: "Jobs en cola",
+        description: `${totalToProcess} ${regenType === 'sleep' ? 'historias' : 'lecciones'} encoladas con voz ${selectedVoice}. Activa auto-procesar para iniciar.`,
       });
-
-      let processed = 0;
-
-      while (processed < totalToProcess) {
-        const batchSize = Math.min(2, totalToProcess - processed);
-        
-        const { data, error } = await supabase.functions.invoke(functionName, {
-          body: { 
-            limit: batchSize,
-            forceRegenerate: true,
-            voice: selectedVoice
-          }
-        });
-
-        if (error) throw error;
-
-        processed += data.processed || 0;
-
-        toast({
-          title: "Progreso",
-          description: `${processed}/${totalToProcess} procesados con voz ${selectedVoice}`,
-        });
-
-        // Small delay between batches
-        if (processed < totalToProcess) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        }
-      }
-
-      toast({
-        title: "¡Completado!",
-        description: `${processed} archivos regenerados con voz ${selectedVoice}`,
-      });
-
-      // Refresh content list
-      await fetchContent();
 
     } catch (error) {
-      console.error('Error regenerating premium audio:', error);
+      console.error('Error queuing premium audio:', error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Error al regenerar audio",
+        description: error instanceof Error ? error.message : "Error al encolar audio",
         variant: "destructive"
       });
-    } finally {
-      setRegenerating(null);
     }
   };
 
@@ -299,10 +282,10 @@ export const AdminContent = () => {
                 onClick={() => openRegenDialog('sleep')}
                 size="sm"
                 variant="default"
-                disabled={regenerating === 'sleep'}
+                disabled={sleepPremiumJobs.stats.pending > 0 || sleepPremiumJobs.stats.processing > 0}
                 className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
               >
-                {regenerating === 'sleep' ? (
+                {sleepPremiumJobs.stats.processing > 0 ? (
                   <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
                 ) : (
                   <Sparkles className="h-4 w-4 mr-2" />
@@ -311,6 +294,16 @@ export const AdminContent = () => {
               </Button>
             </div>
           </div>
+          
+          {/* Panel de progreso para sleep premium */}
+          {(sleepPremiumJobs.stats.total > 0) && (
+            <JobProgressPanel 
+              jobType="sleep_tts_premium"
+              title="Audio Premium - Sueño"
+              showDetails={true}
+              className="border-amber-500/20"
+            />
+          )}
           <Card>
             <CardContent className="p-0">
               {renderContentTable(sleepStories, 'audio', 'audio_url')}
@@ -367,10 +360,10 @@ export const AdminContent = () => {
                 onClick={() => openRegenDialog('lessons')}
                 size="sm"
                 variant="default"
-                disabled={regenerating === 'lessons'}
+                disabled={lessonPremiumJobs.stats.pending > 0 || lessonPremiumJobs.stats.processing > 0}
                 className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
               >
-                {regenerating === 'lessons' ? (
+                {lessonPremiumJobs.stats.processing > 0 ? (
                   <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
                 ) : (
                   <Sparkles className="h-4 w-4 mr-2" />
@@ -379,6 +372,17 @@ export const AdminContent = () => {
               </Button>
             </div>
           </div>
+          
+          {/* Panel de progreso para lesson premium */}
+          {(lessonPremiumJobs.stats.total > 0) && (
+            <JobProgressPanel 
+              jobType="lesson_tts_premium"
+              title="Audio Premium - Lecciones"
+              showDetails={true}
+              className="border-amber-500/20"
+            />
+          )}
+          
           <Card>
             <CardContent className="p-0">
               {renderContentTable(lessons, 'audio', 'audio_url')}
