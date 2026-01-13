@@ -264,6 +264,7 @@ export const AdminContent = () => {
     }
   };
 
+  const markAsPremium = async () => {
     if (!markPremiumDialog.item) return;
     
     const { item, type } = markPremiumDialog;
