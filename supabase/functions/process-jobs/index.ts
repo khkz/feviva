@@ -12,6 +12,8 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
+const MAX_CHARS = 3800;
+
 interface ProcessingJob {
   id: string;
   job_type: string;
@@ -21,13 +23,127 @@ interface ProcessingJob {
   status: string;
   attempts: number;
   max_attempts: number;
+  result_data: Record<string, unknown> | null;
 }
+
+// Instrucciones de estilo para TTS
+const SLEEP_INSTRUCTIONS = `Habla con un tono muy cálido, suave y profundamente relajante. 
+Tu voz debe ser como un abrazo auditivo que invite al descanso.
+Ritmo lento y pausado, con respiraciones naturales entre frases.
+Transmite paz, serenidad y calma absoluta.
+Ideal para ayudar a alguien a quedarse dormido.`;
+
+const LESSON_INSTRUCTIONS = `Habla con un tono educativo, claro y empático.
+Tu voz debe transmitir sabiduría y cercanía, como un buen maestro.
+Ritmo moderado, con énfasis en los conceptos importantes.
+Transmite entusiasmo por el conocimiento sin ser abrumador.
+Ideal para enseñar con paciencia y claridad.`;
 
 async function logJobAttempt(jobId: string, attemptNumber: number, status: string, message: string, metadata?: Record<string, unknown>): Promise<void> {
   await supabase.from('processing_logs').insert({ job_id: jobId, attempt_number: attemptNumber, status, message, metadata });
 }
 
-async function generateTTS(text: string, voice: string): Promise<Uint8Array> {
+// Limpiar texto para TTS en español
+function cleanTextForSpanishTTS(text: string): string {
+  let cleaned = text
+    // Expandir abreviaciones bíblicas
+    .replace(/\bGn\s+(\d+)/gi, 'Génesis capítulo $1')
+    .replace(/\bEx\s+(\d+)/gi, 'Éxodo capítulo $1')
+    .replace(/\bSal\s+(\d+)/gi, 'Salmo $1')
+    .replace(/\bMt\s+(\d+)/gi, 'Mateo capítulo $1')
+    .replace(/\bMc\s+(\d+)/gi, 'Marcos capítulo $1')
+    .replace(/\bLc\s+(\d+)/gi, 'Lucas capítulo $1')
+    .replace(/\bJn\s+(\d+)/gi, 'Juan capítulo $1')
+    .replace(/\bRom\s+(\d+)/gi, 'Romanos capítulo $1')
+    .replace(/\b1\s*Cor\s+(\d+)/gi, 'Primera Corintios capítulo $1')
+    .replace(/\b2\s*Cor\s+(\d+)/gi, 'Segunda Corintios capítulo $1')
+    // Limpiar markdown
+    .replace(/#{1,6}\s*/g, '')
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/\*(.*?)\*/g, '$1')
+    .replace(/\[(.*?)\]\(.*?\)/g, '$1')
+    .replace(/`{1,3}[^`]*`{1,3}/g, '')
+    // Limpiar caracteres problemáticos
+    .replace(/—/g, ', ')
+    .replace(/–/g, ', ')
+    .replace(/\.\.\./g, '...')
+    .replace(/\s+/g, ' ')
+    .trim();
+  
+  return cleaned;
+}
+
+// Dividir texto en chunks respetando límites
+function splitTextIntoChunks(text: string): string[] {
+  if (text.length <= MAX_CHARS) return [text];
+  
+  const chunks: string[] = [];
+  const sentences = text.split(/(?<=[.!?])\s+/);
+  let currentChunk = '';
+  
+  for (const sentence of sentences) {
+    if ((currentChunk + ' ' + sentence).length > MAX_CHARS) {
+      if (currentChunk) chunks.push(currentChunk.trim());
+      currentChunk = sentence;
+    } else {
+      currentChunk = currentChunk ? currentChunk + ' ' + sentence : sentence;
+    }
+  }
+  
+  if (currentChunk) chunks.push(currentChunk.trim());
+  return chunks;
+}
+
+// Generar TTS con modelo premium
+async function generatePremiumTTS(text: string, voice: string, instructions: string, speed: number = 1.0): Promise<Uint8Array> {
+  const cleanedText = cleanTextForSpanishTTS(text);
+  const chunks = splitTextIntoChunks(cleanedText);
+  const audioBuffers: ArrayBuffer[] = [];
+  
+  console.log(`[TTS Premium] Generando ${chunks.length} chunks con voz ${voice}`);
+  
+  for (let i = 0; i < chunks.length; i++) {
+    const chunk = chunks[i];
+    console.log(`[TTS Premium] Chunk ${i + 1}/${chunks.length} (${chunk.length} chars)`);
+    
+    const response = await fetch('https://api.openai.com/v1/audio/speech', {
+      method: 'POST',
+      headers: { 
+        'Authorization': `Bearer ${OPENAI_API_KEY}`, 
+        'Content-Type': 'application/json' 
+      },
+      body: JSON.stringify({ 
+        model: 'gpt-4o-mini-tts', 
+        input: chunk, 
+        voice,
+        instructions,
+        response_format: 'mp3',
+        speed
+      }),
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`OpenAI TTS error: ${errorText}`);
+    }
+    
+    audioBuffers.push(await response.arrayBuffer());
+  }
+  
+  // Concatenar buffers
+  const totalLength = audioBuffers.reduce((acc, c) => acc + c.byteLength, 0);
+  const combined = new Uint8Array(totalLength);
+  let offset = 0;
+  for (const buffer of audioBuffers) {
+    combined.set(new Uint8Array(buffer), offset);
+    offset += buffer.byteLength;
+  }
+  
+  return combined;
+}
+
+// Generar TTS estándar (modelo básico)
+async function generateStandardTTS(text: string, voice: string): Promise<Uint8Array> {
   const chunks: ArrayBuffer[] = [];
   const chunkSize = 4000;
   
@@ -55,11 +171,12 @@ async function generateTTS(text: string, voice: string): Promise<Uint8Array> {
   return combined;
 }
 
+// Procesar TTS para historias de sueño (estándar)
 async function processSleepTTS(targetId: string): Promise<Record<string, unknown>> {
   const { data: story, error } = await supabase.from('sleep_stories').select('contenido').eq('id', targetId).single();
   if (error || !story) throw new Error(`Historia no encontrada: ${error?.message}`);
   
-  const audio = await generateTTS(story.contenido, 'nova');
+  const audio = await generateStandardTTS(story.contenido, 'nova');
   const filename = `sleep-story-${targetId}.mp3`;
   
   await supabase.storage.from('teachings-audio').upload(filename, audio, { contentType: 'audio/mpeg', upsert: true });
@@ -69,11 +186,12 @@ async function processSleepTTS(targetId: string): Promise<Record<string, unknown
   return { audioUrl: urlData.publicUrl };
 }
 
+// Procesar TTS para lecciones (estándar)
 async function processLessonTTS(targetId: string): Promise<Record<string, unknown>> {
   const { data: lesson, error } = await supabase.from('library_lessons').select('contenido, contenido_enriquecido').eq('id', targetId).single();
   if (error || !lesson) throw new Error(`Lección no encontrada: ${error?.message}`);
   
-  const audio = await generateTTS(lesson.contenido_enriquecido || lesson.contenido, 'onyx');
+  const audio = await generateStandardTTS(lesson.contenido_enriquecido || lesson.contenido, 'onyx');
   const filename = `lesson-${targetId}.mp3`;
   
   await supabase.storage.from('teachings-audio').upload(filename, audio, { contentType: 'audio/mpeg', upsert: true });
@@ -81,6 +199,43 @@ async function processLessonTTS(targetId: string): Promise<Record<string, unknow
   
   await supabase.from('library_lessons').update({ audio_url: urlData.publicUrl }).eq('id', targetId);
   return { audioUrl: urlData.publicUrl };
+}
+
+// Procesar TTS PREMIUM para historias de sueño
+async function processSleepTTSPremium(targetId: string, voice: string = 'shimmer'): Promise<Record<string, unknown>> {
+  const { data: story, error } = await supabase.from('sleep_stories').select('contenido, titulo').eq('id', targetId).single();
+  if (error || !story) throw new Error(`Historia no encontrada: ${error?.message}`);
+  
+  console.log(`[Premium Sleep TTS] Procesando: ${story.titulo} con voz ${voice}`);
+  
+  const audio = await generatePremiumTTS(story.contenido, voice, SLEEP_INSTRUCTIONS, 0.85);
+  const filename = `sleep-story-${targetId}.mp3`;
+  
+  await supabase.storage.from('teachings-audio').upload(filename, audio, { contentType: 'audio/mpeg', upsert: true });
+  const { data: urlData } = supabase.storage.from('teachings-audio').getPublicUrl(filename);
+  
+  await supabase.from('sleep_stories').update({ audio_url: urlData.publicUrl }).eq('id', targetId);
+  
+  return { audioUrl: urlData.publicUrl, voice, model: 'gpt-4o-mini-tts', premium: true };
+}
+
+// Procesar TTS PREMIUM para lecciones
+async function processLessonTTSPremium(targetId: string, voice: string = 'sage'): Promise<Record<string, unknown>> {
+  const { data: lesson, error } = await supabase.from('library_lessons').select('contenido, contenido_enriquecido, titulo').eq('id', targetId).single();
+  if (error || !lesson) throw new Error(`Lección no encontrada: ${error?.message}`);
+  
+  console.log(`[Premium Lesson TTS] Procesando: ${lesson.titulo} con voz ${voice}`);
+  
+  const content = lesson.contenido_enriquecido || lesson.contenido;
+  const audio = await generatePremiumTTS(content, voice, LESSON_INSTRUCTIONS, 0.95);
+  const filename = `lesson-${targetId}.mp3`;
+  
+  await supabase.storage.from('teachings-audio').upload(filename, audio, { contentType: 'audio/mpeg', upsert: true });
+  const { data: urlData } = supabase.storage.from('teachings-audio').getPublicUrl(filename);
+  
+  await supabase.from('library_lessons').update({ audio_url: urlData.publicUrl }).eq('id', targetId);
+  
+  return { audioUrl: urlData.publicUrl, voice, model: 'gpt-4o-mini-tts', premium: true };
 }
 
 async function processJob(job: ProcessingJob): Promise<void> {
@@ -93,12 +248,22 @@ async function processJob(job: ProcessingJob): Promise<void> {
   try {
     let result: Record<string, unknown>;
     
+    // Extraer metadata del job (voice, etc.)
+    const metadata = job.result_data || {};
+    const voice = (metadata.voice as string) || undefined;
+    
     switch (job.job_type) {
       case 'sleep_tts':
         result = await processSleepTTS(job.target_id);
         break;
       case 'lesson_tts':
         result = await processLessonTTS(job.target_id);
+        break;
+      case 'sleep_tts_premium':
+        result = await processSleepTTSPremium(job.target_id, voice || 'shimmer');
+        break;
+      case 'lesson_tts_premium':
+        result = await processLessonTTSPremium(job.target_id, voice || 'sage');
         break;
       default:
         throw new Error(`Tipo de job no soportado: ${job.job_type}`);
