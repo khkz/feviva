@@ -104,12 +104,13 @@ export const AdminContent = () => {
         supabase.from('sleep_stories').select('id, titulo, audio_url, created_at').order('orden'),
         supabase.from('novenas').select('id, titulo, imagen_url, created_at').order('orden'),
         supabase.from('library_lessons').select('id, titulo, contenido_enriquecido, audio_url, verificado_at, verificacion_data, resumen_audio, created_at').order('orden'),
-        // Obtener jobs premium completados para saber cuáles ya tienen audio premium
+        // Obtener jobs premium completados - usamos result_data y completed_at como indicadores
+        // más confiables que status (evita race conditions donde status queda 'pending')
         supabase.from('processing_jobs')
           .select('target_id, result_data, completed_at')
           .in('job_type', ['sleep_tts_premium', 'lesson_tts_premium'])
-          .eq('status', 'completed')
           .not('result_data', 'is', null)
+          .not('completed_at', 'is', null)
       ]);
 
       setSleepStories(storiesRes.data || []);
