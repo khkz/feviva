@@ -69,6 +69,7 @@ export const AdminContent = () => {
   const [selectedVoice, setSelectedVoice] = useState('shimmer');
   const [regenCount, setRegenCount] = useState(5);
   const [activeJobType, setActiveJobType] = useState<string | null>(null);
+  const [premiumProcessedIds, setPremiumProcessedIds] = useState<Map<string, { voice: string; date: string }>>(new Map());
   const { toast } = useToast();
   
   // Hook para jobs generales
@@ -80,15 +81,34 @@ export const AdminContent = () => {
 
   const fetchContent = async () => {
     try {
-      const [storiesRes, novenasRes, lessonsRes] = await Promise.all([
+      const [storiesRes, novenasRes, lessonsRes, premiumJobsRes] = await Promise.all([
         supabase.from('sleep_stories').select('id, titulo, audio_url, created_at').order('orden'),
         supabase.from('novenas').select('id, titulo, imagen_url, created_at').order('orden'),
-        supabase.from('library_lessons').select('id, titulo, contenido_enriquecido, audio_url, created_at').order('orden')
+        supabase.from('library_lessons').select('id, titulo, contenido_enriquecido, audio_url, created_at').order('orden'),
+        // Obtener jobs premium completados para saber cuáles ya tienen audio premium
+        supabase.from('processing_jobs')
+          .select('target_id, result_data, completed_at')
+          .in('job_type', ['sleep_tts_premium', 'lesson_tts_premium'])
+          .eq('status', 'completed')
+          .not('result_data', 'is', null)
       ]);
 
       setSleepStories(storiesRes.data || []);
       setNovenas(novenasRes.data || []);
       setLessons(lessonsRes.data?.map(l => ({ ...l, titulo: l.titulo })) || []);
+      
+      // Mapear IDs a datos premium
+      const premiumMap = new Map<string, { voice: string; date: string }>();
+      (premiumJobsRes.data || []).forEach((job) => {
+        const resultData = job.result_data as Record<string, unknown> | null;
+        if (resultData && resultData.premium) {
+          premiumMap.set(job.target_id, {
+            voice: (resultData.voice as string) || 'unknown',
+            date: job.completed_at || ''
+          });
+        }
+      });
+      setPremiumProcessedIds(premiumMap);
     } catch (error) {
       console.error('Error fetching content:', error);
     } finally {
@@ -198,29 +218,46 @@ export const AdminContent = () => {
         <TableRow>
           <TableHead>Título</TableHead>
           <TableHead>Estado</TableHead>
+          <TableHead>Premium</TableHead>
           <TableHead>Fecha</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {items.map((item) => (
-          <TableRow key={item.id}>
-            <TableCell className="font-medium">{item.titulo}</TableCell>
-            <TableCell>
-              {item[field] ? (
-                <Badge className="bg-green-500/10 text-green-500">
-                  {type === 'audio' && <Volume2 className="h-3 w-3 mr-1" />}
-                  {type === 'image' && <Image className="h-3 w-3 mr-1" />}
-                  Listo
-                </Badge>
-              ) : (
-                <Badge variant="secondary">Pendiente</Badge>
-              )}
-            </TableCell>
-            <TableCell className="text-muted-foreground">
-              {new Date(item.created_at).toLocaleDateString()}
-            </TableCell>
-          </TableRow>
-        ))}
+        {items.map((item) => {
+          const premiumInfo = premiumProcessedIds.get(item.id);
+          return (
+            <TableRow key={item.id}>
+              <TableCell className="font-medium">{item.titulo}</TableCell>
+              <TableCell>
+                {item[field] ? (
+                  <Badge className="bg-green-500/10 text-green-500">
+                    {type === 'audio' && <Volume2 className="h-3 w-3 mr-1" />}
+                    {type === 'image' && <Image className="h-3 w-3 mr-1" />}
+                    Listo
+                  </Badge>
+                ) : (
+                  <Badge variant="secondary">Pendiente</Badge>
+                )}
+              </TableCell>
+              <TableCell>
+                {premiumInfo ? (
+                  <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/30">
+                    <Sparkles className="h-3 w-3 mr-1" />
+                    {premiumInfo.voice}
+                  </Badge>
+                ) : (
+                  <span className="text-muted-foreground text-xs">—</span>
+                )}
+              </TableCell>
+              <TableCell className="text-muted-foreground">
+                {premiumInfo?.date 
+                  ? new Date(premiumInfo.date).toLocaleDateString() 
+                  : new Date(item.created_at).toLocaleDateString()
+                }
+              </TableCell>
+            </TableRow>
+          );
+        })}
       </TableBody>
     </Table>
   );
