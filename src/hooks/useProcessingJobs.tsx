@@ -174,12 +174,31 @@ export const useProcessingJobs = (options: UseProcessingJobsOptions = {}) => {
     }
   };
 
-  // Procesar UN job pendiente (síncrono)
+  // Procesar UN job pendiente (con manejo mejorado de timeout para AI largo)
   const triggerProcessing = async (): Promise<void> => {
+    // Mostrar toast informativo para jobs de larga duración
+    const isLongRunningJob = jobType?.includes('enrich') || jobType?.includes('premium');
+    
+    if (isLongRunningJob) {
+      toast({
+        title: "⏳ Procesando con IA",
+        description: "Esto puede tardar 1-2 minutos. El job continuará en segundo plano.",
+      });
+    }
+
     try {
-      const response = await supabase.functions.invoke('process-jobs', {
+      // Para jobs de IA que tardan, usar Promise.race con timeout extendido
+      const timeoutMs = isLongRunningJob ? 120000 : 60000; // 2 min para IA, 1 min normal
+      
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('TIMEOUT')), timeoutMs);
+      });
+
+      const responsePromise = supabase.functions.invoke('process-jobs', {
         body: { job_type: jobType },
       });
+
+      const response = await Promise.race([responsePromise, timeoutPromise]);
 
       if (response.error) {
         toast({
@@ -192,19 +211,32 @@ export const useProcessingJobs = (options: UseProcessingJobsOptions = {}) => {
 
       if (response.data?.remaining > 0) {
         toast({
-          title: "Job completado",
+          title: "✅ Job completado",
           description: `${response.data.message}. Quedan ${response.data.remaining} pendientes.`,
         });
       } else {
         toast({
-          title: "Procesamiento completado",
+          title: "✅ Procesamiento completado",
           description: response.data?.message || "No hay más jobs pendientes",
         });
       }
       
       fetchJobs();
-    } catch (error) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       console.error('Error triggering processing:', error);
+      
+      // Si es timeout, no es un error real - el job sigue en segundo plano
+      if (errorMessage === 'TIMEOUT') {
+        toast({
+          title: "⏳ Procesando en segundo plano",
+          description: "El job de IA sigue ejecutándose. Revisa el progreso en 1-2 minutos.",
+        });
+        // Refetch después de un delay para ver el estado real
+        setTimeout(fetchJobs, 5000);
+        return;
+      }
+      
       toast({
         title: "Error",
         description: "No se pudo procesar el job",
