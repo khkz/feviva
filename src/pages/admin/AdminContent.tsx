@@ -68,6 +68,8 @@ export const AdminContent = () => {
   const [regenType, setRegenType] = useState<'sleep' | 'lessons'>('sleep');
   const [selectedVoice, setSelectedVoice] = useState('shimmer');
   const [regenCount, setRegenCount] = useState(5);
+  const [markPremiumDialog, setMarkPremiumDialog] = useState<{ open: boolean; item: ContentItem | null; type: 'sleep' | 'lesson' }>({ open: false, item: null, type: 'lesson' });
+  const [markPremiumVoice, setMarkPremiumVoice] = useState('sage');
   const [activeJobType, setActiveJobType] = useState<string | null>(null);
   const [premiumProcessedIds, setPremiumProcessedIds] = useState<Map<string, { voice: string; date: string }>>(new Map());
   const { toast } = useToast();
@@ -208,10 +210,55 @@ export const AdminContent = () => {
     });
   };
 
+  const markAsPremium = async () => {
+    if (!markPremiumDialog.item) return;
+    
+    const { item, type } = markPremiumDialog;
+    const jobType = type === 'sleep' ? 'sleep_tts_premium' : 'lesson_tts_premium';
+    const targetTable = type === 'sleep' ? 'sleep_stories' : 'library_lessons';
+
+    try {
+      const { error } = await supabase.from('processing_jobs').insert({
+        job_type: jobType,
+        target_id: item.id,
+        target_table: targetTable,
+        target_title: item.titulo,
+        status: 'completed',
+        result_data: { premium: true, voice: markPremiumVoice, retroactive: true },
+        completed_at: new Date().toISOString(),
+        attempts: 1
+      });
+
+      if (error) throw error;
+
+      // Update local state
+      setPremiumProcessedIds(prev => {
+        const newMap = new Map(prev);
+        newMap.set(item.id, { voice: markPremiumVoice, date: new Date().toISOString() });
+        return newMap;
+      });
+
+      toast({
+        title: "Éxito",
+        description: `"${item.titulo}" marcado como premium (${markPremiumVoice})`
+      });
+      
+      setMarkPremiumDialog({ open: false, item: null, type: 'lesson' });
+    } catch (error) {
+      console.error('Error marking as premium:', error);
+      toast({
+        title: "Error",
+        description: "No se pudo marcar como premium",
+        variant: "destructive"
+      });
+    }
+  };
+
   const renderContentTable = (
     items: ContentItem[], 
     type: 'audio' | 'image' | 'enriched',
-    field: 'audio_url' | 'imagen_url' | 'contenido_enriquecido'
+    field: 'audio_url' | 'imagen_url' | 'contenido_enriquecido',
+    contentType?: 'sleep' | 'lesson'
   ) => (
     <Table>
       <TableHeader>
@@ -225,6 +272,9 @@ export const AdminContent = () => {
       <TableBody>
         {items.map((item) => {
           const premiumInfo = premiumProcessedIds.get(item.id);
+          const hasAudio = !!item[field];
+          const canMarkPremium = type === 'audio' && hasAudio && !premiumInfo && contentType;
+          
           return (
             <TableRow key={item.id}>
               <TableCell className="font-medium">{item.titulo}</TableCell>
@@ -245,6 +295,16 @@ export const AdminContent = () => {
                     <Sparkles className="h-3 w-3 mr-1" />
                     {premiumInfo.voice}
                   </Badge>
+                ) : canMarkPremium ? (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 px-2 text-xs text-muted-foreground hover:text-amber-600"
+                    onClick={() => setMarkPremiumDialog({ open: true, item, type: contentType })}
+                  >
+                    <Sparkles className="h-3 w-3 mr-1" />
+                    Marcar
+                  </Button>
                 ) : (
                   <span className="text-muted-foreground text-xs">—</span>
                 )}
@@ -343,7 +403,7 @@ export const AdminContent = () => {
           )}
           <Card>
             <CardContent className="p-0">
-              {renderContentTable(sleepStories, 'audio', 'audio_url')}
+              {renderContentTable(sleepStories, 'audio', 'audio_url', 'sleep')}
             </CardContent>
           </Card>
           <p className="text-xs text-muted-foreground">
@@ -422,7 +482,7 @@ export const AdminContent = () => {
           
           <Card>
             <CardContent className="p-0">
-              {renderContentTable(lessons, 'audio', 'audio_url')}
+              {renderContentTable(lessons, 'audio', 'audio_url', 'lesson')}
             </CardContent>
           </Card>
           <p className="text-xs text-muted-foreground">
@@ -492,6 +552,55 @@ export const AdminContent = () => {
             >
               <Sparkles className="h-4 w-4 mr-2" />
               Regenerar {regenCount}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog for marking existing audio as premium */}
+      <Dialog open={markPremiumDialog.open} onOpenChange={(open) => setMarkPremiumDialog(prev => ({ ...prev, open }))}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-amber-500" />
+              Marcar como Premium
+            </DialogTitle>
+            <DialogDescription>
+              Registrar "{markPremiumDialog.item?.titulo}" como audio premium generado anteriormente.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Voz utilizada</Label>
+              <Select value={markPremiumVoice} onValueChange={setMarkPremiumVoice}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {VOICES.map(voice => (
+                    <SelectItem key={voice.value} value={voice.value}>
+                      <div className="flex flex-col">
+                        <span>{voice.label}</span>
+                        <span className="text-xs text-muted-foreground">{voice.description}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setMarkPremiumDialog({ open: false, item: null, type: 'lesson' })}>
+              Cancelar
+            </Button>
+            <Button 
+              onClick={markAsPremium}
+              className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
+            >
+              <Sparkles className="h-4 w-4 mr-2" />
+              Marcar Premium
             </Button>
           </DialogFooter>
         </DialogContent>
