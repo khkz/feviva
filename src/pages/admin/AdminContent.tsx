@@ -176,12 +176,24 @@ export const AdminContent = () => {
     
     try {
       const items = regenType === 'sleep' ? sleepStories : lessons;
-      const totalToProcess = Math.min(regenCount, items.length);
       const jobType = regenType === 'sleep' ? 'sleep_tts_premium' : 'lesson_tts_premium';
       const tableName = regenType === 'sleep' ? 'sleep_stories' : 'library_lessons';
       
+      // Filtrar items que YA tienen audio premium procesado
+      const itemsWithoutPremium = items.filter(item => !premiumProcessedIds.has(item.id));
+      
+      if (itemsWithoutPremium.length === 0) {
+        toast({
+          title: "Info",
+          description: "Todos los items ya tienen audio premium generado"
+        });
+        return;
+      }
+      
+      const totalToProcess = Math.min(regenCount, itemsWithoutPremium.length);
+      
       // Preparar items con metadata (voz seleccionada)
-      const jobItems = items.slice(0, totalToProcess).map(item => ({
+      const jobItems = itemsWithoutPremium.slice(0, totalToProcess).map(item => ({
         id: item.id,
         title: item.titulo,
         table: tableName,
