@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -63,72 +63,63 @@ export const JobProgressPanel = ({
 
   const [autoProcess, setAutoProcess] = useState(false);
   const [countdown, setCountdown] = useState(0);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const countdownRef = useRef<NodeJS.Timeout | null>(null);
-  const isRunningRef = useRef(false);
 
-  // Auto-procesamiento
+  // Auto-procesamiento simplificado - sin refs mutables que causan estado inconsistente
   useEffect(() => {
-    const cleanup = () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-      if (countdownRef.current) clearInterval(countdownRef.current);
-      timerRef.current = null;
-      countdownRef.current = null;
-    };
-
     if (!autoProcess) {
-      cleanup();
       setCountdown(0);
-      isRunningRef.current = false;
       return;
     }
-
-    if (stats.pending === 0) {
+    
+    // Si ya no hay nada pendiente ni procesando, apagar auto-process
+    if (stats.pending === 0 && stats.processing === 0) {
       setAutoProcess(false);
+      setCountdown(0);
       return;
     }
 
-    // Si hay algo procesando, esperar y hacer polling
+    // Si hay algo procesando, solo hacer polling sin countdown
     if (stats.processing > 0) {
-      cleanup();
       setCountdown(0);
-      isRunningRef.current = false;
-      // Poll cada 5 segundos hasta que termine
-      timerRef.current = setTimeout(() => refetch(), 5000);
-      return () => cleanup();
+      const pollInterval = setInterval(() => {
+        refetch();
+      }, 3000);
+      return () => clearInterval(pollInterval);
     }
 
-    // Si ya hay un countdown corriendo, no reiniciar
-    if (isRunningRef.current) return;
-
-    // Iniciar countdown de 10 segundos
-    console.log('Auto-process: iniciando countdown de 10s');
-    isRunningRef.current = true;
-    setCountdown(10);
-
+    // Nada procesando pero hay pendientes - iniciar countdown
     let count = 10;
-    countdownRef.current = setInterval(() => {
+    setCountdown(count);
+    let hasTriggered = false;
+
+    const countdownInterval = setInterval(() => {
+      if (hasTriggered) return;
+      
       count--;
       setCountdown(count);
-      if (count <= 0 && countdownRef.current) {
-        clearInterval(countdownRef.current);
-        countdownRef.current = null;
+      
+      if (count <= 0) {
+        hasTriggered = true;
+        clearInterval(countdownInterval);
+        
+        // Ejecutar procesamiento
+        triggerProcessing()
+          .then(() => {
+            // Esperar un poco y refetch para actualizar stats
+            setTimeout(() => {
+              refetch();
+            }, 2000);
+          })
+          .catch((error) => {
+            console.error('Error en auto-procesamiento:', error);
+            refetch();
+          });
       }
     }, 1000);
 
-    timerRef.current = setTimeout(async () => {
-      console.log('Auto-process: ejecutando triggerProcessing');
-      isRunningRef.current = false;
-      try {
-        await triggerProcessing();
-      } catch (e) {
-        console.error('Auto-process error:', e);
-      }
-      // Refetch después de procesar
-      setTimeout(() => refetch(), 3000);
-    }, 10000);
-
-    return () => cleanup();
+    return () => {
+      clearInterval(countdownInterval);
+    };
   }, [autoProcess, stats.pending, stats.processing, triggerProcessing, refetch]);
 
   if (loading) {
