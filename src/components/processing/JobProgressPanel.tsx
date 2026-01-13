@@ -309,6 +309,14 @@ export const JobProgressPanel = ({
 const JobItem = ({ job }: { job: ProcessingJob }) => {
   const config = statusConfig[job.status];
   const Icon = config.icon;
+  
+  // Calcular tiempo transcurrido para jobs en procesamiento
+  const elapsedSeconds = job.status === 'processing' && job.started_at
+    ? Math.floor((Date.now() - new Date(job.started_at).getTime()) / 1000)
+    : null;
+  
+  // Determinar si es un job de IA de larga duración
+  const isLongRunningJob = job.job_type?.includes('enrich') || job.job_type?.includes('premium');
 
   return (
     <div className={cn(
@@ -320,6 +328,15 @@ const JobItem = ({ job }: { job: ProcessingJob }) => {
         <p className="truncate font-medium">
           {job.target_title || job.target_id.slice(0, 8)}
         </p>
+        {job.status === 'processing' && isLongRunningJob && (
+          <p className="text-xs text-primary/80 flex items-center gap-1">
+            <Timer className="h-3 w-3" />
+            IA procesando... ~60-90s por item
+            {elapsedSeconds !== null && elapsedSeconds > 0 && (
+              <span className="ml-1">({elapsedSeconds}s)</span>
+            )}
+          </p>
+        )}
         {job.error_message && (
           <p className="text-xs text-destructive truncate flex items-center gap-1">
             <AlertCircle className="h-3 w-3" />
