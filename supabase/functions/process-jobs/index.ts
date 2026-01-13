@@ -7,6 +7,7 @@ const corsHeaders = {
 };
 
 const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
@@ -238,6 +239,171 @@ async function processLessonTTSPremium(targetId: string, voice: string = 'sage')
   return { audioUrl: urlData.publicUrl, voice, model: 'gpt-4o-mini-tts', premium: true };
 }
 
+// ============= ENRIQUECIMIENTO DE CONTENIDO CON GEMINI 3 PRO =============
+
+async function processLessonContentEnrich(targetId: string): Promise<Record<string, unknown>> {
+  console.log(`[Content Enrich] Iniciando enriquecimiento de lección: ${targetId}`);
+  
+  if (!LOVABLE_API_KEY) {
+    throw new Error('LOVABLE_API_KEY no configurada');
+  }
+  
+  // Obtener lección actual
+  const { data: lesson, error } = await supabase
+    .from('library_lessons')
+    .select('titulo, descripcion, contenido, contenido_enriquecido, categoria')
+    .eq('id', targetId)
+    .single();
+  
+  if (error || !lesson) {
+    throw new Error(`Lección no encontrada: ${error?.message}`);
+  }
+  
+  console.log(`[Content Enrich] Procesando: ${lesson.titulo}`);
+  
+  const systemPrompt = `Eres un teólogo católico experto con doctorado en historia de la Iglesia, patrología y sagradas escrituras.
+Tu misión es VERIFICAR y ENRIQUECER contenido teológico asegurando:
+
+REGLAS CRÍTICAS DE VERIFICACIÓN:
+1. Verificar CADA cita bíblica - debe ser exacta (libro, capítulo, versículo)
+2. Verificar CADA referencia al Catecismo (CIC) - usar numeración correcta
+3. Verificar fechas históricas y atribuciones a santos/Padres de la Iglesia
+4. Distinguir CLARAMENTE entre:
+   - Dogma de fe (definido infaliblemente)
+   - Doctrina católica (enseñanza oficial)
+   - Tradición piadosa (no vinculante)
+   - Opinión teológica (discutible)
+5. Corregir CUALQUIER error teológico, histórico o de citas
+6. Incluir referencias al Magisterio cuando sea apropiado
+7. Citar Padres de la Iglesia relevantes
+
+ESTILO DE ESCRITURA:
+- Académico pero accesible
+- Profundo sin ser árido
+- Pastoral y formativo
+- En español latinoamericano claro
+
+Responde ÚNICAMENTE con JSON válido, sin markdown ni texto adicional.`;
+
+  const currentContent = lesson.contenido_enriquecido || lesson.contenido;
+  
+  const userPrompt = `LECCIÓN A VERIFICAR Y ENRIQUECER:
+
+TÍTULO: ${lesson.titulo}
+CATEGORÍA: ${lesson.categoria}
+DESCRIPCIÓN: ${lesson.descripcion}
+
+CONTENIDO ACTUAL:
+${currentContent}
+
+TAREAS OBLIGATORIAS:
+1. Verificar que TODOS los datos históricos sean correctos
+2. Corregir cualquier error en citas bíblicas o del Catecismo
+3. Expandir significativamente con información verificable (mínimo 2500 palabras)
+4. Añadir referencias al Catecismo de la Iglesia Católica (CIC) donde corresponda
+5. Incluir testimonios de Padres de la Iglesia cuando sea relevante
+6. Añadir contexto histórico importante
+7. Crear un resumen de 400-500 palabras optimizado para narración de audio
+8. Extraer 5-7 puntos clave para estudio
+
+FORMATO DE RESPUESTA JSON:
+{
+  "contenido_verificado": "<HTML completo con estructura: h2, h3, p, blockquote para citas, ul/li para listas. SIN etiquetas html, head, body. Solo el contenido.>",
+  "verificacion": {
+    "datos_correctos": true o false,
+    "correcciones_hechas": ["lista de correcciones específicas realizadas"],
+    "nivel_confianza": "alto" o "medio" o "bajo",
+    "fuentes_implicitas": ["CIC 1234", "Mt 5,1-12", "San Agustín, Confesiones", etc.],
+    "notas_adicionales": "observaciones sobre el contenido original"
+  },
+  "resumen_audio": "<Texto de 400-500 palabras, natural para narrar, sin marcadores de formato>",
+  "puntos_clave": ["punto clave 1", "punto clave 2", "...hasta 7 puntos"]
+}`;
+
+  console.log(`[Content Enrich] Llamando a Gemini 3 Pro...`);
+  
+  const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'google/gemini-3-pro-preview',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ],
+      temperature: 0.4, // Más bajo para mayor precisión histórica
+      max_tokens: 16000,
+    }),
+  });
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
+  }
+  
+  const aiResult = await response.json();
+  const rawContent = aiResult.choices?.[0]?.message?.content;
+  
+  if (!rawContent) {
+    throw new Error('Respuesta vacía de Gemini');
+  }
+  
+  console.log(`[Content Enrich] Respuesta recibida, parseando JSON...`);
+  
+  // Limpiar posible markdown del JSON
+  let cleanedJson = rawContent
+    .replace(/```json\s*/g, '')
+    .replace(/```\s*/g, '')
+    .trim();
+  
+  let enrichedData;
+  try {
+    enrichedData = JSON.parse(cleanedJson);
+  } catch (parseError) {
+    console.error('[Content Enrich] Error parseando JSON:', cleanedJson.substring(0, 500));
+    throw new Error(`Error parseando respuesta de Gemini: ${parseError}`);
+  }
+  
+  // Validar estructura mínima
+  if (!enrichedData.contenido_verificado) {
+    throw new Error('Respuesta de Gemini no contiene contenido_verificado');
+  }
+  
+  console.log(`[Content Enrich] Actualizando base de datos...`);
+  
+  // Actualizar lección en base de datos
+  const { error: updateError } = await supabase
+    .from('library_lessons')
+    .update({
+      contenido_enriquecido: enrichedData.contenido_verificado,
+      verificado_at: new Date().toISOString(),
+      verificacion_data: enrichedData.verificacion,
+      resumen_audio: enrichedData.resumen_audio,
+    })
+    .eq('id', targetId);
+  
+  if (updateError) {
+    throw new Error(`Error actualizando lección: ${updateError.message}`);
+  }
+  
+  console.log(`[Content Enrich] ✅ Lección enriquecida exitosamente: ${lesson.titulo}`);
+  
+  return {
+    verified: true,
+    model: 'google/gemini-3-pro-preview',
+    titulo: lesson.titulo,
+    nivel_confianza: enrichedData.verificacion?.nivel_confianza || 'unknown',
+    correcciones: enrichedData.verificacion?.correcciones_hechas?.length || 0,
+    puntos_clave: enrichedData.puntos_clave?.length || 0,
+    contenido_length: enrichedData.contenido_verificado?.length || 0
+  };
+}
+
+// ============= FIN ENRIQUECIMIENTO =============
+
 async function processJob(job: ProcessingJob): Promise<void> {
   console.log(`[process-jobs] Procesando: ${job.job_type} - ${job.target_title || job.target_id}`);
   const startTime = Date.now();
@@ -264,6 +430,9 @@ async function processJob(job: ProcessingJob): Promise<void> {
         break;
       case 'lesson_tts_premium':
         result = await processLessonTTSPremium(job.target_id, voice || 'sage');
+        break;
+      case 'lesson_content_enrich':
+        result = await processLessonContentEnrich(job.target_id);
         break;
       default:
         throw new Error(`Tipo de job no soportado: ${job.job_type}`);

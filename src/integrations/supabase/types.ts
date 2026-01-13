@@ -1109,7 +1109,10 @@ export type Database = {
           nivel: number
           orden: number | null
           recursos: Json | null
+          resumen_audio: string | null
           titulo: string
+          verificacion_data: Json | null
+          verificado_at: string | null
         }
         Insert: {
           audio_url?: string | null
@@ -1124,7 +1127,10 @@ export type Database = {
           nivel: number
           orden?: number | null
           recursos?: Json | null
+          resumen_audio?: string | null
           titulo: string
+          verificacion_data?: Json | null
+          verificado_at?: string | null
         }
         Update: {
           audio_url?: string | null
@@ -1139,7 +1145,10 @@ export type Database = {
           nivel?: number
           orden?: number | null
           recursos?: Json | null
+          resumen_audio?: string | null
           titulo?: string
+          verificacion_data?: Json | null
+          verificado_at?: string | null
         }
         Relationships: []
       }
