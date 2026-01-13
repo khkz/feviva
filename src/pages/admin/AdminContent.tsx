@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Moon, Church, BookOpen, Volume2, Image, RefreshCw, Sparkles } from 'lucide-react';
+import { Moon, Church, BookOpen, Volume2, Image, RefreshCw, Sparkles, Brain, CheckCircle2, AlertCircle, Clock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -50,12 +50,23 @@ const VOICES = [
   { value: 'verse', label: 'Verse', description: 'Artística, dramática' },
 ];
 
+interface VerificacionData {
+  nivel_confianza?: string;
+  correcciones_hechas?: string[];
+  fuentes_implicitas?: string[];
+  datos_correctos?: boolean;
+  notas_adicionales?: string;
+}
+
 interface ContentItem {
   id: string;
   titulo: string;
   audio_url?: string | null;
   imagen_url?: string | null;
   contenido_enriquecido?: string | null;
+  verificado_at?: string | null;
+  verificacion_data?: VerificacionData | null;
+  resumen_audio?: string | null;
   created_at: string;
 }
 
@@ -72,6 +83,9 @@ export const AdminContent = () => {
   const [markPremiumVoice, setMarkPremiumVoice] = useState('sage');
   const [activeJobType, setActiveJobType] = useState<string | null>(null);
   const [premiumProcessedIds, setPremiumProcessedIds] = useState<Map<string, { voice: string; date: string }>>(new Map());
+  const [lessonSubTab, setLessonSubTab] = useState<'audio' | 'contenido'>('audio');
+  const [enrichCount, setEnrichCount] = useState(5);
+  const [showEnrichDialog, setShowEnrichDialog] = useState(false);
   const { toast } = useToast();
   
   // Hook para jobs generales
@@ -80,13 +94,16 @@ export const AdminContent = () => {
   // Hook para jobs premium (sleep o lessons)
   const sleepPremiumJobs = useProcessingJobs({ jobType: 'sleep_tts_premium' });
   const lessonPremiumJobs = useProcessingJobs({ jobType: 'lesson_tts_premium' });
+  
+  // Hook para jobs de enriquecimiento de contenido
+  const lessonEnrichJobs = useProcessingJobs({ jobType: 'lesson_content_enrich' });
 
   const fetchContent = async () => {
     try {
       const [storiesRes, novenasRes, lessonsRes, premiumJobsRes] = await Promise.all([
         supabase.from('sleep_stories').select('id, titulo, audio_url, created_at').order('orden'),
         supabase.from('novenas').select('id, titulo, imagen_url, created_at').order('orden'),
-        supabase.from('library_lessons').select('id, titulo, contenido_enriquecido, audio_url, created_at').order('orden'),
+        supabase.from('library_lessons').select('id, titulo, contenido_enriquecido, audio_url, verificado_at, verificacion_data, resumen_audio, created_at').order('orden'),
         // Obtener jobs premium completados para saber cuáles ya tienen audio premium
         supabase.from('processing_jobs')
           .select('target_id, result_data, completed_at')
@@ -97,7 +114,10 @@ export const AdminContent = () => {
 
       setSleepStories(storiesRes.data || []);
       setNovenas(novenasRes.data || []);
-      setLessons(lessonsRes.data?.map(l => ({ ...l, titulo: l.titulo })) || []);
+      setLessons((lessonsRes.data || []).map(l => ({
+        ...l,
+        verificacion_data: l.verificacion_data as VerificacionData | null
+      })));
       
       // Mapear IDs a datos premium
       const premiumMap = new Map<string, { voice: string; date: string }>();
@@ -210,7 +230,40 @@ export const AdminContent = () => {
     });
   };
 
-  const markAsPremium = async () => {
+  const queueContentEnrichment = async () => {
+    setShowEnrichDialog(false);
+    
+    try {
+      const lessonsToEnrich = lessons.filter(l => !l.verificado_at).slice(0, enrichCount);
+      
+      if (lessonsToEnrich.length === 0) {
+        toast({ title: "Info", description: "Todas las lecciones ya están verificadas" });
+        return;
+      }
+
+      const jobItems = lessonsToEnrich.map(item => ({
+        id: item.id,
+        title: item.titulo,
+        table: 'library_lessons'
+      }));
+
+      await queueJobs('lesson_content_enrich', jobItems);
+      
+      toast({
+        title: "Jobs en cola",
+        description: `${jobItems.length} lecciones encoladas para verificación con Gemini 3 Pro. Activa auto-procesar para iniciar.`,
+      });
+
+    } catch (error) {
+      console.error('Error queuing content enrichment:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Error al encolar verificación",
+        variant: "destructive"
+      });
+    }
+  };
+
     if (!markPremiumDialog.item) return;
     
     const { item, type } = markPremiumDialog;
@@ -441,54 +494,171 @@ export const AdminContent = () => {
             <div>
               <h2 className="text-lg font-semibold">Lecciones</h2>
               <p className="text-sm text-muted-foreground">
-                {lessons.filter(l => l.audio_url).length}/{lessons.length} con audio
+                {lessons.filter(l => l.audio_url).length}/{lessons.length} audio • {lessons.filter(l => l.verificado_at).length}/{lessons.length} verificadas
               </p>
-            </div>
-            <div className="flex gap-2">
-              <Button 
-                onClick={() => queueAudioGeneration('lesson_tts', lessons)}
-                size="sm"
-                variant="outline"
-              >
-                <Volume2 className="h-4 w-4 mr-2" />
-                Generar Faltante
-              </Button>
-              <Button 
-                onClick={() => openRegenDialog('lessons')}
-                size="sm"
-                variant="default"
-                disabled={lessonPremiumJobs.stats.pending > 0 || lessonPremiumJobs.stats.processing > 0}
-                className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
-              >
-                {lessonPremiumJobs.stats.processing > 0 ? (
-                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                ) : (
-                  <Sparkles className="h-4 w-4 mr-2" />
-                )}
-                Regenerar Premium
-              </Button>
             </div>
           </div>
           
-          {/* Panel de progreso para lesson premium */}
-          {(lessonPremiumJobs.stats.total > 0) && (
-            <JobProgressPanel 
-              jobType="lesson_tts_premium"
-              title="Audio Premium - Lecciones"
-              showDetails={true}
-              className="border-amber-500/20"
-            />
-          )}
-          
-          <Card>
-            <CardContent className="p-0">
-              {renderContentTable(lessons, 'audio', 'audio_url', 'lesson')}
-            </CardContent>
-          </Card>
-          <p className="text-xs text-muted-foreground">
-            <Sparkles className="h-3 w-3 inline mr-1" />
-            Premium usa gpt-4o-mini-tts con voz sage y estilo educativo
-          </p>
+          {/* Sub-tabs para Audio y Contenido */}
+          <Tabs value={lessonSubTab} onValueChange={(v) => setLessonSubTab(v as 'audio' | 'contenido')}>
+            <TabsList className="grid grid-cols-2 w-full max-w-xs">
+              <TabsTrigger value="audio" className="flex items-center gap-1">
+                <Volume2 className="h-4 w-4" />
+                Audio
+              </TabsTrigger>
+              <TabsTrigger value="contenido" className="flex items-center gap-1">
+                <Brain className="h-4 w-4" />
+                Contenido
+              </TabsTrigger>
+            </TabsList>
+            
+            {/* Sub-tab Audio */}
+            <TabsContent value="audio" className="space-y-4 mt-4">
+              <div className="flex gap-2 flex-wrap">
+                <Button 
+                  onClick={() => queueAudioGeneration('lesson_tts', lessons)}
+                  size="sm"
+                  variant="outline"
+                >
+                  <Volume2 className="h-4 w-4 mr-2" />
+                  Generar Faltante
+                </Button>
+                <Button 
+                  onClick={() => openRegenDialog('lessons')}
+                  size="sm"
+                  variant="default"
+                  disabled={lessonPremiumJobs.stats.pending > 0 || lessonPremiumJobs.stats.processing > 0}
+                  className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
+                >
+                  {lessonPremiumJobs.stats.processing > 0 ? (
+                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-4 w-4 mr-2" />
+                  )}
+                  Regenerar Premium
+                </Button>
+              </div>
+              
+              {/* Panel de progreso para lesson premium */}
+              {(lessonPremiumJobs.stats.total > 0) && (
+                <JobProgressPanel 
+                  jobType="lesson_tts_premium"
+                  title="Audio Premium - Lecciones"
+                  showDetails={true}
+                  className="border-amber-500/20"
+                />
+              )}
+              
+              <Card>
+                <CardContent className="p-0">
+                  {renderContentTable(lessons, 'audio', 'audio_url', 'lesson')}
+                </CardContent>
+              </Card>
+              <p className="text-xs text-muted-foreground">
+                <Sparkles className="h-3 w-3 inline mr-1" />
+                Premium usa gpt-4o-mini-tts con voz sage y estilo educativo
+              </p>
+            </TabsContent>
+            
+            {/* Sub-tab Contenido */}
+            <TabsContent value="contenido" className="space-y-4 mt-4">
+              <div className="flex gap-2 flex-wrap">
+                <Button 
+                  onClick={() => {
+                    setEnrichCount(Math.min(5, lessons.filter(l => !l.verificado_at).length || 5));
+                    setShowEnrichDialog(true);
+                  }}
+                  size="sm"
+                  variant="default"
+                  disabled={lessonEnrichJobs.stats.pending > 0 || lessonEnrichJobs.stats.processing > 0}
+                  className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600"
+                >
+                  {lessonEnrichJobs.stats.processing > 0 ? (
+                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Brain className="h-4 w-4 mr-2" />
+                  )}
+                  Verificar con Gemini 3 Pro
+                </Button>
+              </div>
+              
+              {/* Panel de progreso para enriquecimiento */}
+              {(lessonEnrichJobs.stats.total > 0) && (
+                <JobProgressPanel 
+                  jobType="lesson_content_enrich"
+                  title="Verificación con Gemini 3 Pro"
+                  showDetails={true}
+                  className="border-purple-500/20"
+                />
+              )}
+              
+              <Card>
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Título</TableHead>
+                        <TableHead>Estado</TableHead>
+                        <TableHead>Confianza</TableHead>
+                        <TableHead>Verificado</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {lessons.map((lesson) => {
+                        const isVerified = !!lesson.verificado_at;
+                        const confidence = lesson.verificacion_data?.nivel_confianza;
+                        
+                        return (
+                          <TableRow key={lesson.id}>
+                            <TableCell className="font-medium">{lesson.titulo}</TableCell>
+                            <TableCell>
+                              {isVerified ? (
+                                <Badge className="bg-green-500/10 text-green-500 border-green-500/30">
+                                  <CheckCircle2 className="h-3 w-3 mr-1" />
+                                  Gemini 3 Pro
+                                </Badge>
+                              ) : lesson.contenido_enriquecido ? (
+                                <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/30">
+                                  <AlertCircle className="h-3 w-3 mr-1" />
+                                  IA básica
+                                </Badge>
+                              ) : (
+                                <Badge variant="secondary">
+                                  <Clock className="h-3 w-3 mr-1" />
+                                  Sin enriquecer
+                                </Badge>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {confidence === 'alto' ? (
+                                <Badge className="bg-green-500/10 text-green-600">🟢 Alto</Badge>
+                              ) : confidence === 'medio' ? (
+                                <Badge className="bg-amber-500/10 text-amber-600">🟡 Medio</Badge>
+                              ) : confidence === 'bajo' ? (
+                                <Badge className="bg-red-500/10 text-red-600">🔴 Bajo</Badge>
+                              ) : (
+                                <span className="text-muted-foreground text-xs">—</span>
+                              )}
+                            </TableCell>
+                            <TableCell className="text-muted-foreground text-sm">
+                              {lesson.verificado_at 
+                                ? new Date(lesson.verificado_at).toLocaleDateString()
+                                : '—'
+                              }
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+              <p className="text-xs text-muted-foreground">
+                <Brain className="h-3 w-3 inline mr-1" />
+                Gemini 3 Pro verifica datos históricos, citas bíblicas y referencias al Catecismo
+              </p>
+            </TabsContent>
+          </Tabs>
         </TabsContent>
 
       </Tabs>
@@ -601,6 +771,51 @@ export const AdminContent = () => {
             >
               <Sparkles className="h-4 w-4 mr-2" />
               Marcar Premium
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog for content enrichment */}
+      <Dialog open={showEnrichDialog} onOpenChange={setShowEnrichDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Brain className="h-5 w-5 text-purple-500" />
+              Verificar con Gemini 3 Pro
+            </DialogTitle>
+            <DialogDescription>
+              Gemini 3 Pro verificará datos históricos, citas bíblicas y referencias al Catecismo.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="enrichCount">Lecciones a verificar</Label>
+              <Input
+                id="enrichCount"
+                type="number"
+                min={1}
+                max={lessons.filter(l => !l.verificado_at).length || 1}
+                value={enrichCount}
+                onChange={(e) => setEnrichCount(Math.max(1, parseInt(e.target.value) || 1))}
+              />
+              <p className="text-xs text-muted-foreground">
+                {lessons.filter(l => !l.verificado_at).length} lecciones sin verificar
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowEnrichDialog(false)}>
+              Cancelar
+            </Button>
+            <Button 
+              onClick={queueContentEnrichment}
+              className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600"
+            >
+              <Brain className="h-4 w-4 mr-2" />
+              Verificar {enrichCount}
             </Button>
           </DialogFooter>
         </DialogContent>
