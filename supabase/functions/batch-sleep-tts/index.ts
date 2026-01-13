@@ -283,11 +283,13 @@ serve(async (req) => {
   }
 
   try {
-    const { limit = 1, forceRegenerate = false } = await req.json();
+    const { limit = 1, forceRegenerate = false, voice = 'shimmer' } = await req.json();
     
     if (!OPENAI_API_KEY) {
       throw new Error("OPENAI_API_KEY is not configured");
     }
+
+    console.log(`Starting batch-sleep-tts with limit: ${limit}, forceRegenerate: ${forceRegenerate}, voice: ${voice}`);
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -314,10 +316,10 @@ serve(async (req) => {
 
     for (const story of stories || []) {
       try {
-        console.log(`Generating premium audio for: ${story.titulo}`);
+        console.log(`Generating premium audio for: ${story.titulo} with voice: ${voice}`);
         
-        // Generate premium speech with shimmer voice (warm and calming)
-        const audioBuffer = await generateSpeechPremium(story.contenido, 'shimmer');
+        // Generate premium speech with selected voice
+        const audioBuffer = await generateSpeechPremium(story.contenido, voice);
         
         // Upload to storage
         const fileName = `sleep-story-${story.id}.mp3`;
@@ -378,7 +380,7 @@ serve(async (req) => {
       remaining: remainingCount || 0,
       hasMore: (remainingCount || 0) > 0,
       model: 'gpt-4o-mini-tts',
-      voice: 'shimmer',
+      voice,
       results
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
