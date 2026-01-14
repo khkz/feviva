@@ -90,25 +90,23 @@ export function HeroSection({ userName, verse, stats }: HeroSectionProps) {
           {/* Verse */}
           {verse && (
             <motion.div 
-              className="glass-card rounded-xl p-4 relative"
+              className="glass-card rounded-xl p-4"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6 }}
             >
-              <p className="text-white/90 text-sm italic leading-relaxed pr-8">
+              <p className="text-white/90 text-sm italic leading-relaxed">
                 "{verse.text}"
               </p>
-              <p className="text-white/60 text-xs mt-1.5 font-medium">— {verse.reference}</p>
-              
-              {/* Share button mobile */}
-              <div className="absolute top-3 right-3">
+              <div className="flex items-center justify-between mt-2">
+                <p className="text-white/60 text-xs font-medium">— {verse.reference}</p>
                 <DailyShareButton 
                   tipo="versiculo" 
-                  title="Versículo del día"
+                  title=""
                   fallbackText={verse.text}
-                  size="icon"
+                  size="sm"
                   variant="ghost"
-                  className="h-7 w-7 text-white/70 hover:text-white hover:bg-white/10"
+                  className="h-6 text-white/60 hover:text-white hover:bg-white/10 text-xs gap-1"
                 />
               </div>
             </motion.div>
@@ -139,25 +137,23 @@ export function HeroSection({ userName, verse, stats }: HeroSectionProps) {
 
               {verse && (
                 <motion.div 
-                  className="glass-card rounded-2xl p-6 max-w-xl relative group"
+                  className="glass-card rounded-2xl p-6 max-w-xl"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.5 }}
                 >
-                  <p className="text-white/90 text-lg italic leading-relaxed pr-10">
+                  <p className="text-white/90 text-lg italic leading-relaxed">
                     "{verse.text}"
                   </p>
-                  <p className="text-white/60 text-sm mt-2 font-medium">— {verse.reference}</p>
-                  
-                  {/* Share button */}
-                  <div className="absolute top-4 right-4">
+                  <div className="flex items-center justify-between mt-3">
+                    <p className="text-white/60 text-sm font-medium">— {verse.reference}</p>
                     <DailyShareButton 
                       tipo="versiculo" 
-                      title="Versículo del día"
+                      title="Compartir"
                       fallbackText={verse.text}
-                      size="icon"
+                      size="sm"
                       variant="ghost"
-                      className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10"
+                      className="text-white/60 hover:text-white hover:bg-white/10"
                     />
                   </div>
                 </motion.div>
