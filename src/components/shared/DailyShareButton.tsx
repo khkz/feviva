@@ -63,10 +63,16 @@ const DailyPostImage = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isGenerating, setIsGenerating] = useState(true);
+  const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
+  const hasGenerated = useRef(false);
 
   useEffect(() => {
+    // Prevent regenerating if already generated
+    if (hasGenerated.current) return;
     const canvas = canvasRef.current;
     if (!canvas || !content.mainText) return;
+    
+    hasGenerated.current = true;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
@@ -208,33 +214,46 @@ const DailyPostImage = ({
       ctx.fillText('elrugido.com', size / 2, size - 30);
 
       setIsGenerating(false);
-      onGenerated(canvas.toDataURL('image/png'));
+      const dataUrl = canvas.toDataURL('image/png');
+      setImageDataUrl(dataUrl);
+      onGenerated(dataUrl);
     };
 
     logo.onerror = () => {
+      hasGenerated.current = false;
       setIsGenerating(false);
       console.error('Failed to load logo');
     };
 
     logo.src = logoElRugido;
-  }, [tipo, content, onGenerated]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tipo, content.mainText, content.reference]);
 
   return (
     <div className="relative">
-      <canvas
-        ref={canvasRef}
-        className="w-full max-w-[300px] mx-auto rounded-lg shadow-lg"
-        style={{ aspectRatio: '1/1' }}
-      />
-      {isGenerating && (
-        <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-lg">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
+      {imageDataUrl ? (
+        <img 
+          src={imageDataUrl} 
+          alt="Preview" 
+          className="w-full max-w-[300px] mx-auto rounded-lg shadow-lg"
+        />
+      ) : (
+        <>
+          <canvas
+            ref={canvasRef}
+            className="w-full max-w-[300px] mx-auto rounded-lg shadow-lg"
+            style={{ aspectRatio: '1/1' }}
+          />
+          {isGenerating && (
+            <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-lg">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          )}
+        </>
       )}
     </div>
   );
 };
-
 // Canvas component for generating Story (9:16) images
 const DailyStoryImage = ({
   tipo,
@@ -247,10 +266,17 @@ const DailyStoryImage = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isGenerating, setIsGenerating] = useState(true);
+  const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
+  const hasGenerated = useRef(false);
 
   useEffect(() => {
+    // Prevent regenerating if already generated
+    if (hasGenerated.current) return;
+
     const canvas = canvasRef.current;
     if (!canvas || !content.mainText) return;
+
+    hasGenerated.current = true;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
@@ -420,28 +446,42 @@ const DailyStoryImage = ({
       ctx.fillText('elrugido.com', width / 2, height - 60);
 
       setIsGenerating(false);
-      onGenerated(canvas.toDataURL('image/png'));
+      const dataUrl = canvas.toDataURL('image/png');
+      setImageDataUrl(dataUrl);
+      onGenerated(dataUrl);
     };
 
     logo.onerror = () => {
+      hasGenerated.current = false;
       setIsGenerating(false);
       console.error('Failed to load logo');
     };
 
     logo.src = logoElRugido;
-  }, [tipo, content, onGenerated]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tipo, content.mainText, content.reference]);
 
   return (
     <div className="relative">
-      <canvas
-        ref={canvasRef}
-        className="w-full max-w-[180px] mx-auto rounded-lg shadow-lg"
-        style={{ aspectRatio: '9/16' }}
-      />
-      {isGenerating && (
-        <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-lg">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
+      {imageDataUrl ? (
+        <img 
+          src={imageDataUrl} 
+          alt="Preview" 
+          className="w-full max-w-[180px] mx-auto rounded-lg shadow-lg"
+        />
+      ) : (
+        <>
+          <canvas
+            ref={canvasRef}
+            className="w-full max-w-[180px] mx-auto rounded-lg shadow-lg"
+            style={{ aspectRatio: '9/16' }}
+          />
+          {isGenerating && (
+            <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-lg">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          )}
+        </>
       )}
     </div>
   );
@@ -459,10 +499,17 @@ const ComposedSantoStoryImage = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isGenerating, setIsGenerating] = useState(true);
+  const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
+  const hasGenerated = useRef(false);
 
   useEffect(() => {
+    // Prevent regenerating if already generated
+    if (hasGenerated.current) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
+
+    hasGenerated.current = true;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
@@ -574,12 +621,20 @@ const ComposedSantoStoryImage = ({
       ctx.fillText('elrugido.com', width / 2, height - 50);
 
       setIsGenerating(false);
-      onGenerated(canvas.toDataURL('image/png'));
+      const dataUrl = canvas.toDataURL('image/png');
+      setImageDataUrl(dataUrl);
+      onGenerated(dataUrl);
     };
 
     logo.onload = () => {
       logoLoaded = true;
       drawCanvas();
+    };
+
+    logo.onerror = () => {
+      hasGenerated.current = false;
+      setIsGenerating(false);
+      console.error('Failed to load logo');
     };
 
     if (saintImg) {
@@ -595,19 +650,30 @@ const ComposedSantoStoryImage = ({
     }
 
     logo.src = logoElRugido;
-  }, [saintName, saintImageUrl, onGenerated]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [saintName, saintImageUrl]);
 
   return (
     <div className="relative">
-      <canvas
-        ref={canvasRef}
-        className="w-full max-w-[180px] mx-auto rounded-lg shadow-lg"
-        style={{ aspectRatio: '9/16' }}
-      />
-      {isGenerating && (
-        <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-lg">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
+      {imageDataUrl ? (
+        <img 
+          src={imageDataUrl} 
+          alt="Preview" 
+          className="w-full max-w-[180px] mx-auto rounded-lg shadow-lg"
+        />
+      ) : (
+        <>
+          <canvas
+            ref={canvasRef}
+            className="w-full max-w-[180px] mx-auto rounded-lg shadow-lg"
+            style={{ aspectRatio: '9/16' }}
+          />
+          {isGenerating && (
+            <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-lg">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          )}
+        </>
       )}
     </div>
   );
