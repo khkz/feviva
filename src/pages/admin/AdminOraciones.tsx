@@ -8,6 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { useProcessingJobs } from '@/hooks/useProcessingJobs';
 import { 
   Play, 
   Pause,
@@ -18,7 +19,8 @@ import {
   CheckCircle2,
   XCircle,
   BookHeart,
-  Mic
+  Mic,
+  Sparkles
 } from 'lucide-react';
 
 const AVAILABLE_VOICES = [
@@ -45,9 +47,26 @@ export default function AdminOraciones() {
   const [regeneratingId, setRegeneratingId] = useState<string | null>(null);
   const [batchProgress, setBatchProgress] = useState<{ current: number; total: number } | null>(null);
   const [selectedVoice, setSelectedVoice] = useState<string>(() => {
-    return localStorage.getItem('admin_oraciones_voice') || 'onyx';
+    return localStorage.getItem('admin_oraciones_voice') || 'echo';
   });
+  const [isPremiumMode, setIsPremiumMode] = useState(true);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Processing jobs integration
+  const { 
+    jobs, 
+    stats, 
+    queueJobs, 
+    triggerProcessing, 
+    refetch: refetchJobs 
+  } = useProcessingJobs({ 
+    jobType: 'oracion_tts_premium',
+    autoRefresh: true,
+    refreshInterval: 3000
+  });
+
+  const activeJobs = jobs.filter(j => j.status === 'pending' || j.status === 'processing');
+  const isProcessing = activeJobs.length > 0;
 
   useEffect(() => {
     localStorage.setItem('admin_oraciones_voice', selectedVoice);
@@ -67,7 +86,7 @@ export default function AdminOraciones() {
     }
   });
 
-  // Regenerate single audio
+  // Regenerate single audio (legacy - non-premium)
   const regenerateSingle = useMutation({
     mutationFn: async (oracionId: string) => {
       setRegeneratingId(oracionId);
@@ -96,7 +115,7 @@ export default function AdminOraciones() {
     }
   });
 
-  // Regenerate all audios
+  // Regenerate all audios (legacy - non-premium)
   const regenerateAll = useMutation({
     mutationFn: async () => {
       const total = oraciones?.length || 0;
@@ -127,6 +146,63 @@ export default function AdminOraciones() {
       setBatchProgress(null);
     }
   });
+
+  // Queue all for premium processing
+  const queueAllPremium = async () => {
+    if (!oraciones?.length) return;
+    
+    try {
+      const items = oraciones.map(o => ({
+        id: o.id,
+        title: o.nombre,
+        table: 'oraciones',
+        metadata: { voice: selectedVoice }
+      }));
+      
+      const count = await queueJobs('oracion_tts_premium', items);
+      
+      toast({
+        title: '✨ Jobs encolados',
+        description: `${count} oraciones en cola para audio premium con voz "${selectedVoice}".`
+      });
+      
+      // Start processing
+      await triggerProcessing();
+      
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Error al encolar jobs',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  // Queue single for premium
+  const queueSinglePremium = async (oracion: Oracion) => {
+    try {
+      await queueJobs('oracion_tts_premium', [{
+        id: oracion.id,
+        title: oracion.nombre,
+        table: 'oraciones',
+        metadata: { voice: selectedVoice }
+      }]);
+      
+      toast({
+        title: '✨ Encolado',
+        description: `"${oracion.nombre}" en cola para audio premium.`
+      });
+      
+      await triggerProcessing();
+      
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Error al encolar',
+        variant: 'destructive'
+      });
+    }
+  };
 
   const playAudio = (audioUrl: string, oracionId: string) => {
     if (playingId === oracionId) {
@@ -171,7 +247,7 @@ export default function AdminOraciones() {
           <BookHeart className="h-8 w-8 text-primary" />
           <div>
             <h1 className="text-2xl font-bold">Gestión de Oraciones</h1>
-            <p className="text-sm text-muted-foreground">Administrar audios de oraciones</p>
+            <p className="text-sm text-muted-foreground">Administrar audios de oraciones (modo premium)</p>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-3">
@@ -198,29 +274,58 @@ export default function AdminOraciones() {
           </div>
           
           <Button 
-            onClick={() => queryClient.invalidateQueries({ queryKey: ['admin-oraciones'] })}
+            onClick={() => {
+              queryClient.invalidateQueries({ queryKey: ['admin-oraciones'] });
+              refetchJobs();
+            }}
             variant="outline"
             size="sm"
           >
             <RefreshCw className="h-4 w-4 mr-2" />
             Actualizar
           </Button>
+          
+          {/* Premium Button */}
           <Button 
-            onClick={() => regenerateAll.mutate()}
-            disabled={regenerateAll.isPending || !!regeneratingId}
-            className="bg-primary"
+            onClick={queueAllPremium}
+            disabled={isProcessing || !oraciones?.length}
+            className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white"
           >
-            {regenerateAll.isPending ? (
+            {isProcessing ? (
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
             ) : (
-              <RefreshCw className="h-4 w-4 mr-2" />
+              <Sparkles className="h-4 w-4 mr-2" />
             )}
-            Regenerar Todos con "{selectedVoiceInfo?.name}"
+            ✨ Regenerar Premium ({selectedVoiceInfo?.name})
           </Button>
         </div>
       </div>
 
-      {/* Batch Progress */}
+      {/* Processing Progress */}
+      {isProcessing && (
+        <Card className="border-amber-500/50 bg-amber-500/5">
+          <CardContent className="pt-4">
+            <div className="flex items-center gap-4">
+              <Loader2 className="h-5 w-5 animate-spin text-amber-500" />
+              <div className="flex-1">
+                <p className="text-sm font-medium">✨ Procesando audio premium con voz "{selectedVoiceInfo?.name}"...</p>
+                <Progress 
+                  value={stats.total > 0 ? ((stats.total - activeJobs.length) / stats.total) * 100 : 0} 
+                  className="mt-2"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {activeJobs.length} pendientes • {stats.successRate.toFixed(0)}% éxito
+                </p>
+              </div>
+              <span className="text-sm text-muted-foreground">
+                {stats.total - activeJobs.length} / {stats.total}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Legacy Batch Progress */}
       {batchProgress && (
         <Card className="border-primary/50">
           <CardContent className="pt-4">
@@ -242,7 +347,7 @@ export default function AdminOraciones() {
       )}
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -284,6 +389,23 @@ export default function AdminOraciones() {
             <p className="text-xs text-muted-foreground mt-1">{selectedVoiceInfo?.description}</p>
           </CardContent>
         </Card>
+        <Card className="border-amber-500/30 bg-amber-500/5">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-amber-600">
+              <Sparkles className="h-4 w-4 inline mr-1" />
+              Jobs Premium
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2">
+              <span className="text-2xl font-bold">{activeJobs.length}</span>
+              <span className="text-sm text-muted-foreground">pendientes</span>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Modelo: gpt-4o-mini-tts
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Oraciones List */}
@@ -294,72 +416,84 @@ export default function AdminOraciones() {
         <CardContent>
           <ScrollArea className="h-[500px] pr-4">
             <div className="space-y-2">
-              {oraciones?.map((oracion) => (
-                <div
-                  key={oracion.id}
-                  className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
-                >
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium truncate">{oracion.nombre}</span>
-                        {oracion.es_fundamental && (
-                          <Badge variant="default" className="shrink-0">Fundamental</Badge>
-                        )}
+              {oraciones?.map((oracion) => {
+                const isQueued = activeJobs.some(j => j.target_id === oracion.id);
+                
+                return (
+                  <div
+                    key={oracion.id}
+                    className={`flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors ${
+                      isQueued ? 'border-amber-500/50 bg-amber-500/5' : ''
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium truncate">{oracion.nombre}</span>
+                          {oracion.es_fundamental && (
+                            <Badge variant="default" className="shrink-0">Fundamental</Badge>
+                          )}
+                          {isQueued && (
+                            <Badge variant="outline" className="shrink-0 border-amber-500 text-amber-600">
+                              <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                              Procesando
+                            </Badge>
+                          )}
+                        </div>
+                        <span className="text-xs text-muted-foreground">{oracion.categoria}</span>
                       </div>
-                      <span className="text-xs text-muted-foreground">{oracion.categoria}</span>
+                      
+                      {oracion.audio_url ? (
+                        <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/30 shrink-0">
+                          <Volume2 className="h-3 w-3 mr-1" />
+                          Audio
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="bg-red-500/10 text-red-600 border-red-500/30 shrink-0">
+                          <VolumeX className="h-3 w-3 mr-1" />
+                          Sin audio
+                        </Badge>
+                      )}
                     </div>
-                    
-                    {oracion.audio_url ? (
-                      <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/30 shrink-0">
-                        <Volume2 className="h-3 w-3 mr-1" />
-                        Audio
-                      </Badge>
-                    ) : (
-                      <Badge variant="outline" className="bg-red-500/10 text-red-600 border-red-500/30 shrink-0">
-                        <VolumeX className="h-3 w-3 mr-1" />
-                        Sin audio
-                      </Badge>
-                    )}
-                  </div>
 
-                  <div className="flex items-center gap-2 ml-4">
-                    {/* Play Button */}
-                    {oracion.audio_url && (
+                    <div className="flex items-center gap-2 ml-4">
+                      {/* Play Button */}
+                      {oracion.audio_url && (
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => playAudio(oracion.audio_url!, oracion.id)}
+                          className="h-8 w-8"
+                        >
+                          {playingId === oracion.id ? (
+                            <Pause className="h-4 w-4" />
+                          ) : (
+                            <Play className="h-4 w-4" />
+                          )}
+                        </Button>
+                      )}
+
+                      {/* Premium Regenerate Button */}
                       <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={() => playAudio(oracion.audio_url!, oracion.id)}
-                        className="h-8 w-8"
+                        size="sm"
+                        variant={oracion.audio_url ? "outline" : "default"}
+                        onClick={() => queueSinglePremium(oracion)}
+                        disabled={isQueued || isProcessing}
+                        className={`shrink-0 ${!oracion.audio_url ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-0' : ''}`}
                       >
-                        {playingId === oracion.id ? (
-                          <Pause className="h-4 w-4" />
+                        {isQueued ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
-                          <Play className="h-4 w-4" />
+                          <>
+                            <Sparkles className="h-4 w-4 mr-1" />
+                            {oracion.audio_url ? 'Regen' : 'Generar'}
+                          </>
                         )}
                       </Button>
-                    )}
-
-                    {/* Regenerate Button */}
-                    <Button
-                      size="sm"
-                      variant={oracion.audio_url ? "outline" : "default"}
-                      onClick={() => regenerateSingle.mutate(oracion.id)}
-                      disabled={regeneratingId === oracion.id || regenerateAll.isPending}
-                      className="shrink-0"
-                    >
-                      {regeneratingId === oracion.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <>
-                          <RefreshCw className="h-4 w-4 mr-1" />
-                          {oracion.audio_url ? 'Regen' : 'Generar'}
-                        </>
-                      )}
-                    </Button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </ScrollArea>
         </CardContent>
