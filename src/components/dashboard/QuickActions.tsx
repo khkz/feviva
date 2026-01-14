@@ -66,35 +66,43 @@ export function QuickActions() {
 
   return (
     <section className="px-5 -mt-3 relative z-20 lg:px-0 lg:mt-0">
-      {/* Mobile: Horizontal scroll */}
-      <motion.div 
-        className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide lg:hidden"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        {actions.map((action) => (
-          <motion.button
-            key={action.path}
-            onClick={() => navigate(action.path)}
-            className="group flex-shrink-0 flex flex-col items-center gap-2 p-3 rounded-2xl glass-button min-w-[72px] hover:scale-105 transition-transform"
-            variants={itemVariants}
-            whileTap={{ scale: 0.95 }}
-          >
-            <motion.div 
-              className={`relative p-3 rounded-2xl bg-gradient-to-br ${action.bgGradient}`}
-              whileHover={{ rotate: [0, -5, 5, 0] }}
-              transition={{ duration: 0.3 }}
+      {/* Mobile: Horizontal scroll with fade indicators */}
+      <div className="relative lg:hidden">
+        {/* Left fade gradient */}
+        <div className="absolute left-0 top-0 bottom-2 w-6 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none opacity-0 transition-opacity" />
+        
+        {/* Right fade gradient - indicates more content */}
+        <div className="absolute right-0 top-0 bottom-2 w-8 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+        
+        <motion.div 
+          className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-1"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          {actions.map((action) => (
+            <motion.button
+              key={action.path}
+              onClick={() => navigate(action.path)}
+              className="group flex-shrink-0 flex flex-col items-center gap-2 p-3 rounded-2xl glass-button min-w-[76px] active:scale-95 active:opacity-80 transition-all"
+              variants={itemVariants}
+              whileTap={{ scale: 0.95 }}
             >
-              <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${action.gradient} opacity-0 group-hover:opacity-100 transition-opacity`} />
-              <action.icon className="relative w-5 h-5 text-foreground group-hover:text-white transition-colors" />
-            </motion.div>
-            <span className="text-xs font-medium text-foreground/80 group-hover:text-foreground transition-colors">
-              {action.label}
-            </span>
-          </motion.button>
-        ))}
-      </motion.div>
+              <motion.div 
+                className={`relative p-3.5 rounded-2xl bg-gradient-to-br ${action.bgGradient}`}
+                whileHover={{ rotate: [0, -5, 5, 0] }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${action.gradient} opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity`} />
+                <action.icon className="relative w-5 h-5 text-foreground group-hover:text-white group-active:text-white transition-colors" />
+              </motion.div>
+              <span className="text-xs font-medium text-foreground/80 group-hover:text-foreground transition-colors">
+                {action.label}
+              </span>
+            </motion.button>
+          ))}
+        </motion.div>
+      </div>
 
       {/* Desktop: Full grid */}
       <motion.div 
@@ -107,7 +115,7 @@ export function QuickActions() {
           <motion.button
             key={action.path}
             onClick={() => navigate(action.path)}
-            className="group flex flex-col items-center gap-3 p-5 rounded-2xl glass-card hover:shadow-medium transition-all"
+            className="group flex flex-col items-center gap-3 p-5 rounded-2xl glass-card hover:shadow-medium active:scale-[0.98] transition-all"
             variants={itemVariants}
             whileHover={{ scale: 1.05, y: -4 }}
             whileTap={{ scale: 0.98 }}

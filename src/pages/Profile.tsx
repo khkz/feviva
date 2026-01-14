@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Save, User, Palette, Bell, ChevronRight, LogOut, Gift } from "lucide-react";
+import { ArrowLeft, Save, User, Palette, Bell, ChevronRight, LogOut, Flame, Trophy, Zap } from "lucide-react";
 import { z } from "zod";
 import { ThemeSelector } from "@/components/ui/theme-toggle";
 import { motion } from "framer-motion";
@@ -15,6 +15,8 @@ import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { useNotifications } from "@/hooks/useNotifications";
 import { ReferralCard } from "@/components/referrals/ReferralCard";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useUserStats } from "@/hooks/useUserStats";
 
 const COUNTRY_OPTIONS = [
   { code: 'MX', name: 'México', flag: '🇲🇽' },
@@ -55,6 +57,7 @@ const Profile = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { practiceReminders } = useNotifications();
+  const { stats } = useUserStats();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<ProfileFormData>({
@@ -168,7 +171,7 @@ const Profile = () => {
     <div className="min-h-screen flex w-full">
       <DesktopSidebar />
       <div className="flex-1 lg:ml-64 pb-20 md:pb-8">
-      {/* Hero Header */}
+      {/* Enhanced Hero Header with Avatar and Stats */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-secondary/60" />
         <div className="absolute inset-0 bg-[url('data:image/svg+xml,...')] opacity-5" />
@@ -177,7 +180,7 @@ const Profile = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="relative z-10 container mx-auto px-4 py-6"
+          className="relative z-10 container mx-auto px-4 py-6 safe-area-inset-top"
         >
           <Button
             variant="ghost"
@@ -185,17 +188,55 @@ const Profile = () => {
             className="glass-button text-foreground hover:bg-background/20 mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Volver al Dashboard
+            Volver
           </Button>
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-secondary/20 backdrop-blur-sm flex items-center justify-center">
-              <User className="w-6 h-6 text-secondary" />
-            </div>
-            <div>
-              <h1 className="font-heading text-3xl font-bold text-white">Mi Perfil</h1>
-              <p className="text-white/80">Gestiona tu información personal</p>
+          
+          {/* Profile Header with Avatar */}
+          <div className="flex items-center gap-4">
+            <Avatar className="w-16 h-16 border-2 border-secondary/50 shadow-lg">
+              <AvatarFallback className="bg-secondary/20 text-white text-2xl font-bold">
+                {formData.nombre?.charAt(0)?.toUpperCase() || "U"}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <h1 className="font-heading text-2xl font-bold text-white">
+                {formData.nombre || "Mi Perfil"}
+              </h1>
+              <p className="text-white/70 text-sm">Gestiona tu cuenta</p>
             </div>
           </div>
+
+          {/* Mini Stats Row */}
+          {stats && (
+            <motion.div 
+              className="flex gap-3 mt-4"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <div className="glass-button rounded-xl px-4 py-2 flex items-center gap-2">
+                <Flame className="w-4 h-4 text-orange-400" />
+                <div>
+                  <p className="text-white text-sm font-bold">{stats.racha_actual_dias || 0}</p>
+                  <p className="text-white/60 text-[10px]">Racha</p>
+                </div>
+              </div>
+              <div className="glass-button rounded-xl px-4 py-2 flex items-center gap-2">
+                <Trophy className="w-4 h-4 text-secondary" />
+                <div>
+                  <p className="text-white text-sm font-bold">{stats.nivel || 1}</p>
+                  <p className="text-white/60 text-[10px]">Nivel</p>
+                </div>
+              </div>
+              <div className="glass-button rounded-xl px-4 py-2 flex items-center gap-2">
+                <Zap className="w-4 h-4 text-yellow-400" />
+                <div>
+                  <p className="text-white text-sm font-bold">{stats.puntos_totales || 0}</p>
+                  <p className="text-white/60 text-[10px]">Puntos</p>
+                </div>
+              </div>
+            </motion.div>
+          )}
         </motion.header>
       </div>
 
