@@ -36,6 +36,36 @@ interface ContentData {
   subtitle?: string;
 }
 
+// Helper to calculate dynamic font size based on text length
+const calculateFontSize = (
+  textLength: number,
+  format: 'post' | 'story'
+): { fontSize: number; lineHeight: number } => {
+  if (format === 'post') {
+    // Para formato 1:1 (1080x1080)
+    if (textLength < 80) {
+      return { fontSize: 42, lineHeight: 58 }; // Texto muy corto - grande
+    } else if (textLength < 150) {
+      return { fontSize: 34, lineHeight: 48 }; // Texto corto
+    } else if (textLength < 250) {
+      return { fontSize: 28, lineHeight: 40 }; // Texto medio
+    } else {
+      return { fontSize: 22, lineHeight: 32 }; // Texto largo - pequeño
+    }
+  } else {
+    // Para formato 9:16 (1080x1920)
+    if (textLength < 80) {
+      return { fontSize: 52, lineHeight: 72 }; // Texto muy corto - grande
+    } else if (textLength < 150) {
+      return { fontSize: 44, lineHeight: 62 }; // Texto corto
+    } else if (textLength < 300) {
+      return { fontSize: 36, lineHeight: 54 }; // Texto medio
+    } else {
+      return { fontSize: 28, lineHeight: 42 }; // Texto largo - pequeño
+    }
+  }
+};
+
 // Helper to wrap text into lines
 const wrapText = (ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] => {
   const words = text.split(' ');
@@ -170,13 +200,15 @@ const DailyPostImage = ({
       ctx.font = 'bold 20px Arial, sans-serif';
       ctx.fillText(badgeLabel, size / 2, badgeY + 30);
 
-      // Main content text
+      // Main content text - dynamic font size based on text length
       ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-      ctx.font = tipo === 'versiculo' ? 'italic 28px Georgia, serif' : '26px Georgia, serif';
+      const { fontSize, lineHeight } = calculateFontSize(content.mainText.length, 'post');
+      ctx.font = tipo === 'versiculo' 
+        ? `italic ${fontSize}px Georgia, serif` 
+        : `${fontSize - 2}px Georgia, serif`;
       ctx.textAlign = 'center';
 
       const maxWidth = size - 120;
-      const lineHeight = 40;
       
       // Limit text length to fit in canvas
       const displayText = content.mainText.length > 400 
@@ -402,13 +434,15 @@ const DailyStoryImage = ({
       ctx.font = 'bold 26px Arial, sans-serif';
       ctx.fillText(badgeLabel, width / 2, badgeY + 38);
 
-      // Main content text
+      // Main content text - dynamic font size based on text length
       ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-      ctx.font = tipo === 'versiculo' ? 'italic 36px Georgia, serif' : '34px Georgia, serif';
+      const { fontSize, lineHeight } = calculateFontSize(content.mainText.length, 'story');
+      ctx.font = tipo === 'versiculo' 
+        ? `italic ${fontSize}px Georgia, serif` 
+        : `${fontSize - 2}px Georgia, serif`;
       ctx.textAlign = 'center';
 
       const maxWidth = width - 140;
-      const lineHeight = 54;
       
       // Limit text length to fit in canvas
       const displayText = content.mainText.length > 500 
