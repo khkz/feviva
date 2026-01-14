@@ -1,5 +1,6 @@
-import { Sparkles, Sun, Moon, CloudSun, Flame, Trophy, Zap } from "lucide-react";
+import { Sparkles, Sun, Moon, CloudSun, Flame, Trophy, Zap, Share2 } from "lucide-react";
 import { motion } from "framer-motion";
+import { DailyShareButton } from "@/components/shared/DailyShareButton";
 import heroBackground from "@/assets/hero-background.jpg";
 
 interface HeroSectionProps {
@@ -89,15 +90,27 @@ export function HeroSection({ userName, verse, stats }: HeroSectionProps) {
           {/* Verse */}
           {verse && (
             <motion.div 
-              className="glass-card rounded-xl p-4"
+              className="glass-card rounded-xl p-4 relative"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6 }}
             >
-              <p className="text-white/90 text-sm italic leading-relaxed">
+              <p className="text-white/90 text-sm italic leading-relaxed pr-8">
                 "{verse.text}"
               </p>
               <p className="text-white/60 text-xs mt-1.5 font-medium">— {verse.reference}</p>
+              
+              {/* Share button mobile */}
+              <div className="absolute top-3 right-3">
+                <DailyShareButton 
+                  tipo="versiculo" 
+                  title="Versículo del día"
+                  fallbackText={verse.text}
+                  size="icon"
+                  variant="ghost"
+                  className="h-7 w-7 text-white/70 hover:text-white hover:bg-white/10"
+                />
+              </div>
             </motion.div>
           )}
         </div>
@@ -126,15 +139,27 @@ export function HeroSection({ userName, verse, stats }: HeroSectionProps) {
 
               {verse && (
                 <motion.div 
-                  className="glass-card rounded-2xl p-6 max-w-xl"
+                  className="glass-card rounded-2xl p-6 max-w-xl relative group"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.5 }}
                 >
-                  <p className="text-white/90 text-lg italic leading-relaxed">
+                  <p className="text-white/90 text-lg italic leading-relaxed pr-10">
                     "{verse.text}"
                   </p>
                   <p className="text-white/60 text-sm mt-2 font-medium">— {verse.reference}</p>
+                  
+                  {/* Share button */}
+                  <div className="absolute top-4 right-4">
+                    <DailyShareButton 
+                      tipo="versiculo" 
+                      title="Versículo del día"
+                      fallbackText={verse.text}
+                      size="icon"
+                      variant="ghost"
+                      className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10"
+                    />
+                  </div>
                 </motion.div>
               )}
             </motion.div>
