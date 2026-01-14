@@ -253,7 +253,7 @@ export const SaintOfTheDayCard = ({ userCountryCode }: SaintOfTheDayCardProps) =
               <img
                 src={saint.image_url}
                 alt={saint.name}
-                className="w-full h-48 object-cover rounded-lg"
+                className="w-full h-48 object-cover object-top rounded-lg"
               />
             )}
             <p className="text-sm leading-relaxed">{saint.description}</p>
