@@ -314,7 +314,7 @@ export default function AdminOraciones() {
                   className="mt-2"
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  {activeJobs.length} pendientes • {stats.successRate.toFixed(0)}% éxito
+                  {activeJobs.length} pendientes • {(stats?.successRate ?? 0).toFixed(0)}% éxito
                 </p>
               </div>
               <span className="text-sm text-muted-foreground">
