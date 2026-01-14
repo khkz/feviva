@@ -53,6 +53,13 @@ Ritmo moderado, con énfasis en los conceptos importantes.
 Transmite entusiasmo por el conocimiento sin ser abrumador.
 Ideal para enseñar con paciencia y claridad.`;
 
+const ORACION_INSTRUCTIONS = `Eres un narrador de oraciones católicas con voz profundamente espiritual.
+Tu tono debe ser solemne, reverente y lleno de devoción, como en una iglesia antigua.
+Habla pausadamente, con respiraciones naturales que inviten a la meditación.
+Pronuncia con claridad especial las palabras en latín cuando aparezcan.
+Transmite fe, paz interior y conexión con lo sagrado en cada palabra.
+El ritmo debe ser meditativo, sin prisa, permitiendo que cada frase penetre en el corazón.`;
+
 async function logJobAttempt(jobId: string, attemptNumber: number, status: string, message: string, metadata?: Record<string, unknown>): Promise<void> {
   await supabase.from('processing_logs').insert({ job_id: jobId, attempt_number: attemptNumber, status, message, metadata });
 }
@@ -248,6 +255,24 @@ async function processLessonTTSPremium(targetId: string, voice: string = 'sage')
   const { data: urlData } = supabase.storage.from('teachings-audio').getPublicUrl(filename);
   
   await supabase.from('library_lessons').update({ audio_url: urlData.publicUrl }).eq('id', targetId);
+  
+  return { audioUrl: urlData.publicUrl, voice, model: 'gpt-4o-mini-tts', premium: true };
+}
+
+// Procesar TTS PREMIUM para oraciones
+async function processOracionTTSPremium(targetId: string, voice: string = 'echo'): Promise<Record<string, unknown>> {
+  const { data: oracion, error } = await supabase.from('oraciones').select('texto, nombre').eq('id', targetId).single();
+  if (error || !oracion) throw new Error(`Oración no encontrada: ${error?.message}`);
+  
+  console.log(`[Premium Oracion TTS] Procesando: ${oracion.nombre} con voz ${voice}`);
+  
+  const audio = await generatePremiumTTS(oracion.texto, voice, ORACION_INSTRUCTIONS, 0.85);
+  const filename = `oracion-${targetId}.mp3`;
+  
+  await supabase.storage.from('teachings-audio').upload(filename, audio, { contentType: 'audio/mpeg', upsert: true });
+  const { data: urlData } = supabase.storage.from('teachings-audio').getPublicUrl(filename);
+  
+  await supabase.from('oraciones').update({ audio_url: urlData.publicUrl }).eq('id', targetId);
   
   return { audioUrl: urlData.publicUrl, voice, model: 'gpt-4o-mini-tts', premium: true };
 }
@@ -510,6 +535,9 @@ async function processJob(job: ProcessingJob): Promise<void> {
         break;
       case 'lesson_content_enrich':
         result = await processLessonContentEnrich(job.target_id);
+        break;
+      case 'oracion_tts_premium':
+        result = await processOracionTTSPremium(job.target_id, voice || 'echo');
         break;
       default:
         throw new Error(`Tipo de job no soportado: ${job.job_type}`);
