@@ -20,6 +20,11 @@ interface DailyShareButtonProps {
   tipo: ShareImageType;
   title?: string;
   fallbackText?: string;
+  directContent?: {
+    mainText: string;
+    reference?: string;
+    subtitle?: string;
+  };
   className?: string;
   variant?: "default" | "outline" | "ghost" | "secondary";
   size?: "default" | "sm" | "lg" | "icon";
@@ -683,6 +688,7 @@ export const DailyShareButton = ({
   tipo,
   title = "Compartir",
   fallbackText,
+  directContent,
   className,
   variant = "outline",
   size = "default",
@@ -707,6 +713,11 @@ export const DailyShareButton = ({
 
   // Build content data based on type
   const getContentData = (): ContentData | null => {
+    // If directContent is provided, use it first
+    if (directContent) {
+      return directContent;
+    }
+    
     if (tipo === 'versiculo' && dailyContent) {
       return {
         mainText: dailyContent.versiculo_texto,

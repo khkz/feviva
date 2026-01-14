@@ -103,7 +103,10 @@ export function HeroSection({ userName, verse, stats }: HeroSectionProps) {
                 <DailyShareButton 
                   tipo="versiculo" 
                   title=""
-                  fallbackText={verse.text}
+                  directContent={{
+                    mainText: verse.text,
+                    reference: verse.reference
+                  }}
                   size="sm"
                   variant="ghost"
                   className="h-6 text-white/60 hover:text-white hover:bg-white/10 text-xs gap-1"
@@ -150,7 +153,10 @@ export function HeroSection({ userName, verse, stats }: HeroSectionProps) {
                     <DailyShareButton 
                       tipo="versiculo" 
                       title="Compartir"
-                      fallbackText={verse.text}
+                      directContent={{
+                        mainText: verse.text,
+                        reference: verse.reference
+                      }}
                       size="sm"
                       variant="ghost"
                       className="text-white/60 hover:text-white hover:bg-white/10"
