@@ -120,11 +120,29 @@ async function downloadAndUploadImage(
   imageUrl: string, 
   saintName: string, 
   supabaseClient: any
-): Promise<string | null> {
+): Promise<{ storedUrl: string | null; usedDirect: boolean }> {
   try {
     console.log(`Downloading image: ${imageUrl}`);
     
-    const response = await fetch(imageUrl, {
+    // Skip very large images by checking URL patterns
+    const isLargeImage = imageUrl.includes('/commons/') && !imageUrl.includes('/thumb/');
+    
+    // For large images or SVGs, try to get a smaller version
+    let fetchUrl = imageUrl;
+    if (isLargeImage && !imageUrl.endsWith('.svg')) {
+      // Try to get a 600px thumbnail from Commons
+      const fileName = imageUrl.split('/').pop() || '';
+      if (fileName) {
+        const thumbUrl = imageUrl.replace('/commons/', '/commons/thumb/') + '/600px-' + fileName;
+        console.log(`Trying thumbnail: ${thumbUrl}`);
+        const thumbCheck = await fetch(thumbUrl, { method: 'HEAD' });
+        if (thumbCheck.ok) {
+          fetchUrl = thumbUrl;
+        }
+      }
+    }
+    
+    const response = await fetch(fetchUrl, {
       headers: {
         'User-Agent': 'ElRugido/1.0 (https://elrugido.app; contact@elrugido.app)',
       },
@@ -132,10 +150,25 @@ async function downloadAndUploadImage(
     
     if (!response.ok) {
       console.error(`Failed to download image: ${response.status}`);
-      return null;
+      // Return original URL as fallback
+      return { storedUrl: imageUrl, usedDirect: true };
+    }
+    
+    // Check content length - skip if too large (> 5MB)
+    const contentLength = response.headers.get('content-length');
+    if (contentLength && parseInt(contentLength) > 5 * 1024 * 1024) {
+      console.log(`Image too large (${contentLength} bytes), using direct URL`);
+      return { storedUrl: imageUrl, usedDirect: true };
     }
     
     const contentType = response.headers.get('content-type') || 'image/jpeg';
+    
+    // Skip SVG files - use direct URL
+    if (contentType.includes('svg')) {
+      console.log('SVG file, using direct URL');
+      return { storedUrl: imageUrl, usedDirect: true };
+    }
+    
     const extension = contentType.includes('png') ? 'png' : 
                       contentType.includes('webp') ? 'webp' : 
                       contentType.includes('gif') ? 'gif' : 'jpg';
@@ -154,7 +187,7 @@ async function downloadAndUploadImage(
     
     const filename = `${safeName}-${Date.now()}.${extension}`;
     
-    console.log(`Uploading to storage: ${filename}`);
+    console.log(`Uploading to storage: ${filename} (${bytes.length} bytes)`);
     
     const { data: uploadData, error: uploadError } = await supabaseClient.storage
       .from('saint-images')
@@ -165,7 +198,8 @@ async function downloadAndUploadImage(
     
     if (uploadError) {
       console.error('Upload error:', uploadError);
-      return null;
+      // Return original URL as fallback
+      return { storedUrl: imageUrl, usedDirect: true };
     }
     
     // Get public URL
@@ -173,10 +207,11 @@ async function downloadAndUploadImage(
       .from('saint-images')
       .getPublicUrl(filename);
     
-    return urlData.publicUrl;
+    return { storedUrl: urlData.publicUrl, usedDirect: false };
   } catch (error) {
     console.error('Error downloading/uploading image:', error);
-    return null;
+    // Return original URL as fallback
+    return { storedUrl: imageUrl, usedDirect: true };
   }
 }
 
@@ -268,25 +303,27 @@ serve(async (req) => {
       );
     }
 
-    // Download and upload to Supabase Storage
-    const storedImageUrl = await downloadAndUploadImage(imageUrl, saint.name, supabase);
+    // Download and upload to Supabase Storage (with fallback to direct URL)
+    const { storedUrl, usedDirect } = await downloadAndUploadImage(imageUrl, saint.name, supabase);
 
-    if (!storedImageUrl) {
+    if (!storedUrl) {
       return new Response(
         JSON.stringify({ 
           success: false, 
           saint_name: saint.name,
-          message: 'Found image but failed to download/upload',
+          message: 'Failed to process image',
           original_url: imageUrl
         }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
+    const finalImageUrl = storedUrl;
+
     // Update calendar_saints with image URL
     const { error: updateError } = await supabase
       .from('calendar_saints')
-      .update({ image_url: storedImageUrl })
+      .update({ image_url: finalImageUrl })
       .eq('id', saintId);
 
     if (updateError) {
@@ -297,15 +334,16 @@ serve(async (req) => {
       );
     }
 
-    console.log(`Successfully found and stored image for ${saint.name} from ${source}`);
+    console.log(`Successfully ${usedDirect ? 'linked' : 'stored'} image for ${saint.name} from ${source}`);
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         saint_name: saint.name,
-        image_url: storedImageUrl,
+        image_url: finalImageUrl,
         source: source,
-        original_url: imageUrl
+        original_url: imageUrl,
+        used_direct_url: usedDirect
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
