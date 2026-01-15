@@ -3,34 +3,34 @@ import { Link } from "react-router-dom";
 import { Heart, Church, BookOpen, Sparkles, MapPin, Globe } from "lucide-react";
 import logoElRugido from "@/assets/logo-elrugido.svg";
 
-// Popular saints for SEO links
+// Popular saints for SEO links - Using real database slugs
 const popularSaints = [
-  { name: "Virgen de Guadalupe", slug: "virgen-de-guadalupe" },
-  { name: "San Francisco de Asís", slug: "san-francisco-de-asis" },
-  { name: "Santa Teresa de Jesús", slug: "santa-teresa-de-jesus" },
-  { name: "San Juan Pablo II", slug: "san-juan-pablo-ii" },
-  { name: "San José", slug: "san-jose" },
-  { name: "Santa Rosa de Lima", slug: "santa-rosa-de-lima" },
+  { name: "Virgen de Guadalupe", slug: "virgen-de-guadalupe-061a968f" },
+  { name: "San Francisco de Asís", slug: "san-francisco-de-asis-19ace8a4" },
+  { name: "Santa Teresa de Jesús", slug: "santa-teresa-de-jesus-10832ac0" },
+  { name: "San Juan Pablo II", slug: "san-juan-pablo-ii-3f8d969c" },
+  { name: "San José", slug: "san-jose-307af056" },
+  { name: "Santa Rosa de Lima", slug: "santa-rosa-de-lima-d2af02bd" },
 ];
 
-// Popular prayers for SEO links
+// Popular prayers for SEO links - Using slugs that match generated slugs from nombre
 const popularPrayers = [
   { name: "Padre Nuestro", slug: "padre-nuestro" },
   { name: "Ave María", slug: "ave-maria" },
-  { name: "Gloria al Padre", slug: "gloria-al-padre" },
+  { name: "Gloria", slug: "gloria" },
   { name: "Credo de los Apóstoles", slug: "credo-de-los-apostoles" },
   { name: "Salve Regina", slug: "salve-regina" },
-  { name: "Oración a San Miguel", slug: "oracion-a-san-miguel-arcangel" },
+  { name: "Oración a San Miguel Arcángel", slug: "oracion-a-san-miguel-arcangel" },
 ];
 
-// Patron saints by country for SEO
+// Patron saints by country for SEO - Using real database slugs
 const patronsByCountry = [
-  { name: "México", saint: "Virgen de Guadalupe", slug: "virgen-de-guadalupe" },
-  { name: "Argentina", saint: "Virgen de Luján", slug: "virgen-de-lujan" },
-  { name: "España", saint: "Santiago Apóstol", slug: "santiago-apostol" },
-  { name: "Perú", saint: "Santa Rosa de Lima", slug: "santa-rosa-de-lima" },
-  { name: "Colombia", saint: "Virgen del Rosario", slug: "nuestra-senora-del-rosario-de-chiquinquira" },
-  { name: "Brasil", saint: "Nuestra Señora Aparecida", slug: "nuestra-senora-aparecida" },
+  { name: "México", saint: "Virgen de Guadalupe", slug: "virgen-de-guadalupe-061a968f" },
+  { name: "Argentina", saint: "Nuestra Señora de Luján", slug: "nuestra-senora-de-lujan-826ada82" },
+  { name: "España", saint: "Santiago Apóstol", slug: "santiago-apostol-12e29c61" },
+  { name: "Perú", saint: "Santa Rosa de Lima", slug: "santa-rosa-de-lima-d2af02bd" },
+  { name: "Colombia", saint: "Virgen de Chiquinquirá", slug: "virgen-de-chiquinquira-5a36a7e5" },
+  { name: "Brasil", saint: "Nuestra Señora Aparecida", slug: "nuestra-senora-aparecida-21f9efa5" },
 ];
 
 export const FooterSection = () => {
