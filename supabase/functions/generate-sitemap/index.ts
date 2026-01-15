@@ -6,6 +6,16 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Generate URL-friendly slug from prayer name
+function generateSlug(nombre: string): string {
+  return nombre
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -20,20 +30,38 @@ serve(async (req) => {
     const today = new Date().toISOString().split("T")[0];
 
     // Fetch all saints with slugs
-    const { data: saints, error } = await supabase
+    const { data: saints, error: saintsError } = await supabase
       .from("calendar_saints")
       .select("id, slug, name, category, image_url, feast_month, feast_day, created_at")
       .order("category", { ascending: false })
       .order("feast_month")
       .order("feast_day");
 
-    if (error) throw error;
+    if (saintsError) throw saintsError;
 
-    // Static pages
+    // Fetch all prayers with slug
+    const { data: oraciones, error: oracionesError } = await supabase
+      .from("oraciones")
+      .select("id, nombre, slug, categoria, es_fundamental, created_at")
+      .order("categoria")
+      .order("orden");
+
+    if (oracionesError) throw oracionesError;
+
+    // Static pages with priorities
     const staticPages = [
       { url: "/", changefreq: "daily", priority: "1.0" },
-      { url: "/auth", changefreq: "monthly", priority: "0.8" },
-      { url: "/santos", changefreq: "weekly", priority: "0.9" },
+      { url: "/santos", changefreq: "daily", priority: "0.9" },
+      { url: "/oraciones", changefreq: "weekly", priority: "0.9" },
+      { url: "/auth", changefreq: "monthly", priority: "0.6" },
+      { url: "/frontera-final", changefreq: "weekly", priority: "0.7" },
+      { url: "/frontera-final/padre-big-bang", changefreq: "monthly", priority: "0.6" },
+      { url: "/frontera-final/observatorio-vaticano", changefreq: "monthly", priority: "0.6" },
+      { url: "/frontera-final/bautizar-extraterrestre", changefreq: "monthly", priority: "0.6" },
+      { url: "/frontera-final/punto-omega", changefreq: "monthly", priority: "0.6" },
+      { url: "/frontera-final/libro-naturaleza", changefreq: "monthly", priority: "0.6" },
+      { url: "/frontera-final/ia-alma", changefreq: "monthly", priority: "0.6" },
+      { url: "/frontera-final/colonizar-conquistar", changefreq: "monthly", priority: "0.6" },
     ];
 
     // Build XML
@@ -53,11 +81,27 @@ serve(async (req) => {
 `;
     }
 
+    // Add prayer pages
+    for (const oracion of oraciones || []) {
+      // Use database slug if available, fallback to generated
+      const prayerSlug = oracion.slug || generateSlug(oracion.nombre);
+      const priority = oracion.es_fundamental ? "0.8" : "0.6";
+      const changefreq = "monthly";
+
+      xml += `  <url>
+    <loc>${baseUrl}/oracion/${prayerSlug}</loc>
+    <lastmod>${oracion.created_at?.split("T")[0] || today}</lastmod>
+    <changefreq>${changefreq}</changefreq>
+    <priority>${priority}</priority>
+  </url>
+`;
+    }
+
     // Add saint pages
     for (const saint of saints || []) {
       const slug = saint.slug || saint.id;
       const priority = saint.category === "patron_country" ? "0.8" : "0.6";
-      const changefreq = saint.image_url ? "monthly" : "weekly"; // Pages with complete content change less
+      const changefreq = saint.image_url ? "monthly" : "weekly";
 
       xml += `  <url>
     <loc>${baseUrl}/santo/${slug}</loc>
@@ -89,9 +133,12 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({
           success: true,
-          totalUrls: staticPages.length + (saints?.length || 0),
+          totalUrls: staticPages.length + (saints?.length || 0) + (oraciones?.length || 0),
+          staticPagesCount: staticPages.length,
           saintsCount: saints?.length || 0,
+          oracionesCount: oraciones?.length || 0,
           patronsCount: saints?.filter((s) => s.category === "patron_country").length || 0,
+          fundamentalPrayersCount: oraciones?.filter((o) => o.es_fundamental).length || 0,
           withImageCount: saints?.filter((s) => s.image_url).length || 0,
         }),
         {

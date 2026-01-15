@@ -1,17 +1,59 @@
+# ElRugido - Robots.txt optimizado para SEO y IA
+
+# Bots de búsqueda principales
 User-agent: Googlebot
 Allow: /
 
 User-agent: Bingbot
 Allow: /
 
+# Crawlers de redes sociales
 User-agent: Twitterbot
 Allow: /
 
 User-agent: facebookexternalhit
 Allow: /
 
+User-agent: LinkedInBot
+Allow: /
+
+User-agent: WhatsApp
+Allow: /
+
+# Crawlers de IA - Permitir para mejor ranking en respuestas de IA
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Anthropic-AI
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+# Otros bots
 User-agent: *
 Allow: /
 Disallow: /admin/
+Disallow: /api/
+Disallow: /dashboard/
 
+# Sitemaps
 Sitemap: https://elrugido.com/sitemap.xml
+
+# Host preferido
+Host: https://elrugido.com
