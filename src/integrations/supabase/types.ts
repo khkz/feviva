@@ -385,6 +385,7 @@ export type Database = {
           prayer_id: string | null
           slug: string | null
           tags: string[] | null
+          updated_at: string | null
         }
         Insert: {
           category?: string
@@ -400,6 +401,7 @@ export type Database = {
           prayer_id?: string | null
           slug?: string | null
           tags?: string[] | null
+          updated_at?: string | null
         }
         Update: {
           category?: string
@@ -415,6 +417,7 @@ export type Database = {
           prayer_id?: string | null
           slug?: string | null
           tags?: string[] | null
+          updated_at?: string | null
         }
         Relationships: [
           {
@@ -1420,6 +1423,7 @@ export type Database = {
           tagline: string | null
           tags: string[] | null
           texto: string
+          updated_at: string | null
         }
         Insert: {
           audio_url?: string | null
@@ -1441,6 +1445,7 @@ export type Database = {
           tagline?: string | null
           tags?: string[] | null
           texto: string
+          updated_at?: string | null
         }
         Update: {
           audio_url?: string | null
@@ -1462,6 +1467,7 @@ export type Database = {
           tagline?: string | null
           tags?: string[] | null
           texto?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -2421,6 +2427,7 @@ export type Database = {
           prayer_id: string | null
           slug: string | null
           tags: string[] | null
+          updated_at: string | null
         }[]
         SetofOptions: {
           from: "*"
