@@ -52,8 +52,8 @@ Disallow: /admin/
 Disallow: /api/
 Disallow: /dashboard/
 
-# Sitemaps
-Sitemap: https://elrugido.com/sitemap.xml
+# Sitemaps - Dynamic sitemap via Edge Function
+Sitemap: https://duggdnqpemwojkojfyei.supabase.co/functions/v1/generate-sitemap
 
 # Host preferido
 Host: https://elrugido.com

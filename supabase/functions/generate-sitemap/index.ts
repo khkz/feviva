@@ -29,20 +29,20 @@ serve(async (req) => {
     const baseUrl = "https://elrugido.com";
     const today = new Date().toISOString().split("T")[0];
 
-    // Fetch all saints with slugs
+    // Fetch all saints with slugs and updated_at
     const { data: saints, error: saintsError } = await supabase
       .from("calendar_saints")
-      .select("id, slug, name, category, image_url, feast_month, feast_day, created_at")
+      .select("id, slug, name, category, image_url, feast_month, feast_day, created_at, updated_at")
       .order("category", { ascending: false })
       .order("feast_month")
       .order("feast_day");
 
     if (saintsError) throw saintsError;
 
-    // Fetch all prayers with slug
+    // Fetch all prayers with slug and updated_at
     const { data: oraciones, error: oracionesError } = await supabase
       .from("oraciones")
-      .select("id, nombre, slug, categoria, es_fundamental, created_at")
+      .select("id, nombre, slug, categoria, es_fundamental, created_at, updated_at")
       .order("categoria")
       .order("orden");
 
@@ -87,10 +87,11 @@ serve(async (req) => {
       const prayerSlug = oracion.slug || generateSlug(oracion.nombre);
       const priority = oracion.es_fundamental ? "0.8" : "0.6";
       const changefreq = "monthly";
+      const lastmod = oracion.updated_at?.split("T")[0] || oracion.created_at?.split("T")[0] || today;
 
       xml += `  <url>
     <loc>${baseUrl}/oracion/${prayerSlug}</loc>
-    <lastmod>${oracion.created_at?.split("T")[0] || today}</lastmod>
+    <lastmod>${lastmod}</lastmod>
     <changefreq>${changefreq}</changefreq>
     <priority>${priority}</priority>
   </url>
@@ -102,10 +103,11 @@ serve(async (req) => {
       const slug = saint.slug || saint.id;
       const priority = saint.category === "patron_country" ? "0.8" : "0.6";
       const changefreq = saint.image_url ? "monthly" : "weekly";
+      const lastmod = saint.updated_at?.split("T")[0] || saint.created_at?.split("T")[0] || today;
 
       xml += `  <url>
     <loc>${baseUrl}/santo/${slug}</loc>
-    <lastmod>${saint.created_at?.split("T")[0] || today}</lastmod>
+    <lastmod>${lastmod}</lastmod>
     <changefreq>${changefreq}</changefreq>
     <priority>${priority}</priority>`;
 
@@ -151,6 +153,8 @@ serve(async (req) => {
       headers: {
         ...corsHeaders,
         "Content-Type": "application/xml",
+        "Cache-Control": "public, max-age=86400, s-maxage=86400",
+        "X-Robots-Tag": "noindex",
       },
     });
   } catch (err) {
