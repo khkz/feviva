@@ -1415,6 +1415,7 @@ export type Database = {
           language: string | null
           nombre: string
           orden: number | null
+          slug: string | null
           subcategoria: string | null
           tagline: string | null
           tags: string[] | null
@@ -1435,6 +1436,7 @@ export type Database = {
           language?: string | null
           nombre: string
           orden?: number | null
+          slug?: string | null
           subcategoria?: string | null
           tagline?: string | null
           tags?: string[] | null
@@ -1455,6 +1457,7 @@ export type Database = {
           language?: string | null
           nombre?: string
           orden?: number | null
+          slug?: string | null
           subcategoria?: string | null
           tagline?: string | null
           tags?: string[] | null
@@ -2382,6 +2385,7 @@ export type Database = {
           total_count: number
         }[]
       }
+      generate_prayer_slug: { Args: { nombre: string }; Returns: string }
       generate_referral_code: { Args: never; Returns: string }
       generate_saint_slug: { Args: { name_input: string }; Returns: string }
       get_or_create_referral_code: {

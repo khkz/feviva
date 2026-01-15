@@ -32,19 +32,28 @@ const OracionPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
 
-  // Fetch prayer by slug (matching against normalized name)
+  // Fetch prayer by slug from database
   const { data: oracion, isLoading } = useQuery({
     queryKey: ['oracion-public', slug],
     queryFn: async () => {
-      // Fetch all prayers and match by slug
-      const { data, error } = await supabase
+      // First try to find by slug column
+      const { data: bySlug, error: slugError } = await supabase
+        .from('oraciones')
+        .select('*')
+        .eq('slug', slug)
+        .maybeSingle();
+      
+      if (slugError) throw slugError;
+      if (bySlug) return bySlug as Oracion;
+      
+      // Fallback: search by generated slug from name (for backwards compatibility)
+      const { data: allPrayers, error } = await supabase
         .from('oraciones')
         .select('*');
       
       if (error) throw error;
       
-      // Find by slug match
-      const prayer = (data as Oracion[]).find(o => {
+      const prayer = (allPrayers as Oracion[]).find(o => {
         const prayerSlug = o.nombre
           .toLowerCase()
           .normalize('NFD')
