@@ -4,6 +4,8 @@ import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { ShareModal } from '@/components/shared/ShareModal';
+import { FooterSection } from '@/components/landing/FooterSection';
+import logoElRugido from '@/assets/logo-elrugido.svg';
 import {
   ArrowLeft, 
   Calendar, 
@@ -23,7 +25,6 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { supabase } from '@/integrations/supabase/client';
-import logoElRugido from '@/assets/logo-elrugido.svg';
 import { countryFlags, countryNames, formatFeastDate, getCountryContinent, continentCountries } from '@/lib/countryMappings';
 
 export default function SantoPage() {
@@ -660,54 +661,7 @@ export default function SantoPage() {
         </section>
 
         {/* Footer with SEO Links */}
-        <footer className="py-8 px-4 border-t">
-          <div className="container mx-auto max-w-5xl">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-              <div>
-                <h4 className="font-semibold mb-3">Patronos Populares</h4>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li><Link to="/santo/virgen-de-guadalupe" className="hover:text-foreground">Virgen de Guadalupe</Link></li>
-                  <li><Link to="/santo/san-patricio" className="hover:text-foreground">San Patricio</Link></li>
-                  <li><Link to="/santo/santiago-apostol" className="hover:text-foreground">Santiago Apóstol</Link></li>
-                  <li><Link to="/santo/san-jose" className="hover:text-foreground">San José</Link></li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold mb-3">Por Continente</h4>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li><Link to="/santos?continent=latinoamerica" className="hover:text-foreground">Latinoamérica</Link></li>
-                  <li><Link to="/santos?continent=europa" className="hover:text-foreground">Europa</Link></li>
-                  <li><Link to="/santos?continent=asia" className="hover:text-foreground">Asia</Link></li>
-                  <li><Link to="/santos?continent=africa" className="hover:text-foreground">África</Link></li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold mb-3">Recursos</h4>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li><Link to="/santos" className="hover:text-foreground">Calendario de Santos</Link></li>
-                  <li><Link to="/auth" className="hover:text-foreground">Oraciones Guiadas</Link></li>
-                  <li><Link to="/auth" className="hover:text-foreground">Rosario Interactivo</Link></li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold mb-3">ElRugido</h4>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li><Link to="/" className="hover:text-foreground">Inicio</Link></li>
-                  <li><Link to="/auth" className="hover:text-foreground">Crear Cuenta</Link></li>
-                  <li><Link to="/auth" className="hover:text-foreground">Iniciar Sesión</Link></li>
-                </ul>
-              </div>
-            </div>
-            
-            <div className="pt-6 border-t flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-              <Link to="/" className="flex items-center gap-2">
-                <img src={logoElRugido} alt="ElRugido" className="h-6 w-6" />
-                <span className="font-display font-semibold">ElRugido</span>
-              </Link>
-              <p>© {new Date().getFullYear()} ElRugido - Tu compañero de fe católica</p>
-            </div>
-          </div>
-        </footer>
+        <FooterSection />
       </div>
 
       {/* Share Modal */}
