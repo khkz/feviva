@@ -29,7 +29,6 @@ import Mission from "./pages/Mission";
 import Oraciones from "./pages/Oraciones";
 import Rosario from "./pages/Rosario";
 import SleepStories from "./pages/SleepStories";
-import Musica from "./pages/Musica";
 import Novenas from "./pages/Novenas";
 import BiblePlan from "./pages/BiblePlan";
 import Santos from "./pages/Santos";
@@ -107,7 +106,6 @@ const App = () => (
                 <Route path="/rosario" element={<Rosario />} />
                 <Route path="/sleep-stories" element={<SleepStories />} />
                 <Route path="/sleep" element={<SleepStories />} />
-                <Route path="/musica" element={<Musica />} />
                 <Route path="/novenas" element={<Novenas />} />
                 <Route path="/bible-plan" element={<BiblePlan />} />
                 <Route path="/santos" element={<SantosPublic />} />

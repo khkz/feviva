@@ -15,8 +15,7 @@ import {
   Route,
   Flower2,
   GraduationCap,
-  Rocket,
-  Music
+  Rocket
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import logoElRugido from "@/assets/logo-elrugido.svg";
@@ -40,7 +39,6 @@ const mainNavItems: NavItem[] = [
 const secondaryNavItems: NavItem[] = [
   { path: "/coach", icon: MessageCircle, label: "Coach de Fe" },
   { path: "/library", icon: GraduationCap, label: "Biblioteca" },
-  { path: "/musica", icon: Music, label: "Música" },
   { path: "/frontera-final", icon: Rocket, label: "Frontera Final" },
   { path: "/habits", icon: Target, label: "Hábitos" },
   { path: "/community", icon: Users, label: "Comunidad" },
