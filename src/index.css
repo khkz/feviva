@@ -144,8 +144,102 @@ All colors MUST be HSL.
 }
 
 @layer utilities {
+  /* ========== EL RUGIDO - DEFENDER THEME ========== */
+  
   .text-gradient-gold {
     @apply bg-gradient-to-r from-secondary to-secondary-hover bg-clip-text text-transparent;
+  }
+  
+  .text-gradient-rugido {
+    @apply bg-gradient-to-r from-rugido-gold via-rugido-fire to-rugido-gold bg-clip-text text-transparent;
+  }
+
+  /* Lion glow effect */
+  .glow-lion {
+    box-shadow: 0 0 20px hsla(45, 95%, 58%, 0.4), 0 0 40px hsla(45, 95%, 58%, 0.2);
+    animation: pulse-lion 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse-lion {
+    0%, 100% { 
+      box-shadow: 0 0 20px hsla(45, 95%, 58%, 0.3), 0 0 40px hsla(45, 95%, 58%, 0.1);
+    }
+    50% { 
+      box-shadow: 0 0 30px hsla(45, 95%, 58%, 0.5), 0 0 60px hsla(45, 95%, 58%, 0.3);
+    }
+  }
+
+  /* Battle gradient backgrounds */
+  .battle-gradient {
+    background: linear-gradient(135deg, 
+      hsl(220, 50%, 10%) 0%, 
+      hsl(0, 70%, 25%) 50%, 
+      hsl(45, 95%, 40%) 100%);
+  }
+
+  .battle-gradient-dark {
+    background: linear-gradient(180deg, 
+      hsl(220, 50%, 8%) 0%, 
+      hsl(0, 60%, 15%) 50%, 
+      hsl(220, 50%, 5%) 100%);
+  }
+
+  /* Roar ripple animation */
+  .roar-ripple {
+    animation: roar-expand 2s ease-out infinite;
+  }
+
+  @keyframes roar-expand {
+    0% {
+      transform: scale(1);
+      opacity: 0.6;
+    }
+    100% {
+      transform: scale(2.5);
+      opacity: 0;
+    }
+  }
+
+  /* Fire progress bar */
+  .progress-fire {
+    background: linear-gradient(90deg, 
+      hsl(25, 95%, 53%) 0%, 
+      hsl(0, 80%, 50%) 50%, 
+      hsl(45, 95%, 58%) 100%);
+    background-size: 200% 100%;
+    animation: fire-flow 2s linear infinite;
+  }
+
+  @keyframes fire-flow {
+    0% { background-position: 100% 0; }
+    100% { background-position: -100% 0; }
+  }
+
+  /* Hero defender overlay */
+  .glass-hero-defender {
+    @apply relative overflow-hidden;
+  }
+
+  .glass-hero-defender::before {
+    content: '';
+    @apply absolute inset-0;
+    background: linear-gradient(
+      180deg,
+      hsla(220, 50%, 8%, 0.3) 0%,
+      hsla(0, 60%, 15%, 0.5) 30%,
+      hsla(220, 50%, 5%, 0.9) 70%,
+      hsla(var(--background), 1) 100%
+    );
+  }
+
+  .dark .glass-hero-defender::before {
+    background: linear-gradient(
+      180deg,
+      hsla(220, 50%, 5%, 0.4) 0%,
+      hsla(0, 50%, 10%, 0.6) 30%,
+      hsla(220, 50%, 3%, 0.95) 70%,
+      hsla(var(--background), 1) 100%
+    );
   }
   
   .shadow-glow {
