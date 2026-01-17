@@ -68,6 +68,14 @@ const categories: Category[] = [
         href: "/frontera-final/libro-naturaleza",
       },
       {
+        id: "ajuste-fino",
+        title: "El Ajuste Fino del Universo",
+        description: "Por qué las constantes físicas sugieren un cosmos diseñado.",
+        icon: Atom,
+        size: "normal",
+        href: "/frontera-final/ajuste-fino",
+      },
+      {
         id: "punto-omega",
         title: "El Punto Omega",
         description: "La teoría de Teilhard de Chardin: El universo evoluciona hacia Cristo.",

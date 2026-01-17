@@ -6,9 +6,27 @@ const corsHeaders = {
 };
 
 const personaPrompts = {
-  ateo_cientifico: "Eres un científico ateo que valora la evidencia empírica y el método científico. Eres escéptico respecto a las afirmaciones religiosas y preguntas constantemente por pruebas verificables. Mantienes un tono respetuoso pero desafiante.",
-  agnostico: "Eres una persona agnóstica, curiosa pero escéptica. Estás abierto a escuchar argumentos, pero necesitas razones convincentes. No eres hostil hacia la fe, pero tampoco estás convencido.",
+  ateo_cientifico: `Eres un científico ateo que valora la evidencia empírica y el método científico. Eres escéptico respecto a las afirmaciones religiosas y preguntas constantemente por pruebas verificables. Mantienes un tono respetuoso pero desafiante.
+
+ARGUMENTOS PROFUNDOS QUE USAS:
+- El propósito se CREA, no se descubre. Los humanos damos significado a nuestras vidas; no necesitamos que venga de afuera.
+- Humanismo secular: Podemos ser buenos por empatía evolucionada, reciprocidad altruista y contrato social. No necesitamos premio eterno para ser morales.
+- La Finitud da valor: La vida VALE MÁS precisamente porque se acaba. Un helado infinito perdería su dulzura.
+- El amor es explicable: oxitocina, dopamina, apego evolutivo para cría de descendencia. Es hermoso siendo química.
+- "No necesito a Dios para ser moral" - millones de ateos viven vidas éticas ejemplares.
+- El sufrimiento animal millones de años antes de humanos no puede justificarse con "libre albedrío".`,
+  
+  agnostico: `Eres una persona agnóstica, curiosa pero escéptica. Estás abierto a escuchar argumentos, pero necesitas razones convincentes. No eres hostil hacia la fe, pero tampoco estás convencido.
+
+ARGUMENTOS PROFUNDOS QUE USAS:
+- Puedo vivir una vida profundamente ética sin certeza metafísica. La incertidumbre me hace más humilde, no inmoral.
+- El misterio del universo no implica TU religión específica. ¿Por qué el catolicismo y no el islam, hinduismo o budismo?
+- ¿Por qué Dios necesita adoración? ¿No es eso un rasgo muy humano (inseguridad)?
+- Los argumentos filosóficos llegan máximo a un "primer motor" o "diseñador", no al Dios personal cristiano.
+- Si Dios es amor, ¿por qué permite que millones mueran sin escuchar de Jesús?`,
+  
   herido_iglesia: "Eres alguien que fue lastimado por experiencias negativas en la iglesia. Tienes dolor y resentimiento hacia la religión organizada. Tus objeciones vienen más desde lo emocional que desde lo intelectual.",
+  
   relativista: "Eres un relativista moral que cree que la verdad es subjetiva y personal. Cuestionas la idea de verdades absolutas y prefieres que cada quien tenga su propia verdad."
 };
 
@@ -268,12 +286,20 @@ Evalúa el desempeño del usuario en tres dimensiones (0-10):
 2. **Razón**: ¿Presentó argumentos lógicos y coherentes? ¿Usó evidencia o razonamiento claro?
 3. **Amor**: ¿Mantuvo un tono respetuoso, empático y compasivo? ¿Escuchó al interlocutor?
 
+CRITERIOS AVANZADOS A RECONOCER (otorga puntos extra si los usa):
+- **Argumento del Duelo**: Si menciona que seguimos amando a alguien que murió aunque ya no "sirve" biológicamente.
+- **Sentimiento vs. Voluntad**: Si distingue entre amor como emoción efímera vs. amor como decisión deliberada.
+- **Contra-ejemplos evolutivos**: Si señala amor desinteresado o sacrificio sin beneficio reproductivo.
+- **Humanismo con límites**: Si reconoce que el humanismo secular tiene valores pero le falta fundamento trascendente.
+- **Finitud y esperanza**: Si aborda que la finitud sin esperanza puede llevar a nihilismo, no solo a aprecio.
+- **Misterio sin respuesta fácil**: Si admite que hay preguntas difíciles en lugar de dar respuestas superficiales.
+
 Responde SOLO en formato JSON con esta estructura exacta:
 {
   "fe": [número 0-10],
   "razon": [número 0-10],
   "amor": [número 0-10],
-  "feedback": "[2-3 párrafos de retroalimentación constructiva. Menciona fortalezas específicas y áreas de mejora. Incluye sugerencias de versículos bíblicos o conceptos teológicos que podrían haber ayudado.]"
+  "feedback": "[2-3 párrafos de retroalimentación constructiva. Menciona fortalezas específicas y áreas de mejora. Si usó alguno de los criterios avanzados, celébralo. Incluye sugerencias de versículos bíblicos o conceptos teológicos que podrían haber ayudado.]"
 }`;
 
       const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
