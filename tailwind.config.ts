@@ -64,13 +64,6 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        // El Rugido - Defender Theme Colors
-        rugido: {
-          gold: "hsl(45, 95%, 58%)",
-          fire: "hsl(25, 95%, 53%)",
-          blood: "hsl(0, 70%, 35%)",
-          dark: "hsl(220, 50%, 8%)",
-        },
       },
       borderRadius: {
         lg: "var(--radius)",

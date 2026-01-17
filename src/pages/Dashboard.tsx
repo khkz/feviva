@@ -10,7 +10,6 @@ import { SaintOfTheDayCard } from "@/components/dashboard/SaintOfTheDayCard";
 import { HeroSection } from "@/components/dashboard/HeroSection";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 import { ProgressCard } from "@/components/dashboard/ProgressCard";
-import { NextBattleCard } from "@/components/dashboard/NextBattleCard";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { GospelCard } from "@/components/gospel/GospelCard";
@@ -36,7 +35,7 @@ interface Profile {
 }
 
 const CardSkeleton = ({ height = "h-40" }: { height?: string }) => (
-  <div className="mb-4 px-5 lg:px-0">
+  <div className="mb-4">
     <Skeleton className={`${height} w-full rounded-xl`} />
   </div>
 );
@@ -91,8 +90,8 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-rugido-dark">
-        <div className="animate-pulse text-rugido-gold">
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-pulse text-primary">
           <Sparkles className="w-12 h-12" />
         </div>
       </div>
@@ -104,16 +103,16 @@ const Dashboard = () => {
     <div className="min-h-screen bg-background">
       {/* Desktop Sidebar */}
       <DesktopSidebar 
-        userName={profile?.nombre || "Defensor"}
+        userName={profile?.nombre || "Peregrino"}
         userLevel={stats?.nivel || 1}
         userStreak={stats?.racha_actual_dias || 0}
       />
 
       {/* Main Content - with sidebar offset on desktop */}
       <div className="lg:ml-64 pb-24 lg:pb-8">
-        {/* Hero Section - El León Rugiente */}
+        {/* Hero Section with Immersive Background */}
         <HeroSection 
-          userName={profile?.nombre || "Defensor"} 
+          userName={profile?.nombre || "Peregrino"} 
           verse={dailyVerse}
           stats={stats ? {
             streak: stats.racha_actual_dias,
@@ -131,7 +130,7 @@ const Dashboard = () => {
                 onClick={() => navigate('/admin')}
                 variant="outline"
                 size="sm"
-                className="w-full lg:w-auto border-rugido-gold/30 text-rugido-gold hover:bg-rugido-gold/10"
+                className="w-full lg:w-auto border-primary/30 text-primary hover:bg-primary/10"
               >
                 <Shield className="w-4 h-4 mr-2" />
                 Panel de Administración
@@ -139,34 +138,20 @@ const Dashboard = () => {
             </div>
           )}
 
-          {/* === PRÓXIMA BATALLA - Prominente === */}
-          <NextBattleCard />
-
-          {/* Defender Progress Card - Prominente */}
-          {stats && (
-            <ProgressCard
-              nivel={stats.nivel}
-              puntosTotales={stats.puntos_totales}
-              puntosParaSiguiente={getPointsForNextLevel()}
-              progreso={getProgressToNextLevel()}
-              racha={stats.racha_actual_dias}
-            />
-          )}
-
-          {/* Orden de Batalla - Misión del Momento */}
+          {/* Daily Mission - Tu Misión del Momento */}
           <Suspense fallback={<CardSkeleton height="h-48" />}>
             <DailyMission />
           </Suspense>
 
-          {/* Arsenal del Defensor - Quick Actions */}
+          {/* Quick Actions */}
           <QuickActions />
 
-          {/* === TU CAMPO DE BATALLA === */}
+          {/* === CONTENIDO DIARIO PRIMERO === */}
           
           {/* Tu Día - Evangelio + Para Ti */}
           <section className="px-5 lg:px-0 mb-6">
-            <h2 className="font-heading text-xl font-bold text-foreground mb-4 flex items-center gap-2">
-              <span className="text-rugido-gold">⚔</span> Tu Campo de Batalla
+            <h2 className="font-heading text-xl font-bold text-foreground mb-4">
+              Tu Día
             </h2>
             
             {/* Mobile: Stack view */}
@@ -201,12 +186,12 @@ const Dashboard = () => {
                 <FronteraFinalCard />
               </section>
 
-              {/* Misiones de Combate - Daily Challenge */}
+              {/* Daily Challenge */}
               <Suspense fallback={<CardSkeleton height="h-48" />}>
                 <DailyChallenge />
               </Suspense>
 
-              {/* Arsenal Espiritual - Explore Grid */}
+              {/* Explore Grid - Crece en tu Fe */}
               <Suspense fallback={<CardSkeleton height="h-96" />}>
                 <ExploreGrid />
               </Suspense>
@@ -237,6 +222,17 @@ const Dashboard = () => {
               <Suspense fallback={<CardSkeleton height="h-32" />}>
                 <PracticeRemindersCard />
               </Suspense>
+
+              {/* Progress Card */}
+              {stats && (
+                <ProgressCard
+                  nivel={stats.nivel}
+                  puntosTotales={stats.puntos_totales}
+                  puntosParaSiguiente={getPointsForNextLevel()}
+                  progreso={getProgressToNextLevel()}
+                  racha={stats.racha_actual_dias}
+                />
+              )}
             </div>
           </div>
         </div>
