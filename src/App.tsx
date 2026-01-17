@@ -50,6 +50,7 @@ import PadreBigBang from "./pages/frontera-final/PadreBigBang";
 import ObservatorioVaticano from "./pages/frontera-final/ObservatorioVaticano";
 import ColonizarConquistar from "./pages/frontera-final/ColonizarConquistar";
 import IaAlma from "./pages/frontera-final/IaAlma";
+import AjusteFino from "./pages/frontera-final/AjusteFino";
 import { AdminLayout } from "./layouts/AdminLayout";
 import {
   AdminDashboard,
@@ -124,6 +125,7 @@ const App = () => (
                 <Route path="/frontera-final/observatorio-vaticano" element={<ObservatorioVaticano />} />
                 <Route path="/frontera-final/colonizar-conquistar" element={<ColonizarConquistar />} />
                 <Route path="/frontera-final/ia-alma" element={<IaAlma />} />
+                <Route path="/frontera-final/ajuste-fino" element={<AjusteFino />} />
                 
                 {/* Admin Routes */}
                 <Route path="/admin" element={<AdminLayout />}>

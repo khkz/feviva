@@ -68,6 +68,9 @@ const temas = [
   "Ciencia y Fe",
   "Jesús histórico",
   "Moral objetiva",
+  "¿Por qué existe el amor?",
+  "El sentido de la vida sin Dios",
+  "¿Es posible la moral sin Dios?",
 ];
 
 // Tutorial tips for each topic
@@ -226,6 +229,84 @@ const tutorialTipsByTopic: Record<string, TutorialStep[]> = {
       description: "La moral no es arbitraria ni independiente de Dios.",
       tip: "La moral fluye de la naturaleza de Dios, que es buena.",
       example: "Dios no decide qué es bueno; Él ES la bondad misma..."
+    },
+  ],
+  "¿Por qué existe el amor?": [
+    {
+      title: "El argumento del duelo",
+      description: "Seguimos amando a quienes ya murieron, aunque no 'sirve' biológicamente.",
+      tip: "Si el amor es solo química, debería apagarse cuando la persona muere.",
+      example: "¿Por qué seguimos llorando a alguien años después? La evolución no lo explica..."
+    },
+    {
+      title: "Amor desinteresado",
+      description: "El sacrificio sin beneficio reproductivo desafía la explicación evolutiva.",
+      tip: "El amor a desconocidos, enemigos, o moribundos no tiene sentido evolutivo.",
+      example: "Madre Teresa amó a moribundos sin familia. ¿Qué gen explica eso?"
+    },
+    {
+      title: "Sentimiento vs. Voluntad",
+      description: "El amor maduro es una decisión, no solo una emoción.",
+      tip: "Las mariposas desaparecen; el amor verdadero es elegir amar cada día.",
+      example: "Cuando la dopamina baja, ¿qué mantiene juntas a las parejas 50 años?"
+    },
+    {
+      title: "Reflejo de lo eterno",
+      description: "El amor humano apunta a un Amor originario.",
+      tip: "San Juan: 'Dios es amor'. El amor humano es imagen del divino.",
+      example: "Si el amor es lo más valioso, ¿de dónde viene? ¿Del caos?"
+    },
+  ],
+  "El sentido de la vida sin Dios": [
+    {
+      title: "Significado creado vs. encontrado",
+      description: "El humanismo dice que creamos significado. ¿Es suficiente?",
+      tip: "El significado autoimpuesto puede sentirse arbitrario.",
+      example: "Si yo invento mi propósito, ¿por qué debería tomarme en serio?"
+    },
+    {
+      title: "La finitud sin esperanza",
+      description: "¿La muerte da valor o lo destruye?",
+      tip: "Para algunos, saber que todo termina lleva al nihilismo, no al aprecio.",
+      example: "Si todo se olvida en el frío del universo, ¿importó realmente?"
+    },
+    {
+      title: "Hambre de trascendencia",
+      description: "El deseo humano de significado eterno es universal.",
+      tip: "C.S. Lewis: 'Si tengo deseos que nada en este mundo satisface...'",
+      example: "¿Por qué anhelamos que nuestro amor y trabajo 'importen para siempre'?"
+    },
+    {
+      title: "Propósito como don",
+      description: "Descubrir un propósito dado es más robusto que inventarlo.",
+      tip: "Un mensaje en una botella: ¿tiene más sentido si alguien lo envió?",
+      example: "La vida como regalo vs. la vida como accidente cósmico..."
+    },
+  ],
+  "¿Es posible la moral sin Dios?": [
+    {
+      title: "Distinguir conocer de fundamentar",
+      description: "Los ateos pueden ser morales; la pregunta es de dónde vienen los valores.",
+      tip: "No cuestionamos su bondad, sino el fundamento de esa bondad.",
+      example: "Un ateo puede ser más moral que un creyente. Pero ¿por qué existe 'bueno'?"
+    },
+    {
+      title: "Evolución y obligación",
+      description: "La evolución explica por qué tenemos impulsos, no por qué debemos obedecerlos.",
+      tip: "Del 'es' no se sigue el 'debe'.",
+      example: "También evolucionamos agresión. ¿Por qué la empatía es 'mejor'?"
+    },
+    {
+      title: "Derechos humanos",
+      description: "¿De dónde vienen los derechos inalienables si no hay legislador?",
+      tip: "La declaración universal asume dignidad intrínseca. ¿Por qué?",
+      example: "Si somos solo materia, ¿por qué un humano tiene más derechos que una piedra?"
+    },
+    {
+      title: "Dostoievski revisitado",
+      description: "'Si Dios no existe, todo está permitido' - ¿es cierto?",
+      tip: "No es que todos se vuelvan inmorales, sino que falta el fundamento.",
+      example: "Podemos actuar moralmente sin fe. Pero ¿podemos justificarlo?"
     },
   ],
 };
