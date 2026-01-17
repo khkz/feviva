@@ -267,7 +267,7 @@ serve(async (req) => {
   }
 
   try {
-    const { action, limit = 1 } = await req.json();
+    const { action, limit = 1, themeId } = await req.json();
     
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
@@ -412,13 +412,7 @@ serve(async (req) => {
       });
     } else if (action === "create_by_theme") {
       // Generate story by specific theme
-      const { themeId } = await req.json().catch(() => ({}));
-      
-      // Get themeId from request
-      const requestBody = JSON.parse(await req.clone().text());
-      const selectedThemeId = requestBody.themeId;
-      
-      if (!selectedThemeId || !STORY_THEMES[selectedThemeId]) {
+      if (!themeId || !STORY_THEMES[themeId]) {
         return new Response(JSON.stringify({ 
           error: "Invalid theme. Available themes: " + Object.keys(STORY_THEMES).join(", ") 
         }), {
@@ -427,7 +421,7 @@ serve(async (req) => {
         });
       }
       
-      const theme = STORY_THEMES[selectedThemeId];
+      const theme = STORY_THEMES[themeId];
       
       // Get existing story titles to avoid duplicates
       const { data: existingStories } = await supabase
@@ -470,7 +464,7 @@ serve(async (req) => {
             descripcion: randomPrompt.tema,
             contenido: contenido,
             duracion_estimada: duracionEstimada,
-            categoria: selectedThemeId,
+            categoria: themeId,
             orden: 100 + Date.now() % 1000
           });
         
