@@ -1,7 +1,7 @@
 import { useEffect, useState, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Sparkles, Shield } from "lucide-react";
+import { BookOpen, Shield } from "lucide-react";
 import { useUserStats } from "@/hooks/useUserStats";
 import { useNovenas } from "@/hooks/useNovenas";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
@@ -10,12 +10,14 @@ import { SaintOfTheDayCard } from "@/components/dashboard/SaintOfTheDayCard";
 import { HeroSection } from "@/components/dashboard/HeroSection";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 import { ProgressCard } from "@/components/dashboard/ProgressCard";
+import { NextStepCard } from "@/components/dashboard/NextStepCard";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { GospelCard } from "@/components/gospel/GospelCard";
 import { FronteraFinalCard } from "@/components/dashboard/FronteraFinalCard";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { motion } from "framer-motion";
 
 // Lazy load heavy components
 const PracticeStreaksCard = lazy(() => import("@/components/dashboard/PracticeStreaksCard").then(m => ({ default: m.PracticeStreaksCard })));
@@ -91,9 +93,16 @@ const Dashboard = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-pulse text-primary">
-          <Sparkles className="w-12 h-12" />
-        </div>
+        <motion.div 
+          className="text-secondary"
+          animate={{ 
+            scale: [1, 1.1, 1],
+            rotate: [0, 5, -5, 0]
+          }}
+          transition={{ duration: 1.5, repeat: Infinity }}
+        >
+          <BookOpen className="w-12 h-12" />
+        </motion.div>
       </div>
     );
   }
@@ -138,20 +147,27 @@ const Dashboard = () => {
             </div>
           )}
 
-          {/* Daily Mission - Tu Misión del Momento */}
+          {/* Next Step Card - Prominent Formation Path */}
+          <NextStepCard 
+            currentLevel={stats?.nivel || 1}
+            completedLessons={Math.floor((stats?.puntos_totales || 0) / 100)}
+            totalLessons={10}
+          />
+
+          {/* Daily Mission */}
           <Suspense fallback={<CardSkeleton height="h-48" />}>
             <DailyMission />
           </Suspense>
 
-          {/* Quick Actions */}
+          {/* Quick Actions - Tu Formación */}
           <QuickActions />
 
-          {/* === CONTENIDO DIARIO PRIMERO === */}
+          {/* === CONTENIDO DIARIO === */}
           
-          {/* Tu Día - Evangelio + Para Ti */}
+          {/* Tu Campo de Formación */}
           <section className="px-5 lg:px-0 mb-6">
             <h2 className="font-heading text-xl font-bold text-foreground mb-4">
-              Tu Día
+              Tu Día Espiritual
             </h2>
             
             {/* Mobile: Stack view */}

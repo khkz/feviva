@@ -1,4 +1,4 @@
-import { Trophy, Flame, Zap, Star, TrendingUp } from "lucide-react";
+import { Flame, BookOpen, TrendingUp, Search, MessageSquare, GraduationCap, Star } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { motion } from "framer-motion";
 
@@ -10,12 +10,42 @@ interface ProgressCardProps {
   racha: number;
 }
 
-const getLevelTitle = (nivel: number) => {
-  if (nivel <= 2) return "Discípulo";
-  if (nivel <= 5) return "Aprendiz de Fe";
-  if (nivel <= 10) return "Defensor";
-  if (nivel <= 20) return "Apologista";
-  return "Maestro de la Fe";
+const getRankData = (nivel: number) => {
+  if (nivel <= 2) return { 
+    title: "El Curioso", 
+    nextTitle: "El Estudiante",
+    icon: Search,
+    color: "from-blue-400 to-blue-600",
+    bgColor: "bg-blue-500/10"
+  };
+  if (nivel <= 5) return { 
+    title: "El Estudiante", 
+    nextTitle: "El Practicante",
+    icon: BookOpen,
+    color: "from-emerald-400 to-emerald-600",
+    bgColor: "bg-emerald-500/10"
+  };
+  if (nivel <= 10) return { 
+    title: "El Practicante", 
+    nextTitle: "El Apologista",
+    icon: MessageSquare,
+    color: "from-purple-400 to-purple-600",
+    bgColor: "bg-purple-500/10"
+  };
+  if (nivel <= 20) return { 
+    title: "El Apologista", 
+    nextTitle: "El Maestro",
+    icon: GraduationCap,
+    color: "from-secondary to-amber-600",
+    bgColor: "bg-secondary/10"
+  };
+  return { 
+    title: "El Maestro", 
+    nextTitle: "Maestro Supremo",
+    icon: Star,
+    color: "from-yellow-400 to-orange-500",
+    bgColor: "bg-yellow-500/10"
+  };
 };
 
 export function ProgressCard({ 
@@ -25,6 +55,9 @@ export function ProgressCard({
   progreso,
   racha 
 }: ProgressCardProps) {
+  const rankData = getRankData(nivel);
+  const RankIcon = rankData.icon;
+
   return (
     <motion.section 
       className="px-5 py-3 lg:px-0"
@@ -43,8 +76,8 @@ export function ProgressCard({
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: "spring" as const, stiffness: 200, damping: 15, delay: 1.2 }}
           >
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-secondary to-secondary-hover flex items-center justify-center shadow-lg">
-              <Trophy className="w-7 h-7 text-primary" />
+            <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${rankData.color} flex items-center justify-center shadow-lg`}>
+              <RankIcon className="w-7 h-7 text-white" />
             </div>
             <motion.div 
               className="absolute -bottom-1 -right-1 bg-primary text-primary-foreground text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-card"
@@ -59,8 +92,8 @@ export function ProgressCard({
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between mb-1">
               <div>
-                <p className="font-semibold text-foreground text-sm">Nivel {nivel}</p>
-                <p className="text-xs text-muted-foreground">{getLevelTitle(nivel)}</p>
+                <p className="font-semibold text-foreground text-sm">{rankData.title}</p>
+                <p className="text-xs text-muted-foreground">Nivel {nivel}</p>
               </div>
               
               <motion.div 
@@ -93,22 +126,22 @@ export function ProgressCard({
                   animate={{ y: [0, -2, 0] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
                 >
-                  <Star className="w-4 h-4 text-secondary fill-secondary" />
+                  <BookOpen className="w-4 h-4 text-secondary fill-secondary" />
                 </motion.div>
               </div>
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span className="flex items-center gap-1">
-                  <Zap className="w-3 h-3 text-secondary" />
-                  {puntosTotales} pts
+                  <TrendingUp className="w-3 h-3 text-secondary" />
+                  {puntosTotales} XP
                 </span>
-                <span>{Math.round(puntosParaSiguiente - puntosTotales)} para nivel {nivel + 1}</span>
+                <span>{Math.round(puntosParaSiguiente - puntosTotales)} para {rankData.nextTitle}</span>
               </div>
             </motion.div>
           </div>
         </div>
       </div>
 
-      {/* Desktop Layout - Expanded */}
+      {/* Desktop Layout */}
       <div className="hidden lg:block relative overflow-hidden rounded-2xl bg-card border border-border/50 p-6">
         <div className="absolute -top-20 -right-20 w-48 h-48 bg-secondary/10 rounded-full blur-3xl" />
         <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-primary/5 rounded-full blur-2xl" />
@@ -122,8 +155,8 @@ export function ProgressCard({
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: "spring", stiffness: 200, damping: 15, delay: 1.2 }}
               >
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-secondary to-secondary-hover flex items-center justify-center shadow-lg">
-                  <Trophy className="w-8 h-8 text-primary" />
+                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${rankData.color} flex items-center justify-center shadow-lg`}>
+                  <RankIcon className="w-8 h-8 text-white" />
                 </div>
                 <motion.div 
                   className="absolute -bottom-2 -right-2 bg-primary text-primary-foreground text-sm font-bold rounded-full w-8 h-8 flex items-center justify-center border-2 border-card"
@@ -136,8 +169,8 @@ export function ProgressCard({
               </motion.div>
 
               <div>
-                <h3 className="font-heading text-xl font-bold text-foreground">Nivel {nivel}</h3>
-                <p className="text-muted-foreground">{getLevelTitle(nivel)}</p>
+                <h3 className="font-heading text-xl font-bold text-foreground">{rankData.title}</h3>
+                <p className="text-muted-foreground">Nivel de preparación {nivel}</p>
               </div>
             </div>
 
@@ -161,12 +194,12 @@ export function ProgressCard({
                 </div>
               </motion.div>
 
-              {/* Points */}
+              {/* XP */}
               <div className="flex items-center gap-2 bg-secondary/10 rounded-xl px-4 py-2">
-                <Zap className="w-6 h-6 text-secondary" />
+                <BookOpen className="w-6 h-6 text-secondary" />
                 <div>
                   <span className="text-xl font-bold text-foreground">{puntosTotales}</span>
-                  <p className="text-xs text-muted-foreground">puntos</p>
+                  <p className="text-xs text-muted-foreground">XP total</p>
                 </div>
               </div>
             </div>
@@ -175,7 +208,7 @@ export function ProgressCard({
           {/* Progress */}
           <div className="space-y-3">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Progreso al nivel {nivel + 1}</span>
+              <span className="text-muted-foreground">Progreso hacia {rankData.nextTitle}</span>
               <span className="font-semibold text-foreground flex items-center gap-1">
                 <TrendingUp className="w-4 h-4 text-secondary" />
                 {Math.round(progreso)}%
@@ -189,11 +222,11 @@ export function ProgressCard({
                 animate={{ y: [0, -3, 0] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
               >
-                <Star className="w-5 h-5 text-secondary fill-secondary" />
+                <GraduationCap className="w-5 h-5 text-secondary" />
               </motion.div>
             </div>
             <p className="text-sm text-muted-foreground">
-              Te faltan <span className="font-semibold text-foreground">{Math.round(puntosParaSiguiente - puntosTotales)}</span> puntos para el siguiente nivel
+              Te faltan <span className="font-semibold text-foreground">{Math.round(puntosParaSiguiente - puntosTotales)}</span> XP para alcanzar <span className="font-semibold text-secondary">{rankData.nextTitle}</span>
             </p>
           </div>
         </div>
