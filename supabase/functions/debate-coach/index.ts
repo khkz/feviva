@@ -72,7 +72,7 @@ Inicia la conversación planteando una objeción o pregunta sobre este tema. Haz
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'google/gemini-2.5-flash',
+          model: 'google/gemini-3-pro-preview',
           messages: [
             { role: 'system', content: systemPrompt },
             { role: 'user', content: 'Comienza la conversación.' }
@@ -134,7 +134,7 @@ ${previousArguments ? `\nARGUMENTOS QUE YA USASTE (no repitas estos):\n${previou
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'google/gemini-2.5-flash',
+          model: 'google/gemini-3-pro-preview',
           messages: [
             { role: 'system', content: systemPrompt },
             ...aiMessages
@@ -223,7 +223,7 @@ Proporciona 3 sugerencias prácticas y específicas para mejorar esta respuesta 
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'google/gemini-2.5-flash',
+          model: 'google/gemini-3-pro-preview',
           messages: [
             { role: 'user', content: suggestionPrompt }
           ],
@@ -283,7 +283,7 @@ Responde SOLO en formato JSON con esta estructura exacta:
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'google/gemini-2.5-flash',
+          model: 'google/gemini-3-pro-preview',
           messages: [
             { role: 'user', content: evaluationPrompt }
           ],
