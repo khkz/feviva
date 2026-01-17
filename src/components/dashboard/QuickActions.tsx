@@ -1,8 +1,29 @@
 import { useNavigate } from "react-router-dom";
-import { Hand, BookOpen, Flame, Moon, Play } from "lucide-react";
+import { Hand, BookOpen, Flame, Moon, Play, MessageSquare, Library } from "lucide-react";
 import { motion } from "framer-motion";
 
 const actions = [
+  { 
+    icon: BookOpen, 
+    label: "Estudiar", 
+    path: "/library",
+    gradient: "from-secondary to-amber-600",
+    bgGradient: "from-secondary/20 to-amber-500/20"
+  },
+  { 
+    icon: MessageSquare, 
+    label: "Practicar", 
+    path: "/coach",
+    gradient: "from-purple-400 to-purple-600",
+    bgGradient: "from-purple-500/20 to-purple-600/20"
+  },
+  { 
+    icon: Library, 
+    label: "Arsenal", 
+    path: "/cards",
+    gradient: "from-emerald-400 to-emerald-600",
+    bgGradient: "from-emerald-500/20 to-emerald-600/20"
+  },
   { 
     icon: Play, 
     label: "Evangelio", 
@@ -16,13 +37,6 @@ const actions = [
     path: "/oraciones/app",
     gradient: "from-amber-400 to-orange-500",
     bgGradient: "from-amber-500/20 to-orange-500/20"
-  },
-  { 
-    icon: BookOpen, 
-    label: "Rosario", 
-    path: "/rosario",
-    gradient: "from-blue-400 to-indigo-500",
-    bgGradient: "from-blue-500/20 to-indigo-500/20"
   },
   { 
     icon: Flame, 
@@ -66,6 +80,13 @@ export function QuickActions() {
 
   return (
     <section className="px-5 -mt-3 relative z-20 lg:px-0 lg:mt-0">
+      {/* Section Title */}
+      <div className="mb-3 lg:mb-4">
+        <h2 className="font-heading text-sm lg:text-base font-semibold text-foreground/80">
+          Tu Formación
+        </h2>
+      </div>
+
       {/* Mobile: Horizontal scroll with fade indicators */}
       <div className="relative lg:hidden">
         {/* Left fade gradient */}
@@ -106,7 +127,7 @@ export function QuickActions() {
 
       {/* Desktop: Full grid */}
       <motion.div 
-        className="hidden lg:grid grid-cols-5 gap-4"
+        className="hidden lg:grid grid-cols-7 gap-4"
         variants={containerVariants}
         initial="hidden"
         animate="visible"

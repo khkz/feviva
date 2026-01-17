@@ -1,7 +1,7 @@
-import { Sparkles, Sun, Moon, CloudSun, Flame, Trophy, Zap, Share2 } from "lucide-react";
+import { BookOpen, Sun, Moon, CloudSun, Flame, GraduationCap, MessageSquare } from "lucide-react";
 import { motion } from "framer-motion";
 import { DailyShareButton } from "@/components/shared/DailyShareButton";
-import heroBackground from "@/assets/hero-background.jpg";
+import lionLogo from "@/assets/logo-elrugido.svg";
 
 interface HeroSectionProps {
   userName: string;
@@ -19,57 +19,96 @@ interface HeroSectionProps {
 const getGreeting = () => {
   const hour = new Date().getHours();
   if (hour >= 5 && hour < 12) {
-    return { text: "Buenos días", icon: Sun, gradient: "from-amber-400 to-orange-500" };
+    return { text: "Buenos días, Apologista", subtext: "Prepárate para dar razón de tu fe", icon: Sun, gradient: "from-secondary to-secondary-hover" };
   } else if (hour >= 12 && hour < 19) {
-    return { text: "Buenas tardes", icon: CloudSun, gradient: "from-blue-400 to-indigo-500" };
+    return { text: "Continúa tu formación", subtext: "El conocimiento fortalece la fe", icon: CloudSun, gradient: "from-secondary to-amber-600" };
   } else {
-    return { text: "Buenas noches", icon: Moon, gradient: "from-indigo-500 to-purple-600" };
+    return { text: "Reflexiona y prepárate", subtext: "La sabiduría viene de la meditación", icon: Moon, gradient: "from-indigo-400 to-secondary" };
   }
+};
+
+const getDefenderRank = (level: number) => {
+  if (level <= 2) return { title: "El Curioso", icon: BookOpen };
+  if (level <= 5) return { title: "El Estudiante", icon: BookOpen };
+  if (level <= 10) return { title: "El Practicante", icon: MessageSquare };
+  if (level <= 20) return { title: "El Apologista", icon: GraduationCap };
+  return { title: "El Maestro", icon: GraduationCap };
 };
 
 export function HeroSection({ userName, verse, stats }: HeroSectionProps) {
   const greeting = getGreeting();
   const GreetingIcon = greeting.icon;
+  const rank = stats ? getDefenderRank(stats.level) : null;
 
   return (
-    <section className="relative overflow-hidden lg:min-h-[360px]">
-      {/* Background Image */}
-      <motion.div 
-        className="absolute inset-0"
-        initial={{ scale: 1.1 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 1.5, ease: "easeOut" }}
-      >
-        <img
-          src={heroBackground}
-          alt="Contemplative mountain landscape"
-          className="w-full h-full object-cover"
-        />
-        {/* Gradient Overlay */}
-        <div className="glass-hero absolute inset-0" />
-      </motion.div>
+    <section className="relative overflow-hidden lg:min-h-[380px]">
+      {/* Intense Dark Gradient Background with Golden Glow */}
+      <div className="absolute inset-0 hero-rugido">
+        {/* Animated particles/sparks */}
+        {[...Array(6)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-1 h-1 bg-secondary rounded-full"
+            style={{
+              left: `${15 + i * 15}%`,
+              top: `${20 + (i % 3) * 25}%`,
+            }}
+            animate={{
+              y: [-10, 10, -10],
+              opacity: [0.3, 0.8, 0.3],
+              scale: [1, 1.5, 1],
+            }}
+            transition={{
+              duration: 3 + i * 0.5,
+              repeat: Infinity,
+              delay: i * 0.3,
+            }}
+          />
+        ))}
+      </div>
 
       {/* Content - Different layouts for mobile and desktop */}
       <div className="relative z-10 h-full">
-        {/* Mobile Layout - Reduced height for more content visibility */}
-        <div className="lg:hidden h-[35vh] min-h-[280px] flex flex-col justify-end p-5 pb-6">
-          {/* Logo */}
+        {/* Mobile Layout */}
+        <div className="lg:hidden h-[38vh] min-h-[300px] flex flex-col justify-end p-5 pb-6">
+          {/* Animated Lion Logo with Voice Waves */}
           <motion.div 
-            className="absolute top-5 left-5 flex items-center gap-2"
+            className="absolute top-5 left-5 flex items-center gap-3"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <motion.div 
-              className="glass-button rounded-full p-2"
-              whileHover={{ scale: 1.1, rotate: 10 }}
-            >
-              <Sparkles className="w-5 h-5 text-secondary" />
-            </motion.div>
-            <span className="text-foreground/80 font-heading font-bold text-lg">ElRugido</span>
+            <div className="relative">
+              {/* Voice wave rings */}
+              {[1, 2, 3].map((i) => (
+                <motion.div
+                  key={i}
+                  className="absolute inset-0 rounded-full border border-secondary/40"
+                  animate={{
+                    scale: [1, 1.8, 2.2],
+                    opacity: [0.5, 0.2, 0],
+                  }}
+                  transition={{
+                    duration: 2.5,
+                    repeat: Infinity,
+                    delay: i * 0.6,
+                  }}
+                />
+              ))}
+              <motion.div 
+                className="relative w-12 h-12 p-1.5 rounded-full bg-gradient-to-br from-secondary/20 to-secondary/5 border border-secondary/30"
+                animate={{ 
+                  boxShadow: ["0 0 15px hsla(45, 95%, 58%, 0.3)", "0 0 25px hsla(45, 95%, 58%, 0.5)", "0 0 15px hsla(45, 95%, 58%, 0.3)"]
+                }}
+                transition={{ duration: 3, repeat: Infinity }}
+              >
+                <img src={lionLogo} alt="El Rugido" className="w-full h-full" />
+              </motion.div>
+            </div>
+            <span className="text-white/90 font-heading font-bold text-lg">El Rugido</span>
           </motion.div>
 
-          {/* Greeting Card with Mini Stats */}
+          {/* Greeting Card */}
           <motion.div 
             className="glass-card rounded-2xl p-4 mb-3"
             initial={{ opacity: 0, y: 30 }}
@@ -78,18 +117,18 @@ export function HeroSection({ userName, verse, stats }: HeroSectionProps) {
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${greeting.gradient} flex items-center justify-center`}>
-                  <GreetingIcon className="w-4 h-4 text-white" />
+                <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${greeting.gradient} flex items-center justify-center`}>
+                  <GreetingIcon className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-white/70 text-xs font-medium">{greeting.text}</p>
-                  <h1 className="font-heading text-xl font-bold text-white">
-                    {userName || "Peregrino"}
+                  <h1 className="font-heading text-lg font-bold text-white">
+                    {userName || "Apologista"}
                   </h1>
+                  <p className="text-white/60 text-xs">{greeting.subtext}</p>
                 </div>
               </div>
               
-              {/* Mini Stats Badges */}
+              {/* Mini Stats */}
               {stats && (
                 <div className="flex gap-1.5">
                   <motion.div 
@@ -107,7 +146,7 @@ export function HeroSection({ userName, verse, stats }: HeroSectionProps) {
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.7 }}
                   >
-                    <Trophy className="w-3.5 h-3.5 text-secondary" />
+                    <GraduationCap className="w-3.5 h-3.5 text-secondary" />
                     <span className="text-xs font-semibold text-white">{stats.level}</span>
                   </motion.div>
                 </div>
@@ -115,7 +154,7 @@ export function HeroSection({ userName, verse, stats }: HeroSectionProps) {
             </div>
           </motion.div>
 
-          {/* Verse - Compact */}
+          {/* Verse with 1 Pedro 3:15 emphasis */}
           {verse && (
             <motion.div 
               className="glass-card rounded-xl p-3"
@@ -127,7 +166,7 @@ export function HeroSection({ userName, verse, stats }: HeroSectionProps) {
                 "{verse.text}"
               </p>
               <div className="flex items-center justify-between mt-2">
-                <p className="text-white/60 text-xs font-medium">— {verse.reference}</p>
+                <p className="text-secondary/80 text-xs font-medium">— {verse.reference}</p>
                 <DailyShareButton 
                   tipo="versiculo" 
                   title=""
@@ -145,7 +184,7 @@ export function HeroSection({ userName, verse, stats }: HeroSectionProps) {
         </div>
 
         {/* Desktop Layout */}
-        <div className="hidden lg:flex items-end min-h-[360px] p-8 pb-10">
+        <div className="hidden lg:flex items-end min-h-[380px] p-8 pb-10">
           <div className="flex-1 max-w-7xl mx-auto grid grid-cols-12 gap-8 items-end">
             {/* Left: Greeting & Verse */}
             <motion.div 
@@ -154,21 +193,47 @@ export function HeroSection({ userName, verse, stats }: HeroSectionProps) {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
             >
-              <div className="flex items-center gap-3 mb-4">
-              <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${greeting.gradient} flex items-center justify-center shadow-lg`}>
-                <GreetingIcon className="w-6 h-6 text-white" />
-              </div>
+              <div className="flex items-center gap-4 mb-5">
+                {/* Animated Lion with Voice Waves */}
+                <div className="relative">
+                  {[1, 2, 3].map((i) => (
+                    <motion.div
+                      key={i}
+                      className="absolute inset-0 rounded-full border border-secondary/30"
+                      animate={{
+                        scale: [1, 2, 2.5],
+                        opacity: [0.4, 0.15, 0],
+                      }}
+                      transition={{
+                        duration: 3,
+                        repeat: Infinity,
+                        delay: i * 0.7,
+                      }}
+                    />
+                  ))}
+                  <motion.div 
+                    className="relative w-16 h-16 p-2 rounded-full bg-gradient-to-br from-secondary/20 to-secondary/5 border border-secondary/40"
+                    animate={{ 
+                      boxShadow: ["0 0 20px hsla(45, 95%, 58%, 0.3)", "0 0 35px hsla(45, 95%, 58%, 0.5)", "0 0 20px hsla(45, 95%, 58%, 0.3)"]
+                    }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                  >
+                    <img src={lionLogo} alt="El Rugido" className="w-full h-full" />
+                  </motion.div>
+                </div>
+                
                 <div>
-                  <p className="text-white/70 text-sm font-medium">{greeting.text}</p>
+                  <p className="text-secondary/90 text-sm font-medium">{greeting.text}</p>
                   <h1 className="font-heading text-4xl font-bold text-white">
-                    {userName || "Peregrino"}
+                    {userName || "Apologista"}
                   </h1>
+                  <p className="text-white/50 text-sm mt-1">{greeting.subtext}</p>
                 </div>
               </div>
 
               {verse && (
                 <motion.div 
-                  className="glass-card rounded-2xl p-6 max-w-xl"
+                  className="glass-card rounded-2xl p-6 max-w-xl border-secondary/20"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.5 }}
@@ -177,7 +242,7 @@ export function HeroSection({ userName, verse, stats }: HeroSectionProps) {
                     "{verse.text}"
                   </p>
                   <div className="flex items-center justify-between mt-3">
-                    <p className="text-white/60 text-sm font-medium">— {verse.reference}</p>
+                    <p className="text-secondary/80 text-sm font-medium">— {verse.reference}</p>
                     <DailyShareButton 
                       tipo="versiculo" 
                       title="Compartir"
@@ -194,7 +259,7 @@ export function HeroSection({ userName, verse, stats }: HeroSectionProps) {
               )}
             </motion.div>
 
-            {/* Right: Quick Stats */}
+            {/* Right: Stats with Academic Theme */}
             {stats && (
               <motion.div 
                 className="col-span-5 flex gap-4 justify-end"
@@ -202,34 +267,34 @@ export function HeroSection({ userName, verse, stats }: HeroSectionProps) {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 }}
               >
-                {/* Streak */}
+                {/* Study Streak */}
                 <motion.div 
-                  className="glass-card rounded-2xl p-5 min-w-[140px] text-center"
+                  className="glass-card rounded-2xl p-5 min-w-[140px] text-center border-orange-500/20"
                   whileHover={{ scale: 1.02, y: -2 }}
                 >
                   <Flame className="w-8 h-8 text-orange-500 mx-auto mb-2" />
                   <p className="text-3xl font-bold text-white">{stats.streak}</p>
-                  <p className="text-white/60 text-sm">días de racha</p>
+                  <p className="text-white/60 text-sm">días de estudio</p>
                 </motion.div>
 
-                {/* Level */}
+                {/* Preparation Level */}
                 <motion.div 
-                  className="glass-card rounded-2xl p-5 min-w-[140px] text-center"
+                  className="glass-card rounded-2xl p-5 min-w-[140px] text-center border-secondary/20"
                   whileHover={{ scale: 1.02, y: -2 }}
                 >
-                  <Trophy className="w-8 h-8 text-secondary mx-auto mb-2" />
+                  <GraduationCap className="w-8 h-8 text-secondary mx-auto mb-2" />
                   <p className="text-3xl font-bold text-white">{stats.level}</p>
-                  <p className="text-white/60 text-sm">nivel</p>
+                  <p className="text-white/60 text-sm">{rank?.title}</p>
                 </motion.div>
 
-                {/* Points */}
+                {/* XP */}
                 <motion.div 
-                  className="glass-card rounded-2xl p-5 min-w-[140px] text-center"
+                  className="glass-card rounded-2xl p-5 min-w-[140px] text-center border-secondary/20"
                   whileHover={{ scale: 1.02, y: -2 }}
                 >
-                  <Zap className="w-8 h-8 text-secondary mx-auto mb-2" />
+                  <BookOpen className="w-8 h-8 text-secondary mx-auto mb-2" />
                   <p className="text-3xl font-bold text-white">{stats.points}</p>
-                  <p className="text-white/60 text-sm">puntos</p>
+                  <p className="text-white/60 text-sm">XP aprendizaje</p>
                 </motion.div>
               </motion.div>
             )}
