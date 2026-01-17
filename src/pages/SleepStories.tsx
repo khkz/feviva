@@ -10,7 +10,13 @@ import {
   Expand, 
   Volume2,
   Stars,
-  ImagePlus
+  ImagePlus,
+  Heart,
+  Sun,
+  Cloud,
+  HandHeart,
+  Flower2,
+  HeartHandshake
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useSleepStories, SleepStory } from "@/hooks/useSleepStories";
@@ -22,9 +28,26 @@ import { SleepPlayer } from "@/components/sleep/SleepPlayer";
 import { JobProgressPanel } from "@/components/processing/JobProgressPanel";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import logoElRugido from "@/assets/logo-elrugido.svg";
+
+// Theme definitions with icons for UI
+const THEME_OPTIONS = [
+  { id: "amor", nombre: "Amor", icon: Heart, color: "text-pink-400", bgColor: "from-pink-500/20 to-rose-500/10" },
+  { id: "esperanza", nombre: "Esperanza", icon: Sun, color: "text-amber-400", bgColor: "from-amber-500/20 to-yellow-500/10" },
+  { id: "sanacion", nombre: "Sanación", icon: HeartHandshake, color: "text-violet-400", bgColor: "from-violet-500/20 to-purple-500/10" },
+  { id: "paz", nombre: "Paz", icon: Cloud, color: "text-sky-400", bgColor: "from-sky-500/20 to-blue-500/10" },
+  { id: "gratitud", nombre: "Gratitud", icon: Flower2, color: "text-emerald-400", bgColor: "from-emerald-500/20 to-green-500/10" },
+  { id: "perdon", nombre: "Perdón", icon: HandHeart, color: "text-teal-400", bgColor: "from-teal-500/20 to-cyan-500/10" },
+];
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -54,6 +77,8 @@ const SleepStories = () => {
   const canManageContent = isAdmin || isModerator;
   const [isCreatingStories, setIsCreatingStories] = useState(false);
   const [isExpandingStories, setIsExpandingStories] = useState(false);
+  const [themeDialogOpen, setThemeDialogOpen] = useState(false);
+  const [generatingTheme, setGeneratingTheme] = useState<string | null>(null);
   const [isGeneratingImages, setIsGeneratingImages] = useState(false);
 
   // Check if expanded player should show (item selected and not minimized)
@@ -218,11 +243,41 @@ const SleepStories = () => {
     await queueJobs('sleep_tts', items);
   };
 
+  const handleGenerateByTheme = async (themeId: string) => {
+    setGeneratingTheme(themeId);
+    setThemeDialogOpen(false);
+    
+    const themeName = THEME_OPTIONS.find(t => t.id === themeId)?.nombre || themeId;
+    
+    try {
+      toast.loading(`Generando historia de ${themeName}...`, { id: 'theme-story' });
+      
+      const { data, error } = await supabase.functions.invoke('generate-sleep-stories', {
+        body: { action: 'create_by_theme', themeId }
+      });
+      
+      if (error) throw error;
+      
+      if (data.processed > 0) {
+        const result = data.results[0];
+        toast.success(`✅ "${result.titulo}" creada (${result.duration} min)`, { id: 'theme-story' });
+        refetch();
+      } else {
+        toast.info(data.message || `Ya existen todas las historias de ${themeName}`, { id: 'theme-story' });
+      }
+    } catch (error) {
+      console.error('Error generating themed story:', error);
+      toast.error('Error al generar historia', { id: 'theme-story' });
+    } finally {
+      setGeneratingTheme(null);
+    }
+  };
+
   const shortStoriesCount = stories.filter(s => s.duracion_estimada < 5).length;
   const storiesWithoutAudioCount = stories.filter(s => !s.audio_url).length;
   const storiesWithoutImageCount = stories.filter(s => !s.imagen_url).length;
   
-  const isAnyProcessRunning = isCreatingStories || isExpandingStories || isGeneratingImages;
+  const isAnyProcessRunning = isCreatingStories || isExpandingStories || isGeneratingImages || generatingTheme !== null;
   const hasActiveJobs = jobStats.pending > 0 || jobStats.processing > 0;
 
   if (loading) {
@@ -363,6 +418,53 @@ const SleepStories = () => {
             <span>Crear nuevas historias bíblicas</span>
             <Sparkles className="w-4 h-4 text-amber-500 ml-auto" />
           </Button>
+          
+          {/* Theme-based generation dialog */}
+          <Dialog open={themeDialogOpen} onOpenChange={setThemeDialogOpen}>
+            <DialogTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full justify-start gap-2 glass-button border-border/30 h-12 bg-gradient-to-r from-indigo-500/10 to-purple-500/10"
+                disabled={isAnyProcessRunning}
+              >
+                <Stars className="w-4 h-4 text-indigo-400" />
+                <span>Generar por Tema</span>
+                <Sparkles className="w-4 h-4 text-amber-500 ml-auto" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Moon className="w-5 h-5 text-indigo-400" />
+                  Selecciona un Tema
+                </DialogTitle>
+              </DialogHeader>
+              <div className="grid grid-cols-2 gap-3 py-4">
+                {THEME_OPTIONS.map((theme) => {
+                  const Icon = theme.icon;
+                  return (
+                    <Button
+                      key={theme.id}
+                      variant="outline"
+                      className={`h-20 flex-col gap-2 border-border/30 bg-gradient-to-br ${theme.bgColor} hover:scale-105 transition-transform`}
+                      onClick={() => handleGenerateByTheme(theme.id)}
+                      disabled={generatingTheme !== null}
+                    >
+                      {generatingTheme === theme.id ? (
+                        <Loader2 className="w-6 h-6 animate-spin" />
+                      ) : (
+                        <Icon className={`w-6 h-6 ${theme.color}`} />
+                      )}
+                      <span className="text-sm font-medium">{theme.nombre}</span>
+                    </Button>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-muted-foreground text-center">
+                La IA generará una historia enfocada en el tema seleccionado
+              </p>
+            </DialogContent>
+          </Dialog>
           
           {shortStoriesCount > 0 && (
             <Button

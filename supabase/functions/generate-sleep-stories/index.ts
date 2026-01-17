@@ -8,6 +8,76 @@ const corsHeaders = {
 
 const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
+// Temas temáticos para generación por categoría
+const STORY_THEMES: Record<string, { nombre: string; descripcion: string; prompts: { titulo: string; tema: string }[] }> = {
+  amor: {
+    nombre: "Amor",
+    descripcion: "El amor que vence a la muerte, amor eterno",
+    prompts: [
+      { titulo: "El Hilo Invisible", tema: "Una meditación para el duelo. El dolor de la pérdida como prueba del amor eterno." },
+      { titulo: "El Cantar del Amado", tema: "Meditación sobre el amor divino a través del Cantar de los Cantares." },
+      { titulo: "Rut y Noemí", tema: "El amor fiel que trasciende la sangre y la cultura." },
+      { titulo: "El Amor de Jacob por Raquel", tema: "Siete años que parecieron días, el amor paciente que espera." },
+      { titulo: "María a los Pies de Jesús", tema: "El amor contemplativo que elige la mejor parte." }
+    ]
+  },
+  esperanza: {
+    nombre: "Esperanza",
+    descripcion: "Luz en la oscuridad, promesas cumplidas",
+    prompts: [
+      { titulo: "El Arcoíris de la Promesa", tema: "Después de la tormenta, la alianza de Dios con la humanidad." },
+      { titulo: "Las Estrellas de Abraham", tema: "Cuando todo parecía imposible, Dios cumplió su promesa." },
+      { titulo: "La Vigilia de Simeón", tema: "Esperar toda una vida por la salvación prometida." },
+      { titulo: "Ana y la Oración Cumplida", tema: "La esperanza de una madre que no dejó de creer." },
+      { titulo: "El Amanecer de la Resurrección", tema: "La piedra rodada, la tumba vacía, la esperanza cumplida." }
+    ]
+  },
+  sanacion: {
+    nombre: "Sanación y Duelo",
+    descripcion: "Consuelo en el dolor, el amor más allá de la muerte",
+    prompts: [
+      { titulo: "El Duelo de David", tema: "El llanto por Absalón y la aceptación del dolor sagrado." },
+      { titulo: "Lázaro Duerme", tema: "Jesús llora con nosotros. El amor que despierta de la muerte." },
+      { titulo: "Las Lágrimas de Raquel", tema: "El duelo sagrado y la promesa del reencuentro." },
+      { titulo: "Job en la Noche Oscura", tema: "Cuando todo se pierde, la fe que permanece." },
+      { titulo: "El Padre Misericordioso", tema: "El abrazo que sana todas las heridas del pasado." }
+    ]
+  },
+  paz: {
+    nombre: "Paz Interior",
+    descripcion: "Quietud del alma, descanso en Dios",
+    prompts: [
+      { titulo: "El Susurro de Elías", tema: "Dios no está en el terremoto ni en el fuego, sino en la brisa suave." },
+      { titulo: "Junto a Aguas Tranquilas", tema: "El Salmo veintitrés vivido como experiencia de paz profunda." },
+      { titulo: "La Paz que el Mundo No Da", tema: "La última cena y las palabras de paz de Jesús." },
+      { titulo: "El Jardín de la Mañana", tema: "María Magdalena encuentra la paz en el jardín del Resucitado." },
+      { titulo: "La Calma Después de la Tempestad", tema: "Jesús duerme en la barca mientras la tormenta se aquieta." }
+    ]
+  },
+  gratitud: {
+    nombre: "Gratitud",
+    descripcion: "Agradecer las bendiciones, encontrar lo bueno",
+    prompts: [
+      { titulo: "Los Diez Leprosos", tema: "El que volvió a dar gracias. La gratitud como sanación." },
+      { titulo: "El Maná del Desierto", tema: "Pan del cielo cada mañana. Agradecer lo cotidiano." },
+      { titulo: "Magnificat de María", tema: "El canto de gratitud de María por las maravillas de Dios." },
+      { titulo: "El Vino de Caná", tema: "Lo ordinario transformado en extraordinario. La gratitud por los pequeños milagros." },
+      { titulo: "Los Cinco Panes y Dos Peces", tema: "La bendición de lo poco que se multiplica con gratitud." }
+    ]
+  },
+  perdon: {
+    nombre: "Perdón",
+    descripcion: "Liberación del resentimiento, reconciliación",
+    prompts: [
+      { titulo: "El Hijo que Volvió", tema: "El padre que espera. El abrazo del perdón incondicional." },
+      { titulo: "Setenta Veces Siete", tema: "Perdonar como liberación del alma." },
+      { titulo: "La Mujer del Perfume", tema: "Mucho se le perdona porque mucho ha amado." },
+      { titulo: "Pedro y el Fuego en la Playa", tema: "Tres veces negó, tres veces fue restaurado. El perdón que reconstruye." },
+      { titulo: "José y Sus Hermanos", tema: "Lo que pensaron para mal, Dios lo usó para bien. El perdón que sana familias." }
+    ]
+  }
+};
+
 // Temas ya cubiertos por historias existentes (para evitar duplicados temáticos)
 const EXISTING_THEMES = [
   { keywords: ["buen", "pastor", "salmo"], existing: "El Buen Pastor" },
@@ -24,7 +94,6 @@ const NEW_STORIES = [
   { titulo: "Elías en el Monte Horeb", tema: "Elías encuentra a Dios en el suave susurro del viento" },
   { titulo: "José y el Manto de Colores", tema: "Los sueños de José y su camino hacia el destino divino" },
   { titulo: "El Jardín de Getsemaní", tema: "Una noche de oración y paz en el huerto de olivos" },
-  // Nuevas historias añadidas (sin Noé duplicado ni Salmo 23 duplicado)
   { titulo: "Jacob y la Escalera al Cielo", tema: "El sueño de Jacob con ángeles subiendo y bajando en la noche estrellada" },
   { titulo: "La Pesca Milagrosa", tema: "Pedro y los discípulos en el lago al amanecer, la bruma sobre las aguas" },
   { titulo: "El Huerto del Cantar de los Cantares", tema: "Imágenes poéticas del amor divino, jardines fragantes y fuentes selladas" },
@@ -341,9 +410,115 @@ serve(async (req) => {
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
+    } else if (action === "create_by_theme") {
+      // Generate story by specific theme
+      const { themeId } = await req.json().catch(() => ({}));
+      
+      // Get themeId from request
+      const requestBody = JSON.parse(await req.clone().text());
+      const selectedThemeId = requestBody.themeId;
+      
+      if (!selectedThemeId || !STORY_THEMES[selectedThemeId]) {
+        return new Response(JSON.stringify({ 
+          error: "Invalid theme. Available themes: " + Object.keys(STORY_THEMES).join(", ") 
+        }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      
+      const theme = STORY_THEMES[selectedThemeId];
+      
+      // Get existing story titles to avoid duplicates
+      const { data: existingStories } = await supabase
+        .from('sleep_stories')
+        .select('titulo');
+      
+      const existingTitlesSet = new Set(existingStories?.map(s => s.titulo.toLowerCase()) || []);
+      
+      // Filter prompts that don't exist yet
+      const availablePrompts = theme.prompts.filter(p => 
+        !existingTitlesSet.has(p.titulo.toLowerCase())
+      );
+      
+      if (availablePrompts.length === 0) {
+        return new Response(JSON.stringify({
+          action: "create_by_theme",
+          themeName: theme.nombre,
+          message: `Ya existen todas las historias de ${theme.nombre}`,
+          processed: 0,
+          results: []
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      
+      // Pick a random available prompt
+      const randomPrompt = availablePrompts[Math.floor(Math.random() * availablePrompts.length)];
+      
+      try {
+        console.log(`Generating themed story: ${randomPrompt.titulo} (${theme.nombre})`);
+        const contenido = await generateStory(randomPrompt.titulo, randomPrompt.tema);
+        
+        const wordCount = contenido.split(/\s+/).length;
+        const duracionEstimada = Math.round(wordCount / 150);
+        
+        const { error: insertError } = await supabase
+          .from('sleep_stories')
+          .insert({
+            titulo: randomPrompt.titulo,
+            descripcion: randomPrompt.tema,
+            contenido: contenido,
+            duracion_estimada: duracionEstimada,
+            categoria: selectedThemeId,
+            orden: 100 + Date.now() % 1000
+          });
+        
+        if (insertError) {
+          throw insertError;
+        }
+        
+        console.log(`Created themed story: ${randomPrompt.titulo} (${duracionEstimada} min)`);
+        
+        return new Response(JSON.stringify({
+          action: "create_by_theme",
+          themeName: theme.nombre,
+          processed: 1,
+          remaining: availablePrompts.length - 1,
+          results: [{ titulo: randomPrompt.titulo, status: 'success', duration: duracionEstimada }]
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+        
+      } catch (e) {
+        const errorMsg = e instanceof Error ? e.message : String(e);
+        console.error(`Error generating themed story:`, e);
+        return new Response(JSON.stringify({
+          action: "create_by_theme",
+          themeName: theme.nombre,
+          processed: 0,
+          error: errorMsg,
+          results: [{ titulo: randomPrompt.titulo, status: 'error', error: errorMsg }]
+        }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    } else if (action === "get_themes") {
+      // Return available themes for UI
+      const themes = Object.entries(STORY_THEMES).map(([id, theme]) => ({
+        id,
+        nombre: theme.nombre,
+        descripcion: theme.descripcion,
+        storiesCount: theme.prompts.length
+      }));
+      
+      return new Response(JSON.stringify({ themes }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
     
-    return new Response(JSON.stringify({ error: "Invalid action. Use 'create_new' or 'expand_existing'" }), {
+    return new Response(JSON.stringify({ error: "Invalid action. Use 'create_new', 'expand_existing', 'create_by_theme', or 'get_themes'" }), {
       status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
