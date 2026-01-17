@@ -1,7 +1,9 @@
 import { BookOpen, Sun, Moon, CloudSun, Flame, GraduationCap, MessageSquare } from "lucide-react";
 import { motion } from "framer-motion";
 import { DailyShareButton } from "@/components/shared/DailyShareButton";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 import lionLogo from "@/assets/logo-elrugido.svg";
+import heroBackground from "@/assets/hero-background.jpg";
 
 interface HeroSectionProps {
   userName: string;
@@ -42,26 +44,39 @@ export function HeroSection({ userName, verse, stats }: HeroSectionProps) {
 
   return (
     <section className="relative overflow-hidden lg:min-h-[380px]">
-      {/* Intense Dark Gradient Background with Golden Glow */}
-      <div className="absolute inset-0 hero-rugido">
-        {/* Animated particles/sparks */}
-        {[...Array(6)].map((_, i) => (
+      {/* Background Image with Dark-Gold Overlay */}
+      <div className="absolute inset-0">
+        <OptimizedImage 
+          src={heroBackground} 
+          alt="Academia del Apologista" 
+          className="w-full h-full"
+          priority
+        />
+        {/* Dark overlay with gold gradient */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[hsl(220,50%,8%)/0.88] via-[hsl(207,60%,12%)/0.82] to-[hsl(45,90%,50%)/0.25]" />
+        {/* Additional vignette effect */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,hsl(220,50%,5%)/0.4_100%)]" />
+      </div>
+
+      {/* Animated golden particles */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(8)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-1 h-1 bg-secondary rounded-full"
+            className="absolute w-1.5 h-1.5 bg-secondary rounded-full"
             style={{
-              left: `${15 + i * 15}%`,
-              top: `${20 + (i % 3) * 25}%`,
+              left: `${10 + i * 12}%`,
+              top: `${15 + (i % 4) * 20}%`,
             }}
             animate={{
-              y: [-10, 10, -10],
-              opacity: [0.3, 0.8, 0.3],
-              scale: [1, 1.5, 1],
+              y: [-15, 15, -15],
+              opacity: [0.2, 0.7, 0.2],
+              scale: [1, 1.8, 1],
             }}
             transition={{
-              duration: 3 + i * 0.5,
+              duration: 4 + i * 0.5,
               repeat: Infinity,
-              delay: i * 0.3,
+              delay: i * 0.4,
             }}
           />
         ))}
