@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAudioCache } from "@/hooks/useAudioCache";
+import { AddToPlaylistButton } from "@/components/audio/AddToPlaylistButton";
 
 interface OracionCardProps {
   id: string;
@@ -160,6 +161,18 @@ export function OracionCard({
           
           {/* Actions */}
           <div className="flex flex-col items-center gap-1">
+            {/* Add to playlist button */}
+            <AddToPlaylistButton
+              item={{
+                id,
+                title: nombre,
+                subtitle: subcategoria || categoria,
+                audioUrl: audioUrl || null,
+                type: 'oracion',
+              }}
+              size="sm"
+            />
+            
             <Button
               variant="ghost"
               size="icon"

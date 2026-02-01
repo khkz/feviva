@@ -28,6 +28,7 @@ const DailyChallenge = lazy(() => import("@/components/dashboard/DailyChallenge"
 const FeaturedContent = lazy(() => import("@/components/dashboard/FeaturedContent").then(m => ({ default: m.FeaturedContent })));
 const GratitudePrompt = lazy(() => import("@/components/dashboard/GratitudePrompt").then(m => ({ default: m.GratitudePrompt })));
 const DailyMission = lazy(() => import("@/components/dashboard/DailyMission").then(m => ({ default: m.DailyMission })));
+const DailyRoutineCard = lazy(() => import("@/components/dashboard/DailyRoutineCard").then(m => ({ default: m.DailyRoutineCard })));
 
 interface Profile {
   nombre: string;
@@ -157,6 +158,11 @@ const Dashboard = () => {
           {/* Daily Mission */}
           <Suspense fallback={<CardSkeleton height="h-48" />}>
             <DailyMission />
+          </Suspense>
+
+          {/* Daily Routine Card - Prayer Playlist */}
+          <Suspense fallback={<CardSkeleton height="h-40" />}>
+            <DailyRoutineCard />
           </Suspense>
 
           {/* Quick Actions - Tu Formación */}
