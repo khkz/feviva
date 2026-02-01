@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Play, Trash2, ListMusic, Cross, Moon, GripVertical } from "lucide-react";
+import { X, Play, Trash2, ListMusic, Cross, Moon, BookOpen, GripVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
@@ -178,12 +178,14 @@ function QueueItem({
 }: {
   title: string;
   subtitle?: string;
-  type: 'oracion' | 'sleep_story';
+  type: 'oracion' | 'sleep_story' | 'lesson';
   imageUrl?: string;
   isActive?: boolean;
   onClick: () => void;
 }) {
-  const IconComponent = type === 'oracion' ? Cross : Moon;
+  const IconComponent = type === 'oracion' ? Cross : type === 'lesson' ? BookOpen : Moon;
+  const iconBg = type === 'oracion' ? "bg-secondary/10" : type === 'lesson' ? "bg-blue-500/10" : "bg-indigo-500/10";
+  const iconColor = type === 'oracion' ? "text-secondary" : type === 'lesson' ? "text-blue-400" : "text-indigo-400";
 
   return (
     <motion.button
@@ -198,15 +200,12 @@ function QueueItem({
     >
       <div className={cn(
         "w-10 h-10 rounded-lg overflow-hidden shrink-0 flex items-center justify-center",
-        type === 'oracion' ? "bg-secondary/10" : "bg-indigo-500/10"
+        iconBg
       )}>
         {imageUrl ? (
           <img src={imageUrl} alt={title} className="w-full h-full object-cover" />
         ) : (
-          <IconComponent className={cn(
-            "w-5 h-5",
-            type === 'oracion' ? "text-secondary" : "text-indigo-400"
-          )} />
+          <IconComponent className={cn("w-5 h-5", iconColor)} />
         )}
       </div>
       <div className="flex-1 min-w-0">
@@ -235,7 +234,9 @@ function RoutineItem({
   item: PlaylistItem;
   onRemove: (e: React.MouseEvent) => void;
 }) {
-  const IconComponent = item.type === 'oracion' ? Cross : Moon;
+  const IconComponent = item.type === 'oracion' ? Cross : item.type === 'lesson' ? BookOpen : Moon;
+  const iconBg = item.type === 'oracion' ? "bg-secondary/10" : item.type === 'lesson' ? "bg-blue-500/10" : "bg-indigo-500/10";
+  const iconColor = item.type === 'oracion' ? "text-secondary" : item.type === 'lesson' ? "text-blue-400" : "text-indigo-400";
 
   return (
     <motion.div
@@ -249,15 +250,12 @@ function RoutineItem({
       
       <div className={cn(
         "w-10 h-10 rounded-lg overflow-hidden shrink-0 flex items-center justify-center",
-        item.type === 'oracion' ? "bg-secondary/10" : "bg-indigo-500/10"
+        iconBg
       )}>
         {item.imageUrl ? (
           <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
         ) : (
-          <IconComponent className={cn(
-            "w-5 h-5",
-            item.type === 'oracion' ? "text-secondary" : "text-indigo-400"
-          )} />
+          <IconComponent className={cn("w-5 h-5", iconColor)} />
         )}
       </div>
 

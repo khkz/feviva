@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, X, SkipBack, SkipForward, ListMusic, Moon, Cross, Loader2 } from "lucide-react";
+import { Play, Pause, X, SkipBack, SkipForward, ListMusic, Moon, Cross, BookOpen, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
 import { cn } from "@/lib/utils";
@@ -35,7 +35,6 @@ export function UnifiedMiniPlayer({ className }: UnifiedMiniPlayerProps) {
   if (!currentItem || !isMinimized) return null;
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
-  const isOracion = currentItem.type === 'oracion';
   const hasQueue = queue.length > 1;
 
   const formatTime = (time: number) => {
@@ -45,27 +44,42 @@ export function UnifiedMiniPlayer({ className }: UnifiedMiniPlayerProps) {
   };
 
   // Theme based on content type
-  const theme = isOracion
-    ? {
-        bg: "from-secondary/95 via-secondary/90 to-primary/90",
-        progressBg: "from-primary to-secondary",
-        text: "text-secondary-foreground",
-        textMuted: "text-secondary-foreground/60",
-        buttonHover: "hover:bg-secondary-foreground/10",
-        border: "border-secondary/20",
-        icon: Cross,
-        iconBg: "from-secondary/30 to-primary/20"
-      }
-    : {
-        bg: "from-indigo-950/95 via-purple-950/95 to-slate-950/95",
-        progressBg: "from-indigo-400 to-purple-400",
-        text: "text-white",
-        textMuted: "text-indigo-200/60",
-        buttonHover: "hover:bg-white/10",
-        border: "border-white/10",
-        icon: Moon,
-        iconBg: "from-indigo-500/30 to-purple-500/20"
-      };
+  const theme = 
+    currentItem.type === 'oracion'
+      ? {
+          bg: "from-secondary/95 via-secondary/90 to-primary/90",
+          progressBg: "from-primary to-secondary",
+          text: "text-secondary-foreground",
+          textMuted: "text-secondary-foreground/60",
+          buttonHover: "hover:bg-secondary-foreground/10",
+          border: "border-secondary/20",
+          icon: Cross,
+          iconBg: "from-secondary/30 to-primary/20",
+          subtitle: "Oración"
+        }
+      : currentItem.type === 'lesson'
+      ? {
+          bg: "from-blue-950/95 via-indigo-950/95 to-slate-950/95",
+          progressBg: "from-blue-400 to-indigo-400",
+          text: "text-white",
+          textMuted: "text-blue-200/60",
+          buttonHover: "hover:bg-white/10",
+          border: "border-blue-500/20",
+          icon: BookOpen,
+          iconBg: "from-blue-500/30 to-indigo-500/20",
+          subtitle: "Lección"
+        }
+      : {
+          bg: "from-indigo-950/95 via-purple-950/95 to-slate-950/95",
+          progressBg: "from-indigo-400 to-purple-400",
+          text: "text-white",
+          textMuted: "text-indigo-200/60",
+          buttonHover: "hover:bg-white/10",
+          border: "border-white/10",
+          icon: Moon,
+          iconBg: "from-indigo-500/30 to-purple-500/20",
+          subtitle: "Historia para dormir"
+        };
 
   const IconComponent = theme.icon;
 
@@ -127,7 +141,7 @@ export function UnifiedMiniPlayer({ className }: UnifiedMiniPlayerProps) {
                   {currentItem.title}
                 </p>
                 <p className={cn("text-xs", theme.textMuted)}>
-                  {currentItem.subtitle || (isOracion ? "Oración" : "Historia para dormir")} • {formatTime(currentTime)} / {formatTime(duration)}
+                  {currentItem.subtitle || theme.subtitle} • {formatTime(currentTime)} / {formatTime(duration)}
                 </p>
               </div>
 
