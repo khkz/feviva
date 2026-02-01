@@ -5,7 +5,7 @@ import { toast } from "sonner";
 
 export interface PlaylistItem {
   id: string;
-  type: 'oracion' | 'sleep_story';
+  type: 'oracion' | 'sleep_story' | 'lesson';
   title: string;
   subtitle?: string;
   audioUrl?: string | null;

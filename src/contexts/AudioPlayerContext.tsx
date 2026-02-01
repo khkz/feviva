@@ -7,7 +7,7 @@ export interface AudioQueueItem {
   subtitle?: string;
   imageUrl?: string;
   audioUrl: string | null;
-  type: 'oracion' | 'sleep_story';
+  type: 'oracion' | 'sleep_story' | 'lesson';
   // Original data for reference
   originalData?: unknown;
 }

@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -16,15 +16,14 @@ interface EnrichedContent {
   resumen_audio: string;
 }
 
+/**
+ * Hook for generating lesson audio (TTS).
+ * Playback is handled by the global AudioPlayerContext.
+ */
 export function useLessonAudio({ lessonId, titulo, existingAudioUrl }: UseLessonAudioProps) {
   const { toast } = useToast();
   const [audioUrl, setAudioUrl] = useState<string | null>(existingAudioUrl || null);
   const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const generateAudio = useCallback(async (resumenAudio: string) => {
     if (audioUrl || isGeneratingAudio) return audioUrl;
@@ -70,109 +69,9 @@ export function useLessonAudio({ lessonId, titulo, existingAudioUrl }: UseLesson
     return null;
   }, [lessonId, titulo, audioUrl, isGeneratingAudio, toast]);
 
-  const play = useCallback(async (url?: string) => {
-    const targetUrl = url || audioUrl;
-    if (!targetUrl) return;
-
-    if (!audioRef.current || audioRef.current.src !== targetUrl) {
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
-      audioRef.current = new Audio(targetUrl);
-      
-      audioRef.current.onloadedmetadata = () => {
-        if (audioRef.current) {
-          setDuration(audioRef.current.duration);
-        }
-      };
-      
-      audioRef.current.onended = () => {
-        setIsPlaying(false);
-        setProgress(0);
-        setCurrentTime(0);
-      };
-      
-      audioRef.current.ontimeupdate = () => {
-        if (audioRef.current) {
-          const pct = (audioRef.current.currentTime / audioRef.current.duration) * 100;
-          setProgress(pct);
-          setCurrentTime(audioRef.current.currentTime);
-        }
-      };
-    }
-
-    await audioRef.current.play();
-    setIsPlaying(true);
-  }, [audioUrl]);
-
-  const pause = useCallback(() => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    }
-  }, []);
-
-  const toggle = useCallback(() => {
-    if (isPlaying) {
-      pause();
-    } else {
-      play();
-    }
-  }, [isPlaying, play, pause]);
-
-  const seek = useCallback((time: number) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = time;
-      setCurrentTime(time);
-    }
-  }, []);
-
-  const seekByPercent = useCallback((percent: number) => {
-    if (audioRef.current && duration > 0) {
-      const time = (percent / 100) * duration;
-      seek(time);
-    }
-  }, [duration, seek]);
-
-  const stop = useCallback(() => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-      setIsPlaying(false);
-      setProgress(0);
-      setCurrentTime(0);
-    }
-  }, []);
-
-  const skipForward = useCallback((seconds: number = 15) => {
-    if (audioRef.current) {
-      const newTime = Math.min(audioRef.current.currentTime + seconds, duration);
-      seek(newTime);
-    }
-  }, [duration, seek]);
-
-  const skipBackward = useCallback((seconds: number = 15) => {
-    if (audioRef.current) {
-      const newTime = Math.max(audioRef.current.currentTime - seconds, 0);
-      seek(newTime);
-    }
-  }, [seek]);
-
   return {
     audioUrl,
     isGeneratingAudio,
-    isPlaying,
-    progress,
-    duration,
-    currentTime,
-    play,
-    pause,
-    toggle,
-    stop,
-    seek,
-    seekByPercent,
-    skipForward,
-    skipBackward,
     generateAudio,
     hasAudio: !!audioUrl,
   };

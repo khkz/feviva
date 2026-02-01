@@ -12,6 +12,7 @@ import { Slider } from "@/components/ui/slider";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLessonAudio, useLessonEnrichment } from "@/hooks/useLessonEnrichment";
+import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
 import { ContentFeedback } from "@/components/feedback/ContentFeedback";
 
 interface Lesson {
@@ -52,6 +53,19 @@ export function LessonDetailModal({
   const [activeTab, setActiveTab] = useState<string>("contenido");
   const [isMuted, setIsMuted] = useState(false);
   
+  // Global audio player
+  const { 
+    play: playGlobal, 
+    pause: pauseGlobal,
+    togglePlay: toggleGlobalPlay,
+    isPlaying: globalIsPlaying, 
+    currentItem, 
+    minimize,
+    currentTime: globalCurrentTime,
+    duration: globalDuration,
+    seek: globalSeek
+  } = useAudioPlayer();
+  
   const { 
     isEnriching, 
     enrichedContent, 
@@ -62,14 +76,6 @@ export function LessonDetailModal({
   const {
     audioUrl,
     isGeneratingAudio,
-    isPlaying,
-    progress,
-    duration,
-    currentTime,
-    toggle,
-    seekByPercent,
-    skipForward,
-    skipBackward,
     generateAudio,
     hasAudio,
   } = useLessonAudio({
@@ -77,6 +83,13 @@ export function LessonDetailModal({
     titulo: lesson.titulo,
     existingAudioUrl: lesson.audio_url,
   });
+
+  // Check if THIS lesson is currently playing
+  const isThisLessonPlaying = currentItem?.id === lesson.id;
+  const isPlaying = isThisLessonPlaying && globalIsPlaying;
+  const currentTime = isThisLessonPlaying ? globalCurrentTime : 0;
+  const duration = isThisLessonPlaying ? globalDuration : 0;
+  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   // Check if we should use enriched content
   const displayContent = enrichedContent?.contenido_enriquecido || lesson.contenido_enriquecido || lesson.contenido;
@@ -98,14 +111,63 @@ export function LessonDetailModal({
   };
 
   const handlePlayAudio = async () => {
+    if (isThisLessonPlaying) {
+      // Toggle play/pause for current lesson
+      toggleGlobalPlay();
+      return;
+    }
+
+    // If no audio exists but we have a summary, generate it first
     if (!hasAudio && enrichedContent?.resumen_audio) {
       const url = await generateAudio(enrichedContent.resumen_audio);
       if (url) {
-        toggle();
+        playGlobal({
+          id: lesson.id,
+          title: lesson.titulo,
+          subtitle: lesson.categoria,
+          audioUrl: url,
+          type: 'lesson',
+          originalData: lesson
+        });
       }
-    } else {
-      toggle();
+    } else if (audioUrl) {
+      // Play the lesson using global player
+      playGlobal({
+        id: lesson.id,
+        title: lesson.titulo,
+        subtitle: lesson.categoria,
+        audioUrl: audioUrl,
+        type: 'lesson',
+        originalData: lesson
+      });
     }
+  };
+
+  const handleClose = () => {
+    // If this lesson is playing, minimize instead of stopping
+    if (isThisLessonPlaying) {
+      minimize();
+    }
+    onClose();
+  };
+
+  const handleSeekByPercent = (percent: number) => {
+    if (duration > 0) {
+      const time = (percent / 100) * duration;
+      globalSeek(time);
+    }
+  };
+
+  const handleSkipForward = () => {
+    if (duration > 0) {
+      const newTime = Math.min(currentTime + 15, duration);
+      globalSeek(newTime);
+    }
+  };
+
+  const handleSkipBackward = () => {
+    const newTime = Math.max(currentTime - 15, 0);
+    globalSeek(newTime);
   };
 
   return (
@@ -114,7 +176,7 @@ export function LessonDetailModal({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      onClick={onClose}
+      onClick={handleClose}
     >
       <motion.div
         className="relative w-full max-w-4xl max-h-[90vh] bg-background/95 backdrop-blur-xl rounded-3xl border border-border/50 overflow-hidden"
@@ -172,7 +234,7 @@ export function LessonDetailModal({
             <Button
               variant="ghost"
               size="icon"
-              onClick={onClose}
+              onClick={handleClose}
               className="rounded-full glass-button"
             >
               <X className="h-5 w-5" />
@@ -195,8 +257,8 @@ export function LessonDetailModal({
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => skipBackward(15)}
-                    disabled={!hasAudio || isGeneratingAudio}
+                    onClick={handleSkipBackward}
+                    disabled={!isThisLessonPlaying || isGeneratingAudio}
                     className="h-8 w-8 rounded-full"
                   >
                     <SkipBack className="h-4 w-4" />
@@ -219,8 +281,8 @@ export function LessonDetailModal({
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => skipForward(15)}
-                    disabled={!hasAudio || isGeneratingAudio}
+                    onClick={handleSkipForward}
+                    disabled={!isThisLessonPlaying || isGeneratingAudio}
                     className="h-8 w-8 rounded-full"
                   >
                     <SkipForward className="h-4 w-4" />
@@ -236,9 +298,9 @@ export function LessonDetailModal({
                     value={[progress]}
                     max={100}
                     step={0.1}
-                    onValueChange={(value) => seekByPercent(value[0])}
+                    onValueChange={(value) => handleSeekByPercent(value[0])}
                     className="flex-1"
-                    disabled={!hasAudio}
+                    disabled={!isThisLessonPlaying}
                   />
                   <span className="text-xs text-muted-foreground w-10">
                     {formatTime(duration)}
