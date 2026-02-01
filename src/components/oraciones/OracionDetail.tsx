@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X, Heart, Play, Pause, Volume2, Info, Loader2, Share2, ChevronUp, ChevronDown, Cross, Quote } from "lucide-react";
+import { X, Heart, Play, Pause, Volume2, Info, Loader2, Share2, ChevronUp, ChevronDown, Cross, Quote, ListPlus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -8,6 +8,7 @@ import { Slider } from "@/components/ui/slider";
 import { useOracionAudio } from "@/hooks/useOracionAudio";
 import { ShareModal } from "@/components/shared/ShareModal";
 import { AmbientSoundMixer } from "@/components/sleep/AmbientSoundMixer";
+import { AddToPlaylistButton } from "@/components/audio/AddToPlaylistButton";
 import { cn } from "@/lib/utils";
 
 // Import images for header backgrounds
@@ -404,6 +405,19 @@ export function OracionDetail({
         transition={{ delay: 0.4 }}
       >
         <div className="max-w-lg mx-auto">
+          {/* Add to Routine Button */}
+          <div className="flex justify-center mb-4">
+            <AddToPlaylistButton
+              item={{
+                id,
+                title: nombre,
+                subtitle: categoria,
+                audioUrl: existingAudioUrl || null,
+                type: 'oracion',
+              }}
+              variant="full"
+            />
+          </div>
           {/* Progress bar */}
           <AnimatePresence>
             {(isPlaying || progress > 0) && (

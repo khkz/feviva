@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { AudioPlayerProvider } from "@/contexts/AudioPlayerContext";
 import { RosarioProvider } from "@/contexts/RosarioContext";
-import { MiniPlayer } from "@/components/audio/MiniPlayer";
+import { UnifiedMiniPlayer } from "@/components/audio/UnifiedMiniPlayer";
 import { OracionPlayer } from "@/components/oraciones/OracionPlayer";
 import { RosarioMiniPlayer } from "@/components/rosario/RosarioMiniPlayer";
 import { RosarioInterstellar } from "@/components/frontera-final/RosarioInterstellar";
@@ -154,7 +154,7 @@ const App = () => (
               
               {/* Global Players */}
               <OracionPlayer />
-              <MiniPlayer />
+              <UnifiedMiniPlayer />
               <RosarioMiniPlayer />
               <RosarioInterstellar />
             </BrowserRouter>
