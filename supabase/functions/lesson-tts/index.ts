@@ -8,11 +8,11 @@ const corsHeaders = {
 
 const MAX_CHARS = 4000;
 
-// Limpia el texto para mejor pronunciación en español
+// Limpia el texto para mejor pronunciación en español con pausas naturales
 function cleanTextForSpanishTTS(text: string): string {
   let cleaned = text;
   
-  // Reemplazos para términos que causan problemas de pronunciación
+  // 1. Reemplazos para términos que causan problemas de pronunciación
   const replacements: Record<string, string> = {
     // Términos latinos
     'et al.': 'y otros',
@@ -48,17 +48,42 @@ function cleanTextForSpanishTTS(text: string): string {
     cleaned = cleaned.replace(new RegExp(key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), value);
   }
   
-  // Limpiar markdown y caracteres especiales
-  cleaned = cleaned
-    .replace(/\*\*/g, '')
-    .replace(/\*/g, '')
-    .replace(/##\s*/g, '')
-    .replace(/#\s*/g, '')
-    .replace(/\n{3,}/g, '\n\n')
-    .replace(/\s{2,}/g, ' ')
-    .trim();
+  // 2. Manejar títulos/encabezados con pausas dramáticas
+  cleaned = cleaned.replace(/^#{1,3}\s*(.+)$/gm, '\n\n$1.\n\n');
   
-  return cleaned;
+  // 3. Manejar citas blockquote con entonación apropiada
+  cleaned = cleaned.replace(/^>\s*"(.+)"$/gm, 'Y cito: "$1"');
+  cleaned = cleaned.replace(/^>\s*(.+)$/gm, 'Cito: $1');
+  
+  // 4. Manejar listas con pausas entre elementos
+  cleaned = cleaned.replace(/^[-*]\s+(.+)$/gm, '$1.');
+  
+  // 5. Manejar texto en negrita con pequeñas pausas para énfasis
+  cleaned = cleaned.replace(/\*\*([^*]+)\*\*/g, ', $1,');
+  
+  // 6. Limpiar asteriscos sueltos
+  cleaned = cleaned.replace(/\*/g, '');
+  
+  // 7. Preservar pausas de párrafo
+  cleaned = cleaned.replace(/\n\n+/g, '.\n\n');
+  
+  // 8. Convertir saltos simples en espacios
+  cleaned = cleaned.replace(/\n/g, ' ');
+  
+  // 9. Limpiar puntuación duplicada
+  cleaned = cleaned.replace(/\.{2,}/g, '.');
+  cleaned = cleaned.replace(/,{2,}/g, ',');
+  cleaned = cleaned.replace(/\.\s*,/g, '.');
+  cleaned = cleaned.replace(/,\s*\./g, '.');
+  
+  // 10. Limpiar espacios múltiples
+  cleaned = cleaned.replace(/\s{2,}/g, ' ');
+  
+  // 11. Limpiar puntos al inicio de oraciones
+  cleaned = cleaned.replace(/^\.\s*/g, '');
+  cleaned = cleaned.replace(/\s+\.\s*\./g, '.');
+  
+  return cleaned.trim();
 }
 
 function splitTextIntoChunks(text: string): string[] {
