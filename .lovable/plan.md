@@ -1,154 +1,171 @@
 
 
-# Plan: Mejorar la Función TTS para Español Natural
+# Plan: Regenerar Audio Individual en Admin Content
 
 ## El Problema
-El audio de "El Mito de las Mariposas" suena mal porque la función `cleanTextForSpanishTTS` elimina la estructura del contenido sin añadir las pausas y la puntuación necesarias para una narración natural.
+Actualmente el diálogo "Regenerar Premium" solo permite procesar audios **en lote** (cantidad X). No hay forma de seleccionar un audio específico para regenerar (como "El Mito de las Mariposas").
 
-**Problemas específicos:**
-1. Los títulos de sección (`## Parte 1:`) se eliminan sin pausa
-2. Múltiples líneas se comprimen en texto corrido
-3. Las citas (`>`) pierden su entonación especial
-4. Las listas fluyen sin pausas entre elementos
-5. El texto en negrita pierde énfasis
+## Solución
+Añadir un botón de "Regenerar" en cada fila de la tabla que abra un diálogo para regenerar ese audio específico.
 
 ---
 
-## Solución: Mejorar `cleanTextForSpanishTTS`
+## Cambios en la UI
 
-### Transformaciones necesarias:
+### 1. Nueva columna "Acciones" en la tabla
 
-| Elemento Original | Transformación | Razón |
-|-------------------|----------------|-------|
-| `## Título` | `... Título ...` (pausas) | Marca cambio de sección |
-| `# Título Principal` | `... Título Principal ...` | Pausa dramática |
-| `**texto**` | `texto` + instrucción de énfasis | Mantiene significado |
-| `> "Cita..."` | `Cita...` (con pausa antes/después) | Entonación de cita |
-| `- Elemento lista` | `Elemento lista.` | Pausa entre elementos |
-| `\n\n` | Pausa natural (2 segundos) | Separación de párrafos |
+Añadir una columna con un botón de regenerar para cada item que ya tenga audio:
 
----
+```
+| Título              | Estado | Premium     | Fecha      | Acciones      |
+|---------------------|--------|-------------|------------|---------------|
+| El Mito de las...   | ✓ Listo| ⭐ sage     | 01/02/2026 | 🔄 Regenerar  |
+| Jesús Histórico     | ✓ Listo| —           | 01/02/2026 | 🔄 Regenerar  |
+```
 
-## Archivos a Modificar
+### 2. Nuevo diálogo "Regenerar Audio Individual"
 
-### 1. `supabase/functions/lesson-tts/index.ts`
-### 2. `supabase/functions/text-to-speech/index.ts`
-
-Ambas funciones usan `cleanTextForSpanishTTS`, así que mejoraré la función en ambas.
+Al hacer clic en "Regenerar", se abre un diálogo con:
+- Título del contenido seleccionado
+- Selector de voz (las 11 voces disponibles)
+- Botón "Regenerar Este Audio"
 
 ---
 
-## Nueva Implementación de `cleanTextForSpanishTTS`
+## Archivo a Modificar
+
+**`src/pages/admin/AdminContent.tsx`**
+
+### Nuevos estados:
+```typescript
+const [singleRegenDialog, setSingleRegenDialog] = useState<{
+  open: boolean;
+  item: ContentItem | null;
+  type: 'sleep' | 'lesson';
+}>({ open: false, item: null, type: 'lesson' });
+const [singleRegenVoice, setSingleRegenVoice] = useState('sage');
+```
+
+### Nueva función `regenerateSingleAudio`:
+```typescript
+const regenerateSingleAudio = async () => {
+  if (!singleRegenDialog.item) return;
+  
+  const { item, type } = singleRegenDialog;
+  const jobType = type === 'sleep' ? 'sleep_tts_premium' : 'lesson_tts_premium';
+  const tableName = type === 'sleep' ? 'sleep_stories' : 'library_lessons';
+  
+  // Encolar un solo job con la voz seleccionada
+  await queueJobs(jobType, [{
+    id: item.id,
+    title: item.titulo,
+    table: tableName,
+    metadata: { voice: singleRegenVoice, premium: true, forceRegenerate: true }
+  }]);
+  
+  setSingleRegenDialog({ open: false, item: null, type: 'lesson' });
+  
+  toast({
+    title: "Audio en cola",
+    description: `"${item.titulo}" será regenerado con voz ${singleRegenVoice}`,
+  });
+};
+```
+
+### Modificar `renderContentTable`:
+Añadir columna de acciones con botón de regenerar:
 
 ```typescript
-function cleanTextForSpanishTTS(text: string): string {
-  let cleaned = text;
-  
-  // 1. Reemplazos de términos problemáticos (existente)
-  const replacements: Record<string, string> = {
-    'et al.': 'y otros',
-    'vs.': 'versus',
-    'etc.': 'etcétera',
-    // ... resto igual ...
-  };
-  
-  for (const [key, value] of Object.entries(replacements)) {
-    cleaned = cleaned.replace(new RegExp(key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), value);
-  }
-  
-  // 2. NUEVO: Manejar títulos/encabezados con pausas
-  // ## Título -> "... Título ..." para crear pausa dramática
-  cleaned = cleaned.replace(/^#{1,3}\s*(.+)$/gm, '\n\n$1.\n\n');
-  
-  // 3. NUEVO: Manejar citas blockquote con entonación
-  // > "Cita aquí" -> Como dijo alguien: "Cita aquí"
-  cleaned = cleaned.replace(/^>\s*"(.+)"$/gm, 'Y cito: "$1"');
-  cleaned = cleaned.replace(/^>\s*(.+)$/gm, 'Cito: $1');
-  
-  // 4. NUEVO: Manejar listas con pausas
-  // - Elemento -> Elemento. (punto para pausa)
-  cleaned = cleaned.replace(/^[-*]\s+(.+)$/gm, '$1.');
-  
-  // 5. NUEVO: Manejar texto en negrita con pequeñas pausas
-  // **texto** -> , texto, (comas para énfasis sutil)
-  cleaned = cleaned.replace(/\*\*([^*]+)\*\*/g, ', $1,');
-  
-  // 6. Limpiar asteriscos sueltos
-  cleaned = cleaned.replace(/\*/g, '');
-  
-  // 7. NUEVO: Preservar pausas de párrafo
-  // Convertir doble salto de línea en punto y pausa
-  cleaned = cleaned.replace(/\n\n+/g, '.\n\n');
-  
-  // 8. Convertir saltos simples en espacios
-  cleaned = cleaned.replace(/\n/g, ' ');
-  
-  // 9. Limpiar puntuación duplicada
-  cleaned = cleaned.replace(/\.{2,}/g, '.');
-  cleaned = cleaned.replace(/,{2,}/g, ',');
-  cleaned = cleaned.replace(/\.\s*,/g, '.');
-  cleaned = cleaned.replace(/,\s*\./g, '.');
-  
-  // 10. Limpiar espacios múltiples
-  cleaned = cleaned.replace(/\s{2,}/g, ' ');
-  
-  // 11. Limpiar puntos al inicio de oraciones
-  cleaned = cleaned.replace(/^\.\s*/g, '');
-  cleaned = cleaned.replace(/\s+\.\s*\./g, '.');
-  
-  return cleaned.trim();
-}
+<TableHead>Acciones</TableHead>
+...
+<TableCell>
+  {hasAudio && (
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={() => {
+        setSingleRegenVoice(premiumInfo?.voice || (contentType === 'sleep' ? 'shimmer' : 'sage'));
+        setSingleRegenDialog({ open: true, item, type: contentType! });
+      }}
+    >
+      <RefreshCw className="h-4 w-4" />
+    </Button>
+  )}
+</TableCell>
+```
+
+### Nuevo diálogo:
+```tsx
+<Dialog open={singleRegenDialog.open} onOpenChange={...}>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>
+        <RefreshCw className="h-5 w-5 mr-2" />
+        Regenerar Audio
+      </DialogTitle>
+      <DialogDescription>
+        Regenerar audio de "{singleRegenDialog.item?.titulo}"
+      </DialogDescription>
+    </DialogHeader>
+    
+    <div className="space-y-4 py-4">
+      <Label>Seleccionar Voz</Label>
+      <Select value={singleRegenVoice} onValueChange={setSingleRegenVoice}>
+        {/* Voces */}
+      </Select>
+    </div>
+    
+    <DialogFooter>
+      <Button variant="outline">Cancelar</Button>
+      <Button onClick={regenerateSingleAudio}>
+        Regenerar Este Audio
+      </Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
 ```
 
 ---
 
-## Ejemplo de Transformación
+## Flujo del Usuario
 
-**Antes (raw markdown):**
-```markdown
-## Parte 1: Las Mariposas Mueren
-
-Todos conocemos la sensación: el corazón acelerado...
-
-Aquí está la verdad que nadie te dice: **las mariposas mueren**.
-
-> "El amor joven dice: Te amo porque te necesito."
 ```
-
-**Después (optimizado para TTS):**
-```text
-Parte 1: Las Mariposas Mueren.
-
-Todos conocemos la sensación: el corazón acelerado...
-
-Aquí está la verdad que nadie te dice:, las mariposas mueren,.
-
-Y cito: "El amor joven dice: Te amo porque te necesito."
+┌─────────────────────────────────────────────────────────────┐
+│ Admin ve tabla de lecciones                                  │
+│                                                              │
+│ | El Mito de las Mariposas | ✓ Listo | sage | 🔄            │
+│                                                              │
+│ → Clic en 🔄                                                 │
+│                                                              │
+│ ┌──────────────────────────────────────┐                    │
+│ │ Regenerar Audio                       │                    │
+│ │                                       │                    │
+│ │ "El Mito de las Mariposas"            │                    │
+│ │                                       │                    │
+│ │ Voz: [sage ▼]                         │                    │
+│ │   • shimmer - Cálida, suave           │                    │
+│ │   • nova - Clara, expresiva           │                    │
+│ │   • sage - Contemplativa (actual)     │                    │
+│ │                                       │                    │
+│ │ [Cancelar]  [Regenerar Este Audio]    │                    │
+│ └──────────────────────────────────────┘                    │
+│                                                              │
+│ → Clic en "Regenerar Este Audio"                            │
+│                                                              │
+│ Toast: "El Mito de las Mariposas será regenerado con sage"  │
+│                                                              │
+│ → Se añade a la cola de procesamiento                       │
+│ → El nuevo audio usará la función TTS mejorada              │
+└─────────────────────────────────────────────────────────────┘
 ```
-
----
-
-## Paso Adicional: Regenerar el Audio
-
-Después de actualizar la función, necesitarás regenerar el audio de "El Mito de las Mariposas" para que use la nueva lógica de limpieza.
-
----
-
-## Orden de Implementación
-
-1. **Actualizar `lesson-tts/index.ts`** - Mejorar la función de limpieza
-2. **Actualizar `text-to-speech/index.ts`** - Sincronizar la misma mejora
-3. **Desplegar las funciones**
-4. **Regenerar audio** - Borrar el audio actual y generar uno nuevo desde la biblioteca
 
 ---
 
 ## Resultado Esperado
 
-El audio de las lecciones:
-- Tendrá pausas naturales entre secciones
-- Las citas se escucharán con entonación apropiada
-- Los elementos importantes tendrán énfasis sutil
-- Las listas se escucharán claramente separadas
-- Sonará como una narración profesional, no texto corrido
+- Cada fila con audio tiene un botón 🔄 para regenerar
+- Al hacer clic, se abre un diálogo para elegir la voz
+- La voz por defecto es la actual (si existe) o sage/shimmer según el tipo
+- Se encola un solo job para regenerar ese audio específico
+- El nuevo audio usará la función `cleanTextForSpanishTTS` mejorada
 
