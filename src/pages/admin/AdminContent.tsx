@@ -86,6 +86,14 @@ export const AdminContent = () => {
   const [lessonSubTab, setLessonSubTab] = useState<'audio' | 'contenido'>('audio');
   const [enrichCount, setEnrichCount] = useState(5);
   const [showEnrichDialog, setShowEnrichDialog] = useState(false);
+  
+  // Estado para regenerar audio individual
+  const [singleRegenDialog, setSingleRegenDialog] = useState<{
+    open: boolean;
+    item: ContentItem | null;
+    type: 'sleep' | 'lesson';
+  }>({ open: false, item: null, type: 'lesson' });
+  const [singleRegenVoice, setSingleRegenVoice] = useState('sage');
   const { toast } = useToast();
   
   // Hook para jobs generales
@@ -321,6 +329,38 @@ export const AdminContent = () => {
     }
   };
 
+  // Regenerar audio individual
+  const regenerateSingleAudio = async () => {
+    if (!singleRegenDialog.item) return;
+    
+    const { item, type } = singleRegenDialog;
+    const jobType = type === 'sleep' ? 'sleep_tts_premium' : 'lesson_tts_premium';
+    const tableName = type === 'sleep' ? 'sleep_stories' : 'library_lessons';
+    
+    try {
+      await queueJobs(jobType, [{
+        id: item.id,
+        title: item.titulo,
+        table: tableName,
+        metadata: { voice: singleRegenVoice, premium: true, forceRegenerate: true }
+      }]);
+      
+      setSingleRegenDialog({ open: false, item: null, type: 'lesson' });
+      
+      toast({
+        title: "Audio en cola",
+        description: `"${item.titulo}" será regenerado con voz ${singleRegenVoice}`,
+      });
+    } catch (error) {
+      console.error('Error queuing single audio:', error);
+      toast({
+        title: "Error",
+        description: "No se pudo encolar el audio",
+        variant: "destructive"
+      });
+    }
+  };
+
   const renderContentTable = (
     items: ContentItem[], 
     type: 'audio' | 'image' | 'enriched',
@@ -334,6 +374,7 @@ export const AdminContent = () => {
           <TableHead>Estado</TableHead>
           <TableHead>Premium</TableHead>
           <TableHead>Fecha</TableHead>
+          {type === 'audio' && contentType && <TableHead>Acciones</TableHead>}
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -382,6 +423,24 @@ export const AdminContent = () => {
                   : new Date(item.created_at).toLocaleDateString()
                 }
               </TableCell>
+              {type === 'audio' && contentType && (
+                <TableCell>
+                  {hasAudio && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 w-7 p-0 text-muted-foreground hover:text-primary"
+                      onClick={() => {
+                        setSingleRegenVoice(premiumInfo?.voice || (contentType === 'sleep' ? 'shimmer' : 'sage'));
+                        setSingleRegenDialog({ open: true, item, type: contentType });
+                      }}
+                      title="Regenerar audio"
+                    >
+                      <RefreshCw className="h-4 w-4" />
+                    </Button>
+                  )}
+                </TableCell>
+              )}
             </TableRow>
           );
         })}
@@ -830,6 +889,52 @@ export const AdminContent = () => {
             >
               <Brain className="h-4 w-4 mr-2" />
               Verificar {enrichCount}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog for single audio regeneration */}
+      <Dialog open={singleRegenDialog.open} onOpenChange={(open) => setSingleRegenDialog(prev => ({ ...prev, open }))}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <RefreshCw className="h-5 w-5 text-primary" />
+              Regenerar Audio
+            </DialogTitle>
+            <DialogDescription>
+              Regenerar audio de "{singleRegenDialog.item?.titulo}"
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Seleccionar Voz</Label>
+              <Select value={singleRegenVoice} onValueChange={setSingleRegenVoice}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {VOICES.map(voice => (
+                    <SelectItem key={voice.value} value={voice.value}>
+                      <div className="flex flex-col">
+                        <span>{voice.label}</span>
+                        <span className="text-xs text-muted-foreground">{voice.description}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSingleRegenDialog({ open: false, item: null, type: 'lesson' })}>
+              Cancelar
+            </Button>
+            <Button onClick={regenerateSingleAudio}>
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Regenerar Este Audio
             </Button>
           </DialogFooter>
         </DialogContent>
