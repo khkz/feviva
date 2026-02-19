@@ -84,6 +84,58 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
+    // === Quota check for AI actions ===
+    const aiActions = ['start', 'respond', 'suggest', 'evaluate'];
+    if (aiActions.includes(action)) {
+      const DAILY_LIMIT = 3;
+      const supabaseAdmin = createClient(
+        Deno.env.get('SUPABASE_URL')!,
+        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+      );
+
+      // Determine user_id from auth
+      let userId: string | null = null;
+      if (authHeader?.startsWith('Bearer ')) {
+        const ac = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_ANON_KEY')!, { global: { headers: { Authorization: authHeader! } } });
+        const { data: userData } = await ac.auth.getUser(authHeader!.replace('Bearer ', ''));
+        userId = userData?.user?.id ?? null;
+      }
+
+      if (userId) {
+        const today = new Date().toISOString().split('T')[0];
+
+        // Get or create today's quota row
+        const { data: quota } = await supabaseAdmin
+          .from('usage_quotas')
+          .select('ai_generations')
+          .eq('user_id', userId)
+          .eq('date', today)
+          .maybeSingle();
+
+        const currentCount = quota?.ai_generations ?? 0;
+
+        if (currentCount >= DAILY_LIMIT) {
+          return new Response(JSON.stringify({
+            error: 'Límite diario alcanzado',
+            message: `Has alcanzado el límite de ${DAILY_LIMIT} interacciones de IA por día. Vuelve mañana para seguir practicando.`,
+            limit: DAILY_LIMIT,
+            used: currentCount,
+          }), {
+            status: 429,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Increment counter (upsert)
+        await supabaseAdmin
+          .from('usage_quotas')
+          .upsert(
+            { user_id: userId, date: today, ai_generations: currentCount + 1, updated_at: new Date().toISOString() },
+            { onConflict: 'user_id,date' }
+          );
+      }
+    }
+
     const personaPrompt = personaPrompts[persona as keyof typeof personaPrompts] || personaPrompts.ateo_cientifico;
     const dificultadPrompt = dificultadPrompts[dificultad as keyof typeof dificultadPrompts] || dificultadPrompts.aprendiz;
 
