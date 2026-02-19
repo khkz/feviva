@@ -1807,6 +1807,69 @@ export type Database = {
         }
         Relationships: []
       }
+      rosario_misterios: {
+        Row: {
+          created_at: string
+          dia: string
+          fruto: string
+          id: string
+          meditacion: string
+          nombre: string
+          numero: number
+          tipo: string
+          titulo: string
+        }
+        Insert: {
+          created_at?: string
+          dia: string
+          fruto: string
+          id?: string
+          meditacion: string
+          nombre: string
+          numero: number
+          tipo: string
+          titulo: string
+        }
+        Update: {
+          created_at?: string
+          dia?: string
+          fruto?: string
+          id?: string
+          meditacion?: string
+          nombre?: string
+          numero?: number
+          tipo?: string
+          titulo?: string
+        }
+        Relationships: []
+      }
+      rosario_oraciones: {
+        Row: {
+          clave: string
+          created_at: string
+          id: string
+          nombre: string
+          orden: number
+          texto: string
+        }
+        Insert: {
+          clave: string
+          created_at?: string
+          id?: string
+          nombre: string
+          orden?: number
+          texto: string
+        }
+        Update: {
+          clave?: string
+          created_at?: string
+          id?: string
+          nombre?: string
+          orden?: number
+          texto?: string
+        }
+        Relationships: []
+      }
       sleep_stories: {
         Row: {
           audio_url: string | null
