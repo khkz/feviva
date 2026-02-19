@@ -1158,6 +1158,39 @@ export type Database = {
           },
         ]
       }
+      knowledge_chunks: {
+        Row: {
+          content: string
+          created_at: string
+          embedding: string | null
+          id: string
+          metadata: Json | null
+          reference: string
+          source: string
+          title: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          embedding?: string | null
+          id?: string
+          metadata?: Json | null
+          reference: string
+          source: string
+          title?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          embedding?: string | null
+          id?: string
+          metadata?: Json | null
+          reference?: string
+          source?: string
+          title?: string | null
+        }
+        Relationships: []
+      }
       library_lessons: {
         Row: {
           audio_url: string | null
@@ -2652,6 +2685,22 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      match_documents: {
+        Args: {
+          filter_source?: string
+          match_count?: number
+          match_threshold?: number
+          query_embedding: string
+        }
+        Returns: {
+          content: string
+          id: string
+          reference: string
+          similarity: number
+          source: string
+          title: string
+        }[]
       }
       process_referral: {
         Args: { p_referral_code: string; p_referred_id: string }

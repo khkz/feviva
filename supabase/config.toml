@@ -77,3 +77,9 @@ verify_jwt = false
 
 [functions.send-push]
 verify_jwt = false
+
+[functions.ingest-knowledge]
+verify_jwt = false
+
+[functions.semantic-search]
+verify_jwt = false
