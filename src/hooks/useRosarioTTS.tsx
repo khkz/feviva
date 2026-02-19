@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { requireAuth } from "@/lib/auth-guard";
 import { useAudioCache } from "@/hooks/useAudioCache";
 import { ORACIONES_ROSARIO } from "@/lib/rosarioData";
 
@@ -59,6 +60,8 @@ export function useRosarioTTS() {
     setGeneratingPrayer(prayerType);
 
     try {
+      if (!(await requireAuth())) return null;
+
       const prayerTexts: Record<PrayerType, string> = {
         padreNuestro: ORACIONES_ROSARIO.padreNuestro,
         aveMaria: ORACIONES_ROSARIO.aveMaria,

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { requireAuth } from "@/lib/auth-guard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -406,6 +407,7 @@ const Coach = () => {
 
     // Get initial message from AI
     try {
+      if (!(await requireAuth())) { setLoading(false); return; }
       const response = await supabase.functions.invoke("debate-coach", {
         body: {
           persona: selectedPersona,

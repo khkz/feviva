@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { requireAuth } from '@/lib/auth-guard';
 
 export interface PathProgress {
   id: string;
@@ -397,6 +398,7 @@ export const useApostlePath = () => {
   const getAIReflection = async (etapa: number, tipo: 'reflexion' | 'quiz' | 'analisis' | 'consejo') => {
     setAiLoading(true);
     try {
+      if (!(await requireAuth())) { setAiLoading(false); return null; }
       const { data, error } = await supabase.functions.invoke('apostle-path-ai', {
         body: {
           etapa,
