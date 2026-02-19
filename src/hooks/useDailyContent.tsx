@@ -1,3 +1,4 @@
+import { useEffect, useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -33,20 +34,25 @@ interface UserRitual {
   examen_conciencia: Record<string, string> | null;
 }
 
-const today = new Date().toISOString().split('T')[0];
+const getLocalToday = () => {
+  const now = new Date();
+  return now.getFullYear() +
+    '-' + String(now.getMonth() + 1).padStart(2, '0') +
+    '-' + String(now.getDate()).padStart(2, '0');
+};
 
-const fetchDailyContent = async (): Promise<DailyContent | null> => {
-  const { data: existingContent, error } = await supabase
+const fetchDailyContent = async (date: string): Promise<DailyContent | null> => {
+  const { data, error } = await supabase
     .from('daily_content')
     .select('*')
-    .eq('fecha', today)
+    .eq('fecha', date)
     .maybeSingle();
 
   if (error) throw error;
-  return existingContent as DailyContent | null;
+  return data as DailyContent | null;
 };
 
-const fetchUserRitual = async (): Promise<UserRitual | null> => {
+const fetchUserRitual = async (date: string): Promise<UserRitual | null> => {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 
@@ -54,7 +60,7 @@ const fetchUserRitual = async (): Promise<UserRitual | null> => {
     .from('user_rituals')
     .select('*')
     .eq('user_id', user.id)
-    .eq('fecha', today)
+    .eq('fecha', date)
     .maybeSingle();
 
   if (error) throw error;
@@ -63,6 +69,30 @@ const fetchUserRitual = async (): Promise<UserRitual | null> => {
 
 export const useDailyContent = () => {
   const queryClient = useQueryClient();
+  const [today, setToday] = useState(getLocalToday);
+
+  // Detect day change on tab focus / visibility
+  useEffect(() => {
+    const checkDayChange = () => {
+      const current = getLocalToday();
+      if (current !== today) {
+        setToday(current);
+        queryClient.invalidateQueries({ queryKey: ['daily-content'] });
+        queryClient.invalidateQueries({ queryKey: ['user-ritual'] });
+      }
+    };
+
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') checkDayChange();
+    };
+
+    window.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('focus', checkDayChange);
+    return () => {
+      window.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('focus', checkDayChange);
+    };
+  }, [today, queryClient]);
 
   const { 
     data: content, 
@@ -71,8 +101,8 @@ export const useDailyContent = () => {
     refetch: refetchContent
   } = useQuery({
     queryKey: ['daily-content', today],
-    queryFn: fetchDailyContent,
-    staleTime: 30 * 60 * 1000, // 30 minutes - content doesn't change often
+    queryFn: () => fetchDailyContent(today),
+    staleTime: 30 * 60 * 1000,
   });
 
   const { 
@@ -81,7 +111,7 @@ export const useDailyContent = () => {
     refetch: refetchRitual
   } = useQuery({
     queryKey: ['user-ritual', today],
-    queryFn: fetchUserRitual,
+    queryFn: () => fetchUserRitual(today),
     staleTime: 5 * 60 * 1000,
   });
 
@@ -98,15 +128,17 @@ export const useDailyContent = () => {
     },
   });
 
-  const updateRitual = async (updates: Partial<UserRitual>) => {
+  const updateRitual = useCallback(async (updates: Partial<UserRitual>) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('No user logged in');
 
-    if (ritual) {
+    const currentRitual = queryClient.getQueryData<UserRitual | null>(['user-ritual', today]);
+
+    if (currentRitual) {
       const { data, error } = await supabase
         .from('user_rituals')
         .update(updates)
-        .eq('id', ritual.id)
+        .eq('id', currentRitual.id)
         .select()
         .single();
 
@@ -128,16 +160,16 @@ export const useDailyContent = () => {
       queryClient.setQueryData(['user-ritual', today], data);
       return data;
     }
-  };
+  }, [today, queryClient]);
 
-  const completeMorningRitual = async (metaEvangelizacion?: string) => {
+  const completeMorningRitual = useCallback(async (metaEvangelizacion?: string) => {
     await updateRitual({
       ritual_matutino_completado: true,
       meta_evangelizacion: metaEvangelizacion || null
     });
-  };
+  }, [updateRitual]);
 
-  const completeEveningRitual = async (data: {
+  const completeEveningRitual = useCallback(async (data: {
     examenConciencia: Record<string, string>;
     diarioPersonal: string;
     compartioFe: boolean;
@@ -150,7 +182,7 @@ export const useDailyContent = () => {
       compartio_fe: data.compartioFe,
       notas_evangelizacion: data.notasEvangelizacion || null
     });
-  };
+  }, [updateRitual]);
 
   return {
     content: content ?? null,
