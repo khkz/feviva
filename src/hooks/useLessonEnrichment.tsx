@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { requireAuth } from "@/lib/auth-guard";
 
 interface UseLessonAudioProps {
   lessonId: string;
@@ -35,6 +36,8 @@ export function useLessonAudio({ lessonId, titulo, existingAudioUrl }: UseLesson
         title: "Generando audio...",
         description: "Esto puede tomar unos segundos",
       });
+
+      if (!(await requireAuth())) { setIsGeneratingAudio(false); return audioUrl; }
 
       const { data, error } = await supabase.functions.invoke('lesson-tts', {
         body: { 
