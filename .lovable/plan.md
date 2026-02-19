@@ -1,301 +1,189 @@
 
 
-# Estrategia de Monetización: Freemium → Premium
+# Plan Maestro: Fases 2-5 de ElRugido
 
-## Tu Inventario de Contenido Actual
+## Estado Actual (Ya Resuelto)
 
-| Contenido | Cantidad | Con Audio | Estado Actual |
-|-----------|----------|-----------|---------------|
-| Santos | 420 | — | Público parcial (24 gratis, resto requiere registro) |
-| Oraciones | 146 | 145 | Público parcial |
-| Lecciones | 13 | 13 | Solo autenticados |
-| Sleep Stories | 29 | 26 | Solo autenticados |
-| Novenas | 9 | — | Solo autenticados |
-| Evangelio diario | Ilimitado | — | Solo autenticados |
+Antes de planificar, es importante reconocer lo que YA se implemento en iteraciones anteriores:
 
-**Usuarios actuales:** 5 perfiles en base de datos
+| Item | Estado |
+|------|--------|
+| Bug "Dia de la Marmota" (useDailyContent.tsx) | RESUELTO - Hook con visibilitychange + focus + invalidacion de cache |
+| Code Splitting (React.lazy) | RESUELTO - 50+ paginas con lazy loading, LoadingScreen como fallback |
+| Seguridad Edge Functions (JWT + Admin Key) | RESUELTO - 35 funciones protegidas |
+| Limites de uso IA (usage_quotas) | RESUELTO - 3 debates/dia con error 429 y UI amigable |
+| Limite de consultas Supabase (1000 rows) | RESUELTO - .limit(3000) en santos y oraciones |
 
 ---
 
-## Estrategia: "Probar → Enamorarse → Pagar"
+## Lo Que Falta Implementar (Ordenado por Impacto)
+
+### BLOQUE A: PWA + Push Notifications (FASE 2 - Retencion)
+
+**Prioridad: CRITICA**
+
+1. Instalar `vite-plugin-pwa` y configurar en `vite.config.ts`
+2. Crear `manifest.json` con iconos, nombre "ElRugido", colores de marca
+3. Configurar Service Worker con Workbox para:
+   - Precache de assets estaticos (JS, CSS, imagenes)
+   - Runtime cache de API calls al santo del dia y contenido diario
+   - `navigateFallbackDenylist: [/^\/~oauth/]` para no interferir con OAuth
+4. Implementar Web Push Notifications:
+   - Crear edge function `push-subscribe` para guardar suscripciones push en tabla `push_subscriptions`
+   - Crear edge function `send-push` para enviar notificaciones via Web Push API
+   - Reemplazar el sistema actual de `Notification` del navegador (que solo funciona con la app abierta) por push real
+   - Mensajes: "Tu racha de X dias esta en peligro", "Tu historia para dormir te espera"
+5. Crear pagina `/install` con instrucciones para instalar la app
+
+**Archivos a crear/modificar:**
+- `vite.config.ts` (agregar VitePWA plugin)
+- `public/manifest.json`
+- `supabase/functions/push-subscribe/index.ts`
+- `supabase/functions/send-push/index.ts`
+- Migracion SQL para tabla `push_subscriptions`
+- `src/hooks/useNotifications.tsx` (reemplazar Notification API por Push)
+- `src/pages/Install.tsx`
+
+---
+
+### BLOQUE B: Social Login - Google y Apple (FASE 3 - Friccion Cero)
+
+**Prioridad: ALTA**
+
+1. Usar el conector de Lovable Cloud para configurar Google OAuth (gestionado automaticamente)
+2. Usar el conector de Lovable Cloud para configurar Apple Sign In
+3. Agregar botones "Continuar con Google" y "Continuar con Apple" en `Auth.tsx`
+4. Usar `lovable.auth.signInWithOAuth()` (NO el SDK de Supabase directo)
+
+**Archivos a modificar:**
+- `src/pages/Auth.tsx` (agregar botones sociales)
+- Generar modulo `src/integrations/lovable/` via herramienta de configuracion
+
+---
+
+### BLOQUE C: Migrar Contenido Hardcodeado a Base de Datos (FASE 3 - Liberacion)
+
+**Prioridad: ALTA**
+
+El archivo `src/lib/rosarioData.ts` tiene 223 lineas de texto religioso (20 misterios + 5 oraciones) hardcodeado en React. Esto impide que un teologo corrija textos sin un despliegue de codigo.
+
+1. Crear tabla `rosario_misterios` con columnas: `tipo` (gozosos/dolorosos/gloriosos/luminosos), `numero`, `titulo`, `fruto`, `meditacion`, `nombre_grupo`, `dia`
+2. Crear tabla `rosario_oraciones` con columnas: `clave` (padreNuestro, aveMaria, etc.), `nombre`, `texto`
+3. Migrar los datos actuales via SQL INSERT
+4. Crear hook `useRosarioData` que consulte estas tablas (con cache agresivo de 24h)
+5. Mantener `rosarioData.ts` como fallback offline
+6. Agregar seccion en Admin para editar misterios y oraciones
+
+**Archivos a crear/modificar:**
+- Migracion SQL (crear tablas + insertar datos)
+- `src/hooks/useRosarioData.tsx` (nuevo)
+- `src/pages/Rosario.tsx` (usar hook en vez de import directo)
+- `src/contexts/RosarioContext.tsx` (actualizar fuente de datos)
+- `src/pages/admin/AdminRosario.tsx` (nuevo, panel de edicion)
+
+---
+
+### BLOQUE D: Modo Offline Basico (FASE 2 - Retencion)
+
+**Prioridad: MEDIA**
+
+Depende del Bloque A (PWA). Una vez que el Service Worker este activo:
+
+1. Configurar Workbox runtime caching strategies:
+   - Santo del Dia: `StaleWhileRevalidate` (mostrar cache, actualizar en fondo)
+   - Rosario (textos): `CacheFirst` con expiracion de 7 dias
+   - Imagenes de santos: `CacheFirst` con limite de 50 entradas
+2. Agregar indicador visual "Sin conexion" en la UI cuando `navigator.onLine === false`
+3. Para el diario de gratitud y rituales: queue de escrituras pendientes con Background Sync API
+
+**Nota:** IndexedDB completo para toda la app es un proyecto grande. Este bloque cubre lo esencial (lectura offline de contenido estatico).
+
+---
+
+### BLOQUE E: Stripe Freemium (FASE 5 - Sostenibilidad)
+
+**Prioridad: MEDIA-ALTA**
+
+1. Habilitar integracion Stripe via herramienta de Lovable
+2. Definir productos:
+   - **Gratis**: Evangelio, Santo del Dia, Rosario, Oraciones, 3 debates IA/dia
+   - **ElRugido+ ($4.99/mes)**: Coach ilimitado, Historias para dormir TTS HD, Reflexiones personalizadas, Descarga offline
+3. Crear pagina de suscripcion `/premium`
+4. Modificar el guard de `usage_quotas` en `debate-coach` para permitir ilimitado a premium
+5. Agregar verificacion de suscripcion activa en hooks que usan features premium
+
+**Archivos a crear/modificar:**
+- Edge function para webhook de Stripe
+- `src/pages/Premium.tsx`
+- `supabase/functions/debate-coach/index.ts` (bypass quota para premium)
+- Tabla `user_subscriptions` o usar metadata de Stripe
+
+---
+
+### BLOQUE F: RAG con pgvector (FASE 4 - IA Infalible)
+
+**Prioridad: MEDIA (alto impacto pero complejo)**
+
+1. Habilitar extension `pgvector` en la base de datos
+2. Crear tabla `document_embeddings` con columna `embedding vector(1536)`
+3. Crear edge function `index-documents` para:
+   - Procesar Catecismo de la Iglesia Catolica (chunking por parrafos)
+   - Generar embeddings via modelo de Lovable AI
+   - Almacenar en pgvector
+4. Modificar `debate-coach` para:
+   - Antes de responder, hacer busqueda semantica en pgvector
+   - Inyectar los fragmentos relevantes como contexto en el prompt
+   - Forzar citacion de fuentes (CIC #numero, versiculo biblico)
+5. Crear funcion SQL `match_documents` para busqueda por similitud
+
+**Archivos a crear/modificar:**
+- Migracion SQL (pgvector + tabla + funcion de busqueda)
+- `supabase/functions/index-documents/index.ts`
+- `supabase/functions/debate-coach/index.ts` (agregar paso RAG)
+
+---
+
+### BLOQUE G: Internacionalizacion i18n (FASE 3 - Expansion)
+
+**Prioridad: BAJA (depende de Bloque C)**
+
+Una vez que el contenido religioso este en base de datos (Bloque C):
+
+1. Agregar columna `language` a tablas de contenido (`rosario_misterios`, `rosario_oraciones`, etc.)
+2. Instalar `react-i18next` para strings de UI
+3. Crear archivos de traduccion `es.json`, `en.json`, `pt.json`
+4. Detectar idioma del navegador y permitir cambio manual en perfil
+
+Este bloque es grande y se recomienda para una fase posterior.
+
+---
+
+## Orden de Ejecucion Recomendado
 
 ```text
-┌─────────────────────────────────────────────────────────────────────────┐
-│                        EMBUDO DE CONVERSIÓN                              │
-├─────────────────────────────────────────────────────────────────────────┤
-│                                                                          │
-│   VISITANTE ──────────────────────────────────────────────► USUARIO      │
-│      │                                                          │        │
-│      │   Contenido SEO público:                                 │        │
-│      │   • 420 santos (páginas indexables)                      │        │
-│      │   • 146 oraciones (texto completo)                       │        │
-│      │   • Evangelio del día                                    │        │
-│      │   • Blog de fe/apologética                               │        │
-│      │                                                          │        │
-│      └─── "Registrarse para escuchar audio" ──────────────────┘         │
-│                                                                          │
-│   USUARIO GRATIS ────────────────────────────────────────► PREMIUM       │
-│      │                                                          │        │
-│      │   Gratis (con registro):                                 │        │
-│      │   • Audio de 3 oraciones/día                             │        │
-│      │   • 1 lección/semana                                     │        │
-│      │   • 1 historia para dormir/mes                           │        │
-│      │   • Rosario básico (una década)                          │        │
-│      │   • Novenas sin guía                                     │        │
-│      │                                                          │        │
-│      └─── "Desbloquea todo por $X/mes" ───────────────────────┘         │
-│                                                                          │
-│   USUARIO PREMIUM ──────────────────────────────────────────────────────│
-│      │                                                                   │
-│      │   • Audio ilimitado (145+ oraciones)                             │
-│      │   • Todas las lecciones con audio                                │
-│      │   • Historias para dormir ilimitadas                             │
-│      │   • Rosario completo guiado                                      │
-│      │   • Novenas con audio y recordatorios                            │
-│      │   • Coach de apologética ilimitado                               │
-│      │   • Sin anuncios (futuro)                                        │
-│      │   • Contenido exclusivo mensual                                  │
-│                                                                          │
-└─────────────────────────────────────────────────────────────────────────┘
+Semana 1-2:  Bloque B (Social Login) - rapido, alto impacto en conversion
+Semana 2-3:  Bloque A (PWA + Push) - critico para retencion
+Semana 3-4:  Bloque C (Migrar contenido a DB) - desbloquea edicion sin codigo
+Semana 4-5:  Bloque E (Stripe) - genera ingresos
+Semana 5-6:  Bloque D (Offline basico) - mejora UX en campo
+Semana 7+:   Bloque F (RAG) y G (i18n) - diferenciacion a largo plazo
 ```
 
----
+## Seccion Tecnica
 
-## Fase 1: Maximizar SEO y Audiencia (Ahora)
+### Dependencias nuevas necesarias:
+- `vite-plugin-pwa` - para Service Worker y manifest
+- `web-push` (en edge functions) - para Push Notifications
+- `react-i18next` + `i18next` (solo si se hace Bloque G)
 
-### 1.1 Contenido Público para SEO
+### Tablas nuevas de base de datos:
+- `push_subscriptions` (user_id, endpoint, keys, created_at) con RLS
+- `rosario_misterios` (tipo, numero, titulo, fruto, meditacion, nombre_grupo, dia)
+- `rosario_oraciones` (clave, nombre, texto)
+- `document_embeddings` (id, content, source, embedding vector) - solo Bloque F
 
-**Crear páginas públicas adicionales:**
-
-| Nueva Página | URL | Propósito SEO |
-|--------------|-----|---------------|
-| Evangelio del día | `/evangelio-del-dia` | Búsquedas diarias recurrentes |
-| Novenas públicas | `/novena/:slug` | Alto volumen de búsquedas |
-| Blog de apologética | `/blog` | Keywords long-tail |
-| Cómo rezar el rosario | `/guia/como-rezar-rosario` | Búsqueda muy popular |
-| Categorías de santos | `/santos/martires`, `/santos/patronos` | Páginas pilar |
-
-### 1.2 Ganchos de Registro
-
-En cada página pública, añadir CTAs estratégicos:
-
-```text
-┌──────────────────────────────────────────┐
-│  📖 Oración a San Miguel Arcángel        │
-│                                          │
-│  [Texto completo de la oración...]       │
-│                                          │
-│  ────────────────────────────────────    │
-│                                          │
-│  🎧 ¿Quieres escuchar esta oración       │
-│     con música y guía de voz?            │
-│                                          │
-│  [▶️ Escuchar Audio - Gratis]            │
-│                                          │
-│  → Requiere cuenta gratuita              │
-│                                          │
-└──────────────────────────────────────────┘
-```
-
----
-
-## Fase 2: Sistema de Suscripción (Futuro)
-
-### 2.1 Tabla de Base de Datos
-
-```sql
--- Tabla de suscripciones
-CREATE TABLE subscriptions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
-  plan TEXT NOT NULL DEFAULT 'free', -- 'free', 'premium', 'family'
-  status TEXT NOT NULL DEFAULT 'active', -- 'active', 'canceled', 'past_due'
-  stripe_customer_id TEXT,
-  stripe_subscription_id TEXT,
-  current_period_start TIMESTAMPTZ,
-  current_period_end TIMESTAMPTZ,
-  created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now()
-);
-
--- Tabla de límites de uso diario para plan gratuito
-CREATE TABLE daily_usage (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
-  fecha DATE DEFAULT CURRENT_DATE,
-  oraciones_escuchadas INTEGER DEFAULT 0,
-  lecciones_vistas INTEGER DEFAULT 0,
-  debates_realizados INTEGER DEFAULT 0,
-  UNIQUE(user_id, fecha)
-);
-```
-
-### 2.2 Límites del Plan Gratuito
-
-| Característica | Gratis | Premium |
-|----------------|--------|---------|
-| Audio de oraciones | 3/día | Ilimitado |
-| Lecciones | 1/semana | Ilimitado |
-| Sleep stories | 1/mes | Ilimitado |
-| Rosario | 1 década | Completo |
-| Coach apologética | 3 debates/mes | Ilimitado |
-| Novenas guiadas | — | ✓ |
-| Contenido exclusivo | — | ✓ |
-| Sin anuncios | — | ✓ |
-
-### 2.3 Precios Sugeridos
-
-| Plan | Precio | Descripción |
-|------|--------|-------------|
-| Gratuito | $0 | Acceso limitado, ideal para probar |
-| Premium Mensual | $4.99/mes | Acceso completo |
-| Premium Anual | $39.99/año | 2 meses gratis |
-| Familia | $7.99/mes | Hasta 6 cuentas |
-
----
-
-## Fase 3: Funciones para Aumentar Retención
-
-### 3.1 Sistema de Puntos Mejorado
-
-Ya tienes el sistema de referidos. Añadir:
-
-```text
-┌──────────────────────────────────────────┐
-│  🏆 Tus Logros                           │
-│                                          │
-│  • 7 días de racha: +50 puntos           │
-│  • Completar novena: +100 puntos         │
-│  • Invitar amigo: +100 puntos            │
-│  • Primer rosario: +75 puntos            │
-│                                          │
-│  ────────────────────────────────────    │
-│  500 puntos = 1 mes gratis Premium       │
-│  ────────────────────────────────────    │
-│                                          │
-└──────────────────────────────────────────┘
-```
-
-### 3.2 Notificaciones y Recordatorios
-
-Usar los recordatorios que ya tienes para re-engagement:
-
-- "¿Rezaste hoy? Tu racha de 7 días está en riesgo"
-- "Nuevo santo del día: San Francisco de Asís"
-- "Tu amigo Juan se unió gracias a ti"
-
-### 3.3 Contenido Exclusivo Mensual
-
-Para premium:
-- 4 lecciones nuevas/mes
-- 2 sleep stories nuevas/mes
-- 1 novena nueva/mes
-- Reflexiones del Evangelio en audio
-
----
-
-## Implementación Técnica
-
-### Archivos Nuevos Necesarios
-
-| Archivo | Propósito |
-|---------|-----------|
-| `src/hooks/useSubscription.tsx` | Verificar plan del usuario |
-| `src/components/premium/PaywallModal.tsx` | Modal de upgrade |
-| `src/components/premium/UsageLimitBanner.tsx` | "Te quedan 2 audios hoy" |
-| `src/pages/Pricing.tsx` | Página pública de precios |
-| `src/pages/EvangelioPublic.tsx` | Evangelio del día público |
-| `supabase/functions/create-checkout/index.ts` | Stripe checkout |
-| `supabase/functions/webhook-stripe/index.ts` | Webhooks de Stripe |
-
-### Hook de Suscripción
-
-```typescript
-// src/hooks/useSubscription.tsx
-export function useSubscription() {
-  const [plan, setPlan] = useState<'free' | 'premium'>('free');
-  const [usage, setUsage] = useState({ oraciones: 0, lecciones: 0 });
-  
-  const isPremium = plan === 'premium';
-  
-  const canPlay = (type: 'oracion' | 'lesson') => {
-    if (isPremium) return true;
-    if (type === 'oracion') return usage.oraciones < 3;
-    if (type === 'lesson') return usage.lecciones < 1;
-    return false;
-  };
-  
-  const trackUsage = async (type: 'oracion' | 'lesson') => {
-    // Incrementar contador en daily_usage
-  };
-  
-  return { plan, isPremium, usage, canPlay, trackUsage };
-}
-```
-
-### Paywall Modal
-
-```typescript
-// src/components/premium/PaywallModal.tsx
-// Se muestra cuando el usuario intenta acceder a contenido premium
-// Opciones: "Ver planes" o "Invitar amigos para ganar acceso"
-```
-
----
-
-## Orden de Implementación Sugerido
-
-### Ahora (Fase 1 - Crecer Audiencia)
-1. **Crear páginas públicas adicionales** (Evangelio, Novenas)
-2. **Añadir CTAs de registro** en contenido público
-3. **Mejorar SEO** con schema.org y meta tags
-4. **Potenciar sistema de referidos** ya existente
-
-### Próximo Mes (Fase 2 - Preparar Monetización)
-5. **Crear tabla de suscripciones** y daily_usage
-6. **Implementar límites** en plan gratuito
-7. **Crear página de precios** pública
-8. **Diseñar paywall modal** atractivo
-
-### Cuando tengas 500+ usuarios (Fase 3 - Activar Pagos)
-9. **Integrar Stripe** (Lovable tiene integración nativa)
-10. **Configurar webhooks** para gestionar suscripciones
-11. **Añadir sistema de puntos** canjeables por premium
-12. **Crear contenido exclusivo** mensual
-
----
-
-## Métricas Clave a Seguir
-
-| Métrica | Objetivo |
-|---------|----------|
-| Visitantes únicos/mes | Crecer 20%/mes |
-| Tasa de registro | >5% de visitantes |
-| Usuarios activos diarios | >10% de registrados |
-| Conversión a premium | >3% de usuarios gratuitos |
-| Retención mensual | >40% |
-| NPS (encuesta) | >50 |
-
----
-
-## Resumen Ejecutivo
-
-```text
-AHORA:
-• Abrir más contenido al público para SEO
-• Usar audio como "gancho" para registro
-• Potenciar referidos
-
-PRONTO:
-• Limitar uso gratuito (3 audios/día)
-• Crear paywall elegante
-• Página de precios atractiva
-
-DESPUÉS:
-• Stripe para pagos
-• Plan Premium $4.99/mes
-• Contenido exclusivo mensual
-```
-
-**La clave:** No limites ahora. Primero construye audiencia con contenido gratuito de calidad. Cuando tengas 500+ usuarios activos, entonces introduces los límites y la monetización.
+### Edge Functions nuevas:
+- `push-subscribe` - registrar suscripcion push
+- `send-push` - enviar notificacion push
+- `index-documents` - indexar documentos para RAG (Bloque F)
 
