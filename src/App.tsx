@@ -12,6 +12,7 @@ import { OracionPlayer } from "@/components/oraciones/OracionPlayer";
 import { RosarioMiniPlayer } from "@/components/rosario/RosarioMiniPlayer";
 import { RosarioInterstellar } from "@/components/frontera-final/RosarioInterstellar";
 import LoadingScreen from "@/components/shared/LoadingScreen";
+import { OfflineIndicator } from "@/components/shared/OfflineIndicator";
 
 // Synchronous imports — critical path (Landing, Auth, NotFound)
 import Index from "./pages/Index";
@@ -84,6 +85,7 @@ const App = () => (
           <TooltipProvider>
             <Toaster />
             <Sonner />
+            <OfflineIndicator />
             <BrowserRouter>
               <Suspense fallback={<LoadingScreen />}>
                 <Routes>

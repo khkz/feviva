@@ -40,7 +40,7 @@ export default defineConfig(({ mode }) => ({
         globPatterns: ["**/*.{js,css,html,ico,png,svg,jpg,webp,woff,woff2}"],
         navigateFallback: "/index.html",
         navigateFallbackDenylist: [/^\/~oauth/, /^\/api/],
-        runtimeCaching: [
+      runtimeCaching: [
           {
             urlPattern: /^https:\/\/duggdnqpemwojkojfyei\.supabase\.co\/rest\/v1\/daily_content/,
             handler: "StaleWhileRevalidate",
@@ -58,11 +58,75 @@ export default defineConfig(({ mode }) => ({
             },
           },
           {
+            urlPattern: /^https:\/\/duggdnqpemwojkojfyei\.supabase\.co\/rest\/v1\/rosario_misterios/,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "rosario-texts-cache",
+              expiration: { maxEntries: 30, maxAgeSeconds: 60 * 60 * 24 * 7 },
+            },
+          },
+          {
+            urlPattern: /^https:\/\/duggdnqpemwojkojfyei\.supabase\.co\/rest\/v1\/rosario_oraciones/,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "rosario-prayers-cache",
+              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 7 },
+            },
+          },
+          {
+            urlPattern: /^https:\/\/duggdnqpemwojkojfyei\.supabase\.co\/rest\/v1\/frontera_articulos/,
+            handler: "StaleWhileRevalidate",
+            options: {
+              cacheName: "frontera-articles-cache",
+              expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 },
+            },
+          },
+          {
+            urlPattern: /^https:\/\/duggdnqpemwojkojfyei\.supabase\.co\/rest\/v1\/oraciones/,
+            handler: "StaleWhileRevalidate",
+            options: {
+              cacheName: "oraciones-cache",
+              expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 },
+            },
+          },
+          {
+            urlPattern: /^https:\/\/duggdnqpemwojkojfyei\.supabase\.co\/rest\/v1\/novenas/,
+            handler: "StaleWhileRevalidate",
+            options: {
+              cacheName: "novenas-cache",
+              expiration: { maxEntries: 30, maxAgeSeconds: 60 * 60 * 24 },
+            },
+          },
+          {
+            urlPattern: /^https:\/\/duggdnqpemwojkojfyei\.supabase\.co\/rest\/v1\/library_lessons/,
+            handler: "StaleWhileRevalidate",
+            options: {
+              cacheName: "lessons-cache",
+              expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 },
+            },
+          },
+          {
             urlPattern: /^https:\/\/duggdnqpemwojkojfyei\.supabase\.co\/storage/,
             handler: "CacheFirst",
             options: {
               cacheName: "storage-images-cache",
               expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 * 7 },
+            },
+          },
+          {
+            urlPattern: /^https:\/\/fonts\.googleapis\.com/,
+            handler: "StaleWhileRevalidate",
+            options: {
+              cacheName: "google-fonts-stylesheets",
+              expiration: { maxEntries: 5, maxAgeSeconds: 60 * 60 * 24 * 30 },
+            },
+          },
+          {
+            urlPattern: /^https:\/\/fonts\.gstatic\.com/,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "google-fonts-webfonts",
+              expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 365 },
             },
           },
         ],
