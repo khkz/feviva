@@ -1,7 +1,8 @@
 import { createContext, useContext, useState, useCallback, useRef, ReactNode, useEffect } from 'react';
-import { MISTERIOS, ORACIONES_ROSARIO, getMisterioDelDia, TipoMisterio } from '@/lib/rosarioData';
+import { getMisterioDelDia, TipoMisterio } from '@/lib/rosarioData';
 import { supabase } from '@/integrations/supabase/client';
 import { useRosarioTTS } from '@/hooks/useRosarioTTS';
+import { useRosarioData } from '@/hooks/useRosarioData';
 
 interface RosarioState {
   // Display state
@@ -52,8 +53,8 @@ interface RosarioContextType extends RosarioState {
   getCurrentPrayerName: () => string;
   getCurrentPrayerText: () => string;
   totalProgress: number;
-  mysteryData: typeof MISTERIOS[TipoMisterio];
-  currentMystery: typeof MISTERIOS[TipoMisterio]['misterios'][0];
+  mysteryData: { nombre: string; dia: string; misterios: { numero: number; titulo: string; fruto: string; meditacion: string }[] };
+  currentMystery: { numero: number; titulo: string; fruto: string; meditacion: string };
 }
 
 const RosarioContext = createContext<RosarioContextType | null>(null);
@@ -67,6 +68,7 @@ export function useRosario() {
 }
 
 export function RosarioProvider({ children }: { children: ReactNode }) {
+  const { misterios: MISTERIOS, oraciones: ORACIONES_ROSARIO } = useRosarioData();
   // State
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);

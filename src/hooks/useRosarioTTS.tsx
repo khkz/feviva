@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { requireAuth } from "@/lib/auth-guard";
 import { useAudioCache } from "@/hooks/useAudioCache";
 import { ORACIONES_ROSARIO } from "@/lib/rosarioData";
+// Note: TTS uses static fallback data directly - DB data flows through RosarioContext
 
 type PrayerType = 'padreNuestro' | 'aveMaria' | 'gloria' | 'salveRegina';
 
