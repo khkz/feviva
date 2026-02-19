@@ -37,7 +37,8 @@ export function useOraciones() {
       const { data, error } = await supabase
         .from("oraciones")
         .select("*")
-        .order("orden", { ascending: true });
+        .order("orden", { ascending: true })
+        .limit(3000);
       
       if (error) throw error;
       return data as Oracion[];
