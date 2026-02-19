@@ -59,7 +59,7 @@ serve(async (req) => {
       "match_documents",
       {
         query_embedding: JSON.stringify(queryEmbedding),
-        match_threshold: 0.65,
+        match_threshold: 0.3,
         match_count: match_count,
         filter_source: source || null,
       }
