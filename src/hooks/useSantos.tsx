@@ -35,7 +35,8 @@ export function useSantos(options: UseSantosOptions = {}) {
         .from('calendar_saints')
         .select('*')
         .order('feast_month', { ascending: true })
-        .order('feast_day', { ascending: true });
+        .order('feast_day', { ascending: true })
+        .limit(3000);
 
       if (error) throw error;
       return data as CalendarSaint[];

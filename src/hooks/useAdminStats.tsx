@@ -57,7 +57,7 @@ export const useAdminStats = () => {
         supabase.from('sleep_stories').select('id, audio_url'),
         supabase.from('novenas').select('id, imagen_url'),
         supabase.from('library_lessons').select('id, contenido_enriquecido'),
-        supabase.from('oraciones').select('id, audio_url'),
+        supabase.from('oraciones').select('id, audio_url').limit(3000),
         supabase.from('courses').select('id, publicado'),
         supabase.from('movies').select('id, publicada'),
         supabase.from('processing_jobs').select('id, status'),
