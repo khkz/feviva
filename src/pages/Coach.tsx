@@ -8,7 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Sparkles, ArrowLeft, Send, BookOpen, Heart, Brain, TrendingUp, X, Plus, Star, GraduationCap, Zap, Trophy, HelpCircle, Lightbulb, ChevronRight, CheckCircle2 } from "lucide-react";
+import { Sparkles, ArrowLeft, Send, BookOpen, Heart, Brain, TrendingUp, X, Plus, Star, GraduationCap, Zap, Trophy, HelpCircle, Lightbulb, ChevronRight, CheckCircle2, Clock } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { useUserStats } from "@/hooks/useUserStats";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -341,6 +342,7 @@ const Coach = () => {
   const [tutorialStep, setTutorialStep] = useState(0);
   const [showTutorialPanel, setShowTutorialPanel] = useState(true);
   const [completedTutorialSteps, setCompletedTutorialSteps] = useState<number[]>([]);
+  const [quotaExceeded, setQuotaExceeded] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const isTutorialMode = selectedDificultad === "tutorial";
@@ -418,7 +420,16 @@ const Coach = () => {
         },
       });
 
-      if (response.error) throw response.error;
+      if (response.error) {
+        // Check for 429 quota exceeded
+        if (response.error?.context?.status === 429 || response.data?.error === 'Límite diario alcanzado') {
+          setQuotaExceeded(true);
+          setDebateStarted(false);
+          setLoading(false);
+          return;
+        }
+        throw response.error;
+      }
 
       const aiMessage: Message = {
         role: "assistant",
@@ -426,13 +437,6 @@ const Coach = () => {
       };
 
       setMessages([aiMessage]);
-    } catch (error) {
-      console.error("Error starting debate:", error);
-      toast({
-        title: "Error",
-        description: "No se pudo conectar con el coach",
-        variant: "destructive",
-      });
     } finally {
       setLoading(false);
     }
@@ -468,7 +472,14 @@ const Coach = () => {
         },
       });
 
-      if (response.error) throw response.error;
+      if (response.error) {
+        if (response.error?.context?.status === 429 || response.data?.error === 'Límite diario alcanzado') {
+          setQuotaExceeded(true);
+          setLoading(false);
+          return;
+        }
+        throw response.error;
+      }
 
       const { message, userScore, feedbackHint } = response.data;
 
@@ -856,6 +867,16 @@ const Coach = () => {
         <DesktopSidebar userName="Usuario" userLevel={1} userStreak={0} />
         
         <div className="flex-1 lg:pl-64 pb-20 lg:pb-0">
+          {/* Quota exceeded alert */}
+          {quotaExceeded && (
+            <Alert className="m-4 border-amber-500/50 bg-amber-50 dark:bg-amber-950/30">
+              <Clock className="h-5 w-5 text-amber-600" />
+              <AlertTitle className="text-amber-800 dark:text-amber-300">Límite diario alcanzado</AlertTitle>
+              <AlertDescription className="text-amber-700 dark:text-amber-400">
+                Has usado tus 3 interacciones de IA por hoy. Vuelve mañana para seguir practicando. ¡Mientras tanto, revisa tu historial de debates!
+              </AlertDescription>
+            </Alert>
+          )}
           {/* Hero Header */}
           <div className="relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-secondary/60" />
