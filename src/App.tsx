@@ -52,14 +52,7 @@ const Install = lazy(() => import("./pages/Install"));
 
 // Frontera Final
 const FronteraFinal = lazy(() => import("./pages/FronteraFinal"));
-const LibroNaturaleza = lazy(() => import("./pages/frontera-final/LibroNaturaleza"));
-const PuntoOmega = lazy(() => import("./pages/frontera-final/PuntoOmega"));
-const BautizarExtraterrestre = lazy(() => import("./pages/frontera-final/BautizarExtraterrestre"));
-const PadreBigBang = lazy(() => import("./pages/frontera-final/PadreBigBang"));
-const ObservatorioVaticano = lazy(() => import("./pages/frontera-final/ObservatorioVaticano"));
-const ColonizarConquistar = lazy(() => import("./pages/frontera-final/ColonizarConquistar"));
-const IaAlma = lazy(() => import("./pages/frontera-final/IaAlma"));
-const AjusteFino = lazy(() => import("./pages/frontera-final/AjusteFino"));
+const FronteraArticlePage = lazy(() => import("./pages/frontera-final/FronteraArticlePage"));
 
 // Admin
 const AdminLayout = lazy(() => import("./layouts/AdminLayout").then(m => ({ default: m.AdminLayout })));
@@ -132,14 +125,7 @@ const App = () => (
                   <Route path="/evangelio/:fecha" element={<DailyGospel />} />
                   <Route path="/install" element={<Install />} />
                   <Route path="/frontera-final" element={<FronteraFinal />} />
-                  <Route path="/frontera-final/libro-naturaleza" element={<LibroNaturaleza />} />
-                  <Route path="/frontera-final/punto-omega" element={<PuntoOmega />} />
-                  <Route path="/frontera-final/bautizar-extraterrestre" element={<BautizarExtraterrestre />} />
-                  <Route path="/frontera-final/padre-big-bang" element={<PadreBigBang />} />
-                  <Route path="/frontera-final/observatorio-vaticano" element={<ObservatorioVaticano />} />
-                  <Route path="/frontera-final/colonizar-conquistar" element={<ColonizarConquistar />} />
-                  <Route path="/frontera-final/ia-alma" element={<IaAlma />} />
-                  <Route path="/frontera-final/ajuste-fino" element={<AjusteFino />} />
+                  <Route path="/frontera-final/:articleId" element={<FronteraArticlePage />} />
 
                   {/* Admin Routes */}
                   <Route path="/admin" element={<AdminLayout />}>

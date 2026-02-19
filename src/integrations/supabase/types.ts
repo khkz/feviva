@@ -904,6 +904,66 @@ export type Database = {
         }
         Relationships: []
       }
+      frontera_articulos: {
+        Row: {
+          categoria: string
+          categoria_grupo: string
+          color: string
+          created_at: string
+          descripcion: string
+          icon_name: string
+          id: string
+          orden: number
+          quotes: Json
+          reflection: string
+          related_articles: Json
+          sections: Json
+          subtitulo: string
+          titulo: string
+          updated_at: string
+          video_id: string | null
+          video_title: string | null
+        }
+        Insert: {
+          categoria: string
+          categoria_grupo: string
+          color?: string
+          created_at?: string
+          descripcion?: string
+          icon_name: string
+          id: string
+          orden?: number
+          quotes?: Json
+          reflection: string
+          related_articles?: Json
+          sections?: Json
+          subtitulo: string
+          titulo: string
+          updated_at?: string
+          video_id?: string | null
+          video_title?: string | null
+        }
+        Update: {
+          categoria?: string
+          categoria_grupo?: string
+          color?: string
+          created_at?: string
+          descripcion?: string
+          icon_name?: string
+          id?: string
+          orden?: number
+          quotes?: Json
+          reflection?: string
+          related_articles?: Json
+          sections?: Json
+          subtitulo?: string
+          titulo?: string
+          updated_at?: string
+          video_id?: string | null
+          video_title?: string | null
+        }
+        Relationships: []
+      }
       gift_invitations: {
         Row: {
           accepted_at: string | null

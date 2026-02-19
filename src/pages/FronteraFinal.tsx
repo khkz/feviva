@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { LucideIcon } from 'lucide-react';
@@ -35,7 +35,13 @@ import { getDailyContent, getContentLabel, DailyContent } from '@/lib/fronteraFa
 import { Button } from '@/components/ui/button';
 import { useRosario } from '@/contexts/RosarioContext';
 import { useFronteraProgress } from '@/hooks/useFronteraProgress';
+import { useFronteraArticulos, FronteraArticulo } from '@/hooks/useFronteraArticulos';
 import { supabase } from '@/integrations/supabase/client';
+
+const iconMap: Record<string, LucideIcon> = {
+  BookOpen, Atom, Infinity: InfinityIcon, HelpCircle,
+  Telescope, Flag, Cpu,
+};
 
 interface CategoryCard {
   id: string;
@@ -53,90 +59,56 @@ interface Category {
   cards: CategoryCard[];
 }
 
-const categories: Category[] = [
+const CATEGORY_META: Record<string, { subtitle: string; color: string }> = {
+  'Cosmos y Credo': { subtitle: 'Teología', color: 'cyan' },
+  'Gigantes de la Fe': { subtitle: 'Historia', color: 'amber' },
+  'Ética del Futuro': { subtitle: 'Moral', color: 'purple' },
+};
+
+function articulosToCategories(articulos: FronteraArticulo[]): Category[] {
+  const grouped: Record<string, CategoryCard[]> = {};
+  for (const a of articulos) {
+    if (!grouped[a.categoria_grupo]) grouped[a.categoria_grupo] = [];
+    grouped[a.categoria_grupo].push({
+      id: a.id,
+      title: a.titulo,
+      description: a.descripcion,
+      icon: iconMap[a.icon_name] || Atom,
+      size: 'normal',
+      href: `/frontera-final/${a.id}`,
+    });
+  }
+  return Object.entries(grouped).map(([title, cards]) => ({
+    title,
+    subtitle: CATEGORY_META[title]?.subtitle || '',
+    color: CATEGORY_META[title]?.color || 'cyan',
+    cards,
+  }));
+}
+
+// Static fallback
+const fallbackCategories: Category[] = [
   {
-    title: "Cosmos y Credo",
-    subtitle: "Teología",
-    color: "cyan",
+    title: "Cosmos y Credo", subtitle: "Teología", color: "cyan",
     cards: [
-      {
-        id: "libro-naturaleza",
-        title: "El Libro de la Naturaleza",
-        description: "Por qué estudiar galaxias es leer la mente de Dios.",
-        icon: BookOpen,
-        size: "normal",
-        href: "/frontera-final/libro-naturaleza",
-      },
-      {
-        id: "ajuste-fino",
-        title: "El Ajuste Fino del Universo",
-        description: "Por qué las constantes físicas sugieren un cosmos diseñado.",
-        icon: Atom,
-        size: "normal",
-        href: "/frontera-final/ajuste-fino",
-      },
-      {
-        id: "punto-omega",
-        title: "El Punto Omega",
-        description: "La teoría de Teilhard de Chardin: El universo evoluciona hacia Cristo.",
-        icon: InfinityIcon,
-        size: "normal",
-        href: "/frontera-final/punto-omega",
-      },
-      {
-        id: "bautizar-extraterrestre",
-        title: "¿Bautizaríamos a un Extraterrestre?",
-        description: "La postura del Vaticano sobre vida inteligente no humana.",
-        icon: HelpCircle,
-        size: "normal",
-        href: "/frontera-final/bautizar-extraterrestre",
-      },
+      { id: "libro-naturaleza", title: "El Libro de la Naturaleza", description: "Por qué estudiar galaxias es leer la mente de Dios.", icon: BookOpen, size: "normal", href: "/frontera-final/libro-naturaleza" },
+      { id: "ajuste-fino", title: "El Ajuste Fino del Universo", description: "Por qué las constantes físicas sugieren un cosmos diseñado.", icon: Atom, size: "normal", href: "/frontera-final/ajuste-fino" },
+      { id: "punto-omega", title: "El Punto Omega", description: "La teoría de Teilhard de Chardin.", icon: InfinityIcon, size: "normal", href: "/frontera-final/punto-omega" },
+      { id: "bautizar-extraterrestre", title: "¿Bautizaríamos a un Extraterrestre?", description: "La postura del Vaticano sobre vida inteligente no humana.", icon: HelpCircle, size: "normal", href: "/frontera-final/bautizar-extraterrestre" },
     ]
   },
   {
-    title: "Gigantes de la Fe",
-    subtitle: "Historia",
-    color: "amber",
+    title: "Gigantes de la Fe", subtitle: "Historia", color: "amber",
     cards: [
-      {
-        id: "padre-big-bang",
-        title: "El Padre del Big Bang",
-        description: "Georges Lemaître: El sacerdote que corrigió a Einstein.",
-        icon: Atom,
-        size: "normal",
-        href: "/frontera-final/padre-big-bang",
-      },
-      {
-        id: "observatorio-vaticano",
-        title: "El Observatorio Vaticano",
-        description: "400 años mirando al cielo antes que la NASA.",
-        icon: Telescope,
-        size: "normal",
-        href: "/frontera-final/observatorio-vaticano",
-      },
+      { id: "padre-big-bang", title: "El Padre del Big Bang", description: "Georges Lemaître: El sacerdote que corrigió a Einstein.", icon: Atom, size: "normal", href: "/frontera-final/padre-big-bang" },
+      { id: "observatorio-vaticano", title: "El Observatorio Vaticano", description: "400 años mirando al cielo antes que la NASA.", icon: Telescope, size: "normal", href: "/frontera-final/observatorio-vaticano" },
     ]
   },
   {
-    title: "Ética del Futuro",
-    subtitle: "Moral",
-    color: "purple",
+    title: "Ética del Futuro", subtitle: "Moral", color: "purple",
     cards: [
-      {
-        id: "colonizar-conquistar",
-        title: "Colonizar sin Conquistar",
-        description: "Cómo evitar el pecado del colonialismo en Marte.",
-        icon: Flag,
-        size: "normal",
-        href: "/frontera-final/colonizar-conquistar",
-      },
-      {
-        id: "ia-alma",
-        title: "IA y Alma",
-        description: "La diferencia entre inteligencia computacional y espíritu.",
-        icon: Cpu,
-        size: "normal",
-        href: "/frontera-final/ia-alma",
-      },
+      { id: "colonizar-conquistar", title: "Colonizar sin Conquistar", description: "Cómo evitar el pecado del colonialismo en Marte.", icon: Flag, size: "normal", href: "/frontera-final/colonizar-conquistar" },
+      { id: "ia-alma", title: "IA y Alma", description: "La diferencia entre inteligencia computacional y espíritu.", icon: Cpu, size: "normal", href: "/frontera-final/ia-alma" },
     ]
   },
 ];
@@ -156,6 +128,11 @@ export default function FronteraFinal() {
   
   const { open: openRosario } = useRosario();
   const { markQuizCompleted, progress } = useFronteraProgress();
+  const { data: articulosData } = useFronteraArticulos();
+  const categories = useMemo(
+    () => articulosData ? articulosToCategories(articulosData) : fallbackCategories,
+    [articulosData]
+  );
 
   // Fetch user stats
   useEffect(() => {
