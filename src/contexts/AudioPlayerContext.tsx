@@ -81,7 +81,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
 
   // Timer countdown effect
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     
     if (isPlaying && timerRemaining !== null && timerRemaining > 0) {
       interval = setInterval(() => {
