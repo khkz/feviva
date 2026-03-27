@@ -495,12 +495,15 @@ serve(async (req) => {
       );
     }
 
-    // Update the saint's description
+    // Transform raw Wikipedia bio into spiritual hagiography via LLM
+    const hagiography = await transformToHagiography(result.extract, saintName);
+
+    // Update the saint's description with the transformed hagiography
     const { error: updateError } = await supabase
       .from("calendar_saints")
       .update({
-        description: result.extract,
-        description_source: result.source,
+        description: hagiography,
+        description_source: `${result.source}_hagiography`,
       })
       .eq("id", saintId);
 
