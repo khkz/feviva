@@ -17,6 +17,7 @@ import { Progress } from "@/components/ui/progress";
 import { motion, AnimatePresence } from "framer-motion";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
+import { ExportLightCard } from "@/components/shared/ExportLightCard";
 
 interface Message {
   role: "user" | "assistant";
@@ -1512,6 +1513,14 @@ const Coach = () => {
                     </p>
                   </div>
 
+                  {/* Export Light - si empatía y ternura >= 80 */}
+                  {(pupiloEvaluation.empatia >= 80 || pupiloEvaluation.ternura >= 80) && (
+                    <ExportLightCard
+                      text={pupiloEvaluation.reporte_ia}
+                      context="Formador del Pupilo Digital"
+                    />
+                  )}
+
                   <div className="flex flex-col sm:flex-row gap-2">
                     <Button onClick={() => navigate("/dashboard")} variant="outline" className="flex-1 glass-button">
                       Volver al Dashboard
@@ -1588,6 +1597,14 @@ const Coach = () => {
                       {evaluation!.feedback}
                     </p>
                   </div>
+
+                  {/* Export Light - si amor >= 8 */}
+                  {evaluation!.amor >= 8 && (
+                    <ExportLightCard
+                      text={evaluation!.feedback}
+                      context="Coach de Apologética"
+                    />
+                  )}
 
                   <div className="flex flex-col sm:flex-row gap-2">
                     <Button onClick={() => navigate("/dashboard")} variant="outline" className="flex-1 glass-button">
