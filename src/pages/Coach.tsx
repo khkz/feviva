@@ -8,11 +8,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Sparkles, ArrowLeft, Send, BookOpen, Heart, Brain, TrendingUp, X, Plus, Star, GraduationCap, Zap, Trophy, HelpCircle, Lightbulb, ChevronRight, CheckCircle2, Clock } from "lucide-react";
+import { Sparkles, ArrowLeft, Send, BookOpen, Heart, Brain, TrendingUp, X, Plus, Star, GraduationCap, Zap, Trophy, HelpCircle, Lightbulb, ChevronRight, CheckCircle2, Clock, Bot, Cpu, HeartHandshake, Eye, MessageCircleHeart } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { useUserStats } from "@/hooks/useUserStats";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Progress } from "@/components/ui/progress";
 import { motion, AnimatePresence } from "framer-motion";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
@@ -28,6 +29,15 @@ interface Evaluation {
   fe: number;
   razon: number;
   amor: number;
+  feedback: string;
+}
+
+interface PupiloEvaluation {
+  empatia: number;
+  claridad: number;
+  ternura: number;
+  profundidad: number;
+  reporte_ia: string;
   feedback: string;
 }
 
@@ -49,11 +59,25 @@ interface TutorialStep {
   example?: string;
 }
 
+const modeOptions = [
+  { value: "debate", label: "Coach de Debate", description: "Entrena contra personajes con objeciones", icon: Brain, color: "text-primary" },
+  { value: "pupilo", label: "El Pupilo Digital", description: "Enséñale a una IA fría sobre el amor humano", icon: Bot, color: "text-cyan-500" },
+];
+
 const personas = [
   { value: "ateo_cientifico", label: "Ateo Científico", description: "Busca evidencia empírica" },
   { value: "agnostico", label: "Agnóstico Curioso", description: "Abierto pero escéptico" },
   { value: "herido_iglesia", label: "Herido por la Iglesia", description: "Con dolor y resentimiento" },
   { value: "relativista", label: "Relativista Moral", description: "No cree en verdad absoluta" },
+];
+
+const pupiloTemas = [
+  "¿Por qué los humanos aman a sus enemigos?",
+  "¿Qué es el perdón y por qué es lógico perdonar?",
+  "¿Por qué Cristo se sacrificó pudiendo evitarlo?",
+  "¿Por qué lloran los humanos cuando alguien muere?",
+  "¿Qué es la misericordia y por qué supera a la justicia?",
+  "¿Por qué una madre ama a un hijo que la lastimó?",
 ];
 
 const dificultades = [
@@ -328,11 +352,14 @@ const Coach = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [selectedMode, setSelectedMode] = useState<"debate" | "pupilo">("debate");
   const [selectedPersona, setSelectedPersona] = useState("ateo_cientifico");
   const [selectedDificultad, setSelectedDificultad] = useState("tutorial");
   const [selectedTema, setSelectedTema] = useState(temas[0]);
+  const [selectedPupiloTema, setSelectedPupiloTema] = useState(pupiloTemas[0]);
   const [debateStarted, setDebateStarted] = useState(false);
   const [evaluation, setEvaluation] = useState<Evaluation | null>(null);
+  const [pupiloEvaluation, setPupiloEvaluation] = useState<PupiloEvaluation | null>(null);
   const [debateId, setDebateId] = useState<string | null>(null);
   const [suggestion, setSuggestion] = useState<Suggestion | null>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -345,7 +372,8 @@ const Coach = () => {
   const [quotaExceeded, setQuotaExceeded] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const isTutorialMode = selectedDificultad === "tutorial";
+  const isPupiloMode = selectedMode === "pupilo";
+  const isTutorialMode = selectedDificultad === "tutorial" && !isPupiloMode;
   const currentTutorialTips = tutorialTipsByTopic[selectedTema] || [];
   const currentTip = currentTutorialTips[tutorialStep];
 
@@ -364,17 +392,22 @@ const Coach = () => {
     setTutorialStep(0);
     setCompletedTutorialSteps([]);
     setShowTutorialPanel(true);
+    setPupiloEvaluation(null);
+    setEvaluation(null);
 
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
+
+    const activeTema = isPupiloMode ? selectedPupiloTema : selectedTema;
+    const activePersona = isPupiloMode ? "pupilo_digital" : selectedPersona;
 
     // Create debate record
     const { data, error } = await supabase
       .from("debates")
       .insert({
         user_id: session.user.id,
-        tema: selectedTema,
-        personaje: selectedPersona,
+        tema: activeTema,
+        personaje: activePersona,
         transcript: [],
       })
       .select()
@@ -384,7 +417,7 @@ const Coach = () => {
       console.error("Error creating debate:", error);
       toast({
         title: "Error",
-        description: "No se pudo iniciar el debate",
+        description: "No se pudo iniciar la sesión",
         variant: "destructive",
       });
       setLoading(false);
@@ -394,15 +427,15 @@ const Coach = () => {
     setDebateId(data.id);
 
     // For tutorial mode, use aprendiz difficulty in backend
-    const backendDificultad = isTutorialMode ? "aprendiz" : selectedDificultad;
+    const backendDificultad = isPupiloMode ? "aprendiz" : (isTutorialMode ? "aprendiz" : selectedDificultad);
 
     // Get initial message from AI
     try {
       if (!(await requireAuth())) { setLoading(false); return; }
       const response = await supabase.functions.invoke("debate-coach", {
         body: {
-          persona: selectedPersona,
-          tema: selectedTema,
+          persona: activePersona,
+          tema: activeTema,
           dificultad: backendDificultad,
           messages: [],
           action: "start",
@@ -448,13 +481,15 @@ const Coach = () => {
       setCompletedTutorialSteps(prev => [...prev, tutorialStep]);
     }
 
-    const backendDificultad = isTutorialMode ? "aprendiz" : selectedDificultad;
+    const backendDificultad = isPupiloMode ? "aprendiz" : (isTutorialMode ? "aprendiz" : selectedDificultad);
+    const activePersona = isPupiloMode ? "pupilo_digital" : selectedPersona;
+    const activeTema = isPupiloMode ? selectedPupiloTema : selectedTema;
 
     try {
       const response = await supabase.functions.invoke("debate-coach", {
         body: {
-          persona: selectedPersona,
-          tema: selectedTema,
+          persona: activePersona,
+          tema: activeTema,
           dificultad: backendDificultad,
           messages: [...messages, userMessage],
           action: "respond",
@@ -575,35 +610,51 @@ const Coach = () => {
 
     setLoading(true);
 
-    const backendDificultad = isTutorialMode ? "aprendiz" : selectedDificultad;
+    const backendDificultad = isPupiloMode ? "aprendiz" : (isTutorialMode ? "aprendiz" : selectedDificultad);
+    const activePersona = isPupiloMode ? "pupilo_digital" : selectedPersona;
+    const activeTema = isPupiloMode ? selectedPupiloTema : selectedTema;
 
     try {
       const response = await supabase.functions.invoke("debate-coach", {
         body: {
-          persona: selectedPersona,
-          tema: selectedTema,
+          persona: activePersona,
+          tema: activeTema,
           dificultad: backendDificultad,
           messages,
-          action: "evaluate",
+          action: isPupiloMode ? "evaluate_pupilo" : "evaluate",
         },
       });
 
       if (response.error) throw response.error;
 
       const evalData = response.data;
-      setEvaluation(evalData);
-
-      // Update debate record
-      await supabase
-        .from("debates")
-        .update({
-          completed: true,
-          puntaje_fe: evalData.fe,
-          puntaje_razon: evalData.razon,
-          puntaje_amor: evalData.amor,
-          feedback: evalData.feedback,
-        })
-        .eq("id", debateId);
+      
+      if (isPupiloMode) {
+        setPupiloEvaluation(evalData);
+        // Save scores mapped to debate columns
+        await supabase
+          .from("debates")
+          .update({
+            completed: true,
+            puntaje_fe: Math.round(evalData.profundidad / 10),
+            puntaje_razon: Math.round(evalData.claridad / 10),
+            puntaje_amor: Math.round(evalData.empatia / 10),
+            feedback: evalData.feedback,
+          })
+          .eq("id", debateId);
+      } else {
+        setEvaluation(evalData);
+        await supabase
+          .from("debates")
+          .update({
+            completed: true,
+            puntaje_fe: evalData.fe,
+            puntaje_razon: evalData.razon,
+            puntaje_amor: evalData.amor,
+            feedback: evalData.feedback,
+          })
+          .eq("id", debateId);
+      }
 
       // Update user stats
       await incrementDebates();
@@ -911,6 +962,84 @@ const Coach = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
+                  {/* Mode Selector */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Modo de Entrenamiento</label>
+                    <div className="grid grid-cols-2 gap-3">
+                      {modeOptions.map((mode) => {
+                        const Icon = mode.icon;
+                        const isSelected = selectedMode === mode.value;
+                        return (
+                          <button
+                            key={mode.value}
+                            onClick={() => setSelectedMode(mode.value as "debate" | "pupilo")}
+                            className={`p-4 rounded-xl border-2 transition-all text-left ${
+                              isSelected
+                                ? mode.value === "pupilo"
+                                  ? "border-cyan-500 bg-cyan-500/10"
+                                  : "border-primary bg-primary/10"
+                                : "border-border/50 hover:border-primary/50 bg-background/50"
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 mb-1">
+                              <Icon className={`w-5 h-5 ${mode.color}`} />
+                              <span className="font-semibold text-sm">{mode.label}</span>
+                            </div>
+                            <p className="text-xs text-muted-foreground">{mode.description}</p>
+                            {mode.value === "pupilo" && (
+                              <Badge className="mt-2 text-[10px] bg-cyan-500/20 text-cyan-400 border-cyan-500/30">
+                                Nuevo · Formador de IA
+                              </Badge>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Pupilo mode info */}
+                  {isPupiloMode && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      className="bg-cyan-500/10 rounded-lg p-4 border border-cyan-500/20"
+                    >
+                      <div className="flex items-start gap-3">
+                        <Bot className="w-5 h-5 text-cyan-400 mt-0.5" />
+                        <div>
+                          <h4 className="font-medium text-sm mb-1">El Pupilo Digital</h4>
+                          <p className="text-xs text-muted-foreground">
+                            Una IA fría y lógica que no entiende el amor, el perdón ni la misericordia. 
+                            Tu misión es enseñarle con paciencia y ternura. Al final, ella evaluará 
+                            tu capacidad de transmitir humanidad.
+                          </p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* Pupilo tema selector */}
+                  {isPupiloMode && (
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Tema de Enseñanza</label>
+                      <Select value={selectedPupiloTema} onValueChange={setSelectedPupiloTema}>
+                        <SelectTrigger className="glass-button bg-background/50">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background/95 backdrop-blur-xl border-border/50">
+                          {pupiloTemas.map((tema) => (
+                            <SelectItem key={tema} value={tema}>
+                              {tema}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  {/* Debate mode options */}
+                  {!isPupiloMode && (
+                  <>
                   {/* Difficulty Selector */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Nivel de Dificultad</label>
@@ -1022,9 +1151,15 @@ const Coach = () => {
                       </div>
                     </div>
                   )}
+                  </>
+                  )}
 
-                  <Button onClick={startDebate} className="w-full shadow-glow" disabled={loading}>
-                    {loading ? "Preparando..." : selectedDificultad === "tutorial" ? "Comenzar Tutorial" : "Comenzar Entrenamiento"}
+                  <Button 
+                    onClick={startDebate} 
+                    className={`w-full ${isPupiloMode ? "bg-cyan-600 hover:bg-cyan-700 text-white" : "shadow-glow"}`} 
+                    disabled={loading}
+                  >
+                    {loading ? "Preparando..." : isPupiloMode ? "Comenzar Sesión con el Pupilo" : (selectedDificultad === "tutorial" ? "Comenzar Tutorial" : "Comenzar Entrenamiento")}
                   </Button>
                 </CardContent>
               </Card>
@@ -1044,7 +1179,7 @@ const Coach = () => {
       <div className="flex-1 lg:pl-64 flex flex-col pb-20 lg:pb-0">
         {/* Header */}
         <div className="relative overflow-hidden flex-shrink-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-secondary/60" />
+          <div className={`absolute inset-0 ${isPupiloMode ? "bg-gradient-to-br from-cyan-900 via-cyan-800 to-teal-700" : "bg-gradient-to-br from-primary via-primary/90 to-secondary/60"}`} />
           
           <motion.header 
             initial={{ opacity: 0, y: -20 }}
@@ -1062,14 +1197,19 @@ const Coach = () => {
                 >
                   <ArrowLeft className="w-4 h-4" />
                 </Button>
-                <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-secondary/20 backdrop-blur-sm flex items-center justify-center">
-                  <Sparkles className="w-4 h-4 lg:w-5 lg:h-5 text-secondary" />
+                <div className={`w-8 h-8 lg:w-10 lg:h-10 rounded-full ${isPupiloMode ? "bg-cyan-400/20" : "bg-secondary/20"} backdrop-blur-sm flex items-center justify-center`}>
+                  {isPupiloMode 
+                    ? <Bot className="w-4 h-4 lg:w-5 lg:h-5 text-cyan-300" />
+                    : <Sparkles className="w-4 h-4 lg:w-5 lg:h-5 text-secondary" />
+                  }
                 </div>
                 <div>
                   <h1 className="font-heading text-lg lg:text-xl font-bold text-white">
-                    {isTutorialMode ? "Tutorial" : "Coach de Debate"}
+                    {isPupiloMode ? "El Pupilo Digital" : (isTutorialMode ? "Tutorial" : "Coach de Debate")}
                   </h1>
-                  <p className="text-xs lg:text-sm text-white/70 truncate max-w-[150px] lg:max-w-none">{selectedTema}</p>
+                  <p className="text-xs lg:text-sm text-white/70 truncate max-w-[150px] lg:max-w-none">
+                    {isPupiloMode ? selectedPupiloTema : selectedTema}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -1117,7 +1257,7 @@ const Coach = () => {
         </AnimatePresence>
 
         <main className="flex-1 container mx-auto px-4 py-4 lg:py-6 flex flex-col lg:flex-row gap-4 max-w-7xl overflow-hidden">
-          {!evaluation ? (
+          {!evaluation && !pupiloEvaluation ? (
             <>
               {/* Tutorial panel - Mobile: top, Desktop: side */}
               {isTutorialMode && showTutorialPanel && (
@@ -1153,11 +1293,17 @@ const Coach = () => {
                         <Card
                           className={`${
                             message.role === "user"
-                              ? "bg-primary text-primary-foreground"
-                              : "glass-card border-border/50"
+                              ? isPupiloMode ? "bg-teal-700 text-white" : "bg-primary text-primary-foreground"
+                              : isPupiloMode ? "glass-card border-cyan-500/30 bg-cyan-950/20" : "glass-card border-border/50"
                           }`}
                         >
                           <CardContent className="p-3 lg:p-4">
+                            {isPupiloMode && message.role === "assistant" && (
+                              <div className="flex items-center gap-1.5 mb-2 text-cyan-400">
+                                <Cpu className="w-3.5 h-3.5" />
+                                <span className="text-xs font-medium">Pupilo Digital</span>
+                              </div>
+                            )}
                             <p className="whitespace-pre-wrap text-sm lg:text-base">{message.content}</p>
                           </CardContent>
                         </Card>
@@ -1184,7 +1330,7 @@ const Coach = () => {
                     <Textarea
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
-                      placeholder={isTutorialMode ? "Escribe tu respuesta (usa las sugerencias del panel de guía)..." : "Escribe tu respuesta..."}
+                      placeholder={isPupiloMode ? "Enséñale al pupilo con paciencia y ternura..." : (isTutorialMode ? "Escribe tu respuesta (usa las sugerencias del panel de guía)..." : "Escribe tu respuesta...")}
                       className="resize-none glass-button bg-background/50 flex-1 min-h-[60px] lg:min-h-[80px]"
                       rows={isMobile ? 2 : 3}
                       onKeyDown={(e) => {
@@ -1196,25 +1342,27 @@ const Coach = () => {
                     />
                     {/* Desktop: vertical buttons */}
                     <div className="hidden lg:flex flex-col gap-2">
-                      <Button onClick={sendMessage} disabled={loading || !input.trim()} size="icon" className="shadow-glow">
+                      <Button onClick={sendMessage} disabled={loading || !input.trim()} size="icon" className={isPupiloMode ? "bg-cyan-600 hover:bg-cyan-700 text-white" : "shadow-glow"}>
                         <Send className="w-4 h-4" />
                       </Button>
-                      <Button
-                        onClick={getSuggestions}
-                        variant="outline"
-                        size="icon"
-                        disabled={loading || messages.length < 2}
-                        title="Pedir ayuda"
-                        className="glass-button"
-                      >
-                        <Sparkles className="w-4 h-4" />
-                      </Button>
+                      {!isPupiloMode && (
+                        <Button
+                          onClick={getSuggestions}
+                          variant="outline"
+                          size="icon"
+                          disabled={loading || messages.length < 2}
+                          title="Pedir ayuda"
+                          className="glass-button"
+                        >
+                          <Sparkles className="w-4 h-4" />
+                        </Button>
+                      )}
                       <Button
                         onClick={evaluateDebate}
                         variant="outline"
                         size="icon"
                         disabled={loading || messages.length < 4}
-                        title="Evaluar debate"
+                        title={isPupiloMode ? "Obtener reporte" : "Evaluar debate"}
                         className="glass-button"
                       >
                         <TrendingUp className="w-4 h-4" />
@@ -1227,22 +1375,24 @@ const Coach = () => {
                     <Button 
                       onClick={sendMessage} 
                       disabled={loading || !input.trim()} 
-                      className="flex-1 shadow-glow"
+                      className={`flex-1 ${isPupiloMode ? "bg-cyan-600 hover:bg-cyan-700 text-white" : "shadow-glow"}`}
                       size="sm"
                     >
                       <Send className="w-4 h-4 mr-2" />
                       Enviar
                     </Button>
-                    <Button
-                      onClick={getSuggestions}
-                      variant="outline"
-                      size="sm"
-                      disabled={loading || messages.length < 2}
-                      className="glass-button"
-                    >
-                      <Sparkles className="w-4 h-4 mr-1" />
-                      Ayuda
-                    </Button>
+                    {!isPupiloMode && (
+                      <Button
+                        onClick={getSuggestions}
+                        variant="outline"
+                        size="sm"
+                        disabled={loading || messages.length < 2}
+                        className="glass-button"
+                      >
+                        <Sparkles className="w-4 h-4 mr-1" />
+                        Ayuda
+                      </Button>
+                    )}
                     <Button
                       onClick={evaluateDebate}
                       variant="outline"
@@ -1251,7 +1401,7 @@ const Coach = () => {
                       className="glass-button"
                     >
                       <TrendingUp className="w-4 h-4 mr-1" />
-                      Evaluar
+                      {isPupiloMode ? "Reporte" : "Evaluar"}
                     </Button>
                   </div>
                 </div>
@@ -1306,7 +1456,85 @@ const Coach = () => {
                 </SheetContent>
               </Sheet>
             </>
+          ) : pupiloEvaluation ? (
+            /* Pupilo Digital Evaluation */
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className="w-full max-w-2xl mx-auto"
+            >
+              <Card className="glass-card border-cyan-500/30 bg-gradient-to-b from-cyan-950/20 to-background">
+                <CardHeader className="text-center">
+                  <div className="mx-auto w-16 h-16 rounded-full bg-cyan-500/20 flex items-center justify-center mb-3">
+                    <Bot className="w-8 h-8 text-cyan-400" />
+                  </div>
+                  <CardTitle className="text-xl">Reporte del Pupilo Digital</CardTitle>
+                  <CardDescription>La IA ha procesado tu enseñanza</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Metrics */}
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { label: "Empatía", value: pupiloEvaluation.empatia, icon: HeartHandshake, color: "text-rose-400" },
+                      { label: "Claridad", value: pupiloEvaluation.claridad, icon: Eye, color: "text-blue-400" },
+                      { label: "Ternura", value: pupiloEvaluation.ternura, icon: MessageCircleHeart, color: "text-pink-400" },
+                      { label: "Profundidad", value: pupiloEvaluation.profundidad, icon: Brain, color: "text-purple-400" },
+                    ].map((metric) => (
+                      <div key={metric.label} className="glass-card p-3 rounded-lg space-y-2">
+                        <div className="flex items-center gap-2">
+                          <metric.icon className={`w-4 h-4 ${metric.color}`} />
+                          <span className="text-sm font-medium">{metric.label}</span>
+                        </div>
+                        <div className="text-2xl font-bold">{metric.value}<span className="text-sm text-muted-foreground">/100</span></div>
+                        <Progress value={metric.value} className="h-2" />
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* AI Report - the emotional core */}
+                  <div className="relative overflow-hidden rounded-xl border border-cyan-500/30 bg-cyan-950/30 p-5">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-teal-400 to-cyan-500" />
+                    <div className="flex items-start gap-3 mb-3">
+                      <Cpu className="w-5 h-5 text-cyan-400 mt-0.5 shrink-0" />
+                      <h3 className="font-semibold text-cyan-300">Mensaje del Pupilo</h3>
+                    </div>
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap italic text-foreground/90">
+                      "{pupiloEvaluation.reporte_ia}"
+                    </p>
+                  </div>
+
+                  {/* Feedback */}
+                  <div className="glass-card p-4 rounded-lg">
+                    <h3 className="font-medium mb-2">Retroalimentación para el Formador</h3>
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                      {pupiloEvaluation.feedback}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Button onClick={() => navigate("/dashboard")} variant="outline" className="flex-1 glass-button">
+                      Volver al Dashboard
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setDebateStarted(false);
+                        setMessages([]);
+                        setEvaluation(null);
+                        setPupiloEvaluation(null);
+                        setDebateId(null);
+                        setTotalPoints(0);
+                      }}
+                      className="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white"
+                    >
+                      Nueva Sesión con el Pupilo
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
           ) : (
+            /* Standard Debate Evaluation */
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -1336,28 +1564,28 @@ const Coach = () => {
                         <Heart className="w-4 h-4 lg:w-5 lg:h-5 text-secondary" />
                         <span className="font-medium text-xs lg:text-sm">Amor</span>
                       </div>
-                      <div className="text-2xl lg:text-3xl font-bold text-secondary">{evaluation.amor}/10</div>
+                      <div className="text-2xl lg:text-3xl font-bold text-secondary">{evaluation!.amor}/10</div>
                     </div>
                     <div className="text-center glass-card p-3 lg:p-4 rounded-lg">
                       <div className="flex items-center justify-center gap-1 lg:gap-2 mb-2">
                         <Brain className="w-4 h-4 lg:w-5 lg:h-5 text-primary" />
                         <span className="font-medium text-xs lg:text-sm">Razón</span>
                       </div>
-                      <div className="text-2xl lg:text-3xl font-bold text-primary">{evaluation.razon}/10</div>
+                      <div className="text-2xl lg:text-3xl font-bold text-primary">{evaluation!.razon}/10</div>
                     </div>
                     <div className="text-center glass-card p-3 lg:p-4 rounded-lg">
                       <div className="flex items-center justify-center gap-1 lg:gap-2 mb-2">
                         <BookOpen className="w-4 h-4 lg:w-5 lg:h-5 text-secondary" />
                         <span className="font-medium text-xs lg:text-sm">Fe</span>
                       </div>
-                      <div className="text-2xl lg:text-3xl font-bold text-secondary">{evaluation.fe}/10</div>
+                      <div className="text-2xl lg:text-3xl font-bold text-secondary">{evaluation!.fe}/10</div>
                     </div>
                   </div>
 
                   <div className="glass-card p-4 rounded-lg">
                     <h3 className="font-medium mb-2">Retroalimentación</h3>
                     <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                      {evaluation.feedback}
+                      {evaluation!.feedback}
                     </p>
                   </div>
 
@@ -1370,6 +1598,7 @@ const Coach = () => {
                         setDebateStarted(false);
                         setMessages([]);
                         setEvaluation(null);
+                        setPupiloEvaluation(null);
                         setDebateId(null);
                         setTotalPoints(0);
                         setTutorialStep(0);
