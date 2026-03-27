@@ -1298,6 +1298,12 @@ const Coach = () => {
                           }`}
                         >
                           <CardContent className="p-3 lg:p-4">
+                            {isPupiloMode && message.role === "assistant" && (
+                              <div className="flex items-center gap-1.5 mb-2 text-cyan-400">
+                                <Cpu className="w-3.5 h-3.5" />
+                                <span className="text-xs font-medium">Pupilo Digital</span>
+                              </div>
+                            )}
                             <p className="whitespace-pre-wrap text-sm lg:text-base">{message.content}</p>
                           </CardContent>
                         </Card>
