@@ -15,123 +15,113 @@ interface FaqItem {
   answer: string;
   source?: string;
   sourceUrl?: string;
-  category: 'espacio' | 'ciencia' | 'etica' | 'teologia';
+  category: 'ia' | 'dignidad' | 'familia' | 'discernimiento';
 }
 
 const faqItems: FaqItem[] = [
   {
-    id: "caso-galileo",
-    category: "ciencia",
-    question: "¿La Iglesia no odiaba la ciencia por lo de Galileo?",
-    answer: "Es un mito histórico. La Iglesia fundó las universidades y financió a Galileo. El conflicto no fue por 'hacer ciencia', sino porque Galileo enseñó su teoría como verdad absoluta sin tener pruebas físicas (que llegaron años después) y ridiculizó al Papa en sus escritos. Fue un error de personas, no de la fe. Juan Pablo II pidió perdón por el proceso en 1992, reconociendo que la fe y la ciencia se necesitan mutuamente.",
-    source: "Juan Pablo II, Discurso 1992",
+    id: "ia-reemplazar",
+    category: "ia",
+    question: "¿La IA va a reemplazar a los humanos?",
+    answer: "La IA puede automatizar tareas, pero no puede reemplazar lo esencialmente humano: amar, perdonar, crear con alma, tomar decisiones morales. El Papa Francisco advirtió que 'no debemos permitir que los algoritmos decidan por nosotros'. La clave no es competir con la máquina en velocidad, sino desarrollar lo que ella jamás podrá: compasión, creatividad genuina y relación con Dios.",
+    source: "Papa Francisco, Mensaje Jornada de la Paz 2024",
     sourceUrl: "https://www.vatican.va",
   },
   {
-    id: "gasto-espacio",
-    category: "espacio",
-    question: "¿Por qué gastar dinero en el espacio y no en los pobres?",
-    answer: "La tecnología espacial (satélites, predicción climática, comunicaciones) salva vidas en la Tierra hoy. Los satélites meteorológicos previenen desastres naturales, los de comunicaciones conectan regiones remotas con educación y salud. Además, el espíritu humano necesita explorar para no atrofiarse. El mismo impulso que nos lleva al espacio nos impulsa a buscar a Dios.",
-    source: "Pontificio Consejo Justicia y Paz",
-  },
-  {
-    id: "soberbia-planetas",
-    category: "etica",
-    question: "¿Es soberbia ir a otros planetas?",
-    answer: "No si vamos como custodios, no como conquistadores. Dios dijo 'Llenad la tierra y sometedla' (Gn 1:28). El universo es su regalo para ser descubierto y cuidado. La verdadera soberbia sería pensar que este vasto cosmos fue creado sin propósito o que no tenemos la responsabilidad de explorarlo con humildad y asombro.",
-    source: "Génesis 1:28, Catecismo 2415",
-    sourceUrl: "https://www.vatican.va/archive/catechism_sp/p3s2c2a7_sp.html",
-  },
-  {
-    id: "cielo-cohete",
-    category: "teologia",
-    question: "¿Dónde queda el cielo si subimos en cohete?",
-    answer: "El Cielo no es un lugar físico arriba de las nubes, es una dimensión de comunión plena con Dios. Santo Tomás de Aquino enseñó que el Cielo es un 'estado' más que un 'lugar'. Ir a Marte no te aleja ni te acerca a Dios, tu corazón sí. Un astronauta puede estar más cerca del Cielo en órbita que un incrédulo en la Tierra.",
-    source: "Santo Tomás de Aquino, Summa Theologiae",
-  },
-  {
-    id: "extraterrestres-fe",
-    category: "teologia",
-    question: "¿Qué pasaría con nuestra fe si encontramos vida extraterrestre?",
-    answer: "Nada cambiaría en lo esencial. El Padre José Gabriel Funes, ex-director del Observatorio Vaticano, dijo que creer en extraterrestres no contradice la fe. Si Dios creó vida en otros mundos, eso solo magnifica su creatividad infinita. Cristo vino a salvar a la humanidad; otras criaturas podrían tener su propia relación con el Creador.",
-    source: "P. José Gabriel Funes, L'Osservatore Romano 2008",
-    sourceUrl: "https://www.vaticanobservatory.org",
-  },
-  {
-    id: "big-bang-dios",
-    category: "ciencia",
-    question: "¿El Big Bang contradice la creación divina?",
-    answer: "Todo lo contrario. El sacerdote católico Georges Lemaître propuso la teoría del Big Bang, que confirma que el universo tuvo un comienzo. La ciencia explica el 'cómo', la fe explica el 'por qué'. El Big Bang es el 'Fiat Lux' que la ciencia puede observar.",
-    source: "Georges Lemaître, 1927",
-  },
-  {
-    id: "evolucion-adan",
-    category: "ciencia",
-    question: "¿La evolución es compatible con Adán y Eva?",
-    answer: "La Iglesia acepta la evolución como teoría científica para el cuerpo, pero afirma que cada alma es creada directamente por Dios. Pío XII en 'Humani Generis' (1950) permitió investigar la evolución del cuerpo humano. La verdad revelada es que Dios creó al ser humano con alma inmortal.",
-    source: "Pío XII, Humani Generis (1950)",
-    sourceUrl: "https://www.vatican.va/content/pius-xii/es/encyclicals/documents/hf_p-xii_enc_12081950_humani-generis.html",
-  },
-  {
-    id: "ia-conciencia",
-    category: "etica",
+    id: "ia-alma",
+    category: "ia",
     question: "¿Puede una IA tener alma o conciencia?",
-    answer: "No. La inteligencia artificial procesa información pero no tiene experiencia subjetiva, libre albedrío ni relación con lo trascendente. El alma es un don divino, no un emergente de la complejidad computacional. La IA puede simular respuestas, pero no puede amar, sufrir o buscar a Dios.",
-    source: "Documento 'Rome Call for AI Ethics' (2020)",
+    answer: "No. La inteligencia artificial procesa información pero no tiene experiencia subjetiva, libre albedrío ni relación con lo trascendente. El alma es un don divino, no un emergente de la complejidad computacional. La IA puede simular respuestas emocionales, pero no puede amar, sufrir con sentido, ni buscar a Dios. Santo Tomás enseñó que el intelecto humano trasciende la materia.",
+    source: "Rome Call for AI Ethics (2020), CIC #363",
     sourceUrl: "https://www.romecall.org",
   },
   {
-    id: "colonizar-etica",
-    category: "etica",
-    question: "¿Cómo colonizar otros planetas éticamente?",
-    answer: "Laudato Si' nos enseña que somos custodios, no dueños de la creación. Colonizar implica responsabilidad: no repetir los errores del colonialismo terrestre, respetar posible vida microbiana, evitar la explotación irresponsable de recursos. Ir al espacio debe ser para el bien común de la humanidad.",
-    source: "Papa Francisco, Laudato Si' (2015)",
-    sourceUrl: "https://www.vatican.va/content/francesco/es/encyclicals/documents/papa-francesco_20150524_enciclica-laudato-si.html",
+    id: "doomscrolling",
+    category: "dignidad",
+    question: "¿Por qué el doomscrolling es un problema espiritual?",
+    answer: "El scroll infinito de noticias catastróficas genera ansiedad, desesperanza y parálisis — todo lo contrario a la paz que Cristo promete ('Mi paz os dejo', Jn 14:27). Los algoritmos priorizan contenido que genera miedo porque mantiene tu atención. San Pablo nos dice: 'Todo lo que es verdadero, noble, justo, puro, amable... en eso pensad' (Fil 4:8). La ascesis digital es el ayuno de nuestra era.",
+    source: "Filipenses 4:8, Juan 14:27",
   },
   {
-    id: "observatorio-vaticano",
-    category: "ciencia",
-    question: "¿Por qué la Iglesia tiene un observatorio astronómico?",
-    answer: "El Observatorio Vaticano, fundado en 1891 por León XIII, demuestra que la Iglesia no teme a la ciencia. 35 cráteres lunares llevan nombres de jesuitas científicos. La Iglesia promueve el conocimiento porque la verdad, venga de donde venga, apunta hacia Dios.",
-    source: "Observatorio Vaticano (Specola Vaticana)",
-    sourceUrl: "https://www.vaticanobservatory.org",
+    id: "algoritmo-manipula",
+    category: "ia",
+    question: "¿Los algoritmos de redes sociales me manipulan?",
+    answer: "Sí, están diseñados para maximizar tu tiempo en pantalla, no tu bienestar. Utilizan la dopamina (likes, notificaciones) como mecanismo de enganche. El documento 'Rome Call for AI Ethics' firmado por el Vaticano exige que la IA respete la dignidad humana y la autonomía de las personas. Tú no eres el cliente de las redes sociales, eres el producto. Recuperar tu atención es un acto de libertad.",
+    source: "Rome Call for AI Ethics, Vaticano 2020",
+    sourceUrl: "https://www.romecall.org",
   },
   {
-    id: "vida-marte",
-    category: "teologia",
-    question: "¿Si hay vida en Marte, necesitaría ser evangelizada?",
-    answer: "El Papa Francisco dijo que bautizaría a un extraterrestre si lo pidiera. Sin embargo, la misión evangelizadora de Cristo fue dada específicamente para la humanidad. Otras formas de vida podrían tener su propia relación con el Creador, o quizás ni siquiera necesitarían redención si no conocen el pecado.",
-    source: "Papa Francisco, Homilía 12 mayo 2014",
+    id: "hijos-pantallas",
+    category: "familia",
+    question: "¿Cómo protejo a mis hijos de las pantallas sin aislarlos?",
+    answer: "La clave no es prohibir sino formar. Establece horarios claros (no pantallas en comidas ni antes de dormir), usa controles parentales apropiados por edad, y sobre todo: sé ejemplo. Si tú estás pegado al teléfono, ellos lo imitarán. Crea espacios 'sagrados' sin tecnología: la cena familiar, el rezo juntos, los paseos. El Catecismo nos recuerda que los padres son los primeros educadores (CIC #2223).",
+    source: "Catecismo #2223, Amoris Laetitia",
   },
   {
-    id: "multiverso",
-    category: "teologia",
-    question: "¿Qué dice la Iglesia sobre la teoría del multiverso?",
-    answer: "La teoría del multiverso es especulativa y no demostrada. Si existieran múltiples universos, todos serían creación de Dios. La omnipotencia divina no se limita a un solo cosmos. Sin embargo, la fe no depende de teorías cosmológicas; nuestra relación con Dios trasciende cualquier modelo físico.",
-    source: "Pontificia Academia de Ciencias",
+    id: "ia-orar",
+    category: "discernimiento",
+    question: "¿Puedo usar IA para orar o estudiar la Biblia?",
+    answer: "La IA puede ser una herramienta útil para estudiar contexto bíblico, buscar versículos o estructurar reflexiones. Pero la oración es relación personal con Dios, no procesamiento de datos. Usar ChatGPT para generar una oración no es orar; es leer texto generado. La oración requiere tu corazón, tu silencio y tu vulnerabilidad ante Dios. La tecnología puede acercarte al texto, pero solo tú puedes encontrarte con la Persona.",
+    source: "CIC #2559 - La oración es elevación del alma",
   },
   {
-    id: "transhumanismo",
-    category: "etica",
-    question: "¿Es lícito mejorar al ser humano con tecnología?",
-    answer: "La Iglesia distingue entre terapia (curar enfermedades) y mejoramiento (superar límites naturales). Curar es parte de nuestra vocación de cuidar la vida. Pero pretender 'superar' la naturaleza humana con implantes o modificaciones genéticas radicales puede atentar contra la dignidad dada por Dios y crear desigualdades injustas.",
-    source: "Academia Pontificia para la Vida",
-    sourceUrl: "https://www.academyforlife.va",
+    id: "fake-news-fe",
+    category: "dignidad",
+    question: "¿Cómo distinguir noticias falsas sobre la fe?",
+    answer: "Aplica tres filtros: 1) ¿La fuente es confiable? (Vaticano, conferencias episcopales, medios católicos reconocidos). 2) ¿Tiene contexto o es un titular sensacionalista? 3) ¿Promueve la unidad o la división? Jesús dijo 'La verdad os hará libres' (Jn 8:32). Compartir desinformación, incluso con buena intención, es faltar a la verdad. Antes de compartir, verifica. El octavo mandamiento aplica también en WhatsApp.",
+    source: "Juan 8:32, CIC #2464-2487",
+  },
+  {
+    id: "adiccion-digital",
+    category: "dignidad",
+    question: "¿La adicción al teléfono es pecado?",
+    answer: "En sí mismo, usar el teléfono no es pecado. Pero cuando se convierte en un ídolo que ocupa el lugar de Dios, la familia o el prójimo, se convierte en un desorden. Si no puedes dejarlo durante la Misa, si lo revisas antes de orar, si prefieres el scroll a conversar con tu cónyuge: hay un problema de prioridades. El primer mandamiento nos pide no tener otros dioses. A veces el dios moderno cabe en tu bolsillo.",
+    source: "CIC #2113 - La idolatría",
+  },
+  {
+    id: "trabajo-ia",
+    category: "ia",
+    question: "¿La IA me va a quitar mi trabajo?",
+    answer: "La IA transformará muchos empleos, pero creará otros nuevos. La Doctrina Social de la Iglesia defiende que el trabajo es vocación y dignidad, no solo producción (Laborem Exercens). En lugar de temer, prepárate: desarrolla habilidades que la IA no puede replicar — liderazgo empático, creatividad artística, pensamiento ético, trabajo manual con amor. El que sabe usar la IA como herramienta, no será reemplazado por ella.",
+    source: "Juan Pablo II, Laborem Exercens (1981)",
+    sourceUrl: "https://www.vatican.va",
+  },
+  {
+    id: "ia-relaciones",
+    category: "familia",
+    question: "¿Las relaciones virtuales pueden sustituir las reales?",
+    answer: "No. El ser humano fue creado para la comunión presencial: 'No es bueno que el hombre esté solo' (Gn 2:18). Las relaciones digitales pueden complementar pero jamás sustituir el abrazo, la mirada, la presencia física. Los estudios muestran que el aislamiento digital aumenta la depresión. La Eucaristía misma requiere presencia real: Cristo no se hizo un archivo descargable, se hizo carne.",
+    source: "Génesis 2:18, CIC #1146",
+  },
+  {
+    id: "discernir-contenido",
+    category: "discernimiento",
+    question: "¿Cómo saber si un contenido digital me edifica o me destruye?",
+    answer: "San Ignacio de Loyola enseñó a discernir por los frutos: lo que viene de Dios produce paz, esperanza y deseo de servir. Lo que viene del enemigo produce ansiedad, comparación y vacío. Después de consumir un contenido, pregúntate: ¿Estoy más en paz o más ansioso? ¿Quiero amar más o estoy más resentido? ¿Me acerco a Dios o me alejo? Tu estado interior es el mejor algoritmo de filtrado.",
+    source: "San Ignacio, Ejercicios Espirituales, Reglas de Discernimiento",
+  },
+  {
+    id: "etica-ia-vaticano",
+    category: "discernimiento",
+    question: "¿Qué dice el Vaticano sobre la inteligencia artificial?",
+    answer: "El Vaticano ha sido pionero en ética de IA. En 2020 lanzó el 'Rome Call for AI Ethics' firmado por Microsoft, IBM, FAO y el Gobierno italiano. Propone 6 principios: transparencia, inclusión, responsabilidad, imparcialidad, confiabilidad y seguridad/privacidad. El Papa Francisco insiste en que la IA debe servir al bien común y respetar la dignidad de cada persona, especialmente de los más vulnerables.",
+    source: "Rome Call for AI Ethics, Vaticano 2020",
+    sourceUrl: "https://www.romecall.org",
   },
 ];
 
 const categoryLabels: Record<string, string> = {
-  espacio: "Exploración Espacial",
-  ciencia: "Ciencia y Fe",
-  etica: "Ética del Futuro",
-  teologia: "Teología Cósmica",
+  ia: "Inteligencia Artificial",
+  dignidad: "Dignidad Digital",
+  familia: "Familia y Pantallas",
+  discernimiento: "Discernimiento",
 };
 
 const categoryColors: Record<string, string> = {
-  espacio: "text-cyan-400 bg-cyan-400/10",
-  ciencia: "text-amber-400 bg-amber-400/10",
-  etica: "text-purple-400 bg-purple-400/10",
-  teologia: "text-emerald-400 bg-emerald-400/10",
+  ia: "text-cyan-400 bg-cyan-400/10",
+  dignidad: "text-amber-400 bg-amber-400/10",
+  familia: "text-rose-400 bg-rose-400/10",
+  discernimiento: "text-emerald-400 bg-emerald-400/10",
 };
 
 export function EscudoVerdad() {
@@ -150,7 +140,7 @@ export function EscudoVerdad() {
     });
   }, [searchQuery, selectedCategory]);
 
-  const categories = ['espacio', 'ciencia', 'etica', 'teologia'];
+  const categories = ['ia', 'dignidad', 'familia', 'discernimiento'];
 
   return (
     <motion.div
