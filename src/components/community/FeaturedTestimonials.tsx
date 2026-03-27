@@ -49,9 +49,14 @@ const featuredTestimonials = [
     avatar: "AE",
     tag: "Conversión",
   },
+  {
+    quote: "Llevo un año en una cama de hospital, sin movilidad, con un cáncer gravísimo. Nadie pensaba que en 2025 iba a estar viva. Cuando me mandaron a paliativos, rezamos muchísimo Emilio y yo, y al día siguiente apareció un ensayo clínico para mi tumor. Nunca me he preguntado '¿por qué a mí?', sino '¿para qué?' La vida es bonita, incluso ahora.",
+    author: "Belén Domínguez",
+    role: "Autora de 'La vida es bonita, incluso ahora' · Sevilla, España",
+    avatar: "BD",
+    tag: "Esperanza en el sufrimiento",
+  },
 ];
-
-export const FeaturedTestimonials = () => {
   const navigate = useNavigate();
   const [current, setCurrent] = useState(0);
 
