@@ -1151,9 +1151,15 @@ const Coach = () => {
                       </div>
                     </div>
                   )}
+                  </>
+                  )}
 
-                  <Button onClick={startDebate} className="w-full shadow-glow" disabled={loading}>
-                    {loading ? "Preparando..." : selectedDificultad === "tutorial" ? "Comenzar Tutorial" : "Comenzar Entrenamiento"}
+                  <Button 
+                    onClick={startDebate} 
+                    className={`w-full ${isPupiloMode ? "bg-cyan-600 hover:bg-cyan-700 text-white" : "shadow-glow"}`} 
+                    disabled={loading}
+                  >
+                    {loading ? "Preparando..." : isPupiloMode ? "Comenzar Sesión con el Pupilo" : (selectedDificultad === "tutorial" ? "Comenzar Tutorial" : "Comenzar Entrenamiento")}
                   </Button>
                 </CardContent>
               </Card>
