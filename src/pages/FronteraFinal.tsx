@@ -13,7 +13,7 @@ import {
   PlayCircle,
   Sparkles,
   Shield,
-  Rocket,
+  ShieldCheck,
   Trophy,
   Brain,
   ArrowLeft,
