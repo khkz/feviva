@@ -13,7 +13,7 @@ import {
   PlayCircle,
   Sparkles,
   Shield,
-  Rocket,
+  ShieldCheck,
   Trophy,
   Brain,
   ArrowLeft,
@@ -31,6 +31,7 @@ import { WelcomeModal } from '@/components/frontera-final/WelcomeModal';
 import { MissionBanner } from '@/components/frontera-final/MissionBanner';
 import { FactShareModal } from '@/components/frontera-final/FactShareModal';
 import { SpaceShareModal } from '@/components/frontera-final/SpaceShareModal';
+import { AlgorithmicDiet } from '@/components/frontera-final/AlgorithmicDiet';
 import { getDailyContent, getContentLabel, DailyContent } from '@/lib/fronteraFactsData';
 import { Button } from '@/components/ui/button';
 import { useRosario } from '@/contexts/RosarioContext';
@@ -178,88 +179,100 @@ export default function FronteraFinal() {
   return (
     <>
       <Helmet>
-        <title>Frontera Final - El Rugido</title>
-        <meta name="description" content="Donde la Fe conquista el Vacío. Explora la intersección entre ciencia, cosmos y catolicismo." />
+        <title>El Continente Digital - El Rugido</title>
+        <meta name="description" content="Manual de Supervivencia y Fe en la Era de la IA. Aprende a no ser reemplazado e inyecta la luz de Cristo en el algoritmo." />
       </Helmet>
 
-      <div className="min-h-screen cyber-sacra-bg relative overflow-hidden">
+      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 relative overflow-hidden">
         {/* Back button */}
         <Link 
           to="/dashboard" 
-          className="fixed top-4 left-4 z-50 flex items-center gap-2 px-4 py-2 rounded-full bg-background/80 backdrop-blur-sm border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20 hover:text-cyan-300 transition-all group"
+          className="fixed top-4 left-4 z-50 flex items-center gap-2 px-4 py-2 rounded-full bg-background/80 backdrop-blur-sm border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 hover:text-amber-300 transition-all group"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           <span className="text-sm font-medium">Inicio</span>
         </Link>
-        
-        {/* Noise overlay */}
-        <div className="noise-overlay absolute inset-0 pointer-events-none" />
-        
-        {/* Animated stars background */}
-        <div className="absolute inset-0 overflow-hidden">
-          {[...Array(50)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-1 h-1 bg-white rounded-full"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-              animate={{
-                opacity: [0.2, 1, 0.2],
-                scale: [1, 1.5, 1],
-              }}
-              transition={{
-                duration: 2 + Math.random() * 3,
-                repeat: Infinity,
-                delay: Math.random() * 2,
-              }}
-            />
-          ))}
+
+        {/* Neural network background */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {/* Neural nodes */}
+          {[...Array(20)].map((_, i) => {
+            const x = 10 + (i % 5) * 20 + Math.random() * 10;
+            const y = 10 + Math.floor(i / 5) * 25 + Math.random() * 10;
+            return (
+              <motion.div
+                key={`node-${i}`}
+                className="absolute w-2 h-2 rounded-full bg-amber-400/30"
+                style={{ left: `${x}%`, top: `${y}%` }}
+                animate={{
+                  opacity: [0.2, 0.6, 0.2],
+                  scale: [1, 1.3, 1],
+                  boxShadow: [
+                    '0 0 4px rgba(251,191,36,0.1)',
+                    '0 0 12px rgba(251,191,36,0.4)',
+                    '0 0 4px rgba(251,191,36,0.1)',
+                  ],
+                }}
+                transition={{
+                  duration: 3 + Math.random() * 2,
+                  repeat: Infinity,
+                  delay: Math.random() * 3,
+                }}
+              />
+            );
+          })}
+          {/* Connecting lines (SVG) */}
+          <svg className="absolute inset-0 w-full h-full opacity-10">
+            {[...Array(12)].map((_, i) => (
+              <motion.line
+                key={`line-${i}`}
+                x1={`${15 + Math.random() * 70}%`}
+                y1={`${10 + Math.random() * 40}%`}
+                x2={`${15 + Math.random() * 70}%`}
+                y2={`${10 + Math.random() * 40}%`}
+                stroke="rgb(251,191,36)"
+                strokeWidth="0.5"
+                animate={{ opacity: [0.1, 0.4, 0.1] }}
+                transition={{ duration: 4 + Math.random() * 3, repeat: Infinity, delay: Math.random() * 2 }}
+              />
+            ))}
+          </svg>
         </div>
 
         {/* HERO SECTION */}
         <section className="relative min-h-[50vh] flex flex-col items-center justify-center px-4 pt-16 pb-8">
-          {/* Nebula gradient background */}
-          <div className="absolute inset-0 bg-gradient-to-b from-cyan-950/30 via-purple-950/20 to-transparent" />
-          
-          {/* Orbital rings decoration */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <motion.div 
-              className="w-[600px] h-[600px] border border-cyan-400/10 rounded-full"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
-            />
-            <motion.div 
-              className="absolute w-[400px] h-[400px] border border-amber-400/10 rounded-full"
-              animate={{ rotate: -360 }}
-              transition={{ duration: 45, repeat: Infinity, ease: "linear" }}
-            />
-            <motion.div 
-              className="absolute w-[200px] h-[200px] border border-purple-400/10 rounded-full"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-            />
-          </div>
+          <div className="absolute inset-0 bg-gradient-to-b from-amber-950/10 via-transparent to-transparent" />
 
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="relative z-10 text-center"
+            className="relative z-10 text-center max-w-3xl mx-auto"
           >
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.6 }}
-              className="mb-4"
+              className="mb-6"
             >
-              <Rocket className="w-16 h-16 mx-auto text-cyan-400 mb-4" />
+              <motion.div
+                animate={{
+                  boxShadow: [
+                    '0 0 20px rgba(251,191,36,0.2)',
+                    '0 0 40px rgba(251,191,36,0.4)',
+                    '0 0 20px rgba(251,191,36,0.2)',
+                  ],
+                }}
+                transition={{ duration: 3, repeat: Infinity }}
+                className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-amber-400/20 to-amber-600/10 border border-amber-400/30 flex items-center justify-center"
+              >
+                <ShieldCheck className="w-10 h-10 text-amber-400" />
+              </motion.div>
             </motion.div>
 
-            <h1 className="font-orbitron text-5xl md:text-7xl font-bold text-white mb-4 tracking-wider">
-              <span className="bg-gradient-to-r from-cyan-400 via-white to-amber-400 bg-clip-text text-transparent glow-cyan-text">
-                FRONTERA FINAL
+            <h1 className="font-orbitron text-4xl md:text-6xl font-bold text-white mb-4 tracking-wide leading-tight">
+              <span className="bg-gradient-to-r from-amber-400 via-white to-amber-400 bg-clip-text text-transparent">
+                El Continente Digital
               </span>
             </h1>
 
@@ -267,69 +280,25 @@ export default function FronteraFinal() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4, duration: 0.6 }}
-              className="text-xl md:text-2xl text-gray-300 font-light tracking-wide"
+              className="text-lg md:text-xl text-gray-400 font-light tracking-wide mb-2"
             >
-              Donde la Fe conquista el Vacío
+              Manual de Supervivencia y Fe en la Era de la IA
+            </motion.p>
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6, duration: 0.6 }}
+              className="text-sm text-gray-500 max-w-lg mx-auto"
+            >
+              No dejes que el algoritmo piense por ti. Aprende a ser libre e inyecta la luz de Cristo en cada byte.
             </motion.p>
           </motion.div>
+        </section>
 
-          {/* Floating Fact Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8, duration: 0.6 }}
-            className="relative z-10 mt-12"
-          >
-            <motion.div
-              animate={{ y: [-5, 5, -5] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              className="glass-cyber rounded-2xl p-6 max-w-md mx-auto border-amber-400/30 relative"
-            >
-              {/* Share button */}
-              <motion.button
-                onClick={() => setIsFactShareOpen(true)}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                className="absolute top-3 right-3 p-2 rounded-full bg-amber-400/20 hover:bg-amber-400/30 transition-colors"
-                title="Compartir dato"
-              >
-                <Share2 className="w-4 h-4 text-amber-400" />
-              </motion.button>
-              
-              <div className="flex items-start gap-3 pr-8">
-                {dailyContent.icon === 'heart' ? (
-                  <span className="text-amber-400 flex-shrink-0 mt-1 text-lg">❤️</span>
-                ) : dailyContent.icon === 'star' ? (
-                  <span className="text-amber-400 flex-shrink-0 mt-1 text-lg">⭐</span>
-                ) : dailyContent.icon === 'book' ? (
-                  <span className="text-amber-400 flex-shrink-0 mt-1 text-lg">📖</span>
-                ) : (
-                  <Sparkles className="w-5 h-5 text-amber-400 flex-shrink-0 mt-1" />
-                )}
-                <div>
-                  <p className="text-amber-400 text-xs font-semibold uppercase tracking-wider mb-2">
-                    {getContentLabel(dailyContent.type)}
-                  </p>
-                  {dailyContent.type === 'quote' ? (
-                    <>
-                      <p className="text-gray-200 text-sm leading-relaxed italic">
-                        "{dailyContent.content}"
-                      </p>
-                      {dailyContent.author && (
-                        <p className="text-amber-400/80 text-xs mt-2">
-                          — {dailyContent.author}
-                        </p>
-                      )}
-                    </>
-                  ) : (
-                    <p className="text-gray-200 text-sm leading-relaxed">
-                      {dailyContent.content}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
+        {/* ALGORITHMIC DIET */}
+        <section className="relative z-10 px-4 md:px-8 py-8 max-w-7xl mx-auto">
+          <AlgorithmicDiet />
         </section>
 
         {/* MISSION BANNER */}

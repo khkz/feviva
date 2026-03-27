@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Rocket, Star, Sparkles } from 'lucide-react';
+import { ShieldCheck, Star, Sparkles } from 'lucide-react';
 
 export function FronteraFinalCard() {
   return (
@@ -8,7 +8,7 @@ export function FronteraFinalCard() {
       <motion.div
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
-        className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-cyan-400/30 p-6 cursor-pointer group"
+        className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-amber-400/30 p-6 cursor-pointer group"
       >
         {/* Animated stars background */}
         <div className="absolute inset-0 overflow-hidden">
@@ -47,20 +47,20 @@ export function FronteraFinalCard() {
               ],
             }}
             transition={{ duration: 2, repeat: Infinity }}
-            className="w-14 h-14 rounded-xl bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center"
+            className="w-14 h-14 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center"
           >
-            <Rocket className="w-7 h-7 text-slate-900" />
+            <ShieldCheck className="w-7 h-7 text-slate-900" />
           </motion.div>
 
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
-              <h3 className="font-orbitron font-bold text-white group-hover:text-cyan-400 transition-colors">
-                Frontera Final
+              <h3 className="font-orbitron font-bold text-white group-hover:text-amber-400 transition-colors">
+                El Continente Digital
               </h3>
               <Sparkles className="w-4 h-4 text-amber-400" />
             </div>
             <p className="text-gray-400 text-sm">
-              Donde la Fe conquista el Vacío
+              Manual de Supervivencia en la Era de la IA
             </p>
           </div>
 
