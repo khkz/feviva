@@ -142,6 +142,43 @@ Dios sabía que yo me tenía que acercar a Jesús a través de la Virgen. Fui a 
 
 Me confirmé con un montón de niños de 15 años en la explanada de la Inmaculada. Fue precioso. Descubrí el amor de Jesús. Decidí ser su amiga, agradeciéndole todo lo que Él había hecho por mí. Y aquí estoy.`,
   },
+  {
+    id: "ayram-edery",
+    author: "Ayram Edery",
+    role: "Creadora de Manual para Enamorarse · Venezuela / EE.UU.",
+    avatar: "AE",
+    tag: "Conversión",
+    excerpt: "Caí en un mundo de vicios, intenté suicidarme con una sobredosis de pastillas. Desperté arropada en mi cama. Dios me fue a buscar en una rumba.",
+    fullStory: `Amigos, mi nombre es Ayram Edery, creadora de Manual para Enamorarse. Soy venezolana, tengo 34 años, y este camino con el Señor empezó a los 25.
+
+Crecí en una familia que no practicaba la religión católica. Mis padres fueron bautizados, pero hasta ahí. En el colegio me pintaban el cielo tan aburrido que yo decía: no quiero ir al cielo. Sentía que tenía que cambiar mi esencia, ponerme una camisa de fuerzas, y yo tenía un espíritu muy eufórico.
+
+Crecí en una familia muy disfuncional, con una falta de amor muy grande y con heridas que, tarde o temprano, salieron. Empecé a explorar, caí en un mundo de vicios muy grande: alcohol, muchísimas drogas. Era mi manera de escapar de esa realidad, de ese vacío.
+
+Me vine a vivir a Estados Unidos con una beca universitaria. Me iba muy bien en los estudios, pero la droga me llevó a perder mi dignidad, mi propósito. Me empezaron a dar ataques de pánico, ataques de ansiedad. Empecé a robar, a hacer cosas muy malas.
+
+Y entra en mi cabeza el pensamiento suicida. No quiero vivir más. No entiendo para qué estoy en la Tierra. Llamé a la persona que vendía drogas y le dije: véndeme tantas pastillas. Esa noche me metí aproximadamente unas 30 o 35 pastillas para suicidarme.
+
+Lo único que recuerdo es que yo decía: que se me pare el corazón o que alguien me diga por qué estoy aquí. Grité al cielo: ¡Dios mío! Pierdo el conocimiento.
+
+A la mañana siguiente me despierto en mi cuarto, arropada. ¿Quién me arropó? ¿Quién me llevó a mi cuarto? Digo que fue mi ángel de la guarda.
+
+Después de seis meses en rehabilitación, salí y volví a caer, mucho más fuerte. Un estudio de mi cerebro mostró que no tenía serotonina, dopamina, prácticamente me quemé la mitad de las neuronas.
+
+Pero el Señor me fue a buscar. Así como buscó a la mujer samaritana en el pozo de Siquén. Me buscó en una rumba. Una amiga me dijo: "Ayram, yo creo que tú necesitas a Dios." Me inscribió en un retiro de Emaús. Le dije que no iba a ir.
+
+Un mes después me engañó y me dejó en la casa de retiro. Entré prácticamente drogada. Hasta que me llevan ante el Santísimo Sacramento. Nunca había estado en uno. Cierro los ojos y escucho algo al corazón: "Mira, Ayram, no hay más oportunidades. Si sigues así, la siguiente sobredosis, te vas a morir. Estás condenada."
+
+Y luego otro mensaje: "Pero eres mi hija muy, muy amada."
+
+Sentí un amor que nunca había sentido antes. Empecé a llorar sin parar. Pedí hablar con un sacerdote y conocí al Padre Oswaldo Agudelo. No fui más a psicólogo ni psiquiatra. Solo Eucaristía diaria, rosario diario y acompañamiento espiritual.
+
+El primero de abril del 2017, dejé la droga hasta el sol de hoy. Para Dios nada es imposible. Después de ese camino nace "Manual para enamorarse", como un desahogo del desamor que me llevó al amor.
+
+El Señor no quiere mi pecado, pero quiere mi persona, mi esencia. El Señor no te sacó de Egipto para dejarte morir en el desierto. Te quiere llevar a la tierra prometida.
+
+Hasta el cielo no paramos. Amén.`,
+  },
 ];
 
 const HistoriasDeFe = () => {

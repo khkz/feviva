@@ -42,6 +42,13 @@ const featuredTestimonials = [
     avatar: "TF",
     tag: "Conversión",
   },
+  {
+    quote: "Caí en un mundo de vicios, intenté suicidarme con una sobredosis de 35 pastillas. Desperté arropada en mi cama sin saber quién me llevó ahí. Digo que fue mi ángel de la guarda. El Señor me fue a buscar en una rumba, como buscó a la samaritana en el pozo. En un retiro de Emaús, ante el Santísimo, escuché: 'Eres mi hija muy amada.' Ese día empezó mi conversión. Hoy soy misionera digital. El Señor no te sacó de Egipto para dejarte morir en el desierto. Hasta el cielo no paramos.",
+    author: "Ayram Edery",
+    role: "Creadora de Manual para Enamorarse · Venezuela / EE.UU.",
+    avatar: "AE",
+    tag: "Conversión",
+  },
 ];
 
 export const FeaturedTestimonials = () => {
