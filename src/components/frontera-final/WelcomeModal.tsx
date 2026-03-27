@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Rocket, Star, Sparkles, ArrowRight, X } from 'lucide-react';
+import { ShieldCheck, Brain, Sparkles, ArrowRight, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const STORAGE_KEY = 'frontera-final-welcomed';
+const STORAGE_KEY = 'continente-digital-welcomed';
 
 export function WelcomeModal() {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,22 +31,22 @@ export function WelcomeModal() {
 
   const steps = [
     {
-      icon: Rocket,
-      title: "Bienvenido, Explorador",
-      description: "Has llegado a la Frontera Final, donde la ciencia y la fe se encuentran en las estrellas.",
-      highlight: "El cosmos no es enemigo de Dios, es Su obra maestra.",
+      icon: ShieldCheck,
+      title: "Bienvenido al Continente Digital",
+      description: "Estás en la pandemia de la información. Los algoritmos compiten por tu atención, tu paz y tu alma.",
+      highlight: "Aquí aprenderás a no ser reemplazado.",
     },
     {
-      icon: Star,
+      icon: Brain,
       title: "Tu Misión",
-      description: "Descubre cómo la Iglesia ha sido pionera en la exploración del universo desde hace siglos.",
-      highlight: "35 cráteres lunares llevan nombres de científicos jesuitas.",
+      description: "Domina la IA en lugar de ser dominado. Aprende a usar la tecnología como herramienta, no como amo. Inyecta la luz de Cristo en cada byte.",
+      highlight: "La IA procesa datos. Tú amas. Esa es tu ventaja.",
     },
     {
       icon: Sparkles,
-      title: "Comienza tu Viaje",
-      description: "Lee artículos, reza con el cosmos, y gana logros espaciales mientras profundizas tu fe.",
-      highlight: "¿Listo para explorar?",
+      title: "4 Pasos de Supervivencia",
+      description: "Dieta algorítmica, academia de prompts, misiones físicas y entrenamiento de la IA del futuro. Todo gamificado para que cada acción cuente.",
+      highlight: "¿Listo para recuperar tu libertad digital?",
     },
   ];
 
@@ -62,29 +62,6 @@ export function WelcomeModal() {
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
         >
-          {/* Animated stars */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            {[...Array(30)].map((_, i) => (
-              <motion.div
-                key={i}
-                className="absolute w-1 h-1 bg-white rounded-full"
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                }}
-                animate={{
-                  opacity: [0.2, 1, 0.2],
-                  scale: [1, 1.5, 1],
-                }}
-                transition={{
-                  duration: 2 + Math.random() * 2,
-                  repeat: Infinity,
-                  delay: Math.random() * 2,
-                }}
-              />
-            ))}
-          </div>
-
           <motion.div
             initial={{ scale: 0.9, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -92,7 +69,6 @@ export function WelcomeModal() {
             transition={{ type: "spring", duration: 0.5 }}
             className="relative w-full max-w-md"
           >
-            {/* Close button */}
             <button
               onClick={handleClose}
               className="absolute -top-12 right-0 text-gray-400 hover:text-white transition-colors"
@@ -100,19 +76,16 @@ export function WelcomeModal() {
               <X className="w-6 h-6" />
             </button>
 
-            {/* Card */}
-            <div className="glass-cyber rounded-3xl p-8 border-cyan-400/30 overflow-hidden">
-              {/* Gradient background */}
-              <div className="absolute inset-0 bg-gradient-to-br from-cyan-950/50 via-purple-950/30 to-amber-950/20" />
+            <div className="glass-cyber rounded-3xl p-8 border-amber-400/30 overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-950/30 via-slate-950/50 to-slate-950/80" />
               
               <div className="relative z-10">
-                {/* Step indicator */}
                 <div className="flex justify-center gap-2 mb-6">
                   {[0, 1, 2].map((i) => (
                     <motion.div
                       key={i}
                       className={`w-2 h-2 rounded-full transition-colors ${
-                        i === step ? 'bg-cyan-400' : 'bg-gray-600'
+                        i === step ? 'bg-amber-400' : 'bg-gray-600'
                       }`}
                       animate={i === step ? { scale: [1, 1.3, 1] } : {}}
                       transition={{ duration: 0.5 }}
@@ -120,7 +93,6 @@ export function WelcomeModal() {
                   ))}
                 </div>
 
-                {/* Icon */}
                 <motion.div
                   key={step}
                   initial={{ scale: 0, rotate: -180 }}
@@ -128,12 +100,11 @@ export function WelcomeModal() {
                   transition={{ type: "spring", duration: 0.6 }}
                   className="flex justify-center mb-6"
                 >
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-cyan-400 to-purple-500 flex items-center justify-center">
-                    <Icon className="w-10 h-10 text-white" />
+                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-400/20 to-amber-600/10 border border-amber-400/30 flex items-center justify-center">
+                    <Icon className="w-10 h-10 text-amber-400" />
                   </div>
                 </motion.div>
 
-                {/* Content */}
                 <motion.div
                   key={`content-${step}`}
                   initial={{ opacity: 0, x: 20 }}
@@ -152,7 +123,6 @@ export function WelcomeModal() {
                   </p>
                 </motion.div>
 
-                {/* Action button */}
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -161,7 +131,7 @@ export function WelcomeModal() {
                 >
                   <Button
                     onClick={handleNext}
-                    className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white font-orbitron px-8"
+                    className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-900 font-orbitron px-8"
                     size="lg"
                   >
                     {step < 2 ? (
@@ -171,8 +141,8 @@ export function WelcomeModal() {
                       </>
                     ) : (
                       <>
-                        Comenzar mi Misión
-                        <Rocket className="w-4 h-4 ml-2" />
+                        Comenzar
+                        <ShieldCheck className="w-4 h-4 ml-2" />
                       </>
                     )}
                   </Button>
