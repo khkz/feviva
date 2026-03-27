@@ -145,6 +145,9 @@ const Dashboard = () => {
             </div>
           )}
 
+          {/* Soul Triage - Spiritual Emergency Kit */}
+          <SoulTriageHero />
+
           {/* Next Step Card - Prominent Formation Path */}
           <NextStepCard 
             currentLevel={stats?.nivel || 1}
