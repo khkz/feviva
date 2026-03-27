@@ -179,6 +179,33 @@ El Señor no quiere mi pecado, pero quiere mi persona, mi esencia. El Señor no 
 
 Hasta el cielo no paramos. Amén.`,
   },
+  {
+    id: "belen-dominguez",
+    author: "Belén Domínguez",
+    role: "Autora de 'La vida es bonita, incluso ahora' · Sevilla, España",
+    avatar: "BD",
+    tag: "Esperanza en el sufrimiento",
+    excerpt: "Llevo un año en una cama de hospital, sin movilidad, con un cáncer gravísimo. Pero sé que Dios me quiere, me acompaña y me da fortaleza.",
+    fullStory: `Mi nombre es Belén Domínguez, tengo 31 años y soy de Sevilla, España. Llevo un año metida en una habitación de hospital, sin salir de la cama, sin movilidad en las piernas y con poca movilidad en el resto del cuerpo. No me levanto, no ando, no puedo ir al baño sola, no puedo hacer nada sola, ni siquiera comer.
+
+Aun así, teniendo un cáncer gravísimo y pasando por momentos de mucha adversidad, Dios me ilumina y me da fortaleza. Ha habido momentos en los que me ha faltado confianza, pero lo he superado porque Dios me ha dado la mano continuamente y me ha animado a seguir adelante.
+
+Incluso cuando me mandaron a paliativos y me dijeron que ya no había nada más que hacer con mi cáncer, en ese momento, cuando más necesité a Dios, ahí estuvo, y me mandó un ensayo clínico justo para mi tumor. Nadie pensaba que en 2025 yo iba a estar viva, y lo estoy.
+
+Mi vida era muy típica: un novio magnífico, amigas, familia perfecta, trabajo en Madrid. De repente, de un día para otro, me empezó a doler mucho el cuello. Siempre pensé que era una contractura de hacer spinning. Hasta que viajando a Londres por trabajo, el dolor fue tan fuerte que tuve que adelantar mi vuelta. Allí en el aeropuerto me recogió Emilio, fuimos al médico y apareció un tumor intramedular dentro de la médula.
+
+Cuando nos dieron el diagnóstico, lo aceptamos desde el primer momento. No hubo un momento en el que dudásemos de que Dios estaría con nosotros. Nuestra fe era muy normalita antes. Íbamos a Misa cuando nos acordábamos. Rezaba bastante poco. Pero en el momento en que me dijeron que tenía cáncer, nunca dudé de que Dios estaba ahí conmigo.
+
+En febrero de 2024 me dijeron que ya no había más nada que hacer. Me mandaron a paliativos. Rezamos muchísimo Emilio y yo por la noche. Y al día siguiente apareció un ensayo clínico para mí. Desde ese momento jamás dejé de confiar en el Señor.
+
+Mi conversión en la fe ha ido in crescendo. Dios me cogió de la mano. Yo le dije que "sí" y desde ese momento nuestra relación es la más bonita que he tenido nunca con nadie. Sé que está ahí, que me quiere, que me cuida.
+
+Nunca me he preguntado "¿por qué a mí?". Jamás. Sino "¿para qué tengo esta enfermedad?" Y me he dado cuenta de que Dios me lo manda para intentar ayudar a otras personas, para evangelizar, para darme cuenta de que el sufrimiento forma parte de la vida, que es un misterio, pero que siempre será por algo.
+
+Como mensaje de esperanza: siempre hay motivos para estar sonriendo, siempre hay motivos para querer vivir. La vida es un don. Abandonaos en Dios. Él siempre va a poder apoyaros y va a daros fortaleza para superar cualquier cosa. Un cristiano con alegría es una de las cosas más bonitas. La vida es bonita, incluso ahora.
+
+Que Dios te bendiga a ti y a toda tu familia.`,
+  },
 ];
 
 const HistoriasDeFe = () => {
