@@ -11,6 +11,12 @@ const stats = [
 
 const testimonials = [
   {
+    quote: "Intenté seguir con los estudios, buscar trabajo… todo se me quedaba grande. Caí en un vacío muy grande. Hasta que un día, buscando a una amiga por los conventos de Murcia, Dios me encontró a mí. Pasé nueve días en la hospedería y sentí por primera vez una paz que no venía de fuera, sino de dentro. Hoy llevo 17 años como Hermana Pobre de Santa Clara. Cristo es la felicidad. Descúbrelo, que te lo digo yo, vale la pena.",
+    author: "Hermana Leo",
+    role: "Orden de las Hermanas Pobres de Santa Clara · Murcia, España",
+    avatar: "L"
+  },
+  {
     quote: "Antes no sabía cómo orar. Ahora tengo un ritual diario que me conecta con Dios cada mañana.",
     author: "María G.",
     role: "Usuaria desde hace 6 meses",
