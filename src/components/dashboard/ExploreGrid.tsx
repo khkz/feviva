@@ -37,6 +37,15 @@ const exploreItems: ExploreItem[] = [
     stats: "10 lecciones"
   },
   {
+    icon: Bot,
+    label: "Pupilo Digital",
+    description: "Enséñale a una IA fría sobre el amor humano",
+    path: "/coach?mode=pupilo",
+    image: communityImage,
+    badge: "Nuevo",
+    stats: "Misión"
+  },
+  {
     icon: MessageCircle,
     label: "Coach IA",
     description: "Entrena con IA para conversaciones reales",
