@@ -29,6 +29,12 @@ const testimonials = [
     avatar: "ER"
   },
   {
+    quote: "Con 22 años descubrí que Dios me quería como misionero claretiano. Tardé seis años en dar el paso. Tenía tres cadenas: mi sueño de emprender, formar una familia y el miedo a decírselo a mis padres. Dios las fue rompiendo una a una. El día que puse el primer pie en la casa de formación sentí algo imborrable: volver a casa. Aquí estamos, confirmando el sí cada día. Usque ad Mortem.",
+    author: "Padre José Enrique",
+    role: "Misionero Claretiano",
+    avatar: "JE"
+  },
+  {
     quote: "Antes no sabía cómo orar. Ahora tengo un ritual diario que me conecta con Dios cada mañana.",
     author: "María G.",
     role: "Usuaria desde hace 6 meses",
