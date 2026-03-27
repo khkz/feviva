@@ -1293,8 +1293,8 @@ const Coach = () => {
                         <Card
                           className={`${
                             message.role === "user"
-                              ? "bg-primary text-primary-foreground"
-                              : "glass-card border-border/50"
+                              ? isPupiloMode ? "bg-teal-700 text-white" : "bg-primary text-primary-foreground"
+                              : isPupiloMode ? "glass-card border-cyan-500/30 bg-cyan-950/20" : "glass-card border-border/50"
                           }`}
                         >
                           <CardContent className="p-3 lg:p-4">
