@@ -13,6 +13,7 @@ import { RosarioMiniPlayer } from "@/components/rosario/RosarioMiniPlayer";
 import { RosarioInterstellar } from "@/components/frontera-final/RosarioInterstellar";
 import LoadingScreen from "@/components/shared/LoadingScreen";
 import { OfflineIndicator } from "@/components/shared/OfflineIndicator";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 // Synchronous imports — critical path (Landing, Auth, NotFound)
 import Index from "./pages/Index";
@@ -95,41 +96,41 @@ const App = () => (
                   <Route path="/auth" element={<Auth />} />
 
                   {/* Lazy routes */}
-                  <Route path="/onboarding" element={<Onboarding />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/coach" element={<Coach />} />
-                  <Route path="/cards" element={<Cards />} />
-                  <Route path="/habits" element={<Habits />} />
-                  <Route path="/community" element={<Community />} />
-                  <Route path="/library" element={<Library />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/profile/reminders" element={<ProfileReminders />} />
-                  <Route path="/debate-history" element={<DebateHistory />} />
-                  <Route path="/gamification" element={<Gamification />} />
-                  <Route path="/morning" element={<Morning />} />
-                  <Route path="/evening" element={<Evening />} />
-                  <Route path="/prayer" element={<Prayer />} />
-                  <Route path="/mission" element={<Mission />} />
+                  <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
+                  <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                  <Route path="/coach" element={<ProtectedRoute><Coach /></ProtectedRoute>} />
+                  <Route path="/cards" element={<ProtectedRoute><Cards /></ProtectedRoute>} />
+                  <Route path="/habits" element={<ProtectedRoute><Habits /></ProtectedRoute>} />
+                  <Route path="/community" element={<ProtectedRoute><Community /></ProtectedRoute>} />
+                  <Route path="/library" element={<ProtectedRoute><Library /></ProtectedRoute>} />
+                  <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                  <Route path="/profile/reminders" element={<ProtectedRoute><ProfileReminders /></ProtectedRoute>} />
+                  <Route path="/debate-history" element={<ProtectedRoute><DebateHistory /></ProtectedRoute>} />
+                  <Route path="/gamification" element={<ProtectedRoute><Gamification /></ProtectedRoute>} />
+                  <Route path="/morning" element={<ProtectedRoute><Morning /></ProtectedRoute>} />
+                  <Route path="/evening" element={<ProtectedRoute><Evening /></ProtectedRoute>} />
+                  <Route path="/prayer" element={<ProtectedRoute><Prayer /></ProtectedRoute>} />
+                  <Route path="/mission" element={<ProtectedRoute><Mission /></ProtectedRoute>} />
                   <Route path="/oraciones" element={<OracionesPublic />} />
-                  <Route path="/oraciones/app" element={<Oraciones />} />
+                  <Route path="/oraciones/app" element={<ProtectedRoute><Oraciones /></ProtectedRoute>} />
                   <Route path="/oracion/:slug" element={<OracionPage />} />
-                  <Route path="/rosario" element={<Rosario />} />
-                  <Route path="/sleep-stories" element={<SleepStories />} />
-                  <Route path="/sleep" element={<SleepStories />} />
-                  <Route path="/novenas" element={<Novenas />} />
-                  <Route path="/bible-plan" element={<BiblePlan />} />
+                  <Route path="/rosario" element={<ProtectedRoute><Rosario /></ProtectedRoute>} />
+                  <Route path="/sleep-stories" element={<ProtectedRoute><SleepStories /></ProtectedRoute>} />
+                  <Route path="/sleep" element={<ProtectedRoute><SleepStories /></ProtectedRoute>} />
+                  <Route path="/novenas" element={<ProtectedRoute><Novenas /></ProtectedRoute>} />
+                  <Route path="/bible-plan" element={<ProtectedRoute><BiblePlan /></ProtectedRoute>} />
                   <Route path="/santos" element={<SantosPublic />} />
-                  <Route path="/santos/app" element={<Santos />} />
+                  <Route path="/santos/app" element={<ProtectedRoute><Santos /></ProtectedRoute>} />
                   <Route path="/santo/:slug" element={<SantoPage />} />
-                  <Route path="/apostle-path" element={<ApostlePath />} />
-                  <Route path="/apologetics-intro" element={<ApologeticsIntro />} />
-                  <Route path="/gratitude" element={<Gratitude />} />
-                  <Route path="/evangelio" element={<DailyGospel />} />
-                  <Route path="/evangelio/:fecha" element={<DailyGospel />} />
+                  <Route path="/apostle-path" element={<ProtectedRoute><ApostlePath /></ProtectedRoute>} />
+                  <Route path="/apologetics-intro" element={<ProtectedRoute><ApologeticsIntro /></ProtectedRoute>} />
+                  <Route path="/gratitude" element={<ProtectedRoute><Gratitude /></ProtectedRoute>} />
+                  <Route path="/evangelio" element={<ProtectedRoute><DailyGospel /></ProtectedRoute>} />
+                  <Route path="/evangelio/:fecha" element={<ProtectedRoute><DailyGospel /></ProtectedRoute>} />
                   <Route path="/install" element={<Install />} />
-                  <Route path="/search" element={<KnowledgeSearch />} />
-                  <Route path="/frontera-final" element={<FronteraFinal />} />
-                  <Route path="/frontera-final/:articleId" element={<FronteraArticlePage />} />
+                  <Route path="/search" element={<ProtectedRoute><KnowledgeSearch /></ProtectedRoute>} />
+                  <Route path="/frontera-final" element={<ProtectedRoute><FronteraFinal /></ProtectedRoute>} />
+                  <Route path="/frontera-final/:articleId" element={<ProtectedRoute><FronteraArticlePage /></ProtectedRoute>} />
 
                   {/* Admin Routes */}
                   <Route path="/admin" element={<AdminLayout />}>

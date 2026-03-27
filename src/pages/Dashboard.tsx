@@ -59,7 +59,7 @@ const Dashboard = () => {
   const dailyVerse = useDailyVerse();
 
   useEffect(() => {
-    checkAuth();
+    loadProfile();
   }, []);
 
   useEffect(() => {
@@ -68,13 +68,9 @@ const Dashboard = () => {
     }
   }, [stats?.id]);
 
-  const checkAuth = async () => {
+  const loadProfile = async () => {
     const { data: { session } } = await supabase.auth.getSession();
-    
-    if (!session) {
-      navigate("/auth");
-      return;
-    }
+    if (!session) return;
 
     const { data, error } = await supabase
       .from("profiles")

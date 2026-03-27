@@ -64,23 +64,22 @@ const Auth = () => {
   }, [searchParams]);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") {
         setShowResetPassword(true);
-      } else if (event === "SIGNED_IN" && !showResetPassword) {
-        navigate("/dashboard");
       }
     });
 
+    // If already authenticated (not in reset flow), go to dashboard
     supabase.auth.getSession().then(({ data: { session } }) => {
       const isResetFlow = searchParams.get("reset") === "true";
       if (session && !isResetFlow) {
-        navigate("/dashboard");
+        navigate("/dashboard", { replace: true });
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, searchParams, showResetPassword]);
+  }, [navigate, searchParams]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

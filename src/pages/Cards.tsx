@@ -24,16 +24,8 @@ const Cards = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    checkAuth();
     fetchCards();
   }, []);
-
-  const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      navigate("/auth");
-    }
-  };
 
   const fetchCards = async () => {
     const { data, error } = await supabase
