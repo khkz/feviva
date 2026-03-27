@@ -1,0 +1,1 @@
+ALTER TABLE public.sleep_stories ADD COLUMN IF NOT EXISTS emotional_tags text[] DEFAULT '{}'::text[];
