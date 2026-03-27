@@ -245,6 +245,37 @@ Como dice San Josemaría: de que hagas las cosas que el Espíritu Santo te inspi
 
 Que Dios te bendiga a ti y a toda tu familia.`,
   },
+  {
+    id: "wilson-tamayo",
+    author: "Wilson Tamayo",
+    role: "Subdirector General de Lazos de Amor Mariano · Colombia",
+    avatar: "WT",
+    tag: "Conversión",
+    excerpt: "A los 15 años caí en un ateísmo práctico. Una noche, hablando con mi primo hasta las 6 de la mañana, el Espíritu Santo tocó mi alma. Experimenté una visión desde la Eucaristía que cambió mi vida para siempre.",
+    fullStory: `Mi nombre es Wilson Tamayo. Soy de Colombia, padre, esposo y subdirector general de Lazos de Amor Mariano.
+
+Tenía 15 años y ya me había alejado mucho de la fe. Mi familia era católica por tradición, pero no por convicción. Mis papás nos inculcaron un profundo amor a la lectura y, devorando libros, algunos autores terminaron poniendo en duda mi fe. Caí en una especie de ateísmo práctico. A los 14 años me pegué la primera borrachera. Llegué borracho a las 3:00 de la mañana. Fue espantoso. Al día siguiente elevé una plegaria: "Ya no sé si existes, pero si existes, ayúdame."
+
+El 29 de abril del año 2000 fueron mis "4:00 de la tarde", como la hora en que Andrés y Juan se encontraron con Jesús. Un primo llegó a mi casa. Nos sentamos a hablar desde las 7 de la noche y terminamos a las 6 de la mañana. Cada respuesta suya iba sanando cada duda de mi alma. Mi primo no solo estaba en un grupo de oración: iba a Misa todos los días, rezaba el Rosario, ayunaba los viernes.
+
+A las tres o cuatro de la mañana tuve un quiebre interior. Sabía que lo que me decía era verdad, pero me sentía incapaz. Le dije: "Christian, eso suena increíble. Sé que es cierto. Pero creo que no soy capaz." Él me miró fijamente y me dijo: "Wilson, lo que para ti es imposible, para Dios es posible."
+
+Entonces decidí creer. Mi primo trazó una cruz en mi frente con la bendición de la Virgen María. Quedé tendido en el suelo en un descanso del Espíritu, con una paz que jamás había experimentado.
+
+Lo que me sucedió después es el único fenómeno que podría llamar sobrenatural en toda mi vida espiritual. Me encontré en la iglesia de mi pueblo, viendo todo desde la Eucaristía. Vi unos diablitos sobre las personas, molestándoles, pero nadie lo percibía. Mi vista se elevó hasta lo alto del templo y vi luces que se encendían: eran personas de las que emanaba luz. Me aproximé a una de ellas, arrodillada. Levantó la cabeza y me di cuenta de que era yo. Abrí los ojos bañado en lágrimas.
+
+Hice un profundo examen de conciencia con una lista escrita de cada pecado. Al terminar, el Padre Juan me dijo: "Entrégame esas hojas." Las rompió delante de mí. "Ahora puedes leer tus pecados." Le dije: "Padre, es imposible." Me respondió: "Eso mismo va a pasar cuando yo te absuelva. Dios tiene un corazón de Padre y olvida todo aquello que hicimos cuando pedimos perdón de corazón."
+
+Cuando regresé a casa, mi hermano me dio un libro con la imagen del Espíritu Santo. Al verla, lloré copiosamente. Sentí que el Señor me decía: "Wilson, yo ya te perdoné. Ahora perdónate tú."
+
+Pasé de no ir a Misa nunca a ir todos los días, de no rezar el Rosario a orarlo diariamente. Algunos amigos se alejaron, pero otros empezaron a acercarse como Nicodemo: en la noche, sin que nadie los viera. Formamos un pequeño grupo de oración.
+
+Tiempo después conocí a mi esposa. Vivimos un noviazgo en castidad, como Dios lo quería, y ahora tenemos un matrimonio como nosotros soñábamos. Para mí, mi esposa y mis hijos son un paraíso.
+
+Hoy, a mis 40 años, miro hacia atrás y de lo único que me arrepiento es de no haberme entregado más. Experimentamos el amor de Dios, nos sentimos bendecidos y queremos que todo el mundo experimente ese amor. Ese amor tiene un nombre: Se llama Jesús de Nazaret.
+
+Que Dios les bendiga.`,
+  },
 ];
 
 const HistoriasDeFe = () => {
