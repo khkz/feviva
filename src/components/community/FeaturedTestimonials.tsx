@@ -56,6 +56,13 @@ const featuredTestimonials = [
     avatar: "BD",
     tag: "Esperanza en el sufrimiento",
   },
+  {
+    quote: "Pasé 257 días secuestrado en un cuarto de un metro por tres. Un día me ofrecieron un whisky y oí una voz: 'Ofrécemelo. Es lo único que depende de ti.' Lo tiré al excusado y recuperé mi libertad interior. En Nochebuena recé con mis secuestradores. Uno por uno me dieron la mano con lágrimas. Fue la Navidad más feliz de mi vida. Estaba desnudo, sin nada material, trabajando por mi Jefe.",
+    author: "Bosco Gutiérrez",
+    role: "Arquitecto, esposo y padre de 9 hijos · México",
+    avatar: "BG",
+    tag: "Fe en el cautiverio",
+  },
 ];
 
 export const FeaturedTestimonials = () => {

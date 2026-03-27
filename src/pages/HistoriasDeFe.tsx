@@ -206,6 +206,45 @@ Como mensaje de esperanza: siempre hay motivos para estar sonriendo, siempre hay
 
 Que Dios te bendiga a ti y a toda tu familia.`,
   },
+  {
+    id: "bosco-gutierrez",
+    author: "Bosco Gutiérrez",
+    role: "Arquitecto, esposo y padre de 9 hijos · México",
+    avatar: "BG",
+    tag: "Fe en el cautiverio",
+    excerpt: "Pasé 257 días secuestrado en un cuarto de un metro por tres. En la oscuridad total, Dios me enseñó que seguía siendo libre.",
+    fullStory: `Mi nombre es Bosco Gutiérrez. Soy esposo de Gaby, padre de nueve hijos, arquitecto y mexicano. Quiero compartirles mi testimonio de los 257 días que pasé secuestrado en un cuarto de un metro por tres.
+
+En 1990 estaba felizmente casado, con siete hijos. Ese día, al salir de Misa, una persona me agarró por detrás en una llave china. Un cachazo explotó en mi boca. Acabé en la puerta de atrás de un coche. Me esposaron, me vendaron los ojos y me llevaron a un cuarto blanco de un metro por tres, con una cámara que me vigilaba. Los 257 días nunca oí una voz de ellos ni vi sus caras; siempre estuvieron encapuchados.
+
+El tercer día me dieron un interrogatorio con preguntas indignantes sobre mi esposa y mis hijos. Sentí que al contestar traicionaba a mi familia. La pérdida de autoestima fue tal que pensé en dejarme morir. Duré 15 días tirado en el suelo sin comer.
+
+Entonces llegó el 15 de septiembre. Un guardián me ofreció tomar lo que quisiera. Pedí un whisky Chivas. Cuando llegó, llorando de alegría, empecé a consentirlo. Hasta que oí una voz en mi conciencia: "Ofréceme el whisky." Negocié con Dios, pero Él me dijo: "Esto es lo único que depende de ti. El alcance de tu libertad." Me hinqué, le di la espalda a la cámara y tiré el whisky al excusado.
+
+Al despertar me sentí con esperanza. Escribí: "Hoy vencí mi primera batalla; porque después de todo, sigo siendo libre." Me escribí una carta a mí mismo como si fuera de mis hermanos. Al releerla reconocí que me la dictó el Espíritu Santo: "Tú eres el más importante de todos, porque eres el único que puede cuidar el cuerpo y la mente de Bosco. Te queremos perfecto."
+
+Hice un plan en tres columnas: salud mental, salud física, y "¡Haz algo!" Aceptar lo que no podía cambiar me dio paz. Pedí material de limpieza, una Biblia, y organicé mi cuartito. Cambió de ser mi encierro a ser mi refugio.
+
+Decidí reafirmar mi fe. Me pregunté: ¿Crees en Dios? Sí, con toda la consecuencia. ¿En un Dios omnipotente o minusválido? Omnipotente. Entonces, ¿por qué permitió tu secuestro? Porque Dios ve infinito para adelante e infinito para atrás. Dios veía desde hace 30 años a ElRugido en el plan de mi vida, yo no lo veía.
+
+En octubre recé por los secuestradores. En noviembre ofrecí mortificaciones. En diciembre pasé a la acción. El 24 de diciembre mandé un papelito: "Hoy no hay secuestrado ni secuestradores. Todos somos hijos de Dios." Esa noche los cinco guardianes encapuchados vinieron a mi ventana. Les leí el Evangelio, les hablé de la Navidad. Recé un Padrenuestro y diez Avemarías. No contestaron, pero uno por uno pasaron y me dieron la mano con lágrimas en los ojos.
+
+Fue la Navidad más feliz de mi vida. Estaba desnudo, sin nada material, trabajando por mi Jefe.
+
+Un guardián, "Tecate", me preguntó por escrito: "¿De dónde saca usted tanta fortaleza?" Le respondí: "Ya no tengo miedo, porque estoy convencido de que no me voy a morir ni un minuto más ni un minuto menos del que Dios quiera; no el que ustedes quieran."
+
+En Semana Santa pedí un Cristo. Al verlo lloré como nunca había llorado ante un crucifijo. Le dije: "Señor, tú pagaste con tu vida por mi vida eterna. Ya no me pertenezco. Voy a vivir pagando y no cobrando."
+
+Desde diciembre preparé mi escape en secreto: un centímetro de navaja de rastrillo, un alambre enderezado de un resorte del catre, y una botella de Melox como cuña. El 12 de mayo de 1991, cuando el guardián se fue y la regadera sonaba arriba, metí el gancho, empujé la aldaba con la cuña y la ventana se abrió al primer intento.
+
+Salí gateando por el garaje, abrí el portón y corrí. Me subí a un taxi sin dinero. Le di mi medalla como prenda. Cuando el taxi se detuvo en carretera, le dije al taxista: "Ese rosario que cuelga del espejo, ¿es para rezar o de adorno?" Me dijo: "De adorno." Le propuse: "Vamos estrenando su rosario." Le cambió la cara, arrancó el coche y me llevó a México.
+
+Llegué a casa de mis papás. Veinte metros antes vi a Gaby con mis siete hijos entrando. Me bajé del taxi gritando: "¡Me escapé, me escapé!"
+
+Como dice San Josemaría: de que hagas las cosas que el Espíritu Santo te inspira, dependen muchas cosas grandes. Esa invitación a rezar el Rosario me produjo mi libertad.
+
+Que Dios te bendiga a ti y a toda tu familia.`,
+  },
 ];
 
 const HistoriasDeFe = () => {
