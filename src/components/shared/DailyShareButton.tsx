@@ -170,7 +170,7 @@ const DailyPostImage = ({
 
       // Brand name
       ctx.fillStyle = '#D4AF37';
-      ctx.font = 'bold 36px Georgia, serif';
+      ctx.font = 'bold 36px Montserrat, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('ElRugido', size / 2, 160);
 
