@@ -31,6 +31,7 @@ import { WelcomeModal } from '@/components/frontera-final/WelcomeModal';
 import { MissionBanner } from '@/components/frontera-final/MissionBanner';
 import { FactShareModal } from '@/components/frontera-final/FactShareModal';
 import { SpaceShareModal } from '@/components/frontera-final/SpaceShareModal';
+import { AlgorithmicDiet } from '@/components/frontera-final/AlgorithmicDiet';
 import { getDailyContent, getContentLabel, DailyContent } from '@/lib/fronteraFactsData';
 import { Button } from '@/components/ui/button';
 import { useRosario } from '@/contexts/RosarioContext';
