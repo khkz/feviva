@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { MessageCircle, BookOpen, Users, Target, Route, Shield, Sparkles } from "lucide-react";
+import { MessageCircle, BookOpen, Users, Target, Route, Shield, Sparkles, Bot } from "lucide-react";
 import { motion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 import coachImage from "@/assets/coach-section.jpg";
