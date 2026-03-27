@@ -52,6 +52,7 @@ const Gratitude = lazy(() => import("./pages/Gratitude"));
 const DailyGospel = lazy(() => import("./pages/DailyGospel"));
 const Install = lazy(() => import("./pages/Install"));
 const KnowledgeSearch = lazy(() => import("./pages/KnowledgeSearch"));
+const HistoriasDeFe = lazy(() => import("./pages/HistoriasDeFe"));
 
 // Frontera Final
 const FronteraFinal = lazy(() => import("./pages/FronteraFinal"));
