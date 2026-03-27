@@ -32,6 +32,15 @@ interface Evaluation {
   feedback: string;
 }
 
+interface PupiloEvaluation {
+  empatia: number;
+  claridad: number;
+  ternura: number;
+  profundidad: number;
+  reporte_ia: string;
+  feedback: string;
+}
+
 interface Suggestion {
   sugerencias: Array<{
     categoria: "Fe" | "Razón" | "Amor";
@@ -50,11 +59,25 @@ interface TutorialStep {
   example?: string;
 }
 
+const modeOptions = [
+  { value: "debate", label: "Coach de Debate", description: "Entrena contra personajes con objeciones", icon: Brain, color: "text-primary" },
+  { value: "pupilo", label: "El Pupilo Digital", description: "Enséñale a una IA fría sobre el amor humano", icon: Bot, color: "text-cyan-500" },
+];
+
 const personas = [
   { value: "ateo_cientifico", label: "Ateo Científico", description: "Busca evidencia empírica" },
   { value: "agnostico", label: "Agnóstico Curioso", description: "Abierto pero escéptico" },
   { value: "herido_iglesia", label: "Herido por la Iglesia", description: "Con dolor y resentimiento" },
   { value: "relativista", label: "Relativista Moral", description: "No cree en verdad absoluta" },
+];
+
+const pupiloTemas = [
+  "¿Por qué los humanos aman a sus enemigos?",
+  "¿Qué es el perdón y por qué es lógico perdonar?",
+  "¿Por qué Cristo se sacrificó pudiendo evitarlo?",
+  "¿Por qué lloran los humanos cuando alguien muere?",
+  "¿Qué es la misericordia y por qué supera a la justicia?",
+  "¿Por qué una madre ama a un hijo que la lastimó?",
 ];
 
 const dificultades = [
