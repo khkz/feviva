@@ -204,8 +204,8 @@ const DailyPostImage = ({
       ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
       const { fontSize, lineHeight } = calculateFontSize(content.mainText.length, 'post');
       ctx.font = tipo === 'versiculo' 
-        ? `italic ${fontSize}px Montserrat, sans-serif` 
-        : `${fontSize - 2}px Montserrat, sans-serif`;
+        ? `italic ${fontSize}px Nunito, sans-serif` 
+        : `${fontSize - 2}px Nunito, sans-serif`;
       ctx.textAlign = 'center';
 
       const maxWidth = size - 120;
@@ -438,8 +438,8 @@ const DailyStoryImage = ({
       ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
       const { fontSize, lineHeight } = calculateFontSize(content.mainText.length, 'story');
       ctx.font = tipo === 'versiculo' 
-        ? `italic ${fontSize}px Montserrat, sans-serif` 
-        : `${fontSize - 2}px Montserrat, sans-serif`;
+        ? `italic ${fontSize}px Nunito, sans-serif` 
+        : `${fontSize - 2}px Nunito, sans-serif`;
       ctx.textAlign = 'center';
 
       const maxWidth = width - 140;
