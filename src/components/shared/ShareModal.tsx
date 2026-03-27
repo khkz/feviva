@@ -97,7 +97,7 @@ const GeneratedPostImage = ({
       // Quote text
       const displayText = text.length > 300 ? text.substring(0, 300) + "..." : text;
       ctx.fillStyle = '#ffffff';
-      ctx.font = 'italic 42px Georgia, serif';
+      ctx.font = 'italic 42px Nunito, sans-serif';
       ctx.textAlign = 'center';
       
       // Word wrap text
@@ -125,31 +125,31 @@ const GeneratedPostImage = ({
 
       // Draw opening quote
       ctx.fillStyle = '#D4AF37';
-      ctx.font = 'bold 80px Georgia, serif';
+      ctx.font = 'bold 80px Montserrat, sans-serif';
       ctx.fillText('"', size / 2 - maxWidth / 2 + 40, startY - 20);
 
       // Draw text lines
       ctx.fillStyle = '#ffffff';
-      ctx.font = 'italic 42px Georgia, serif';
+      ctx.font = 'italic 42px Nunito, sans-serif';
       lines.forEach((l, i) => {
         ctx.fillText(l, size / 2, startY + i * lineHeight);
       });
 
       // Draw closing quote
       ctx.fillStyle = '#D4AF37';
-      ctx.font = 'bold 80px Georgia, serif';
+      ctx.font = 'bold 80px Montserrat, sans-serif';
       ctx.fillText('"', size / 2 + maxWidth / 2 - 40, startY + (lines.length - 1) * lineHeight + 20);
 
       // Reference text
       if (reference) {
         ctx.fillStyle = '#D4AF37';
-        ctx.font = 'bold 32px Georgia, serif';
+        ctx.font = 'bold 32px Montserrat, sans-serif';
         ctx.fillText(`— ${reference}`, size / 2, startY + lines.length * lineHeight + 60);
       }
 
       // Draw branding at bottom
       ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-      ctx.font = '28px Georgia, serif';
+      ctx.font = '28px Nunito, sans-serif';
       ctx.fillText('elrugido.com', size / 2, size - 60);
 
       // Convert to data URL
@@ -250,12 +250,12 @@ const GeneratedStoryImage = ({
 
         // Add branding text below logo
         ctx.fillStyle = '#D4AF37';
-        ctx.font = 'bold 48px Georgia, serif';
+        ctx.font = 'bold 48px Montserrat, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('ElRugido', storyWidth / 2, logoY + logoSize + 50);
 
         ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-        ctx.font = '28px Georgia, serif';
+        ctx.font = '28px Nunito, sans-serif';
         ctx.fillText('elrugido.com', storyWidth / 2, logoY + logoSize + 90);
 
         // Decorative line
@@ -275,7 +275,7 @@ const GeneratedStoryImage = ({
       // Quote text - centered in the middle area
       const displayText = text.length > 400 ? text.substring(0, 400) + "..." : text;
       ctx.fillStyle = '#ffffff';
-      ctx.font = 'italic 52px Georgia, serif';
+      ctx.font = 'italic 52px Nunito, sans-serif';
       ctx.textAlign = 'center';
 
       // Word wrap text
@@ -303,25 +303,25 @@ const GeneratedStoryImage = ({
 
       // Draw opening quote
       ctx.fillStyle = '#D4AF37';
-      ctx.font = 'bold 100px Georgia, serif';
+      ctx.font = 'bold 100px Montserrat, sans-serif';
       ctx.fillText('"', storyWidth / 2 - maxWidth / 2 + 60, startY - 30);
 
       // Draw text lines
       ctx.fillStyle = '#ffffff';
-      ctx.font = 'italic 52px Georgia, serif';
+      ctx.font = 'italic 52px Nunito, sans-serif';
       lines.forEach((l, i) => {
         ctx.fillText(l, storyWidth / 2, startY + i * lineHeight);
       });
 
       // Draw closing quote
       ctx.fillStyle = '#D4AF37';
-      ctx.font = 'bold 100px Georgia, serif';
+      ctx.font = 'bold 100px Montserrat, sans-serif';
       ctx.fillText('"', storyWidth / 2 + maxWidth / 2 - 60, startY + (lines.length - 1) * lineHeight + 30);
 
       // Reference text
       if (reference) {
         ctx.fillStyle = '#D4AF37';
-        ctx.font = 'bold 40px Georgia, serif';
+        ctx.font = 'bold 40px Montserrat, sans-serif';
         ctx.fillText(`— ${reference}`, storyWidth / 2, startY + lines.length * lineHeight + 80);
       }
 

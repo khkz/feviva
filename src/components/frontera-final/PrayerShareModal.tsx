@@ -89,7 +89,7 @@ function PrayerStoryImage({
 
       // "FRONTERA FINAL" title below logo
       ctx.fillStyle = '#22d3ee';
-      ctx.font = 'bold 40px system-ui, sans-serif';
+      ctx.font = 'bold 40px Montserrat, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('FRONTERA FINAL', width / 2, 190);
 
@@ -109,13 +109,13 @@ function PrayerStoryImage({
 
       // Badge text
       ctx.fillStyle = '#22d3ee';
-      ctx.font = 'bold 26px system-ui, sans-serif';
+      ctx.font = 'bold 26px Montserrat, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('🙏 ' + title.toUpperCase(), width / 2, badgeY + 40);
 
       // Prayer text - split into lines
       ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-      ctx.font = 'italic 32px Georgia, serif';
+      ctx.font = 'italic 32px Nunito, sans-serif';
       ctx.textAlign = 'center';
       
       const maxWidth = width - 120;
@@ -148,7 +148,7 @@ function PrayerStoryImage({
       if (saints) {
         const saintsY = startY + totalTextHeight + 80;
         ctx.fillStyle = 'rgba(251, 191, 36, 0.9)';
-        ctx.font = '24px system-ui, sans-serif';
+        ctx.font = '24px Nunito, sans-serif';
         ctx.fillText('Patronos: ' + saints, width / 2, saintsY);
       }
 
@@ -158,7 +158,7 @@ function PrayerStoryImage({
 
       // Footer branding
       ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-      ctx.font = '24px system-ui, sans-serif';
+      ctx.font = '24px Nunito, sans-serif';
       ctx.fillText('elrugido.com', width / 2, height - 80);
 
       // Decorative line
@@ -240,7 +240,7 @@ function PrayerPostImage({
 
       // "FRONTERA FINAL" title below logo
       ctx.fillStyle = '#22d3ee';
-      ctx.font = 'bold 28px system-ui, sans-serif';
+      ctx.font = 'bold 28px Montserrat, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('FRONTERA FINAL', size / 2, 130);
 
@@ -259,12 +259,12 @@ function PrayerPostImage({
       ctx.stroke();
 
       ctx.fillStyle = '#22d3ee';
-      ctx.font = 'bold 22px system-ui, sans-serif';
+      ctx.font = 'bold 22px Montserrat, sans-serif';
       ctx.fillText('🙏 ' + title.toUpperCase(), size / 2, badgeY + 34);
 
       // Prayer text
       ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-      ctx.font = 'italic 26px Georgia, serif';
+      ctx.font = 'italic 26px Nunito, sans-serif';
       
       const maxWidth = size - 100;
       const lineHeight = 38;
@@ -294,7 +294,7 @@ function PrayerPostImage({
       // Saints
       if (saints) {
         ctx.fillStyle = 'rgba(251, 191, 36, 0.9)';
-        ctx.font = '20px system-ui, sans-serif';
+        ctx.font = '20px Nunito, sans-serif';
         ctx.fillText('Patronos: ' + saints, size / 2, size - 100);
       }
 
@@ -304,7 +304,7 @@ function PrayerPostImage({
 
       // Footer
       ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-      ctx.font = '20px system-ui, sans-serif';
+      ctx.font = '20px Nunito, sans-serif';
       ctx.fillText('elrugido.com', size / 2, size - 30);
 
       onGenerated(canvas.toDataURL('image/png'));
