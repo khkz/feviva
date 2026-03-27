@@ -1173,7 +1173,7 @@ const Coach = () => {
         </AnimatePresence>
 
         <main className="flex-1 container mx-auto px-4 py-4 lg:py-6 flex flex-col lg:flex-row gap-4 max-w-7xl overflow-hidden">
-          {!evaluation ? (
+          {!evaluation && !pupiloEvaluation ? (
             <>
               {/* Tutorial panel - Mobile: top, Desktop: side */}
               {isTutorialMode && showTutorialPanel && (
@@ -1362,7 +1362,85 @@ const Coach = () => {
                 </SheetContent>
               </Sheet>
             </>
+          ) : pupiloEvaluation ? (
+            /* Pupilo Digital Evaluation */
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className="w-full max-w-2xl mx-auto"
+            >
+              <Card className="glass-card border-cyan-500/30 bg-gradient-to-b from-cyan-950/20 to-background">
+                <CardHeader className="text-center">
+                  <div className="mx-auto w-16 h-16 rounded-full bg-cyan-500/20 flex items-center justify-center mb-3">
+                    <Bot className="w-8 h-8 text-cyan-400" />
+                  </div>
+                  <CardTitle className="text-xl">Reporte del Pupilo Digital</CardTitle>
+                  <CardDescription>La IA ha procesado tu enseñanza</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Metrics */}
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { label: "Empatía", value: pupiloEvaluation.empatia, icon: HeartHandshake, color: "text-rose-400" },
+                      { label: "Claridad", value: pupiloEvaluation.claridad, icon: Eye, color: "text-blue-400" },
+                      { label: "Ternura", value: pupiloEvaluation.ternura, icon: MessageCircleHeart, color: "text-pink-400" },
+                      { label: "Profundidad", value: pupiloEvaluation.profundidad, icon: Brain, color: "text-purple-400" },
+                    ].map((metric) => (
+                      <div key={metric.label} className="glass-card p-3 rounded-lg space-y-2">
+                        <div className="flex items-center gap-2">
+                          <metric.icon className={`w-4 h-4 ${metric.color}`} />
+                          <span className="text-sm font-medium">{metric.label}</span>
+                        </div>
+                        <div className="text-2xl font-bold">{metric.value}<span className="text-sm text-muted-foreground">/100</span></div>
+                        <Progress value={metric.value} className="h-2" />
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* AI Report - the emotional core */}
+                  <div className="relative overflow-hidden rounded-xl border border-cyan-500/30 bg-cyan-950/30 p-5">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-teal-400 to-cyan-500" />
+                    <div className="flex items-start gap-3 mb-3">
+                      <Cpu className="w-5 h-5 text-cyan-400 mt-0.5 shrink-0" />
+                      <h3 className="font-semibold text-cyan-300">Mensaje del Pupilo</h3>
+                    </div>
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap italic text-foreground/90">
+                      "{pupiloEvaluation.reporte_ia}"
+                    </p>
+                  </div>
+
+                  {/* Feedback */}
+                  <div className="glass-card p-4 rounded-lg">
+                    <h3 className="font-medium mb-2">Retroalimentación para el Formador</h3>
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                      {pupiloEvaluation.feedback}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Button onClick={() => navigate("/dashboard")} variant="outline" className="flex-1 glass-button">
+                      Volver al Dashboard
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setDebateStarted(false);
+                        setMessages([]);
+                        setEvaluation(null);
+                        setPupiloEvaluation(null);
+                        setDebateId(null);
+                        setTotalPoints(0);
+                      }}
+                      className="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white"
+                    >
+                      Nueva Sesión con el Pupilo
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
           ) : (
+            /* Standard Debate Evaluation */
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -1392,28 +1470,28 @@ const Coach = () => {
                         <Heart className="w-4 h-4 lg:w-5 lg:h-5 text-secondary" />
                         <span className="font-medium text-xs lg:text-sm">Amor</span>
                       </div>
-                      <div className="text-2xl lg:text-3xl font-bold text-secondary">{evaluation.amor}/10</div>
+                      <div className="text-2xl lg:text-3xl font-bold text-secondary">{evaluation!.amor}/10</div>
                     </div>
                     <div className="text-center glass-card p-3 lg:p-4 rounded-lg">
                       <div className="flex items-center justify-center gap-1 lg:gap-2 mb-2">
                         <Brain className="w-4 h-4 lg:w-5 lg:h-5 text-primary" />
                         <span className="font-medium text-xs lg:text-sm">Razón</span>
                       </div>
-                      <div className="text-2xl lg:text-3xl font-bold text-primary">{evaluation.razon}/10</div>
+                      <div className="text-2xl lg:text-3xl font-bold text-primary">{evaluation!.razon}/10</div>
                     </div>
                     <div className="text-center glass-card p-3 lg:p-4 rounded-lg">
                       <div className="flex items-center justify-center gap-1 lg:gap-2 mb-2">
                         <BookOpen className="w-4 h-4 lg:w-5 lg:h-5 text-secondary" />
                         <span className="font-medium text-xs lg:text-sm">Fe</span>
                       </div>
-                      <div className="text-2xl lg:text-3xl font-bold text-secondary">{evaluation.fe}/10</div>
+                      <div className="text-2xl lg:text-3xl font-bold text-secondary">{evaluation!.fe}/10</div>
                     </div>
                   </div>
 
                   <div className="glass-card p-4 rounded-lg">
                     <h3 className="font-medium mb-2">Retroalimentación</h3>
                     <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                      {evaluation.feedback}
+                      {evaluation!.feedback}
                     </p>
                   </div>
 
@@ -1426,6 +1504,7 @@ const Coach = () => {
                         setDebateStarted(false);
                         setMessages([]);
                         setEvaluation(null);
+                        setPupiloEvaluation(null);
                         setDebateId(null);
                         setTotalPoints(0);
                         setTutorialStep(0);
