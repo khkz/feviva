@@ -658,10 +658,6 @@ const Coach = () => {
 
       // Update user stats
       await incrementDebates();
-        .eq("id", debateId);
-
-      // Update user stats
-      await incrementDebates();
 
       toast({
         title: "Evaluación completada",
