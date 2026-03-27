@@ -481,13 +481,15 @@ const Coach = () => {
       setCompletedTutorialSteps(prev => [...prev, tutorialStep]);
     }
 
-    const backendDificultad = isTutorialMode ? "aprendiz" : selectedDificultad;
+    const backendDificultad = isPupiloMode ? "aprendiz" : (isTutorialMode ? "aprendiz" : selectedDificultad);
+    const activePersona = isPupiloMode ? "pupilo_digital" : selectedPersona;
+    const activeTema = isPupiloMode ? selectedPupiloTema : selectedTema;
 
     try {
       const response = await supabase.functions.invoke("debate-coach", {
         body: {
-          persona: selectedPersona,
-          tema: selectedTema,
+          persona: activePersona,
+          tema: activeTema,
           dificultad: backendDificultad,
           messages: [...messages, userMessage],
           action: "respond",
