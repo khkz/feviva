@@ -204,8 +204,8 @@ const DailyPostImage = ({
       ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
       const { fontSize, lineHeight } = calculateFontSize(content.mainText.length, 'post');
       ctx.font = tipo === 'versiculo' 
-        ? `italic ${fontSize}px Georgia, serif` 
-        : `${fontSize - 2}px Georgia, serif`;
+        ? `italic ${fontSize}px Montserrat, sans-serif` 
+        : `${fontSize - 2}px Montserrat, sans-serif`;
       ctx.textAlign = 'center';
 
       const maxWidth = size - 120;
@@ -229,7 +229,7 @@ const DailyPostImage = ({
       // Reference (if available)
       if (content.reference) {
         ctx.fillStyle = '#D4AF37';
-        ctx.font = 'bold 22px Georgia, serif';
+        ctx.font = 'bold 22px Montserrat, sans-serif';
         ctx.fillText(`— ${content.reference}`, size / 2, size - 140);
       }
 
@@ -391,13 +391,13 @@ const DailyStoryImage = ({
 
       // Brand name
       ctx.fillStyle = '#D4AF37';
-      ctx.font = 'bold 52px Georgia, serif';
+      ctx.font = 'bold 52px Montserrat, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('ElRugido', width / 2, 250);
 
       // Tagline
       ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-      ctx.font = '28px Georgia, serif';
+      ctx.font = '28px Montserrat, sans-serif';
       ctx.fillText('elrugido.com', width / 2, 300);
 
       // Decorative line
@@ -438,8 +438,8 @@ const DailyStoryImage = ({
       ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
       const { fontSize, lineHeight } = calculateFontSize(content.mainText.length, 'story');
       ctx.font = tipo === 'versiculo' 
-        ? `italic ${fontSize}px Georgia, serif` 
-        : `${fontSize - 2}px Georgia, serif`;
+        ? `italic ${fontSize}px Montserrat, sans-serif` 
+        : `${fontSize - 2}px Montserrat, sans-serif`;
       ctx.textAlign = 'center';
 
       const maxWidth = width - 140;
@@ -463,7 +463,7 @@ const DailyStoryImage = ({
       if (content.reference) {
         const refY = startY + maxLines * lineHeight + 40;
         ctx.fillStyle = '#D4AF37';
-        ctx.font = 'bold 28px Georgia, serif';
+        ctx.font = 'bold 28px Montserrat, sans-serif';
         ctx.fillText(`— ${content.reference}`, width / 2, Math.min(refY, height - 280));
       }
 
@@ -598,12 +598,12 @@ const ComposedSantoStoryImage = ({
 
       // Brand text
       ctx.fillStyle = '#D4AF37';
-      ctx.font = 'bold 48px Georgia, serif';
+      ctx.font = 'bold 48px Montserrat, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('ElRugido', width / 2, 230);
 
       ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-      ctx.font = '28px Georgia, serif';
+      ctx.font = '28px Montserrat, sans-serif';
       ctx.fillText('elrugido.com', width / 2, 280);
 
       // Decorative line
@@ -647,7 +647,7 @@ const ComposedSantoStoryImage = ({
 
       // Saint name
       ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-      ctx.font = 'bold 42px Georgia, serif';
+      ctx.font = 'bold 42px Montserrat, sans-serif';
       ctx.fillText(saintName, width / 2, badgeY + 100);
 
       // Bottom logo
