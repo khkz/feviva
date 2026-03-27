@@ -13,10 +13,8 @@ const WhatsNewSection = lazy(() => import("@/components/landing/WhatsNewSection"
 const UserNeedsSection = lazy(() => import("@/components/landing/UserNeedsSection").then(m => ({ default: m.UserNeedsSection })));
 const DailyJourneySection = lazy(() => import("@/components/landing/DailyJourneySection").then(m => ({ default: m.DailyJourneySection })));
 const FeatureShowcase = lazy(() => import("@/components/landing/FeatureShowcase").then(m => ({ default: m.FeatureShowcase })));
-const ImpactStatsSection = lazy(() => import("@/components/landing/ImpactStatsSection").then(m => ({ default: m.ImpactStatsSection })));
 const TestimonialsSection = lazy(() => import("@/components/landing/TestimonialsSection").then(m => ({ default: m.TestimonialsSection })));
 const SaintOfDayLanding = lazy(() => import("@/components/landing/SaintOfDayLanding").then(m => ({ default: m.SaintOfDayLanding })));
-const SaintsPreviewSection = lazy(() => import("@/components/landing/SaintsPreviewSection").then(m => ({ default: m.SaintsPreviewSection })));
 const FinalCTASection = lazy(() => import("@/components/landing/FinalCTASection").then(m => ({ default: m.FinalCTASection })));
 const FooterSection = lazy(() => import("@/components/landing/FooterSection").then(m => ({ default: m.FooterSection })));
 
@@ -107,7 +105,7 @@ const Index = () => {
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-primary/20 via-secondary/20 to-primary/20 border border-primary/40 hover:border-primary/60 hover:bg-primary/10 transition-all shadow-lg shadow-primary/10"
                 >
                   <Rocket className="w-4 h-4 text-primary animate-pulse" />
-                  <span className="text-sm font-semibold text-foreground">✨ NUEVO: Frontera Final — Fe y Cosmos</span>
+                  <span className="text-sm font-semibold text-foreground">🛡️ NUEVO: El Continente Digital — Supervivencia y Fe en la Era de la IA</span>
                 </button>
               </motion.div>
               
@@ -201,19 +199,11 @@ const Index = () => {
         </Suspense>
 
         <Suspense fallback={<SectionLoader />}>
-          <ImpactStatsSection />
-        </Suspense>
-
-        <Suspense fallback={<SectionLoader />}>
           <TestimonialsSection />
         </Suspense>
 
         <Suspense fallback={<SectionLoader />}>
           <SaintOfDayLanding />
-        </Suspense>
-
-        <Suspense fallback={<SectionLoader />}>
-          <SaintsPreviewSection />
         </Suspense>
 
         <Suspense fallback={<SectionLoader />}>

@@ -8,9 +8,9 @@ const newFeatures = [
   {
     icon: Rocket,
     badge: "NUEVO",
-    title: "Frontera Final",
-    subtitle: "Fe y Cosmos",
-    description: "Descubre cómo la ciencia moderna confirma la fe católica. Explora el Big Bang, la IA, y más desde una perspectiva de fe.",
+    title: "El Continente Digital",
+    subtitle: "Supervivencia y Fe en la Era de la IA",
+    description: "Aprende a no ser reemplazado por la IA. Domina tu dieta algorítmica, entrena con prompts maestros y recupera lo hiper-humano.",
     gradient: "from-violet-600 via-purple-600 to-indigo-600",
     link: "/frontera-final",
     highlight: true,

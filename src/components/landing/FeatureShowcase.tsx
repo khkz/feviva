@@ -140,16 +140,16 @@ const showcaseData: FeatureShowcaseProps[] = [
   },
   {
     icon: Rocket,
-    title: "Frontera Final",
-    problem: "¿Puede la ciencia y la fe coexistir?",
-    solution: "Descubre cómo la ciencia moderna confirma la fe católica. Explora el Big Bang, la IA, el cosmos y más desde una perspectiva de fe.",
+    title: "El Continente Digital",
+    problem: "¿La IA te va a reemplazar?",
+    solution: "Aprende a inyectar la luz de Cristo en el algoritmo. Domina tu dieta digital, entrena con prompts maestros y recupera lo que te hace irremplazable: tu humanidad.",
     features: [
-      "El Padre del Big Bang: Georges Lemaître",
-      "¿Puede una IA tener alma?",
-      "El Observatorio Vaticano",
-      "El Libro de la Naturaleza"
+      "Dieta Algorítmica: controla lo que consumes",
+      "Academia de Prompts católicos",
+      "Misiones Hiper-Humanas (3x XP)",
+      "Simulador: bautiza la red con caridad"
     ],
-    ctaText: "Explorar el cosmos",
+    ctaText: "Entrar al Continente Digital",
     ctaLink: "/frontera-final",
     gradient: "from-violet-600 to-purple-600",
     image: fronteraHero
