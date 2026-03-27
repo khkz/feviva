@@ -63,6 +63,13 @@ const featuredTestimonials = [
     avatar: "BG",
     tag: "Fe en el cautiverio",
   },
+  {
+    quote: "A los 15 años caí en un ateísmo práctico. Una noche hablé con mi primo hasta las 6 de la mañana. Me dijo: 'Lo que para ti es imposible, para Dios es posible.' Decidí creer. En una visión me vi arrodillado en la iglesia, emanando luz desde la Eucaristía. El sacerdote rompió la lista de mis pecados: 'Eso mismo pasará cuando te absuelva. Dios olvida todo.' Hoy llevo el Evangelio al mundo con Lazos de Amor Mariano.",
+    author: "Wilson Tamayo",
+    role: "Subdirector General de Lazos de Amor Mariano · Colombia",
+    avatar: "WT",
+    tag: "Conversión",
+  },
 ];
 
 export const FeaturedTestimonials = () => {
