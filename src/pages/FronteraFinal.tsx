@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { LucideIcon } from 'lucide-react';
@@ -10,37 +10,26 @@ import {
   Telescope, 
   Flag, 
   Cpu, 
-  PlayCircle,
-  Sparkles,
   Shield,
   ShieldCheck,
-  Trophy,
   Brain,
   ArrowLeft,
-  Share2
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { BentoCard } from '@/components/frontera-final/BentoCard';
 import { EscudoVerdad } from '@/components/frontera-final/EscudoVerdad';
-import { SpaceGamification } from '@/components/frontera-final/SpaceGamification';
-import { ApologeticsQuiz } from '@/components/frontera-final/ApologeticsQuiz';
 import { LaboratorioVirtudes } from '@/components/frontera-final/LaboratorioVirtudes';
-import { SonidosEspacio } from '@/components/frontera-final/SonidosEspacio';
-import { ComunidadEspacial } from '@/components/frontera-final/ComunidadEspacial';
 import { WelcomeModal } from '@/components/frontera-final/WelcomeModal';
 import { MissionBanner } from '@/components/frontera-final/MissionBanner';
-import { FactShareModal } from '@/components/frontera-final/FactShareModal';
-import { SpaceShareModal } from '@/components/frontera-final/SpaceShareModal';
+import { ApologeticsQuiz } from '@/components/frontera-final/ApologeticsQuiz';
 import { AlgorithmicDiet } from '@/components/frontera-final/AlgorithmicDiet';
 import { CatholicPromptAcademy } from '@/components/frontera-final/CatholicPromptAcademy';
 import { HyperHumanQuests } from '@/components/frontera-final/HyperHumanQuests';
 import { NetworkParentingSimulator } from '@/components/frontera-final/NetworkParentingSimulator';
-import { getDailyContent, getContentLabel, DailyContent } from '@/lib/fronteraFactsData';
 import { Button } from '@/components/ui/button';
 import { useRosario } from '@/contexts/RosarioContext';
 import { useFronteraProgress } from '@/hooks/useFronteraProgress';
 import { useFronteraArticulos, FronteraArticulo } from '@/hooks/useFronteraArticulos';
-import { supabase } from '@/integrations/supabase/client';
 
 const iconMap: Record<string, LucideIcon> = {
   BookOpen, Atom, Infinity: InfinityIcon, HelpCircle,
@@ -90,7 +79,6 @@ function articulosToCategories(articulos: FronteraArticulo[]): Category[] {
   }));
 }
 
-// Static fallback
 const fallbackCategories: Category[] = [
   {
     title: "Cosmos y Credo", subtitle: "Teología", color: "cyan",
@@ -119,65 +107,14 @@ const fallbackCategories: Category[] = [
 
 export default function FronteraFinal() {
   const [isQuizOpen, setIsQuizOpen] = useState(false);
-  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-  const [isFactShareOpen, setIsFactShareOpen] = useState(false);
-  
-  // Contenido del día basado en la fecha actual
-  const [dailyContent] = useState<DailyContent>(() => getDailyContent());
-  
-  // Stats for sharing
-  const [rosariosCompletados, setRosariosCompletados] = useState(0);
-  const [logrosDesbloqueados, setLogrosDesbloqueados] = useState(0);
-  const [puntosCósmicos, setPuntosCósmicos] = useState(0);
   
   const { open: openRosario } = useRosario();
-  const { markQuizCompleted, progress } = useFronteraProgress();
+  const { markQuizCompleted } = useFronteraProgress();
   const { data: articulosData } = useFronteraArticulos();
   const categories = useMemo(
     () => articulosData ? articulosToCategories(articulosData) : fallbackCategories,
     [articulosData]
   );
-
-  // Fetch user stats
-  useEffect(() => {
-    const fetchStats = async () => {
-      const { data: userData } = await supabase.auth.getUser();
-      const user = userData?.user;
-      if (!user) return;
-
-      try {
-        // Count rosarios - use rpc or simple fetch to avoid deep type issue
-        const { data: rosarios } = await (supabase
-          .from('user_rosario_progress') as any)
-          .select('id')
-          .eq('user_id', user.id)
-          .eq('completed', true);
-        
-        setRosariosCompletados(rosarios?.length || 0);
-
-        // Count achievements
-        const { data: achievements } = await supabase
-          .from('user_achievements')
-          .select('id')
-          .eq('user_id', user.id);
-        
-        setLogrosDesbloqueados(achievements?.length || 0);
-
-        // Get points
-        const { data: stats } = await supabase
-          .from('user_stats')
-          .select('puntos_totales')
-          .eq('user_id', user.id)
-          .maybeSingle();
-        
-        setPuntosCósmicos(stats?.puntos_totales || 0);
-      } catch (error) {
-        console.error('Error fetching stats:', error);
-      }
-    };
-
-    fetchStats();
-  }, []);
 
   return (
     <>
@@ -198,7 +135,6 @@ export default function FronteraFinal() {
 
         {/* Neural network background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {/* Neural nodes */}
           {[...Array(20)].map((_, i) => {
             const x = 10 + (i % 5) * 20 + Math.random() * 10;
             const y = 10 + Math.floor(i / 5) * 25 + Math.random() * 10;
@@ -224,7 +160,6 @@ export default function FronteraFinal() {
               />
             );
           })}
-          {/* Connecting lines (SVG) */}
           <svg className="absolute inset-0 w-full h-full opacity-10">
             {[...Array(12)].map((_, i) => (
               <motion.line
@@ -299,7 +234,7 @@ export default function FronteraFinal() {
           </motion.div>
         </section>
 
-        {/* ALGORITHMIC DIET */}
+        {/* STEP 1: ALGORITHMIC DIET */}
         <section className="relative z-10 px-4 md:px-8 py-8 max-w-7xl mx-auto">
           <AlgorithmicDiet />
         </section>
@@ -320,11 +255,16 @@ export default function FronteraFinal() {
         </section>
 
         {/* MISSION BANNER */}
-        <section className="relative z-10 px-4 md:px-8 max-w-3xl mx-auto -mt-4 mb-8">
+        <section className="relative z-10 px-4 md:px-8 max-w-3xl mx-auto mb-8">
           <MissionBanner onRosarioClick={openRosario} />
         </section>
 
-        {/* BENTO GRID DASHBOARD */}
+        {/* LABORATORIO DE VIRTUDES */}
+        <section className="relative z-10 px-4 md:px-8 py-8 max-w-7xl mx-auto">
+          <LaboratorioVirtudes />
+        </section>
+
+        {/* ARTÍCULOS - BENTO GRID */}
         <section className="relative z-10 px-4 md:px-8 py-12 max-w-7xl mx-auto">
           {categories.map((category, categoryIndex) => (
             <motion.div
@@ -361,91 +301,9 @@ export default function FronteraFinal() {
               </div>
             </motion.div>
           ))}
-
-          {/* Oratorio Orbital - Featured Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.3, duration: 0.6 }}
-            className="mb-12"
-          >
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-2 h-8 rounded-full bg-gradient-to-b from-amber-400 to-cyan-400" />
-              <div>
-                <h2 className="font-orbitron text-2xl font-bold text-white">
-                  Oratorio Orbital
-                </h2>
-                <p className="text-gray-400 text-sm">Espiritualidad</p>
-              </div>
-            </div>
-
-            <motion.button
-              onClick={openRosario}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="w-full md:w-auto glass-cyber rounded-2xl p-8 border-amber-400/40 hover:border-amber-400/60 transition-all duration-300 group cursor-pointer text-left"
-            >
-              <div className="flex items-center gap-6">
-                <div className="relative">
-                  <motion.div
-                    animate={{ 
-                      boxShadow: [
-                        "0 0 20px rgba(251, 191, 36, 0.3)",
-                        "0 0 40px rgba(251, 191, 36, 0.5)",
-                        "0 0 20px rgba(251, 191, 36, 0.3)",
-                      ]
-                    }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="w-20 h-20 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center"
-                  >
-                    <PlayCircle className="w-10 h-10 text-slate-900" />
-                  </motion.div>
-                </div>
-                <div>
-                  <h3 className="font-orbitron text-2xl font-bold text-white mb-2 group-hover:text-amber-400 transition-colors">
-                    Rosario Interestelar
-                  </h3>
-                  <p className="text-gray-300 text-lg">
-                    Reza contemplando la creación. Una experiencia de oración cósmica.
-                  </p>
-                </div>
-              </div>
-            </motion.button>
-          </motion.div>
-
-          {/* LABORATORIO DE VIRTUDES */}
-          <LaboratorioVirtudes />
-
-          {/* SONIDOS DEL ESPACIO */}
-          <SonidosEspacio />
         </section>
 
-        {/* COMUNIDAD GALÁCTICA */}
-        <section className="relative z-10 px-4 md:px-8 py-12 max-w-5xl mx-auto">
-          <ComunidadEspacial />
-        </section>
-
-        {/* GAMIFICACIÓN ESPACIAL */}
-        <section className="relative z-10 px-4 md:px-8 py-12 max-w-5xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-8"
-          >
-            <Trophy className="w-12 h-12 mx-auto text-amber-400 mb-4" />
-            <h2 className="font-orbitron text-3xl font-bold text-white mb-2">
-              Logros Espaciales
-            </h2>
-            <p className="text-gray-400">Tu progreso en la conquista cósmica</p>
-          </motion.div>
-
-          <SpaceGamification />
-        </section>
-
-        {/* ESCUDO DE LA VERDAD - FAQ */}
+        {/* PREGUNTAS FRECUENTES */}
         <section className="relative z-10 px-4 md:px-8 py-12 max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -456,70 +314,30 @@ export default function FronteraFinal() {
           >
             <Shield className="w-12 h-12 mx-auto text-amber-400 mb-4" />
             <h2 className="font-orbitron text-3xl font-bold text-white mb-2">
-              Escudo de la Verdad
+              Preguntas Frecuentes
             </h2>
-            <p className="text-gray-400">Apologética para la era espacial</p>
+            <p className="text-gray-400">Fe, IA y la pandemia de la información</p>
           </motion.div>
 
           <EscudoVerdad />
 
-          {/* Quiz Button */}
           <div className="mt-8 text-center">
             <Button
               onClick={() => setIsQuizOpen(true)}
-              className="bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600 text-white font-orbitron"
+              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-900 font-orbitron"
               size="lg"
             >
               <Brain className="w-5 h-5 mr-2" />
-              Probar Quiz de Apologética
+              Quiz: ¿Cuánto sabes de IA y Fe?
             </Button>
           </div>
         </section>
-
-        {/* Progress indicator */}
-        {progress.progressPercentage > 0 && (
-          <section className="relative z-10 px-4 md:px-8 py-6 max-w-4xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="glass-cyber rounded-2xl p-6 border-cyan-400/20"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-gray-400 text-sm">Tu progreso espacial</span>
-                <span className="text-cyan-400 font-orbitron text-sm">{progress.progressPercentage}%</span>
-              </div>
-              <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
-                <motion.div
-                  className="h-full bg-gradient-to-r from-cyan-500 to-purple-500"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${progress.progressPercentage}%` }}
-                  transition={{ duration: 1, delay: 0.5 }}
-                />
-              </div>
-              <div className="flex justify-between mt-3 text-xs text-gray-500">
-                <span>{progress.articlesRead.length}/7 artículos</span>
-                <span>{progress.rosarioCompleted ? '✓' : '○'} Rosario</span>
-                <span>{progress.quizCompleted ? '✓' : '○'} Quiz</span>
-              </div>
-              
-              {/* Share button */}
-              <Button
-                onClick={() => setIsShareModalOpen(true)}
-                className="w-full mt-4 bg-gradient-to-r from-amber-500 to-cyan-500 hover:from-amber-600 hover:to-cyan-600 text-white font-orbitron"
-              >
-                <Share2 className="w-4 h-4 mr-2" />
-                Compartir mi Viaje Cósmico
-              </Button>
-            </motion.div>
-          </section>
-        )}
 
         {/* Bottom spacing */}
         <div className="h-24" />
       </div>
 
-      {/* Welcome Modal - First time visitors */}
+      {/* Welcome Modal */}
       <WelcomeModal />
 
       {/* Quiz Modal */}
@@ -529,24 +347,6 @@ export default function FronteraFinal() {
           setIsQuizOpen(false);
           markQuizCompleted();
         }}
-      />
-
-      {/* Space Share Modal */}
-      <SpaceShareModal
-        isOpen={isShareModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
-        rosariosCompletados={rosariosCompletados}
-        logrosDesbloqueados={logrosDesbloqueados}
-        totalLogros={6}
-        puntosCósmicos={puntosCósmicos}
-        articulosLeidos={progress.articlesRead.length}
-      />
-
-      {/* Fact Share Modal */}
-      <FactShareModal
-        isOpen={isFactShareOpen}
-        onClose={() => setIsFactShareOpen(false)}
-        content={dailyContent}
       />
     </>
   );
