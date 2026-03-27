@@ -1971,6 +1971,7 @@ export type Database = {
           created_at: string
           descripcion: string
           duracion_estimada: number
+          emotional_tags: string[] | null
           id: string
           imagen_url: string | null
           language: string | null
@@ -1984,6 +1985,7 @@ export type Database = {
           created_at?: string
           descripcion: string
           duracion_estimada?: number
+          emotional_tags?: string[] | null
           id?: string
           imagen_url?: string | null
           language?: string | null
@@ -1997,6 +1999,7 @@ export type Database = {
           created_at?: string
           descripcion?: string
           duracion_estimada?: number
+          emotional_tags?: string[] | null
           id?: string
           imagen_url?: string | null
           language?: string | null
