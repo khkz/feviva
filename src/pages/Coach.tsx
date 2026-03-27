@@ -610,34 +610,54 @@ const Coach = () => {
 
     setLoading(true);
 
-    const backendDificultad = isTutorialMode ? "aprendiz" : selectedDificultad;
+    const backendDificultad = isPupiloMode ? "aprendiz" : (isTutorialMode ? "aprendiz" : selectedDificultad);
+    const activePersona = isPupiloMode ? "pupilo_digital" : selectedPersona;
+    const activeTema = isPupiloMode ? selectedPupiloTema : selectedTema;
 
     try {
       const response = await supabase.functions.invoke("debate-coach", {
         body: {
-          persona: selectedPersona,
-          tema: selectedTema,
+          persona: activePersona,
+          tema: activeTema,
           dificultad: backendDificultad,
           messages,
-          action: "evaluate",
+          action: isPupiloMode ? "evaluate_pupilo" : "evaluate",
         },
       });
 
       if (response.error) throw response.error;
 
       const evalData = response.data;
-      setEvaluation(evalData);
+      
+      if (isPupiloMode) {
+        setPupiloEvaluation(evalData);
+        // Save scores mapped to debate columns
+        await supabase
+          .from("debates")
+          .update({
+            completed: true,
+            puntaje_fe: Math.round(evalData.profundidad / 10),
+            puntaje_razon: Math.round(evalData.claridad / 10),
+            puntaje_amor: Math.round(evalData.empatia / 10),
+            feedback: evalData.feedback,
+          })
+          .eq("id", debateId);
+      } else {
+        setEvaluation(evalData);
+        await supabase
+          .from("debates")
+          .update({
+            completed: true,
+            puntaje_fe: evalData.fe,
+            puntaje_razon: evalData.razon,
+            puntaje_amor: evalData.amor,
+            feedback: evalData.feedback,
+          })
+          .eq("id", debateId);
+      }
 
-      // Update debate record
-      await supabase
-        .from("debates")
-        .update({
-          completed: true,
-          puntaje_fe: evalData.fe,
-          puntaje_razon: evalData.razon,
-          puntaje_amor: evalData.amor,
-          feedback: evalData.feedback,
-        })
+      // Update user stats
+      await incrementDebates();
         .eq("id", debateId);
 
       // Update user stats
