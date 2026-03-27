@@ -16,6 +16,7 @@ import { motion } from "framer-motion";
 import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { CommentSection } from "@/components/community/CommentSection";
+import { FeaturedTestimonials } from "@/components/community/FeaturedTestimonials";
 
 interface Post {
   id: string;
@@ -251,6 +252,7 @@ const Community = () => {
       </div>
 
       <main className="container mx-auto px-4 py-8 max-w-4xl -mt-4 relative z-10">
+        <FeaturedTestimonials />
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
