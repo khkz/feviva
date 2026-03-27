@@ -7,6 +7,7 @@ import { useNovenas } from "@/hooks/useNovenas";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { useDailyVerse } from "@/hooks/useDailyVerse";
 import { SaintOfTheDayCard } from "@/components/dashboard/SaintOfTheDayCard";
+import { SoulTriageHero } from "@/components/triage/SoulTriageHero";
 import { HeroSection } from "@/components/dashboard/HeroSection";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 import { ProgressCard } from "@/components/dashboard/ProgressCard";
