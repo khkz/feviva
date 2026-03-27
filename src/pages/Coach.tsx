@@ -352,11 +352,14 @@ const Coach = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [selectedMode, setSelectedMode] = useState<"debate" | "pupilo">("debate");
   const [selectedPersona, setSelectedPersona] = useState("ateo_cientifico");
   const [selectedDificultad, setSelectedDificultad] = useState("tutorial");
   const [selectedTema, setSelectedTema] = useState(temas[0]);
+  const [selectedPupiloTema, setSelectedPupiloTema] = useState(pupiloTemas[0]);
   const [debateStarted, setDebateStarted] = useState(false);
   const [evaluation, setEvaluation] = useState<Evaluation | null>(null);
+  const [pupiloEvaluation, setPupiloEvaluation] = useState<PupiloEvaluation | null>(null);
   const [debateId, setDebateId] = useState<string | null>(null);
   const [suggestion, setSuggestion] = useState<Suggestion | null>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -369,7 +372,8 @@ const Coach = () => {
   const [quotaExceeded, setQuotaExceeded] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const isTutorialMode = selectedDificultad === "tutorial";
+  const isPupiloMode = selectedMode === "pupilo";
+  const isTutorialMode = selectedDificultad === "tutorial" && !isPupiloMode;
   const currentTutorialTips = tutorialTipsByTopic[selectedTema] || [];
   const currentTip = currentTutorialTips[tutorialStep];
 
