@@ -11,36 +11,6 @@ const stats = [
 
 const testimonials = [
   {
-    quote: "Intenté seguir con los estudios, buscar trabajo… todo se me quedaba grande. Caí en un vacío muy grande. Hasta que un día, buscando a una amiga por los conventos de Murcia, Dios me encontró a mí. Pasé nueve días en la hospedería y sentí por primera vez una paz que no venía de fuera, sino de dentro. Hoy llevo 17 años como Hermana Pobre de Santa Clara. Cristo es la felicidad. Descúbrelo, que te lo digo yo, vale la pena.",
-    author: "Hermana Leo",
-    role: "Orden de las Hermanas Pobres de Santa Clara · Murcia, España",
-    avatar: "L"
-  },
-  {
-    quote: "Viví en un espiral de fiestas, infidelidades y adicciones. Mi matrimonio estaba destruido. Pero Dios tocó primero el corazón de mi esposa Ana María, y a través de ella me llamó a mí. Hice un retiro, una confesión de vida, y todo empezó a cambiar. Hoy somos padres de 6 hijos, vivimos de la providencia de Dios y nuestra familia es un símbolo provida. Confía en Dios, incluso en los momentos más oscuros. Él tiene un plan para tu vida.",
-    author: "Juan Pablo Obregón",
-    role: "Actor, esposo y padre de 6 hijos · Colombia",
-    avatar: "JP"
-  },
-  {
-    quote: "Mi hijo Quique se ahogó en la piscina con dos años. Mi mujer estuvo llorando un año. Fue una experiencia terrible. Pero como dice San Pablo: 'Omnia in bonum' — todo es para bien. No hay palabras, pero sí hay presencia. Estar al lado, coger la mano, repetir juntos el Salmo 24: 'Señor, enséñame tus caminos, instrúyeme en tus sendas.' Me quedo con dos sentencias: 'Omnia in bonum' y 'Omnia tecum' — Señor, contigo todo.",
-    author: "Dr. Enrique Rojas",
-    role: "Psiquiatra · Director del Instituto Rojas Estapé · Madrid",
-    avatar: "ER"
-  },
-  {
-    quote: "Con 22 años descubrí que Dios me quería como misionero claretiano. Tardé seis años en dar el paso. Tenía tres cadenas: mi sueño de emprender, formar una familia y el miedo a decírselo a mis padres. Dios las fue rompiendo una a una. El día que puse el primer pie en la casa de formación sentí algo imborrable: volver a casa. Aquí estamos, confirmando el sí cada día. Usque ad Mortem.",
-    author: "Padre José Enrique",
-    role: "Misionero Claretiano",
-    avatar: "JE"
-  },
-  {
-    quote: "Crecí en una familia que se consideraba católica pero no practicante. Mi padrastro, socialista, se mofaba de la religión. A los 12 años me cambié a Ética. Pero mi abuela Beba rezaba el rosario cada día por nosotros. Un día, en una librería, una luz caía sobre una Biblia didáctica con una palmera en la portada — Tamara significa palmera en hebreo. La compré y esa noche empecé a leerla. Descubrí el amor de Jesús a través de la Virgen, me confesé, me confirmé, y aquí estoy.",
-    author: "Tamara Falcó",
-    role: "Diseñadora de moda y comunicadora · Madrid",
-    avatar: "TF"
-  },
-  {
     quote: "Antes no sabía cómo orar. Ahora tengo un ritual diario que me conecta con Dios cada mañana.",
     author: "María G.",
     role: "Usuaria desde hace 6 meses",
