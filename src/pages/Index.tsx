@@ -30,21 +30,13 @@ const SectionLoader = () => (
 const Index = () => {
   const navigate = useNavigate();
 
-  // Redirect authenticated users to dashboard (e.g. after OAuth callback)
+  // Redirect authenticated users to dashboard
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         navigate("/dashboard", { replace: true });
       }
     });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN" && session) {
-        navigate("/dashboard", { replace: true });
-      }
-    });
-
-    return () => subscription.unsubscribe();
   }, [navigate]);
 
   const scrollToContent = () => {
