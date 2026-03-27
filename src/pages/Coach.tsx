@@ -1342,25 +1342,27 @@ const Coach = () => {
                     />
                     {/* Desktop: vertical buttons */}
                     <div className="hidden lg:flex flex-col gap-2">
-                      <Button onClick={sendMessage} disabled={loading || !input.trim()} size="icon" className="shadow-glow">
+                      <Button onClick={sendMessage} disabled={loading || !input.trim()} size="icon" className={isPupiloMode ? "bg-cyan-600 hover:bg-cyan-700 text-white" : "shadow-glow"}>
                         <Send className="w-4 h-4" />
                       </Button>
-                      <Button
-                        onClick={getSuggestions}
-                        variant="outline"
-                        size="icon"
-                        disabled={loading || messages.length < 2}
-                        title="Pedir ayuda"
-                        className="glass-button"
-                      >
-                        <Sparkles className="w-4 h-4" />
-                      </Button>
+                      {!isPupiloMode && (
+                        <Button
+                          onClick={getSuggestions}
+                          variant="outline"
+                          size="icon"
+                          disabled={loading || messages.length < 2}
+                          title="Pedir ayuda"
+                          className="glass-button"
+                        >
+                          <Sparkles className="w-4 h-4" />
+                        </Button>
+                      )}
                       <Button
                         onClick={evaluateDebate}
                         variant="outline"
                         size="icon"
                         disabled={loading || messages.length < 4}
-                        title="Evaluar debate"
+                        title={isPupiloMode ? "Obtener reporte" : "Evaluar debate"}
                         className="glass-button"
                       >
                         <TrendingUp className="w-4 h-4" />
@@ -1373,22 +1375,24 @@ const Coach = () => {
                     <Button 
                       onClick={sendMessage} 
                       disabled={loading || !input.trim()} 
-                      className="flex-1 shadow-glow"
+                      className={`flex-1 ${isPupiloMode ? "bg-cyan-600 hover:bg-cyan-700 text-white" : "shadow-glow"}`}
                       size="sm"
                     >
                       <Send className="w-4 h-4 mr-2" />
                       Enviar
                     </Button>
-                    <Button
-                      onClick={getSuggestions}
-                      variant="outline"
-                      size="sm"
-                      disabled={loading || messages.length < 2}
-                      className="glass-button"
-                    >
-                      <Sparkles className="w-4 h-4 mr-1" />
-                      Ayuda
-                    </Button>
+                    {!isPupiloMode && (
+                      <Button
+                        onClick={getSuggestions}
+                        variant="outline"
+                        size="sm"
+                        disabled={loading || messages.length < 2}
+                        className="glass-button"
+                      >
+                        <Sparkles className="w-4 h-4 mr-1" />
+                        Ayuda
+                      </Button>
+                    )}
                     <Button
                       onClick={evaluateDebate}
                       variant="outline"
@@ -1397,7 +1401,7 @@ const Coach = () => {
                       className="glass-button"
                     >
                       <TrendingUp className="w-4 h-4 mr-1" />
-                      Evaluar
+                      {isPupiloMode ? "Reporte" : "Evaluar"}
                     </Button>
                   </div>
                 </div>
