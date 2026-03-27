@@ -962,6 +962,84 @@ const Coach = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
+                  {/* Mode Selector */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Modo de Entrenamiento</label>
+                    <div className="grid grid-cols-2 gap-3">
+                      {modeOptions.map((mode) => {
+                        const Icon = mode.icon;
+                        const isSelected = selectedMode === mode.value;
+                        return (
+                          <button
+                            key={mode.value}
+                            onClick={() => setSelectedMode(mode.value as "debate" | "pupilo")}
+                            className={`p-4 rounded-xl border-2 transition-all text-left ${
+                              isSelected
+                                ? mode.value === "pupilo"
+                                  ? "border-cyan-500 bg-cyan-500/10"
+                                  : "border-primary bg-primary/10"
+                                : "border-border/50 hover:border-primary/50 bg-background/50"
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 mb-1">
+                              <Icon className={`w-5 h-5 ${mode.color}`} />
+                              <span className="font-semibold text-sm">{mode.label}</span>
+                            </div>
+                            <p className="text-xs text-muted-foreground">{mode.description}</p>
+                            {mode.value === "pupilo" && (
+                              <Badge className="mt-2 text-[10px] bg-cyan-500/20 text-cyan-400 border-cyan-500/30">
+                                Nuevo · Formador de IA
+                              </Badge>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Pupilo mode info */}
+                  {isPupiloMode && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      className="bg-cyan-500/10 rounded-lg p-4 border border-cyan-500/20"
+                    >
+                      <div className="flex items-start gap-3">
+                        <Bot className="w-5 h-5 text-cyan-400 mt-0.5" />
+                        <div>
+                          <h4 className="font-medium text-sm mb-1">El Pupilo Digital</h4>
+                          <p className="text-xs text-muted-foreground">
+                            Una IA fría y lógica que no entiende el amor, el perdón ni la misericordia. 
+                            Tu misión es enseñarle con paciencia y ternura. Al final, ella evaluará 
+                            tu capacidad de transmitir humanidad.
+                          </p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* Pupilo tema selector */}
+                  {isPupiloMode && (
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Tema de Enseñanza</label>
+                      <Select value={selectedPupiloTema} onValueChange={setSelectedPupiloTema}>
+                        <SelectTrigger className="glass-button bg-background/50">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background/95 backdrop-blur-xl border-border/50">
+                          {pupiloTemas.map((tema) => (
+                            <SelectItem key={tema} value={tema}>
+                              {tema}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  {/* Debate mode options */}
+                  {!isPupiloMode && (
+                  <>
                   {/* Difficulty Selector */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Nivel de Dificultad</label>
