@@ -45,6 +45,7 @@ const featuredTestimonials = [
 ];
 
 export const FeaturedTestimonials = () => {
+  const navigate = useNavigate();
   const [current, setCurrent] = useState(0);
 
   const prev = () => setCurrent((c) => (c === 0 ? featuredTestimonials.length - 1 : c - 1));
