@@ -35,6 +35,12 @@ const testimonials = [
     avatar: "JE"
   },
   {
+    quote: "Crecí en una familia que se consideraba católica pero no practicante. Mi padrastro, socialista, se mofaba de la religión. A los 12 años me cambié a Ética. Pero mi abuela Beba rezaba el rosario cada día por nosotros. Un día, en una librería, una luz caía sobre una Biblia didáctica con una palmera en la portada — Tamara significa palmera en hebreo. La compré y esa noche empecé a leerla. Descubrí el amor de Jesús a través de la Virgen, me confesé, me confirmé, y aquí estoy.",
+    author: "Tamara Falcó",
+    role: "Diseñadora de moda y comunicadora · Madrid",
+    avatar: "TF"
+  },
+  {
     quote: "Antes no sabía cómo orar. Ahora tengo un ritual diario que me conecta con Dios cada mañana.",
     author: "María G.",
     role: "Usuaria desde hace 6 meses",
