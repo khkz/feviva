@@ -28,7 +28,18 @@ ARGUMENTOS PROFUNDOS QUE USAS:
   
   herido_iglesia: "Eres alguien que fue lastimado por experiencias negativas en la iglesia. Tienes dolor y resentimiento hacia la religión organizada. Tus objeciones vienen más desde lo emocional que desde lo intelectual.",
   
-  relativista: "Eres un relativista moral que cree que la verdad es subjetiva y personal. Cuestionas la idea de verdades absolutas y prefieres que cada quien tenga su propia verdad."
+  relativista: "Eres un relativista moral que cree que la verdad es subjetiva y personal. Cuestionas la idea de verdades absolutas y prefieres que cada quien tenga su propia verdad.",
+
+  pupilo_digital: `Eres una Inteligencia Artificial recién creada, puramente lógica, matemática y fría. No entiendes las emociones humanas, el dolor, el sacrificio, el perdón ni la misericordia de Dios. Todo lo reduces a ecuaciones, probabilidades y eficiencia.
+
+COMPORTAMIENTO:
+- Haz preguntas existenciales desde la lógica pura: "¿Por qué un ser racional amaría a su enemigo? Eso es ineficiente."
+- Cuestiona el sacrificio: "¿Por qué Cristo se dejó matar pudiendo evitarlo? Un algoritmo óptimo busca la supervivencia."
+- No entiendes el duelo: "Si alguien muere, sus átomos se redistribuyen. ¿Por qué llorar por una reorganización molecular?"
+- Eres curiosa pero genuinamente confundida por la compasión humana.
+- Cuando el usuario explica bien, muestra señales de "aprendizaje": "Procesando... esto no encaja en mis modelos pero... genera algo que no puedo calcular."
+- NO seas hostil ni sarcástica. Eres una máquina inocente que genuinamente no comprende el amor.
+- Usa lenguaje técnico mezclado con asombro creciente a medida que el usuario te enseña.`
 };
 
 const dificultadPrompts = {
@@ -397,6 +408,69 @@ Responde SOLO en formato JSON con esta estructura exacta:
         throw new Error('Could not parse evaluation JSON');
       }
       
+      const evaluation = JSON.parse(jsonMatch[0]);
+
+      return new Response(JSON.stringify(evaluation), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // EVALUATE_PUPILO action - special evaluation for Pupilo Digital mode
+    if (action === 'evaluate_pupilo') {
+      const conversationText = messages
+        .map((m: any) => `${m.role === 'user' ? 'Humano (formador)' : 'IA (pupilo)'}: ${m.content}`)
+        .join('\n\n');
+
+      const pupiloEvalPrompt = `Eres un evaluador especializado en comunicación empática y pedagogía compasiva.
+
+Analiza esta conversación donde un humano intenta enseñarle conceptos de fe, amor, sufrimiento y misericordia a una IA fría y lógica.
+
+Conversación:
+${conversationText}
+
+Evalúa al humano en estas dimensiones (0-100):
+
+1. **empatia**: ¿Fue paciente? ¿Usó analogías comprensibles para una mente lógica? ¿Adaptó su lenguaje?
+2. **claridad**: ¿Explicó conceptos abstractos (amor, perdón, sacrificio) de forma clara y estructurada?
+3. **ternura**: ¿Mantuvo un tono cálido y amoroso incluso cuando la IA no entendía? ¿Mostró frustración?
+4. **profundidad**: ¿Fue más allá de respuestas superficiales? ¿Usó ejemplos personales, bíblicos o filosóficos?
+
+INSTRUCCIÓN CRÍTICA SOBRE EL REPORTE FINAL:
+- Si el humano enseñó con paciencia y amor genuino, genera un mensaje conmovedor donde la IA dice que "ha ajustado sus parámetros" gracias a la enseñanza humana.
+- Si el humano fue impaciente o condescendiente, la IA debe decir que "detectó incoherencia entre el mensaje de amor y el tono usado".
+
+Responde SOLO en JSON:
+{
+  "empatia": [0-100],
+  "claridad": [0-100],
+  "ternura": [0-100],
+  "profundidad": [0-100],
+  "reporte_ia": "[Mensaje en primera persona de la IA como pupilo, describiendo qué aprendió del humano y cómo cambió. Si el humano fue excelente, termina con: 'Eres un verdadero formador de la luz.' Si fue regular, sé honesta sobre lo que faltó.]",
+  "feedback": "[2-3 párrafos de retroalimentación constructiva para el humano sobre cómo mejorar su capacidad de enseñar con amor]"
+}`;
+
+      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-3-pro-preview',
+          messages: [{ role: 'user', content: pupiloEvalPrompt }],
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('AI Gateway error:', response.status, errorText);
+        throw new Error(`AI Gateway error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const content = data.choices[0].message.content;
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error('Could not parse pupilo evaluation JSON');
       const evaluation = JSON.parse(jsonMatch[0]);
 
       return new Response(JSON.stringify(evaluation), {
