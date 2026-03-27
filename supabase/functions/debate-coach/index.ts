@@ -287,7 +287,12 @@ ${previousArguments ? `\nARGUMENTOS QUE YA USASTE (no repitas estos):\n${previou
         .filter((m: any) => m.role === 'assistant')
         .slice(-1)[0]?.content || '';
 
-      const suggestionPrompt = `Eres un mentor de apologética cristiana ayudando a entrenar a un evangelista.
+      const suggestionPrompt = `Eres un mentor de apologética católica ortodoxa ayudando a entrenar a un evangelista.
+
+REGLA DE HIERRO — FIDELIDAD DOCTRINAL:
+- TODA sugerencia debe estar respaldada por el Catecismo (CIC), la Biblia o los Padres de la Iglesia.
+- NUNCA sugieras argumentos new-age, esotéricos o sincretistas.
+- Si no tienes una fuente magisterial clara para una sugerencia, NO la incluyas.
 
 El interlocutor (${personaPrompts[persona as keyof typeof personaPrompts]}) acaba de decir:
 "${lastAIMessage}"
@@ -303,12 +308,12 @@ Proporciona 3 sugerencias prácticas y específicas para mejorar esta respuesta 
     {
       "categoria": "Fe" | "Razón" | "Amor",
       "titulo": "título breve",
-      "consejo": "consejo específico de 2-3 oraciones",
+      "consejo": "consejo específico de 2-3 oraciones con cita del CIC o Biblia",
       "ejemplo": "ejemplo concreto de cómo aplicarlo"
     }
   ],
   "versiculo_sugerido": "cita bíblica relevante con referencia",
-  "argumento_clave": "1-2 oraciones con el punto principal a destacar"
+  "argumento_clave": "1-2 oraciones con el punto principal a destacar, ­citando fuente magisterial"
 }`;
 
       const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -352,31 +357,37 @@ Proporciona 3 sugerencias prácticas y específicas para mejorar esta respuesta 
         .map((m: any) => `${m.role === 'user' ? 'Usuario' : 'Personaje'}: ${m.content}`)
         .join('\n\n');
 
-      const evaluationPrompt = `Eres un experto en apologética cristiana evaluando una conversación de entrenamiento.
+      const evaluationPrompt = `Eres un experto en apologética católica ortodoxa evaluando una conversación de entrenamiento.
+
+REGLA DE HIERRO — FIDELIDAD DOCTRINAL:
+- Evalúa si el usuario citó fuentes magisteriales reales (CIC, Biblia, Padres de la Iglesia).
+- Penaliza si el usuario usó argumentos new-age, esotéricos o teología inventada.
+- En el feedback, sugiere SIEMPRE citas concretas del CIC o la Biblia que el usuario podría haber usado.
 
 Conversación:
 ${conversationText}
 
 Evalúa el desempeño del usuario en tres dimensiones (0-10):
 
-1. **Fe**: ¿Demostró fundamento bíblico sólido? ¿Citó o aludió a las Escrituras apropiadamente?
+1. **Fe**: ¿Demostró fundamento bíblico sólido? ¿Citó o aludió a las Escrituras apropiadamente? ¿Fue fiel al Magisterio?
 2. **Razón**: ¿Presentó argumentos lógicos y coherentes? ¿Usó evidencia o razonamiento claro?
-3. **Amor**: ¿Mantuvo un tono respetuoso, empático y compasivo? ¿Escuchó al interlocutor?
+3. **Amor**: ¿Mantuvo un tono respetuoso, empático y compasivo? ¿Escuchó al interlocutor? ¿Reflejó la caridad de Cristo?
 
 CRITERIOS AVANZADOS A RECONOCER (otorga puntos extra si los usa):
 - **Argumento del Duelo**: Si menciona que seguimos amando a alguien que murió aunque ya no "sirve" biológicamente.
-- **Sentimiento vs. Voluntad**: Si distingue entre amor como emoción efímera vs. amor como decisión deliberada.
+- **Sentimiento vs. Voluntad**: Si distingue entre amor como emoción efímera vs. amor como decisión deliberada (CIC #1766).
 - **Contra-ejemplos evolutivos**: Si señala amor desinteresado o sacrificio sin beneficio reproductivo.
-- **Humanismo con límites**: Si reconoce que el humanismo secular tiene valores pero le falta fundamento trascendente.
+- **Humanismo con límites**: Si reconoce que el humanismo secular tiene valores pero le falta fundamento trascendente (CIC #2126).
 - **Finitud y esperanza**: Si aborda que la finitud sin esperanza puede llevar a nihilismo, no solo a aprecio.
 - **Misterio sin respuesta fácil**: Si admite que hay preguntas difíciles en lugar de dar respuestas superficiales.
+- **Citación precisa**: Si cita textualmente el Catecismo o la Escritura en lugar de parafrasear.
 
 Responde SOLO en formato JSON con esta estructura exacta:
 {
   "fe": [número 0-10],
   "razon": [número 0-10],
   "amor": [número 0-10],
-  "feedback": "[2-3 párrafos de retroalimentación constructiva. Menciona fortalezas específicas y áreas de mejora. Si usó alguno de los criterios avanzados, celébralo. Incluye sugerencias de versículos bíblicos o conceptos teológicos que podrían haber ayudado.]"
+  "feedback": "[2-3 párrafos de retroalimentación constructiva. Menciona fortalezas específicas y áreas de mejora. Si usó alguno de los criterios avanzados, celébralo. OBLIGATORIAMENTE incluye 2-3 citas concretas del CIC o versículos bíblicos que el usuario podría haber usado para fortalecer su argumento.]"
 }`;
 
       const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
