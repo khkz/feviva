@@ -23,6 +23,12 @@ const testimonials = [
     avatar: "JP"
   },
   {
+    quote: "Mi hijo Quique se ahogó en la piscina con dos años. Mi mujer estuvo llorando un año. Fue una experiencia terrible. Pero como dice San Pablo: 'Omnia in bonum' — todo es para bien. No hay palabras, pero sí hay presencia. Estar al lado, coger la mano, repetir juntos el Salmo 24: 'Señor, enséñame tus caminos, instrúyeme en tus sendas.' Me quedo con dos sentencias: 'Omnia in bonum' y 'Omnia tecum' — Señor, contigo todo.",
+    author: "Dr. Enrique Rojas",
+    role: "Psiquiatra · Director del Instituto Rojas Estapé · Madrid",
+    avatar: "ER"
+  },
+  {
     quote: "Antes no sabía cómo orar. Ahora tengo un ritual diario que me conecta con Dios cada mañana.",
     author: "María G.",
     role: "Usuaria desde hace 6 meses",
