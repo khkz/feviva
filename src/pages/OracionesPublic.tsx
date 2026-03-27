@@ -124,7 +124,7 @@ const OracionesPublic = () => {
   return (
     <>
       <Helmet>
-        <title>Oraciones Católicas | ElRugido - Más de {stats.total} Oraciones con Audio</title>
+        <title>{`Oraciones Católicas | ElRugido - Más de ${stats.total} Oraciones con Audio`}</title>
         <meta
           name="description"
           content={`Colección de ${stats.total}+ oraciones católicas: Padre Nuestro, Ave María, oraciones a los santos, novenas y más. Con audio guiado para tu oración diaria.`}
