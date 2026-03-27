@@ -32,6 +32,8 @@ import { MissionBanner } from '@/components/frontera-final/MissionBanner';
 import { FactShareModal } from '@/components/frontera-final/FactShareModal';
 import { SpaceShareModal } from '@/components/frontera-final/SpaceShareModal';
 import { AlgorithmicDiet } from '@/components/frontera-final/AlgorithmicDiet';
+import { CatholicPromptAcademy } from '@/components/frontera-final/CatholicPromptAcademy';
+import { HyperHumanQuests } from '@/components/frontera-final/HyperHumanQuests';
 import { getDailyContent, getContentLabel, DailyContent } from '@/lib/fronteraFactsData';
 import { Button } from '@/components/ui/button';
 import { useRosario } from '@/contexts/RosarioContext';
@@ -299,6 +301,16 @@ export default function FronteraFinal() {
         {/* ALGORITHMIC DIET */}
         <section className="relative z-10 px-4 md:px-8 py-8 max-w-7xl mx-auto">
           <AlgorithmicDiet />
+        </section>
+
+        {/* STEP 2: CATHOLIC PROMPT ACADEMY */}
+        <section className="relative z-10 px-4 md:px-8 py-8 max-w-7xl mx-auto">
+          <CatholicPromptAcademy />
+        </section>
+
+        {/* STEP 3: HYPER-HUMAN QUESTS */}
+        <section className="relative z-10 px-4 md:px-8 py-8 max-w-7xl mx-auto">
+          <HyperHumanQuests />
         </section>
 
         {/* MISSION BANNER */}
