@@ -1330,7 +1330,7 @@ const Coach = () => {
                     <Textarea
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
-                      placeholder={isTutorialMode ? "Escribe tu respuesta (usa las sugerencias del panel de guía)..." : "Escribe tu respuesta..."}
+                      placeholder={isPupiloMode ? "Enséñale al pupilo con paciencia y ternura..." : (isTutorialMode ? "Escribe tu respuesta (usa las sugerencias del panel de guía)..." : "Escribe tu respuesta...")}
                       className="resize-none glass-button bg-background/50 flex-1 min-h-[60px] lg:min-h-[80px]"
                       rows={isMobile ? 2 : 3}
                       onKeyDown={(e) => {
