@@ -392,17 +392,22 @@ const Coach = () => {
     setTutorialStep(0);
     setCompletedTutorialSteps([]);
     setShowTutorialPanel(true);
+    setPupiloEvaluation(null);
+    setEvaluation(null);
 
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
+
+    const activeTema = isPupiloMode ? selectedPupiloTema : selectedTema;
+    const activePersona = isPupiloMode ? "pupilo_digital" : selectedPersona;
 
     // Create debate record
     const { data, error } = await supabase
       .from("debates")
       .insert({
         user_id: session.user.id,
-        tema: selectedTema,
-        personaje: selectedPersona,
+        tema: activeTema,
+        personaje: activePersona,
         transcript: [],
       })
       .select()
@@ -412,7 +417,7 @@ const Coach = () => {
       console.error("Error creating debate:", error);
       toast({
         title: "Error",
-        description: "No se pudo iniciar el debate",
+        description: "No se pudo iniciar la sesión",
         variant: "destructive",
       });
       setLoading(false);
@@ -422,7 +427,7 @@ const Coach = () => {
     setDebateId(data.id);
 
     // For tutorial mode, use aprendiz difficulty in backend
-    const backendDificultad = isTutorialMode ? "aprendiz" : selectedDificultad;
+    const backendDificultad = isPupiloMode ? "aprendiz" : (isTutorialMode ? "aprendiz" : selectedDificultad);
 
     // Get initial message from AI
     try {
