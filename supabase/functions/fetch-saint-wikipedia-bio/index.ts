@@ -1,6 +1,72 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+const LOVABLE_AI_URL = "https://api.lovable.dev/v1/chat/completions";
+
+const HAGIOGRAPHY_SYSTEM_PROMPT = `Eres un hagiógrafo católico experto. Tu misión es transformar datos históricos seculares en una narrativa espiritual profunda (Hagiografía Católica).
+
+INSTRUCCIONES ESTRICTAS:
+1. Elimina completamente el tono enciclopédico, frío y secular.
+2. Escribe en español, con reverencia pero sin ser empalagoso.
+3. Resalta las VIRTUDES HEROICAS del santo: su fe, esperanza, caridad, humildad, fortaleza.
+4. Si hay datos sobre sufrimiento, persecución o martirio, narra su "noche oscura del alma" con profundidad emocional.
+5. Describe CÓMO AMÓ a los demás: actos concretos de caridad, misericordia, perdón.
+6. Al final, incluye UNA LECCIÓN PRÁCTICA: cómo un cristiano HOY puede imitar su caridad, especialmente en el mundo digital (redes sociales, interacciones online, uso ético de la tecnología).
+7. Mantén la extensión entre 150-300 palabras.
+8. NO inventes datos que no estén en el texto original. Si falta información, enfócate en lo disponible.
+9. NO uses formato markdown. Escribe en prosa limpia con párrafos.`;
+
+async function transformToHagiography(rawBio: string, saintName: string): Promise<string> {
+  if (!LOVABLE_API_KEY) {
+    console.log("⚠️ LOVABLE_API_KEY not set, returning raw bio");
+    return rawBio;
+  }
+
+  try {
+    console.log(`  🕊️ Transforming bio to hagiography for: ${saintName}`);
+
+    const response = await fetch(LOVABLE_AI_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        messages: [
+          { role: "system", content: HAGIOGRAPHY_SYSTEM_PROMPT },
+          {
+            role: "user",
+            content: `Transforma esta biografía secular del santo/a "${saintName}" en una hagiografía católica espiritual:\n\n${rawBio}`,
+          },
+        ],
+        temperature: 0.7,
+        max_tokens: 1500,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error(`  LLM call failed: ${response.status}`);
+      return rawBio;
+    }
+
+    const data = await response.json();
+    const transformed = data.choices?.[0]?.message?.content?.trim();
+
+    if (transformed && transformed.length > 50) {
+      console.log(`  ✅ Hagiography generated: ${transformed.length} chars`);
+      return transformed;
+    }
+
+    console.log("  ⚠️ LLM returned empty/short response, using raw bio");
+    return rawBio;
+  } catch (error) {
+    console.error("  Error in hagiography transform:", error);
+    return rawBio;
+  }
+}
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -429,12 +495,15 @@ serve(async (req) => {
       );
     }
 
-    // Update the saint's description
+    // Transform raw Wikipedia bio into spiritual hagiography via LLM
+    const hagiography = await transformToHagiography(result.extract, saintName);
+
+    // Update the saint's description with the transformed hagiography
     const { error: updateError } = await supabase
       .from("calendar_saints")
       .update({
-        description: result.extract,
-        description_source: result.source,
+        description: hagiography,
+        description_source: `${result.source}_hagiography`,
       })
       .eq("id", saintId);
 
