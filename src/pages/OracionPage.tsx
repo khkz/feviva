@@ -36,7 +36,19 @@ const OracionPage = () => {
   const { data: oracion, isLoading } = useQuery({
     queryKey: ['oracion-public', slug],
     queryFn: async () => {
-      // First try to find by slug column
+      // First try by UUID (if slug looks like a UUID)
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (uuidRegex.test(slug!)) {
+        const { data: byId, error: idError } = await supabase
+          .from('oraciones')
+          .select('*')
+          .eq('id', slug)
+          .maybeSingle();
+        if (idError) throw idError;
+        if (byId) return byId as Oracion;
+      }
+
+      // Then try by slug column
       const { data: bySlug, error: slugError } = await supabase
         .from('oraciones')
         .select('*')
