@@ -434,8 +434,8 @@ const Coach = () => {
       if (!(await requireAuth())) { setLoading(false); return; }
       const response = await supabase.functions.invoke("debate-coach", {
         body: {
-          persona: selectedPersona,
-          tema: selectedTema,
+          persona: activePersona,
+          tema: activeTema,
           dificultad: backendDificultad,
           messages: [],
           action: "start",
