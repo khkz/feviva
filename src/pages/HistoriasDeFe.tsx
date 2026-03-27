@@ -276,6 +276,41 @@ Hoy, a mis 40 años, miro hacia atrás y de lo único que me arrepiento es de no
 
 Que Dios les bendiga.`,
   },
+  {
+    id: "maria-paula-aldana",
+    author: "María Paula Aldana",
+    role: "Conferencista, escritora y creadora de Somos Suyos · Colombia",
+    avatar: "MP",
+    tag: "Libertad interior",
+    excerpt: "Solo quien se sabe esclavo puede anhelar la libertad. Descubrí que era esclava de la pornografía desde los 7 años, del placer, del dinero. Cristo me mostró que la castidad no es un castigo, sino el camino a la verdadera libertad.",
+    fullStory: `Mi nombre es María Paula Aldana, soy conferencista, escritora y creadora de contenido digital. Quiero compartir con ustedes mi camino hacia la verdadera libertad interior.
+
+Solo quien se sabe esclavo puede anhelar la libertad. Ese fue mi encuentro con Cristo: descubrirme tan esclava y al mismo tiempo tan necesitada de un amor liberador.
+
+Nací en Bogotá, Colombia, y crecí en una familia de tradición católica pero no practicante. Recibí los sacramentos como un requisito social. Soñaba con ser una gran abogada, con reconocimiento y dinero. Quería total libertad para hacer lo que yo quería.
+
+Pero además de mi esclavitud al qué dirán, al dinero, a las fiestas, el licor y las drogas, en mi vida había una adicción aún más profunda. Mi primer encuentro con la pornografía fue a los siete años. Un video que distorsionaba por completo la realidad de la unión sexual cambió mi vida para siempre. Tuve múltiples experiencias sexuales desde ese momento hasta mis 13 años. Me abanderé con la causa de la liberación sexual femenina, convencida de que el amor era un riesgo en el que siempre iba a perder.
+
+A mis 19 años, mi familia tuvo una crisis económica muy fuerte. Todo se volvió relativo. Entré en una espiral de autodestrucción y depresión. Consumía alcohol y drogas diariamente en mi habitación para no sentir.
+
+Una prima me invitó a un grupo de oración carismático. Pensé: "He hecho cosas peores. Rezar no puede ser peor." Y fui. Un líder del grupo me dijo al oído sin conocerme: "¡Por fin llegaste! Te he estado esperando por mucho tiempo." En un instante de rara humildad le dije a la Virgen María: "Si esto es verdad, si Dios existe... ¡Háblame!, porque creo que necesito ayuda."
+
+La mujer libre por excelencia vio mi esclavitud y oró a su Hijo por mí. Mi vida nunca más fue la misma. Empecé a leer la Biblia, a renunciar a lo contrario a la ley de Dios. Pero la esclavitud más fuerte de mi corazón me impedía acercarme de verdad. Por más que luchaba contra mi compulsión sexual, solo empeoraba. Descubrí lo engañada que había estado: creía que era libre, pero solo cuando quise detenerme me di cuenta de que no podía.
+
+Ahí comprendí el pregón pascual: "Oh, feliz culpa que mereció tan gran redentor." Vi que, en comparación con su amor, todo lo que antes me satisfacía se quedaba corto.
+
+Después de mucha oración, entré al convento con las franciscanas. Dos de los años más felices y más difíciles de mi vida. En el silencio descubrí lo inquieta que era mi voz interior, lo difícil que era pensar en otros más que en mí. Pero descubrí que no me veía ahí para toda la vida.
+
+Viví cinco años de absoluta oscuridad tras salir del convento. No escuchaba la voz de Dios. Sentía que me había abandonado. Pero Él, en esa aparente oscuridad, me había estado conduciendo.
+
+Una amiga me propuso grabar reflexiones del evangelio. Así nació Somos Suyos. Los videos llegaron a cada vez más personas. Sentí que por fin había encontrado mi lugar.
+
+Entonces la Teología del Cuerpo de san Juan Pablo II llegó a mi vida como un respiro de libertad: la santidad no es dejar de pecar por exigencia moral, sino elegir amar aunque cueste. La castidad dejó de parecerme un castigo. Se volvió un alivio, el camino concreto hacia la libertad que anhelaba.
+
+Hoy me dedico a escribir, a viajar por ciudades y países hablando del amor de Dios que me ha salvado. Sigo descubriendo esclavitudes ocultas, sigo profundizando en mis heridas, y sigo viendo ese amor arriesgado, total, libre, fiel y fecundo de Dios por mí.
+
+La pregunta es solo una: ¿quieres dejarte liberar? No lo olvides: SOMOS SUYOS. Dios te bendiga.`,
+  },
 ];
 
 const HistoriasDeFe = () => {
