@@ -70,6 +70,13 @@ const featuredTestimonials = [
     avatar: "WT",
     tag: "Conversión",
   },
+  {
+    quote: "Solo quien se sabe esclavo puede anhelar la libertad. Mi primer encuentro con la pornografía fue a los 7 años. Viví esclava del placer, las drogas, el alcohol. Un día, la Virgen María escuchó mi grito de ayuda. Entré al convento, salí, viví cinco años de oscuridad. Hasta que la Teología del Cuerpo me mostró: la castidad no es un castigo, es el camino a la verdadera libertad. SOMOS SUYOS.",
+    author: "María Paula Aldana",
+    role: "Conferencista, escritora y creadora de Somos Suyos · Colombia",
+    avatar: "MP",
+    tag: "Libertad interior",
+  },
 ];
 
 export const FeaturedTestimonials = () => {
