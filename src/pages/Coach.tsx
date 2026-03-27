@@ -1095,7 +1095,7 @@ const Coach = () => {
       <div className="flex-1 lg:pl-64 flex flex-col pb-20 lg:pb-0">
         {/* Header */}
         <div className="relative overflow-hidden flex-shrink-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-secondary/60" />
+          <div className={`absolute inset-0 ${isPupiloMode ? "bg-gradient-to-br from-cyan-900 via-cyan-800 to-teal-700" : "bg-gradient-to-br from-primary via-primary/90 to-secondary/60"}`} />
           
           <motion.header 
             initial={{ opacity: 0, y: -20 }}
@@ -1113,14 +1113,19 @@ const Coach = () => {
                 >
                   <ArrowLeft className="w-4 h-4" />
                 </Button>
-                <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-secondary/20 backdrop-blur-sm flex items-center justify-center">
-                  <Sparkles className="w-4 h-4 lg:w-5 lg:h-5 text-secondary" />
+                <div className={`w-8 h-8 lg:w-10 lg:h-10 rounded-full ${isPupiloMode ? "bg-cyan-400/20" : "bg-secondary/20"} backdrop-blur-sm flex items-center justify-center`}>
+                  {isPupiloMode 
+                    ? <Bot className="w-4 h-4 lg:w-5 lg:h-5 text-cyan-300" />
+                    : <Sparkles className="w-4 h-4 lg:w-5 lg:h-5 text-secondary" />
+                  }
                 </div>
                 <div>
                   <h1 className="font-heading text-lg lg:text-xl font-bold text-white">
-                    {isTutorialMode ? "Tutorial" : "Coach de Debate"}
+                    {isPupiloMode ? "El Pupilo Digital" : (isTutorialMode ? "Tutorial" : "Coach de Debate")}
                   </h1>
-                  <p className="text-xs lg:text-sm text-white/70 truncate max-w-[150px] lg:max-w-none">{selectedTema}</p>
+                  <p className="text-xs lg:text-sm text-white/70 truncate max-w-[150px] lg:max-w-none">
+                    {isPupiloMode ? selectedPupiloTema : selectedTema}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
