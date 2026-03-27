@@ -67,16 +67,8 @@ const Habits = () => {
   const [showDevotional, setShowDevotional] = useState("");
 
   useEffect(() => {
-    checkAuth();
     loadHabits();
   }, []);
-
-  const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      navigate("/auth");
-    }
-  };
 
   const loadHabits = async () => {
     const { data: { session } } = await supabase.auth.getSession();

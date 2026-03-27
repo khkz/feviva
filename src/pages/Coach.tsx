@@ -350,23 +350,8 @@ const Coach = () => {
   const currentTip = currentTutorialTips[tutorialStep];
 
   useEffect(() => {
-    checkAuth();
-  }, []);
-
-  useEffect(() => {
     scrollToBottom();
   }, [messages]);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      navigate("/auth");
-    }
-  };
 
   const startDebate = async () => {
     setDebateStarted(true);

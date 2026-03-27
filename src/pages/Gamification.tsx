@@ -1,6 +1,4 @@
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useUserStats } from "@/hooks/useUserStats";
@@ -20,17 +18,6 @@ const Gamification = () => {
     getPointsForNextLevel,
     getProgressToNextLevel,
   } = useUserStats();
-
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      navigate("/auth");
-    }
-  };
 
   if (loading || !stats) {
     return (

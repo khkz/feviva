@@ -73,15 +73,12 @@ const Profile = () => {
   const enabledRemindersCount = practiceReminders.filter(r => r.enabled).length;
 
   useEffect(() => {
-    checkAuth();
+    loadProfile();
   }, []);
 
-  const checkAuth = async () => {
+  const loadProfile = async () => {
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      navigate("/auth");
-      return;
-    }
+    if (!session) return;
 
     const { data, error } = await supabase
       .from("profiles")

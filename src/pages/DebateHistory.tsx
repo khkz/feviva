@@ -43,16 +43,8 @@ const DebateHistory = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    checkAuth();
     fetchDebates();
   }, []);
-
-  const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      navigate("/auth");
-    }
-  };
 
   const fetchDebates = async () => {
     const { data: { user } } = await supabase.auth.getUser();

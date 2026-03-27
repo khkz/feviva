@@ -54,7 +54,6 @@ const Community = () => {
   const [openComments, setOpenComments] = useState<string | null>(null);
 
   useEffect(() => {
-    checkAuth();
     loadPosts();
     
     // Subscribe to new posts
@@ -77,13 +76,6 @@ const Community = () => {
       supabase.removeChannel(channel);
     };
   }, []);
-
-  const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      navigate("/auth");
-    }
-  };
 
   const loadPosts = async () => {
     const { data, error } = await supabase

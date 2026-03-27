@@ -51,7 +51,6 @@ const Library = () => {
   const lessonParam = searchParams.get('lesson');
 
   useEffect(() => {
-    checkAuth();
     fetchLessons();
     fetchProgress();
   }, []);
@@ -81,13 +80,6 @@ const Library = () => {
       }
     }
   }, [lessonParam, lessons]);
-
-  const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      navigate("/auth");
-    }
-  };
 
   const fetchLessons = async () => {
     const { data, error } = await supabase
