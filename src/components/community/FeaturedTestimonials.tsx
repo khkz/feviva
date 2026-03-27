@@ -57,6 +57,8 @@ const featuredTestimonials = [
     tag: "Esperanza en el sufrimiento",
   },
 ];
+
+export const FeaturedTestimonials = () => {
   const navigate = useNavigate();
   const [current, setCurrent] = useState(0);
 
