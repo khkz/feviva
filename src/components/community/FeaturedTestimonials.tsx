@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Quote, ChevronLeft, ChevronRight, Heart, Church, Cross } from "lucide-react";
+import { Quote, ChevronLeft, ChevronRight, Heart, Church, Cross, ArrowRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -115,6 +116,15 @@ export const FeaturedTestimonials = () => {
             <ChevronRight className="w-4 h-4" />
           </Button>
         </div>
+
+        <Button
+          variant="outline"
+          className="w-full mt-4 gap-2 border-primary/20 text-primary hover:bg-primary/5"
+          onClick={() => navigate("/historias-de-fe")}
+        >
+          Ver todas las historias
+          <ArrowRight className="w-4 h-4" />
+        </Button>
       </div>
     </section>
   );
