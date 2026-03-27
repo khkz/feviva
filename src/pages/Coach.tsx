@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { requireAuth } from "@/lib/auth-guard";
 import { Button } from "@/components/ui/button";
@@ -347,13 +347,15 @@ const motivationalMessages = [
 
 const Coach = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const { incrementDebates } = useUserStats();
   const isMobile = useIsMobile();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [selectedMode, setSelectedMode] = useState<"debate" | "pupilo">("debate");
+  const initialMode = searchParams.get("mode") === "pupilo" ? "pupilo" : "debate";
+  const [selectedMode, setSelectedMode] = useState<"debate" | "pupilo">(initialMode);
   const [selectedPersona, setSelectedPersona] = useState("ateo_cientifico");
   const [selectedDificultad, setSelectedDificultad] = useState("tutorial");
   const [selectedTema, setSelectedTema] = useState(temas[0]);

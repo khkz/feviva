@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { MessageCircle, BookOpen, Users, Target, Route, Shield, Sparkles } from "lucide-react";
+import { MessageCircle, BookOpen, Users, Target, Route, Shield, Sparkles, Bot } from "lucide-react";
 import { motion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 import coachImage from "@/assets/coach-section.jpg";
@@ -35,6 +35,15 @@ const exploreItems: ExploreItem[] = [
     image: libraryImage,
     badge: "Nuevo",
     stats: "10 lecciones"
+  },
+  {
+    icon: Bot,
+    label: "Pupilo Digital",
+    description: "Enséñale a una IA fría sobre el amor humano",
+    path: "/coach?mode=pupilo",
+    image: communityImage,
+    badge: "Nuevo",
+    stats: "Misión"
   },
   {
     icon: MessageCircle,
