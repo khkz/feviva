@@ -17,6 +17,12 @@ const testimonials = [
     avatar: "L"
   },
   {
+    quote: "Viví en un espiral de fiestas, infidelidades y adicciones. Mi matrimonio estaba destruido. Pero Dios tocó primero el corazón de mi esposa Ana María, y a través de ella me llamó a mí. Hice un retiro, una confesión de vida, y todo empezó a cambiar. Hoy somos padres de 6 hijos, vivimos de la providencia de Dios y nuestra familia es un símbolo provida. Confía en Dios, incluso en los momentos más oscuros. Él tiene un plan para tu vida.",
+    author: "Juan Pablo Obregón",
+    role: "Actor, esposo y padre de 6 hijos · Colombia",
+    avatar: "JP"
+  },
+  {
     quote: "Antes no sabía cómo orar. Ahora tengo un ritual diario que me conecta con Dios cada mañana.",
     author: "María G.",
     role: "Usuaria desde hace 6 meses",
