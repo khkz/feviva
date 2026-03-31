@@ -54,9 +54,9 @@ interface Category {
 }
 
 const CATEGORY_META: Record<string, { subtitle: string; color: string }> = {
-  'Cosmos y Credo': { subtitle: 'Teología', color: 'cyan' },
-  'Gigantes de la Fe': { subtitle: 'Historia', color: 'amber' },
-  'Ética del Futuro': { subtitle: 'Moral', color: 'purple' },
+  'Identidad Digital': { subtitle: 'Quién eres más allá de la pantalla', color: 'cyan' },
+  'Paz Interior': { subtitle: 'Recupera tu silencio y tu calma', color: 'amber' },
+  'Familia y Tecnología': { subtitle: 'Protege lo que más importa', color: 'purple' },
 };
 
 function articulosToCategories(articulos: FronteraArticulo[]): Category[] {
