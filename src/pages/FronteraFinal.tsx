@@ -33,8 +33,8 @@ import { useFronteraProgress } from '@/hooks/useFronteraProgress';
 import { useFronteraArticulos, FronteraArticulo } from '@/hooks/useFronteraArticulos';
 
 const iconMap: Record<string, LucideIcon> = {
-  BookOpen, Atom, Infinity: InfinityIcon, HelpCircle,
-  Telescope, Flag, Cpu,
+  User, Smartphone, Eye, Heart,
+  Volume2, Newspaper, Users, Cpu,
 };
 
 interface CategoryCard {
