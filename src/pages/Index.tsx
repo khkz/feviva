@@ -86,7 +86,7 @@ const Index = () => {
                 <img 
                   src={logoElRugido} 
                   alt="ElRugido - Tu compañero de fe digital" 
-                  className="w-28 h-28 md:w-36 md:h-36 lg:w-44 lg:h-44 mb-3"
+                  className="w-40 h-40 md:w-52 md:h-52 lg:w-64 lg:h-64 mb-3"
                   loading="eager"
                   decoding="async"
                 />
