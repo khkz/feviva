@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Skeleton } from '@/components/ui/skeleton';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import logoElRugido from '@/assets/logo-elrugido.svg';
+import logoElRugido from '@/assets/logo-elrugido.png';
 import { FooterSection } from '@/components/landing/FooterSection';
 
 // Category configuration

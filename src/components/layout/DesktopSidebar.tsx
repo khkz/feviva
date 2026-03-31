@@ -18,7 +18,7 @@ import {
   Rocket
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import logoElRugido from "@/assets/logo-elrugido.svg";
+import logoElRugido from "@/assets/logo-elrugido.png";
 
 interface NavItem {
   path: string;

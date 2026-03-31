@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Download, Copy, Check, Share2, Code2 } from "lucide-react";
 import { toast } from "sonner";
-import logoElRugido from '@/assets/logo-elrugido.svg';
+import logoElRugido from '@/assets/logo-elrugido.png';
 
 interface PrayerShareModalProps {
   isOpen: boolean;

@@ -2,7 +2,7 @@ import { BookOpen, Sun, Moon, CloudSun, Flame, GraduationCap, MessageSquare } fr
 import { motion } from "framer-motion";
 import { DailyShareButton } from "@/components/shared/DailyShareButton";
 import { OptimizedImage } from "@/components/ui/optimized-image";
-import lionLogo from "@/assets/logo-elrugido.svg";
+import lionLogo from "@/assets/logo-elrugido.png";
 import heroBackground from "@/assets/hero-background.jpg";
 
 interface HeroSectionProps {

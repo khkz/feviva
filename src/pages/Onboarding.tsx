@@ -18,7 +18,7 @@ import {
   Flame,
   Church
 } from "lucide-react";
-import logoElRugido from "@/assets/logo-elrugido.svg";
+import logoElRugido from "@/assets/logo-elrugido.png";
 
 interface OnboardingOption {
   id: string;
