@@ -3,12 +3,13 @@ import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { LucideIcon } from 'lucide-react';
 import { 
-  BookOpen, 
-  Infinity as InfinityIcon, 
-  HelpCircle, 
-  Atom, 
-  Telescope, 
-  Flag, 
+  User, 
+  Smartphone, 
+  Eye, 
+  Heart, 
+  Volume2, 
+  Newspaper, 
+  Users, 
   Cpu, 
   Shield,
   ShieldCheck,
