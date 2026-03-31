@@ -18,7 +18,7 @@ import { SleepStory } from "@/hooks/useSleepStories";
 import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
 import { AmbientSoundMixer } from "./AmbientSoundMixer";
 import { ContentFeedback } from "@/components/feedback/ContentFeedback";
-import logoElRugido from "@/assets/logo-elrugido.svg";
+import logoElRugido from "@/assets/logo-elrugido.png";
 
 interface SleepPlayerProps {
   story: SleepStory;

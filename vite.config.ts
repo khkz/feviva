@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "logo-elrugido.svg", "robots.txt"],
+      includeAssets: ["favicon.ico", "logo-elrugido.png", "robots.txt"],
       manifest: {
         name: "ElRugido - Fe Católica",
         short_name: "ElRugido",
@@ -29,7 +29,7 @@ export default defineConfig(({ mode }) => ({
         categories: ["education", "lifestyle"],
         icons: [
           {
-            src: "/logo-elrugido.svg",
+            src: "/logo-elrugido.png",
             sizes: "any",
             type: "image/svg+xml",
             purpose: "any maskable",

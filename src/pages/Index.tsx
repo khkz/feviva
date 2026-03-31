@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import heroBackground from "@/assets/hero-background.jpg";
-import logoElRugido from "@/assets/logo-elrugido.svg";
+import logoElRugido from "@/assets/logo-elrugido.png";
 
 // Lazy load below-the-fold sections for performance
 const WhatsNewSection = lazy(() => import("@/components/landing/WhatsNewSection").then(m => ({ default: m.WhatsNewSection })));

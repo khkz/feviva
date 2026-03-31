@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { ShareModal } from '@/components/shared/ShareModal';
 import { FooterSection } from '@/components/landing/FooterSection';
-import logoElRugido from '@/assets/logo-elrugido.svg';
+import logoElRugido from '@/assets/logo-elrugido.png';
 import {
   ArrowLeft, 
   Calendar, 
@@ -201,7 +201,7 @@ export default function SantoPage() {
       "name": "ElRugido",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://elrugido.com/logo-elrugido.svg"
+        "url": "https://elrugido.com/logo-elrugido.png"
       }
     },
     "datePublished": saint.created_at,

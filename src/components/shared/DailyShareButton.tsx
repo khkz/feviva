@@ -14,7 +14,7 @@ import { useDailyContent } from "@/hooks/useDailyContent";
 import { useDailyGospel } from "@/hooks/useDailyGospel";
 import { useSaintOfDay } from "@/hooks/useSaintOfDay";
 import { toast } from "sonner";
-import logoElRugido from '@/assets/logo-elrugido.svg';
+import logoElRugido from '@/assets/logo-elrugido.png';
 
 interface DailyShareButtonProps {
   tipo: ShareImageType;

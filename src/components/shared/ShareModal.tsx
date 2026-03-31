@@ -27,7 +27,7 @@ interface ShareModalProps {
 }
 
 // Logo URL for branding
-const LOGO_URL = '/logo-elrugido.svg';
+const LOGO_URL = '/logo-elrugido.png';
 
 // Generate Post (1:1) image with canvas
 const GeneratedPostImage = ({ 

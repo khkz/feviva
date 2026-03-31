@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSantos } from '@/hooks/useSantos';
 import { countryFlags, countryNames, continentNames, countriesByContinent, monthNames } from '@/lib/countryMappings';
-import logoElRugido from '@/assets/logo-elrugido.svg';
+import logoElRugido from '@/assets/logo-elrugido.png';
 import { FooterSection } from '@/components/landing/FooterSection';
 
 const SantosPublic = () => {

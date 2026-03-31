@@ -66,7 +66,7 @@ export const useNotifications = () => {
 
     const notification = new Notification(title, {
       body,
-      icon: "/logo-elrugido.svg",
+      icon: "/logo-elrugido.png",
       tag: "novena-reminder",
     });
 
