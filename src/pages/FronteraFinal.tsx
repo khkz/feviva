@@ -67,7 +67,7 @@ function articulosToCategories(articulos: FronteraArticulo[]): Category[] {
       id: a.id,
       title: a.titulo,
       description: a.descripcion,
-      icon: iconMap[a.icon_name] || Atom,
+      icon: iconMap[a.icon_name] || Cpu,
       size: 'normal',
       href: `/frontera-final/${a.id}`,
     });
