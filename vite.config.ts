@@ -30,8 +30,8 @@ export default defineConfig(({ mode }) => ({
         icons: [
           {
             src: "/logo-elrugido.png",
-            sizes: "any",
-            type: "image/svg+xml",
+            sizes: "512x512",
+            type: "image/png",
             purpose: "any maskable",
           },
         ],
