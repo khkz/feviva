@@ -656,37 +656,6 @@ const Auth = () => {
                         </button>
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="perfil-doctrinal">Perfil Doctrinal</Label>
-                        <Select value={perfilDoctrinal} onValueChange={setPerfilDoctrinal}>
-                          <SelectTrigger id="perfil-doctrinal" className="h-12">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="catolico">Católico</SelectItem>
-                            <SelectItem value="evangelico">Evangélico</SelectItem>
-                            <SelectItem value="pentecostal">Pentecostal</SelectItem>
-                            <SelectItem value="no_denominacional">No Denominacional</SelectItem>
-                            <SelectItem value="otro">Otro</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="edad-segmento">Rango de Edad</Label>
-                        <Select value={edadSegmento} onValueChange={setEdadSegmento} required>
-                          <SelectTrigger id="edad-segmento" className="h-12">
-                            <SelectValue placeholder="Edad" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="18-25">18-25</SelectItem>
-                            <SelectItem value="26-35">26-35</SelectItem>
-                            <SelectItem value="36-50">36-50</SelectItem>
-                            <SelectItem value="51+">51+</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
                     <Button type="submit" className="w-full h-12 text-base font-semibold bg-secondary hover:bg-secondary-hover text-primary" disabled={loading}>
                       {loading ? "Creando cuenta..." : "Crear Cuenta Gratis"}
                     </Button>
