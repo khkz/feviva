@@ -1,7 +1,8 @@
-import { useEffect, useState, lazy, Suspense, useMemo } from "react";
+import { useEffect, useState, lazy, Suspense, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { BookOpen, Shield } from "lucide-react";
+import { FirstDayExperience } from "@/components/ftue/FirstDayExperience";
 import { useUserStats } from "@/hooks/useUserStats";
 import { useNovenas } from "@/hooks/useNovenas";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
@@ -48,6 +49,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [ftueCompleted, setFtueCompleted] = useState(true); // default true to avoid flash
   const {
     stats,
     getPointsForNextLevel,
@@ -97,8 +99,24 @@ const Dashboard = () => {
       setProfile(data);
     }
     
+    // Check if user has ever completed the FTUE (stored in localStorage)
+    const ftueKey = `ftue_completed_${session.user.id}`;
+    const hasCompleted = localStorage.getItem(ftueKey) === "true";
+    setFtueCompleted(hasCompleted);
+    
     setLoading(false);
   };
+
+  const handleFtueComplete = useCallback(() => {
+    const getSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        localStorage.setItem(`ftue_completed_${session.user.id}`, "true");
+      }
+    };
+    getSession();
+    setFtueCompleted(true);
+  }, []);
 
   if (loading) {
     return (
@@ -114,6 +132,16 @@ const Dashboard = () => {
           <BookOpen className="w-12 h-12" />
         </motion.div>
       </div>
+    );
+  }
+
+  // Show FTUE for brand new users
+  if (!ftueCompleted && userMaturity === 0) {
+    return (
+      <FirstDayExperience
+        userName={profile?.nombre?.split(" ")[0] || "Peregrino"}
+        onComplete={handleFtueComplete}
+      />
     );
   }
 
