@@ -135,6 +135,16 @@ const Dashboard = () => {
     );
   }
 
+  // Show FTUE for brand new users
+  if (!ftueCompleted && userMaturity === 0) {
+    return (
+      <FirstDayExperience
+        userName={profile?.nombre?.split(" ")[0] || "Peregrino"}
+        onComplete={handleFtueComplete}
+      />
+    );
+  }
+
   // Show more content as user matures
   const showDailyMission = true; // always
   const showDailyRoutine = true; // always
