@@ -1,7 +1,8 @@
-import { useEffect, useState, lazy, Suspense, useMemo } from "react";
+import { useEffect, useState, lazy, Suspense, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { BookOpen, Shield } from "lucide-react";
+import { FirstDayExperience } from "@/components/ftue/FirstDayExperience";
 import { useUserStats } from "@/hooks/useUserStats";
 import { useNovenas } from "@/hooks/useNovenas";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
