@@ -99,8 +99,24 @@ const Dashboard = () => {
       setProfile(data);
     }
     
+    // Check if user has ever completed the FTUE (stored in localStorage)
+    const ftueKey = `ftue_completed_${session.user.id}`;
+    const hasCompleted = localStorage.getItem(ftueKey) === "true";
+    setFtueCompleted(hasCompleted);
+    
     setLoading(false);
   };
+
+  const handleFtueComplete = useCallback(() => {
+    const getSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        localStorage.setItem(`ftue_completed_${session.user.id}`, "true");
+      }
+    };
+    getSession();
+    setFtueCompleted(true);
+  }, []);
 
   if (loading) {
     return (
