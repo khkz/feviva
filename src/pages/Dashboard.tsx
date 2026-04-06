@@ -118,19 +118,19 @@ const Dashboard = () => {
   }
 
   // Show more content as user matures
-  const showDailyMission = userMaturity >= 0; // always
-  const showDailyRoutine = userMaturity >= 0; // always
-  const showSaintAndGospel = userMaturity >= 0; // always (core 3)
-  const showQuickActions = userMaturity >= 1; // after first interaction
-  const showSoulTriage = userMaturity >= 1;
+  const showDailyMission = true; // always
+  const showDailyRoutine = true; // always
+  const showSaintAndGospel = true; // always (core 3)
+  const showQuickActions = true; // always — navigation is essential
+  const showSoulTriage = true; // always — emergency kit
   const showFrontera = userMaturity >= 2; // after 3 days
-  const showDailyChallenge = userMaturity >= 2;
-  const showExploreGrid = userMaturity >= 2;
+  const showDailyChallenge = userMaturity >= 1;
+  const showExploreGrid = userMaturity >= 1;
   const showNovenas = userMaturity >= 2;
-  const showGratitude = userMaturity >= 1;
+  const showGratitude = true; // always
   const showStreaks = userMaturity >= 1;
   const showReminders = userMaturity >= 2;
-  const showFeaturedContent = userMaturity >= 2;
+  const showFeaturedContent = userMaturity >= 1;
 
   return (
     <div className="min-h-screen bg-background">
