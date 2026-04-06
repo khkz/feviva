@@ -1,4 +1,4 @@
-import { useEffect, useState, lazy, Suspense } from "react";
+import { useEffect, useState, lazy, Suspense, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { BookOpen, Shield } from "lucide-react";
@@ -59,6 +59,18 @@ const Dashboard = () => {
   const { isAdmin } = useAdminAuth();
   const dailyVerse = useDailyVerse();
 
+  // Progressive disclosure: determine user maturity level
+  const userMaturity = useMemo(() => {
+    if (!stats) return 0;
+    const streak = stats.racha_actual_dias || 0;
+    const points = stats.puntos_totales || 0;
+    // Level 0: brand new (0 days), Level 1: day 1-2, Level 2: day 3-6, Level 3: 7+ days
+    if (streak === 0 && points < 50) return 0;
+    if (streak <= 2) return 1;
+    if (streak <= 6) return 2;
+    return 3;
+  }, [stats]);
+
   useEffect(() => {
     loadProfile();
   }, []);
@@ -105,19 +117,30 @@ const Dashboard = () => {
     );
   }
 
+  // Show more content as user matures
+  const showDailyMission = userMaturity >= 0; // always
+  const showDailyRoutine = userMaturity >= 0; // always
+  const showSaintAndGospel = userMaturity >= 0; // always (core 3)
+  const showQuickActions = userMaturity >= 1; // after first interaction
+  const showSoulTriage = userMaturity >= 1;
+  const showFrontera = userMaturity >= 2; // after 3 days
+  const showDailyChallenge = userMaturity >= 2;
+  const showExploreGrid = userMaturity >= 2;
+  const showNovenas = userMaturity >= 2;
+  const showGratitude = userMaturity >= 1;
+  const showStreaks = userMaturity >= 1;
+  const showReminders = userMaturity >= 2;
+  const showFeaturedContent = userMaturity >= 2;
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Desktop Sidebar */}
       <DesktopSidebar 
         userName={profile?.nombre || "Peregrino"}
         userLevel={stats?.nivel || 1}
         userStreak={stats?.racha_actual_dias || 0}
       />
 
-      {/* Main Content - with sidebar offset on desktop */}
       <div className="lg:ml-64 pb-24 lg:pb-8">
-        {/* Hero Section with Immersive Background */}
         <HeroSection 
           userName={profile?.nombre || "Peregrino"} 
           verse={dailyVerse}
@@ -128,9 +151,8 @@ const Dashboard = () => {
           } : undefined}
         />
 
-        {/* Main Content Container */}
         <div className="max-w-7xl mx-auto lg:px-8">
-          {/* Admin Access Button */}
+          {/* Admin Access */}
           {isAdmin && (
             <div className="px-5 py-2 lg:px-0">
               <Button 
@@ -145,107 +167,113 @@ const Dashboard = () => {
             </div>
           )}
 
-          {/* Soul Triage - Spiritual Emergency Kit */}
-          <SoulTriageHero />
+          {/* Core 3: Always visible */}
+          {showSoulTriage && <SoulTriageHero />}
 
-          {/* Next Step Card - Prominent Formation Path */}
           <NextStepCard 
             currentLevel={stats?.nivel || 1}
             completedLessons={Math.floor((stats?.puntos_totales || 0) / 100)}
             totalLessons={10}
           />
 
-          {/* Daily Mission */}
-          <Suspense fallback={<CardSkeleton height="h-48" />}>
-            <DailyMission />
-          </Suspense>
+          {showDailyMission && (
+            <Suspense fallback={<CardSkeleton height="h-48" />}>
+              <DailyMission />
+            </Suspense>
+          )}
 
-          {/* Daily Routine Card - Prayer Playlist */}
-          <Suspense fallback={<CardSkeleton height="h-40" />}>
-            <DailyRoutineCard />
-          </Suspense>
+          {showDailyRoutine && (
+            <Suspense fallback={<CardSkeleton height="h-40" />}>
+              <DailyRoutineCard />
+            </Suspense>
+          )}
 
-          {/* Quick Actions - Tu Formación */}
-          <QuickActions />
+          {showQuickActions && <QuickActions />}
 
-          {/* === CONTENIDO DIARIO === */}
-          
-          {/* Tu Campo de Formación */}
-          <section className="px-5 lg:px-0 mb-6">
-            <h2 className="font-heading text-xl font-bold text-foreground mb-4">
-              Tu Día Espiritual
-            </h2>
-            
-            {/* Mobile: Stack view */}
-            <div className="space-y-4 lg:hidden">
-              <SaintOfTheDayCard userCountryCode={profile?.country_code} />
-              <GospelCard />
-              <Suspense fallback={<CardSkeleton height="h-64" />}>
-                <FeaturedContent hideTitle />
-              </Suspense>
-            </div>
-            
-            {/* Desktop: Grid view */}
-            <div className="hidden lg:grid lg:grid-cols-3 lg:gap-6">
-              <div className="lg:col-span-1 space-y-4">
+          {/* Tu Día Espiritual — always visible */}
+          {showSaintAndGospel && (
+            <section className="px-5 lg:px-0 mb-6">
+              <h2 className="font-heading text-xl font-bold text-foreground mb-4">
+                Tu Día Espiritual
+              </h2>
+              
+              <div className="space-y-4 lg:hidden">
                 <SaintOfTheDayCard userCountryCode={profile?.country_code} />
                 <GospelCard />
+                {showFeaturedContent && (
+                  <Suspense fallback={<CardSkeleton height="h-64" />}>
+                    <FeaturedContent hideTitle />
+                  </Suspense>
+                )}
               </div>
-              <div className="lg:col-span-2">
-                <Suspense fallback={<CardSkeleton height="h-64" />}>
-                  <FeaturedContent hideTitle />
-                </Suspense>
+              
+              <div className="hidden lg:grid lg:grid-cols-3 lg:gap-6">
+                <div className="lg:col-span-1 space-y-4">
+                  <SaintOfTheDayCard userCountryCode={profile?.country_code} />
+                  <GospelCard />
+                </div>
+                <div className="lg:col-span-2">
+                  {showFeaturedContent && (
+                    <Suspense fallback={<CardSkeleton height="h-64" />}>
+                      <FeaturedContent hideTitle />
+                    </Suspense>
+                  )}
+                </div>
               </div>
-            </div>
-          </section>
+            </section>
+          )}
 
-          {/* === CONTENIDO PRINCIPAL + SIDEBAR === */}
+          {/* Progressive content */}
           <div className="lg:grid lg:grid-cols-3 lg:gap-6">
-            {/* Columna izquierda - Contenido principal (2/3) */}
             <div className="lg:col-span-2 space-y-6">
-              {/* Frontera Final - Featured */}
-              <section className="px-5 lg:px-0">
-                <FronteraFinalCard />
-              </section>
+              {showFrontera && (
+                <section className="px-5 lg:px-0">
+                  <FronteraFinalCard />
+                </section>
+              )}
 
-              {/* Daily Challenge */}
-              <Suspense fallback={<CardSkeleton height="h-48" />}>
-                <DailyChallenge />
-              </Suspense>
+              {showDailyChallenge && (
+                <Suspense fallback={<CardSkeleton height="h-48" />}>
+                  <DailyChallenge />
+                </Suspense>
+              )}
 
-              {/* Explore Grid - Crece en tu Fe */}
-              <Suspense fallback={<CardSkeleton height="h-96" />}>
-                <ExploreGrid />
-              </Suspense>
+              {showExploreGrid && (
+                <Suspense fallback={<CardSkeleton height="h-96" />}>
+                  <ExploreGrid />
+                </Suspense>
+              )}
 
-              {/* Novena Carousel - Continúa tu Camino */}
-              <Suspense fallback={<CardSkeleton height="h-64" />}>
-                <NovenaCarousel
-                  novenas={novenas}
-                  getProgress={getProgressForNovena}
-                  loading={novenasLoading}
-                />
-              </Suspense>
+              {showNovenas && (
+                <Suspense fallback={<CardSkeleton height="h-64" />}>
+                  <NovenaCarousel
+                    novenas={novenas}
+                    getProgress={getProgressForNovena}
+                    loading={novenasLoading}
+                  />
+                </Suspense>
+              )}
             </div>
 
-            {/* Columna derecha - Sidebar Stats (1/3) */}
             <div className="lg:col-span-1 space-y-4 px-5 lg:px-0 mt-6 lg:mt-0">
-              {/* Gratitude Prompt */}
-              <Suspense fallback={<CardSkeleton height="h-24" />}>
-                <GratitudePrompt />
-              </Suspense>
+              {showGratitude && (
+                <Suspense fallback={<CardSkeleton height="h-24" />}>
+                  <GratitudePrompt />
+                </Suspense>
+              )}
 
-              {/* Practice Streaks */}
-              <Suspense fallback={<CardSkeleton height="h-32" />}>
-                <PracticeStreaksCard />
-              </Suspense>
+              {showStreaks && (
+                <Suspense fallback={<CardSkeleton height="h-32" />}>
+                  <PracticeStreaksCard />
+                </Suspense>
+              )}
 
-              {/* Practice Reminders */}
-              <Suspense fallback={<CardSkeleton height="h-32" />}>
-                <PracticeRemindersCard />
-              </Suspense>
+              {showReminders && (
+                <Suspense fallback={<CardSkeleton height="h-32" />}>
+                  <PracticeRemindersCard />
+                </Suspense>
+              )}
 
-              {/* Progress Card */}
               {stats && (
                 <ProgressCard
                   nivel={stats.nivel}
@@ -259,7 +287,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Bottom Navigation - Mobile only */}
         <BottomNavigation />
       </div>
     </div>
