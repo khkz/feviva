@@ -49,6 +49,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [ftueCompleted, setFtueCompleted] = useState(true); // default true to avoid flash
   const {
     stats,
     getPointsForNextLevel,
