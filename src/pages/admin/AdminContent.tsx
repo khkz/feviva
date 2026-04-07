@@ -112,7 +112,7 @@ export const AdminContent = () => {
       const [storiesRes, novenasRes, lessonsRes, premiumJobsRes] = await Promise.all([
         supabase.from('sleep_stories').select('id, titulo, audio_url, created_at').order('orden'),
         supabase.from('novenas').select('id, titulo, imagen_url, created_at').order('orden'),
-        supabase.from('library_lessons').select('id, titulo, contenido_enriquecido, audio_url, verificado_at, verificacion_data, resumen_audio, created_at').order('orden'),
+        supabase.from('library_lessons').select('id, titulo, categoria, contenido, contenido_enriquecido, audio_url, verificado_at, verificacion_data, resumen_audio, estado_verificacion, verificado_por, created_at').order('orden'),
         // Obtener jobs premium completados - usamos result_data y completed_at como indicadores
         // más confiables que status (evita race conditions donde status queda 'pending')
         supabase.from('processing_jobs')
@@ -634,103 +634,18 @@ export const AdminContent = () => {
               </p>
             </TabsContent>
             
-            {/* Sub-tab Contenido */}
+            {/* Sub-tab Contenido - Editor de texto */}
             <TabsContent value="contenido" className="space-y-4 mt-4">
-              <div className="flex gap-2 flex-wrap">
-                <Button 
-                  onClick={() => {
-                    setEnrichCount(Math.min(5, lessons.filter(l => !l.verificado_at).length || 5));
-                    setShowEnrichDialog(true);
-                  }}
-                  size="sm"
-                  variant="default"
-                  disabled={lessonEnrichJobs.stats.pending > 0 || lessonEnrichJobs.stats.processing > 0}
-                  className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600"
-                >
-                  {lessonEnrichJobs.stats.processing > 0 ? (
-                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                  ) : (
-                    <Brain className="h-4 w-4 mr-2" />
-                  )}
-                  Verificar con Gemini 3 Pro
-                </Button>
-              </div>
-              
-              {/* Panel de progreso para enriquecimiento */}
-              {(lessonEnrichJobs.stats.total > 0) && (
-                <JobProgressPanel 
-                  jobType="lesson_content_enrich"
-                  title="Verificación con Gemini 3 Pro"
-                  showDetails={true}
-                  className="border-purple-500/20"
-                />
-              )}
-              
-              <Card>
-                <CardContent className="p-0">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Título</TableHead>
-                        <TableHead>Estado</TableHead>
-                        <TableHead>Confianza</TableHead>
-                        <TableHead>Verificado</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {lessons.map((lesson) => {
-                        const isVerified = !!lesson.verificado_at;
-                        const confidence = lesson.verificacion_data?.nivel_confianza;
-                        
-                        return (
-                          <TableRow key={lesson.id}>
-                            <TableCell className="font-medium">{lesson.titulo}</TableCell>
-                            <TableCell>
-                              {isVerified ? (
-                                <Badge className="bg-green-500/10 text-green-500 border-green-500/30">
-                                  <CheckCircle2 className="h-3 w-3 mr-1" />
-                                  Gemini 3 Pro
-                                </Badge>
-                              ) : lesson.contenido_enriquecido ? (
-                                <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/30">
-                                  <AlertCircle className="h-3 w-3 mr-1" />
-                                  IA básica
-                                </Badge>
-                              ) : (
-                                <Badge variant="secondary">
-                                  <Clock className="h-3 w-3 mr-1" />
-                                  Sin enriquecer
-                                </Badge>
-                              )}
-                            </TableCell>
-                            <TableCell>
-                              {confidence === 'alto' ? (
-                                <Badge className="bg-green-500/10 text-green-600">🟢 Alto</Badge>
-                              ) : confidence === 'medio' ? (
-                                <Badge className="bg-amber-500/10 text-amber-600">🟡 Medio</Badge>
-                              ) : confidence === 'bajo' ? (
-                                <Badge className="bg-red-500/10 text-red-600">🔴 Bajo</Badge>
-                              ) : (
-                                <span className="text-muted-foreground text-xs">—</span>
-                              )}
-                            </TableCell>
-                            <TableCell className="text-muted-foreground text-sm">
-                              {lesson.verificado_at 
-                                ? new Date(lesson.verificado_at).toLocaleDateString()
-                                : '—'
-                              }
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
-              <p className="text-xs text-muted-foreground">
-                <Brain className="h-3 w-3 inline mr-1" />
-                Gemini 3 Pro verifica datos históricos, citas bíblicas y referencias al Catecismo
-              </p>
+              <LessonTextEditor 
+                lessons={lessons.map(l => ({
+                  ...l,
+                  categoria: (l as any).categoria || '',
+                  contenido: (l as any).contenido || '',
+                  estado_verificacion: (l as any).estado_verificacion || 'sin_verificar',
+                  verificado_por: (l as any).verificado_por || null,
+                }))}
+                onRefresh={fetchContent}
+              />
             </TabsContent>
           </Tabs>
         </TabsContent>
