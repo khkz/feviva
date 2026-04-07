@@ -31,6 +31,7 @@ const FeaturedContent = lazy(() => import("@/components/dashboard/FeaturedConten
 const GratitudePrompt = lazy(() => import("@/components/dashboard/GratitudePrompt").then(m => ({ default: m.GratitudePrompt })));
 const DailyMission = lazy(() => import("@/components/dashboard/DailyMission").then(m => ({ default: m.DailyMission })));
 const DailyRoutineCard = lazy(() => import("@/components/dashboard/DailyRoutineCard").then(m => ({ default: m.DailyRoutineCard })));
+const DailyCapsuleWidget = lazy(() => import("@/components/dashboard/DailyCapsuleWidget").then(m => ({ default: m.DailyCapsuleWidget })));
 
 interface Profile {
   nombre: string;
@@ -284,6 +285,9 @@ const Dashboard = () => {
             </div>
 
             <div className="lg:col-span-1 space-y-4 px-5 lg:px-0 mt-6 lg:mt-0">
+              <Suspense fallback={null}>
+                <DailyCapsuleWidget />
+              </Suspense>
               {showGratitude && (
                 <Suspense fallback={<CardSkeleton height="h-24" />}>
                   <GratitudePrompt />
