@@ -6,7 +6,6 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Generate URL-friendly slug from prayer name
 function generateSlug(nombre: string): string {
   return nombre
     .toLowerCase()
@@ -41,48 +40,54 @@ serve(async (req) => {
     const baseUrl = "https://elrugido.com";
     const today = new Date().toISOString().split("T")[0];
 
-    // Fetch all saints with slugs and updated_at
+    // Fetch saints
     const { data: saints, error: saintsError } = await supabase
       .from("calendar_saints")
       .select("id, slug, name, category, image_url, feast_month, feast_day, created_at, updated_at")
       .order("category", { ascending: false })
       .order("feast_month")
       .order("feast_day");
-
     if (saintsError) throw saintsError;
 
-    // Fetch all prayers with slug and updated_at
+    // Fetch prayers
     const { data: oraciones, error: oracionesError } = await supabase
       .from("oraciones")
       .select("id, nombre, slug, categoria, es_fundamental, created_at, updated_at")
       .order("categoria")
       .order("orden");
-
     if (oracionesError) throw oracionesError;
 
-    // Static pages with priorities
+    // Fetch novenas
+    const { data: novenas, error: novenasError } = await supabase
+      .from("novenas")
+      .select("id, titulo, created_at")
+      .order("orden");
+    if (novenasError) throw novenasError;
+
+    // Fetch frontera articles
+    const { data: articulos, error: articulosError } = await supabase
+      .from("frontera_articulos")
+      .select("id, updated_at")
+      .order("orden");
+    if (articulosError) throw articulosError;
+
+    // Static pages
     const staticPages = [
       { url: "/", changefreq: "daily", priority: "1.0" },
       { url: "/santos", changefreq: "daily", priority: "0.9" },
       { url: "/oraciones", changefreq: "weekly", priority: "0.9" },
+      { url: "/evangelio-del-dia", changefreq: "daily", priority: "0.9" },
+      { url: "/novenas-publicas", changefreq: "weekly", priority: "0.8" },
       { url: "/auth", changefreq: "monthly", priority: "0.6" },
       { url: "/frontera-final", changefreq: "weekly", priority: "0.7" },
-      { url: "/frontera-final/padre-big-bang", changefreq: "monthly", priority: "0.6" },
-      { url: "/frontera-final/observatorio-vaticano", changefreq: "monthly", priority: "0.6" },
-      { url: "/frontera-final/bautizar-extraterrestre", changefreq: "monthly", priority: "0.6" },
-      { url: "/frontera-final/punto-omega", changefreq: "monthly", priority: "0.6" },
-      { url: "/frontera-final/libro-naturaleza", changefreq: "monthly", priority: "0.6" },
-      { url: "/frontera-final/ia-alma", changefreq: "monthly", priority: "0.6" },
-      { url: "/frontera-final/colonizar-conquistar", changefreq: "monthly", priority: "0.6" },
     ];
 
-    // Build XML
     let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 `;
 
-    // Add static pages
+    // Static pages
     for (const page of staticPages) {
       xml += `  <url>
     <loc>${baseUrl}${page.url}</loc>
@@ -93,37 +98,31 @@ serve(async (req) => {
 `;
     }
 
-    // Add prayer pages
+    // Prayers
     for (const oracion of oraciones || []) {
-      // Use database slug if available, fallback to generated
       const prayerSlug = oracion.slug || generateSlug(oracion.nombre);
       const priority = oracion.es_fundamental ? "0.8" : "0.6";
-      const changefreq = "monthly";
       const lastmod = oracion.updated_at?.split("T")[0] || oracion.created_at?.split("T")[0] || today;
-
       xml += `  <url>
     <loc>${baseUrl}/oracion/${prayerSlug}</loc>
     <lastmod>${lastmod}</lastmod>
-    <changefreq>${changefreq}</changefreq>
+    <changefreq>monthly</changefreq>
     <priority>${priority}</priority>
   </url>
 `;
     }
 
-    // Add saint pages
+    // Saints
     for (const saint of saints || []) {
       const slug = saint.slug || saint.id;
       const priority = saint.category === "patron_country" ? "0.8" : "0.6";
       const changefreq = saint.image_url ? "monthly" : "weekly";
       const lastmod = saint.updated_at?.split("T")[0] || saint.created_at?.split("T")[0] || today;
-
       xml += `  <url>
     <loc>${baseUrl}/santo/${slug}</loc>
     <lastmod>${lastmod}</lastmod>
     <changefreq>${changefreq}</changefreq>
     <priority>${priority}</priority>`;
-
-      // Add image if available
       if (saint.image_url) {
         xml += `
     <image:image>
@@ -131,15 +130,37 @@ serve(async (req) => {
       <image:title>${saint.name}</image:title>
     </image:image>`;
       }
-
       xml += `
+  </url>
+`;
+    }
+
+    // Novenas
+    for (const novena of novenas || []) {
+      const lastmod = novena.created_at?.split("T")[0] || today;
+      xml += `  <url>
+    <loc>${baseUrl}/novena/${novena.id}</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+`;
+    }
+
+    // Frontera articles
+    for (const art of articulos || []) {
+      const lastmod = art.updated_at?.split("T")[0] || today;
+      xml += `  <url>
+    <loc>${baseUrl}/frontera-final/${art.id}</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
 `;
     }
 
     xml += `</urlset>`;
 
-    // Return URL to check if generation was requested or actual XML
     const url = new URL(req.url);
     const format = url.searchParams.get("format");
 
@@ -147,17 +168,14 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({
           success: true,
-          totalUrls: staticPages.length + (saints?.length || 0) + (oraciones?.length || 0),
+          totalUrls: staticPages.length + (saints?.length || 0) + (oraciones?.length || 0) + (novenas?.length || 0) + (articulos?.length || 0),
           staticPagesCount: staticPages.length,
           saintsCount: saints?.length || 0,
           oracionesCount: oraciones?.length || 0,
-          patronsCount: saints?.filter((s) => s.category === "patron_country").length || 0,
-          fundamentalPrayersCount: oraciones?.filter((o) => o.es_fundamental).length || 0,
-          withImageCount: saints?.filter((s) => s.image_url).length || 0,
+          novenasCount: novenas?.length || 0,
+          articulosCount: articulos?.length || 0,
         }),
-        {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -174,10 +192,7 @@ serve(async (req) => {
     console.error("Error generating sitemap:", errorMessage);
     return new Response(
       JSON.stringify({ error: errorMessage }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
