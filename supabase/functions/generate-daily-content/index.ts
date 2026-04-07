@@ -208,7 +208,8 @@ Responde ÚNICAMENTE con un objeto JSON válido (sin markdown, sin backticks):
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-3-flash-preview',
+        model: 'google/gemini-3-pro-preview',
+        temperature: 0.9,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
