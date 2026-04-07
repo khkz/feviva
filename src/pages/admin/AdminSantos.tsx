@@ -909,6 +909,7 @@ export default function AdminSantos() {
                 <TableHead className="w-[80px] text-center">Historia</TableHead>
                 <TableHead className="w-[80px] text-center">Oración</TableHead>
                 <TableHead className="w-[80px] text-center">Imagen</TableHead>
+                <TableHead className="w-[80px] text-center">Fuente</TableHead>
                 <TableHead className="w-[160px]">Acciones</TableHead>
               </TableRow>
             </TableHeader>
