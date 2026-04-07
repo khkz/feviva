@@ -957,7 +957,14 @@ export default function AdminSantos() {
                       </TableCell>
                       <TableCell className="text-center">
                         {hasHistory ? (
-                          <Check className="h-4 w-4 text-green-600 mx-auto" />
+                          <div className="flex items-center justify-center gap-1">
+                            <Check className="h-4 w-4 text-green-600" />
+                            {saint.estado_verificacion === 'verificado' ? (
+                              <Badge className="text-[10px] px-1 bg-green-500/10 text-green-600">✅</Badge>
+                            ) : (
+                              <Badge className="text-[10px] px-1 bg-amber-500/10 text-amber-600">⏳</Badge>
+                            )}
+                          </div>
                         ) : (
                           <X className="h-4 w-4 text-muted-foreground/40 mx-auto" />
                         )}
@@ -975,6 +982,14 @@ export default function AdminSantos() {
                         ) : (
                           <X className="h-4 w-4 text-muted-foreground/40 mx-auto" />
                         )}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Badge variant="outline" className="text-[10px]">
+                          {saint.fuente_descripcion === 'verificada_humano' ? '👤 Humano' :
+                           saint.fuente_descripcion === 'wikipedia' ? '📖 Wiki' :
+                           saint.description_source?.includes('wikipedia') ? '📖 Wiki' :
+                           '🤖 IA'}
+                        </Badge>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
