@@ -26,8 +26,9 @@ export function useLessonAudio({ lessonId, titulo, existingAudioUrl }: UseLesson
   const [audioUrl, setAudioUrl] = useState<string | null>(existingAudioUrl || null);
   const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
 
-  const generateAudio = useCallback(async (resumenAudio: string) => {
-    if (audioUrl || isGeneratingAudio) return audioUrl;
+  const generateAudio = useCallback(async (resumenAudio: string, forceRegenerate = false) => {
+    if (isGeneratingAudio) return audioUrl;
+    if (audioUrl && !forceRegenerate) return audioUrl;
     
     setIsGeneratingAudio(true);
     
