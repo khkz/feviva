@@ -1177,6 +1177,15 @@ export default function AdminSantos() {
                   </Badge>
                 )}
                 <Badge variant="outline">{categoryLabels[viewingSaint.category]}</Badge>
+                <Badge variant="outline" className="text-xs">
+                  Fuente: {viewingSaint.fuente_descripcion === 'verificada_humano' ? '👤 Humano' :
+                    viewingSaint.description_source?.includes('wikipedia') ? '📖 Wikipedia' : '🤖 IA'}
+                </Badge>
+                {viewingSaint.estado_verificacion === 'verificado' ? (
+                  <Badge className="bg-green-500/10 text-green-600 border-green-500/30">✅ Verificado</Badge>
+                ) : (
+                  <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/30">⏳ Sin verificar</Badge>
+                )}
               </div>
 
               {/* Description */}
@@ -1186,13 +1195,35 @@ export default function AdminSantos() {
                   Historia
                 </h4>
                 {viewingSaint.description ? (
-                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                    {viewingSaint.description}
-                  </p>
+                  <ScrollArea className="max-h-[300px]">
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                      {viewingSaint.description}
+                    </p>
+                  </ScrollArea>
                 ) : (
                   <p className="text-sm text-muted-foreground italic">Sin historia registrada</p>
                 )}
               </div>
+
+              {/* Mark as verified */}
+              {viewingSaint.description && viewingSaint.estado_verificacion !== 'verificado' && (
+                <Button
+                  onClick={async () => {
+                    const { data: { user } } = await supabase.auth.getUser();
+                    await supabase.from('calendar_saints').update({
+                      estado_verificacion: 'verificado',
+                      verificado_por: user?.id,
+                      fuente_descripcion: 'verificada_humano',
+                    }).eq('id', viewingSaint.id);
+                    toast.success('Santo marcado como verificado');
+                    queryClient.invalidateQueries({ queryKey: ['admin-calendar-saints'] });
+                    setViewingSaint(null);
+                  }}
+                  className="w-full bg-green-600 hover:bg-green-700"
+                >
+                  ✅ Marcar como verificado por humano
+                </Button>
+              )}
 
               {/* Prayer link */}
               {viewingSaint.prayer_id && (
