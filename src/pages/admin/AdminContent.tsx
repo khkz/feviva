@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Moon, Church, BookOpen, Volume2, Image, RefreshCw, Sparkles, Brain, CheckCircle2, AlertCircle, Clock } from 'lucide-react';
+import { Moon, Church, BookOpen, Volume2, Image, RefreshCw, Sparkles, Brain, CheckCircle2, AlertCircle, Clock, FileEdit } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -34,6 +34,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useProcessingJobs } from '@/hooks/useProcessingJobs';
 import { JobProgressPanel } from '@/components/processing/JobProgressPanel';
+import { LessonTextEditor } from '@/components/admin/LessonTextEditor';
 
 // Available voices for gpt-4o-mini-tts
 const VOICES = [
