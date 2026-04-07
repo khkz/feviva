@@ -32,7 +32,7 @@ const NovenaPublicPage = () => {
     staleTime: 60 * 60 * 1000,
   });
 
-  const dias = (novena?.dias as NovenaDia[] | null) || [];
+  const dias = (novena?.dias as unknown as NovenaDia[] | null) || [];
   const dia1 = dias[0];
 
   const schemaHowTo = novena ? {

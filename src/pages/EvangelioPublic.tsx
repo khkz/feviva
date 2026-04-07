@@ -11,7 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const EvangelioPublic = () => {
   const { activeGospel, isLoading } = useDailyGospel();
-  const { dailyContent } = useDailyContent();
+  const { content: dailyContent } = useDailyContent();
 
   const today = new Date();
   const formattedDate = format(today, "EEEE d 'de' MMMM, yyyy", { locale: es });
