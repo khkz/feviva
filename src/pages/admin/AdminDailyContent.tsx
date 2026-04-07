@@ -319,8 +319,6 @@ export const AdminDailyContent = () => {
                             content={day.content}
                             dateLabel={format(new Date(day.date), "d 'de' MMMM", { locale: es })}
                           />
-                            </div>
-                          )}
                         </div>
                       )}
                     </div>
