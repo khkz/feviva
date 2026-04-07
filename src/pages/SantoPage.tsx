@@ -178,6 +178,15 @@ export default function SantoPage() {
     "description": saint.description || metaDescription,
     "image": saint.image_url,
     "url": `https://elrugido.com/santo/${saint.slug}`,
+    "sameAs": [
+      `https://es.wikipedia.org/wiki/${encodeURIComponent(saint.name.replace(/ /g, '_'))}`,
+      `https://www.catholic.org/saints/`
+    ],
+    "knowsAbout": saint.tags || [],
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://elrugido.com/santo/${saint.slug}`
+    },
     ...(isPatron && saint.country_code && {
       "nationality": {
         "@type": "Country",
