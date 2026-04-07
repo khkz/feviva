@@ -49,9 +49,11 @@ export const useDailyCapsule = () => {
   });
 
   const incrementShare = async (capsuleId: string) => {
-    await supabase.rpc('increment_capsule_share' as never, { capsule_id: capsuleId } as never).catch(() => {
+    try {
+      await supabase.rpc('increment_capsule_share' as never, { capsule_id: capsuleId } as never);
+    } catch {
       // Fallback: just track client-side
-    });
+    }
   };
 
   return { capsule, recentCapsules, isLoading, incrementShare };

@@ -55,7 +55,7 @@ export const CapsuleShareButtons = ({ capsule, onShare }: CapsuleShareButtonsPro
           <Share2 className="w-4 h-4" /> Compartir
         </Button>
       )}
-      <Button variant="outline" size="icon" onClick={handleWhatsApp} className="text-green-600 hover:text-green-700 hover:bg-green-50">
+      <Button variant="outline" size="icon" onClick={handleWhatsApp} className="text-primary hover:text-primary/80">
         <MessageCircle className="w-4 h-4" />
       </Button>
       <Button variant="outline" size="icon" onClick={handleTwitter}>
