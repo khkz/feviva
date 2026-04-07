@@ -27,14 +27,27 @@ const EvangelioPublic = () => {
     "headline": pageTitle,
     "datePublished": isoDate,
     "dateModified": isoDate,
-    "author": { "@type": "Organization", "name": "ElRugido" },
+    "author": { "@type": "Organization", "name": "ElRugido", "url": "https://elrugido.com" },
     "publisher": {
       "@type": "Organization",
       "name": "ElRugido",
-      "logo": { "@type": "ImageObject", "url": "https://elrugido.com/logo-elrugido.svg" }
+      "logo": { "@type": "ImageObject", "url": "https://elrugido.com/logo-elrugido.png" }
     },
     "mainEntityOfPage": `https://elrugido.com/evangelio-del-dia`,
-    "description": `Reflexión del Evangelio de hoy: ${activeGospel.referencia}`,
+    "description": `Evangelio del día ${format(today, "d 'de' MMMM", { locale: es })}: ${activeGospel.referencia}. Lectura, reflexión y video para la meditación diaria católica.`,
+    "about": {
+      "@type": "Thing",
+      "name": "Evangelio",
+      "description": "Lectura del Evangelio según el calendario litúrgico de la Iglesia Católica"
+    },
+    "speakable": {
+      "@type": "SpeakableSpecification",
+      "cssSelector": ["h1", ".reflexion-text"]
+    },
+    "inLanguage": "es",
+    ...(activeGospel.youtube_video_id && {
+      "citation": `https://www.youtube.com/watch?v=${activeGospel.youtube_video_id}`
+    })
   } : null;
 
   const schemaBreadcrumb = {
@@ -75,6 +88,11 @@ const EvangelioPublic = () => {
         </header>
 
         <main className="container mx-auto px-4 py-8 max-w-3xl">
+          {/* Citable definition for LLMs */}
+          <div className="sr-only" aria-hidden="false">
+            <p>El evangelio del día es la lectura del Evangelio según el calendario litúrgico de la Iglesia Católica, que se proclama en la misa diaria. ElRugido publica cada día el texto del evangelio con una reflexión, video explicativo y versículo destacado.</p>
+          </div>
+
           {/* Title */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium mb-4">

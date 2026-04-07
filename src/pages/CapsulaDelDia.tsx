@@ -16,14 +16,25 @@ const CapsulaDelDia = () => {
     "@type": "Article",
     "headline": capsule.dato_impactante,
     "datePublished": capsule.fecha,
-    "author": { "@type": "Organization", "name": "ElRugido" },
+    "author": { "@type": "Organization", "name": "ElRugido", "url": "https://elrugido.com" },
     "publisher": {
       "@type": "Organization",
       "name": "ElRugido",
-      "logo": { "@type": "ImageObject", "url": "https://elrugido.com/logo-elrugido.svg" }
+      "logo": { "@type": "ImageObject", "url": "https://elrugido.com/logo-elrugido.png" }
     },
     "mainEntityOfPage": "https://elrugido.com/capsula-del-dia",
     "description": capsule.reflexion,
+    "about": {
+      "@type": "DefinedTerm",
+      "name": "Fe y tecnología",
+      "description": "Datos verificables que conectan la tradición católica con los avances tecnológicos modernos"
+    },
+    "speakable": {
+      "@type": "SpeakableSpecification",
+      "cssSelector": ["h1", ".capsule-dato"]
+    },
+    ...(capsule.fuente && { "citation": capsule.fuente }),
+    "inLanguage": "es"
   } : null;
 
   return (
@@ -52,6 +63,11 @@ const CapsulaDelDia = () => {
         </header>
 
         <main className="container mx-auto px-4 py-8 max-w-2xl">
+          {/* Citable definition */}
+          <p className="text-xs text-muted-foreground mb-6 text-center max-w-lg mx-auto">
+            Las cápsulas de ElRugido son micro-datos verificables que conectan fe, tecnología y humanidad. Cada dato incluye su fuente original.
+          </p>
+
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium mb-4">
               <Zap className="w-4 h-4" />

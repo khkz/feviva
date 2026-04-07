@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles, Shield, Clock, Zap } from "lucide-react";
+import { ArrowRight, Sparkles, Shield, Clock, Zap, BookOpen, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
@@ -39,7 +39,7 @@ export const FinalCTASection = () => {
           </h2>
           
           <p className="text-lg text-muted-foreground max-w-xl mx-auto mb-8">
-            No esperes más. Miles de personas ya están transformando su vida espiritual. 
+            ElRugido es una herramienta joven construida con rigor teológico. 
             <strong className="text-foreground"> Tu primera oración te espera.</strong>
           </p>
           
@@ -75,6 +75,33 @@ export const FinalCTASection = () => {
               <Clock className="w-4 h-4 text-primary" />
               <span>Menos de 1 min para empezar</span>
             </div>
+          </div>
+        </motion.div>
+
+        {/* E-E-A-T Authority signals */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="mt-12 p-6 rounded-2xl bg-muted/50 border border-border/50"
+        >
+          <div className="flex items-start gap-3 mb-3">
+            <ShieldCheck className="w-5 h-5 text-primary mt-0.5 shrink-0" />
+            <div>
+              <h3 className="font-semibold text-foreground text-sm mb-1">Sobre ElRugido</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                ElRugido es un proyecto fundado en 2025 por un equipo de católicos comprometidos con hacer la fe accesible en la era digital. 
+                Nuestro contenido se fundamenta en el <strong>Catecismo de la Iglesia Católica</strong> (CIC), documentos del <strong>Concilio Vaticano II</strong>, 
+                encíclicas papales y la <strong>Sagrada Escritura</strong>. Las biografías de santos se verifican con fuentes como la Catholic Encyclopedia y Wikipedia. 
+                No sustituimos la guía espiritual de un sacerdote ni la participación en los sacramentos.
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-3 mt-3 ml-8">
+            <span className="text-[11px] bg-primary/10 text-primary px-2 py-0.5 rounded-full">Catecismo de la Iglesia Católica</span>
+            <span className="text-[11px] bg-primary/10 text-primary px-2 py-0.5 rounded-full">Concilio Vaticano II</span>
+            <span className="text-[11px] bg-primary/10 text-primary px-2 py-0.5 rounded-full">Sagrada Escritura</span>
           </div>
         </motion.div>
       </div>

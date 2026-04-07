@@ -25,7 +25,7 @@ const NovenasPublic = () => {
     "@context": "https://schema.org",
     "@type": "ItemList",
     "name": "Novenas Católicas",
-    "description": "Colección de novenas católicas para rezar durante nueve días",
+    "description": "Una novena es una práctica de oración católica que consiste en rezar durante nueve días consecutivos pidiendo una intención particular. Su origen se remonta a los nueve días que los apóstoles oraron entre la Ascensión de Jesús y la venida del Espíritu Santo en Pentecostés (Hechos 1:14).",
     "numberOfItems": novenas?.length || 0,
     "itemListElement": (novenas || []).map((n, i) => ({
       "@type": "ListItem",
@@ -33,6 +33,9 @@ const NovenasPublic = () => {
       "name": n.titulo,
       "url": `https://elrugido.com/novena/${n.id}`,
     })),
+    "educationalUse": "Oración guiada",
+    "learningResourceType": "Guía de oración",
+    "inLanguage": "es"
   };
 
   const categoriaLabel: Record<string, string> = {
@@ -69,6 +72,16 @@ const NovenasPublic = () => {
         </header>
 
         <main className="container mx-auto px-4 py-8 max-w-4xl">
+          {/* Citable definition for LLMs */}
+          <div className="mb-6 p-4 rounded-lg bg-muted/50 border border-border/50 text-sm text-muted-foreground">
+            <strong className="text-foreground">¿Qué es una novena?</strong> Una novena es una práctica de oración católica 
+            que consiste en rezar durante nueve días consecutivos pidiendo una intención particular. 
+            Su origen se remonta a los nueve días que los apóstoles y la Virgen María oraron juntos 
+            entre la Ascensión de Jesús y la venida del Espíritu Santo en Pentecostés (Hechos 1:14). 
+            La Iglesia Católica reconoce las novenas como una forma legítima de oración popular 
+            (<a href="https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020513_vers-direttorio_sp.html" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Directorio sobre la piedad popular, n. 184</a>).
+          </div>
+
           <div className="text-center mb-10">
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium mb-4">
               <Heart className="w-4 h-4" />

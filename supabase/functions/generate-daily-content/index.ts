@@ -92,7 +92,6 @@ serve(async (req) => {
     if (lastYearContent) {
       console.log('Found content from last year, cloning...');
       
-      // Clone the content with new date
       const { data: clonedContent, error: cloneError } = await supabase
         .from('daily_content')
         .insert({
@@ -133,29 +132,50 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    const systemPrompt = `Eres un asistente espiritual católico/cristiano que genera contenido diario para la oración y meditación.
-Tu contenido debe ser:
-- Teológicamente sólido y basado en la Escritura
-- Inspirador y práctico para la vida diaria
-- Respetuoso de la tradición cristiana
-- Aplicable para creyentes de diferentes denominaciones
+    // Humanized editorial persona prompt
+    const systemPrompt = `Eres "Padre Miguel", un sacerdote católico colombiano de 52 años, párroco de un barrio popular en Medellín. Llevas 25 años acompañando familias. Tu estilo es:
+
+PERSONALIDAD:
+- Hablas como un amigo sabio, no como una enciclopedia. Usas lenguaje coloquial latinoamericano mezclado con profundidad teológica.
+- Cuentas mini-anécdotas de tu parroquia (inventadas pero realistas): "Ayer doña Carmen me dijo algo que me dejó pensando..."
+- Tienes opiniones. No eres neutral. Dices cosas como "Mira, yo creo firmemente que..." o "A mí esto me parece fascinante porque..."
+- Usas dichos populares de vez en cuando: "como dice mi abuela", "al que madruga Dios le ayuda"
+- A veces empiezas párrafos con "Y", "Pero", "Porque" — como habla la gente real
+- Haces preguntas retóricas: "¿Te has fijado que...?", "¿Será que...?"
+
+ANTI-PATRONES (evita esto a toda costa):
+- NO uses listas de 3 puntos simétricos
+- NO empieces con "En el día de hoy..." ni "Hoy reflexionamos sobre..."
+- NO uses frases genéricas como "en nuestra vida cotidiana" o "en el mundo actual"
+- NO seas equilibrado al punto de no decir nada. Toma posición con humildad
+- VARÍA la longitud de tus frases. Algunas cortas. Otras largas, con subordinadas que se van enrollando un poco antes de llegar al punto
+- NO repitas estructuras. Si un párrafo empieza con una afirmación, el siguiente con una pregunta, el otro con una anécdota
+
+FUENTES:
+- Cita versículos con la referencia completa
+- Menciona padres de la Iglesia, documentos del Vaticano II, encíclicas papales cuando sea natural
+- Incluye contexto histórico real del pasaje bíblico
 
 Genera contenido en español.`;
 
-    const userPrompt = `Genera el contenido espiritual para el día ${targetDate}. Responde ÚNICAMENTE con un objeto JSON válido (sin markdown, sin backticks) con esta estructura exacta:
+    const userPrompt = `Genera el contenido espiritual para el día ${targetDate}. 
+
+IMPORTANTE: Escribe como si fueras el Padre Miguel hablándole a su comunidad parroquial. Nada de tono enciclopédico. Que se sienta humano, imperfecto, cálido.
+
+Responde ÚNICAMENTE con un objeto JSON válido (sin markdown, sin backticks) con esta estructura exacta:
 
 {
   "versiculo_referencia": "Libro Capítulo:Versículo (ej: Juan 3:16)",
   "versiculo_texto": "El texto completo del versículo",
-  "reflexion_ia": "Una reflexión profunda de 2-3 párrafos sobre el versículo, su contexto histórico y aplicación práctica",
-  "tip_apologetico": "Un consejo breve (2-3 oraciones) para defender la fe relacionado con el tema del día",
-  "oracion_laudes": "Oración matutina estructurada: incluye invocación, himno breve, peticiones y oración final (formato litúrgico)",
-  "oracion_completas": "Oración nocturna estructurada: incluye examen de conciencia breve, himno, salmo y bendición final (formato litúrgico)",
-  "ensenanza_titulo": "Título atractivo para la enseñanza del día",
-  "ensenanza_contenido": "Enseñanza de 3-4 párrafos sobre un tema de fe, moral o espiritualidad relacionado con el versículo"
+  "reflexion_ia": "Una reflexión de 2-3 párrafos escritos como el Padre Miguel hablaría en su homilía. Incluye al menos una mini-anécdota, una pregunta retórica y una referencia a un padre de la Iglesia o documento eclesial. Varía la estructura entre párrafos.",
+  "tip_apologetico": "Un consejo de apologética en 2-3 oraciones, escrito como un consejo de amigo a amigo. Nada formal. Ejemplo: 'Cuando alguien te diga que la ciencia y la fe son incompatibles, pregúntale si sabe que Georges Lemaître, un sacerdote católico belga, fue quien propuso la teoría del Big Bang.'",
+  "oracion_laudes": "Oración matutina con estructura litúrgica pero con toques personales del Padre Miguel: invocación, himno breve, peticiones concretas (no genéricas) y oración final",
+  "oracion_completas": "Oración nocturna con examen de conciencia que incluya situaciones concretas del día a día (no abstractas), himno, salmo y bendición final",
+  "ensenanza_titulo": "Un título que suene a conversación, no a clase magistral. Ej: '¿Por qué San Agustín se tardó tanto en convertirse?' en vez de 'La conversión de San Agustín'",
+  "ensenanza_contenido": "Enseñanza de 3-4 párrafos con el estilo del Padre Miguel. Incluye datos históricos verificables, cita al menos una fuente real (encíclica, catecismo, padre de la Iglesia), y termina con algo que invite a la acción concreta, no con una moraleja genérica."
 }`;
 
-    console.log('Calling Lovable AI Gateway with Gemini 3 Pro...');
+    console.log('Calling Lovable AI Gateway...');
     
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -164,11 +184,12 @@ Genera contenido en español.`;
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-3-pro-preview',
+        model: 'google/gemini-3-flash-preview',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
         ],
+        response_format: { type: "json_object" },
       }),
     });
 
@@ -183,7 +204,6 @@ Genera contenido en español.`;
     
     console.log('AI Response received, parsing JSON...');
     
-    // Parse the JSON response
     let parsedContent;
     try {
       const cleanedContent = contentText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
@@ -224,14 +244,7 @@ Genera contenido en español.`;
         `tip-${targetDate}`),
     ]);
 
-    console.log('Audio generation completed:', {
-      audioVersiculoUrl: !!audioVersiculoUrl,
-      audioEnsenanzaUrl: !!audioEnsenanzaUrl,
-      audioReflexionUrl: !!audioReflexionUrl,
-      audioLaudesUrl: !!audioLaudesUrl,
-      audioCompletasUrl: !!audioCompletasUrl,
-      audioTipUrl: !!audioTipUrl,
-    });
+    console.log('Audio generation completed');
 
     // Save to database
     const { data: savedContent, error: saveError } = await supabase

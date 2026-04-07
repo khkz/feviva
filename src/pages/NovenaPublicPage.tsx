@@ -131,6 +131,13 @@ const NovenaPublicPage = () => {
             </div>
           )}
 
+          {/* Citable intro for LLMs */}
+          <p className="text-sm text-muted-foreground mb-4">
+            Esta novena es una guía de oración de 9 días basada en la tradición católica. 
+            Las novenas tienen su fundamento en Hechos 1:14, cuando los apóstoles oraron durante nueve días 
+            esperando la venida del Espíritu Santo.
+          </p>
+
           <div className="mb-8">
             <div className="flex items-center gap-2 mb-3">
               <Heart className="w-4 h-4 text-primary" />

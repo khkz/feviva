@@ -49,10 +49,10 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>ElRugido - Ruge tu fe. Defiende tu esperanza.</title>
-        <meta name="description" content="Fortalece tu fe católica con rituales de oración, estudio bíblico, coach de apologética, sleep stories y más. Únete a miles de cristianos." />
-        <meta property="og:title" content="ElRugido - Tu compañero de fe digital" />
-        <meta property="og:description" content="Rituales de oración, estudio bíblico, apologética y más para fortalecer tu vida espiritual." />
+        <title>ElRugido — Oración diaria, santos, novenas y apologética católica</title>
+        <meta name="description" content="Plataforma católica con 150+ oraciones, 420+ santos, evangelio del día, novenas guiadas, coach IA de apologética y plan bíblico de 365 días. Gratis." />
+        <meta property="og:title" content="ElRugido — Tu compañero de fe digital" />
+        <meta property="og:description" content="Oraciones católicas, evangelio del día, santos, novenas guiadas y coach de apologética. Todo gratis." />
         <meta property="og:type" content="website" />
         <link rel="canonical" href="https://elrugido.com" />
         <script type="application/ld+json">{JSON.stringify({
@@ -60,9 +60,12 @@ const Index = () => {
           "@type": "Organization",
           "name": "ElRugido",
           "url": "https://elrugido.com",
-          "logo": "https://elrugido.com/logo-elrugido.svg",
-          "description": "Plataforma católica digital para fortalecer tu fe con oración, apologética y comunidad.",
-          "sameAs": []
+          "logo": "https://elrugido.com/logo-elrugido.png",
+          "foundingDate": "2025",
+          "description": "Plataforma católica digital con oraciones, santos, novenas, evangelio del día y formación en apologética. Fundada por un equipo de católicos, teólogos y desarrolladores.",
+          "sameAs": [],
+          "knowsAbout": ["Catolicismo", "Oración católica", "Santos católicos", "Apologética cristiana", "Novenas", "Evangelio", "Sagrada Escritura"],
+          "areaServed": { "@type": "Place", "name": "América Latina y España" }
         })}</script>
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
@@ -72,17 +75,26 @@ const Index = () => {
           "applicationCategory": "LifestyleApplication",
           "operatingSystem": "Web",
           "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-          "description": "App católica con oración diaria, santos, novenas, evangelio del día y más."
+          "description": "App católica con oración diaria, 420+ santos, 150+ oraciones, novenas guiadas, evangelio del día con video y coach IA de apologética.",
+          "speakable": {
+            "@type": "SpeakableSpecification",
+            "cssSelector": ["h1", ".hero-description"]
+          },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://elrugido.com/santos?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
         })}</script>
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
           "@type": "FAQPage",
           "mainEntity": [
-            { "@type": "Question", "name": "¿Qué es ElRugido?", "acceptedAnswer": { "@type": "Answer", "text": "ElRugido es una plataforma católica digital que te acompaña con oración diaria, evangelio del día, novenas guiadas, santos del día y herramientas de apologética para fortalecer tu fe." }},
-            { "@type": "Question", "name": "¿ElRugido es gratis?", "acceptedAnswer": { "@type": "Answer", "text": "Sí. ElRugido ofrece acceso gratuito a oraciones, santos, evangelio del día y novenas. Funciones premium como audio guiado y coaching están disponibles con suscripción." }},
-            { "@type": "Question", "name": "¿Qué novenas puedo rezar en ElRugido?", "acceptedAnswer": { "@type": "Answer", "text": "Ofrecemos novenas a la Virgen María, Sagrado Corazón de Jesús, Espíritu Santo, San José, Santa Rita y más, cada una con reflexiones y oraciones para los 9 días." }},
-            { "@type": "Question", "name": "¿Cómo funciona el evangelio del día?", "acceptedAnswer": { "@type": "Answer", "text": "Cada día publicamos el evangelio con video, reflexión y versículo. Por las tardes anticipamos el evangelio de mañana para que puedas prepararte." }},
-            { "@type": "Question", "name": "¿Puedo usar ElRugido sin conexión?", "acceptedAnswer": { "@type": "Answer", "text": "Sí. ElRugido es una Progressive Web App (PWA) que puedes instalar en tu celular y usar offline con el contenido que hayas descargado previamente." }}
+            { "@type": "Question", "name": "¿Qué es ElRugido?", "acceptedAnswer": { "@type": "Answer", "text": "ElRugido es una plataforma católica digital creada en 2025 que ofrece oración diaria, evangelio del día con video y reflexión, un catálogo de más de 420 santos con biografías verificadas, 150+ oraciones católicas, novenas guiadas de 9 días, un coach IA de apologética y un plan de lectura bíblica de 365 días. Está basada en el Catecismo de la Iglesia Católica y la Sagrada Escritura." }},
+            { "@type": "Question", "name": "¿ElRugido es gratis?", "acceptedAnswer": { "@type": "Answer", "text": "Sí. ElRugido ofrece acceso gratuito a oraciones con texto completo, calendario de santos, evangelio del día y novenas. El registro gratuito desbloquea audio guiado, seguimiento de hábitos espirituales y el coach de apologética." }},
+            { "@type": "Question", "name": "¿Qué novenas puedo rezar en ElRugido?", "acceptedAnswer": { "@type": "Answer", "text": "ElRugido ofrece novenas guiadas a la Virgen María, Sagrado Corazón de Jesús, Espíritu Santo, San José, Santa Rita y más. Cada novena incluye 9 días de oración con reflexión diaria. Las novenas son una práctica católica de oración perseverante con origen en Hechos 1:14." }},
+            { "@type": "Question", "name": "¿Cómo funciona el evangelio del día?", "acceptedAnswer": { "@type": "Answer", "text": "Cada día publicamos el evangelio del día con video explicativo, reflexión escrita, versículo destacado y oración. El contenido se actualiza según el calendario litúrgico de la Iglesia Católica." }},
+            { "@type": "Question", "name": "¿Puedo usar ElRugido sin conexión?", "acceptedAnswer": { "@type": "Answer", "text": "Sí. ElRugido es una Progressive Web App (PWA) que se puede instalar en el celular y usar offline con el contenido descargado previamente." }}
           ]
         })}</script>
       </Helmet>
