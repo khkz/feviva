@@ -9,7 +9,7 @@ const needs = [
     title: "Quiero empezar a orar",
     problem: "No sé cómo orar o me cuesta mantener la constancia",
     solution: "Rituales guiados matutinos y nocturnos",
-    testimonial: "Ahora oro cada mañana sin falta",
+    feature: "150+ oraciones con audio guiado",
     color: "from-rose-500/20 to-pink-500/20",
     iconColor: "text-rose-400",
     link: "/morning"
@@ -19,7 +19,7 @@ const needs = [
     title: "Busco paz interior",
     problem: "Ansiedad, estrés, no puedo dormir bien",
     solution: "Sleep Stories y sonidos de relajación",
-    testimonial: "Duermo mejor que nunca",
+    feature: "29 historias para dormir + ambient sounds",
     color: "from-indigo-500/20 to-purple-500/20",
     iconColor: "text-indigo-400",
     link: "/sleep-stories"
@@ -29,7 +29,7 @@ const needs = [
     title: "Quiero entender la Biblia",
     problem: "La Biblia me parece difícil de entender",
     solution: "Plan de lectura guiado con reflexiones",
-    testimonial: "Por fin entiendo las Escrituras",
+    feature: "365 días de lectura con contexto histórico",
     color: "from-amber-500/20 to-orange-500/20",
     iconColor: "text-amber-400",
     link: "/bible"
@@ -39,7 +39,7 @@ const needs = [
     title: "Necesito respuestas",
     problem: "Tengo dudas sobre la fe, no sé qué responder",
     solution: "Coach de debate y tarjetas de argumentos",
-    testimonial: "Ahora sé defender mi fe con confianza",
+    feature: "Practica con 4 perfiles de interlocutor",
     color: "from-emerald-500/20 to-teal-500/20",
     iconColor: "text-emerald-400",
     link: "/coach"
@@ -49,7 +49,7 @@ const needs = [
     title: "Quiero ser constante",
     problem: "Empiezo pero no mantengo los hábitos espirituales",
     solution: "Sistema de hábitos con rachas y logros",
-    testimonial: "Llevo 30 días sin fallar",
+    feature: "Tracking diario + medallas por constancia",
     color: "from-cyan-500/20 to-blue-500/20",
     iconColor: "text-cyan-400",
     link: "/habits"
@@ -59,7 +59,7 @@ const needs = [
     title: "Busco comunidad",
     problem: "Me siento solo en mi camino de fe",
     solution: "Comunidad de oración y testimonios",
-    testimonial: "Encontré mi familia espiritual",
+    feature: "Comparte intenciones y lee historias de fe",
     color: "from-violet-500/20 to-fuchsia-500/20",
     iconColor: "text-violet-400",
     link: "/community"
