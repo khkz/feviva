@@ -56,6 +56,7 @@ const HistoriasDeFe = lazy(() => import("./pages/HistoriasDeFe"));
 const EvangelioPublic = lazy(() => import("./pages/EvangelioPublic"));
 const NovenasPublic = lazy(() => import("./pages/NovenasPublic"));
 const NovenaPublicPage = lazy(() => import("./pages/NovenaPublicPage"));
+const CapsulaDelDia = lazy(() => import("./pages/CapsulaDelDia"));
 
 // Frontera Final
 const FronteraFinal = lazy(() => import("./pages/FronteraFinal"));
