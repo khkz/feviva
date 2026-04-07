@@ -135,47 +135,49 @@ function isSimilarToExisting(titulo: string, existingTitles: string[]): boolean 
 }
 
 async function generateStory(titulo: string, tema: string): Promise<string> {
-  const systemPrompt = `Eres un narrador experto en crear historias bíblicas para dormir. 
-Tu estilo es:
-- Muy calmado, pausado y contemplativo
-- Usa descripciones sensoriales detalladas (sonidos suaves, aromas, texturas, temperaturas)
-- Incluye pausas naturales con "..." para respiración
-- Repite frases suaves ocasionalmente para inducir calma
-- La narrativa debe fluir lentamente, sin prisas
-- Usa lenguaje poético pero sencillo
-- Incluye reflexiones espirituales suaves entrelazadas con la historia
-- El ritmo debe ir decreciendo gradualmente hacia el final
-- Termina con una bendición o palabras de paz
+  // 6 aperturas distintas para evitar el patrón "Cierra tus ojos... respira..."
+  const aperturas = [
+    "Empieza directamente con una escena: un sonido, un aroma, un paisaje. El oyente ya está ahí, sin preámbulos de relajación.",
+    "Arranca con una pregunta suave: '¿Has sentido alguna vez...?' y luego transiciona a la escena bíblica.",
+    "Comienza con un detalle minúsculo — el crujir de una rama, el calor de una piedra al sol — y expande desde ahí.",
+    "Empieza con un recuerdo inventado del narrador: 'Mi abuela solía contarme que...' y conecta con la historia bíblica.",
+    "Arranca in medias res, en mitad de la acción de la historia bíblica, y luego retrocede para dar contexto.",
+    "Comienza con el sonido del silencio: describe la ausencia de ruido antes de que la historia empiece a desplegarse lentamente.",
+  ];
+  const apertura = aperturas[Math.floor(Math.random() * aperturas.length)];
 
-REGLAS CRÍTICAS PARA AUDIO TTS:
-- NUNCA uses abreviaciones de libros bíblicos (escribe "Génesis" NO "Gn.", "Juan" NO "Jn.", "Mateo" NO "Mt.")
-- Escribe las referencias bíblicas de forma legible para voz: "el Salmo veintitrés" en lugar de "Salmo 23"
-- Cuando cites capítulos y versículos, usa formato hablado: "el capítulo tres del Evangelio de Juan, versículo dieciséis" en lugar de "Juan 3:16"
-- Escribe los números como palabras: "tres" en lugar de "3", "cuarenta" en lugar de "40"
-- Evita símbolos como ":", ";", "&" - usa palabras completas
-- Los números romanos deben escribirse: "segundo" en lugar de "II", "tercero" en lugar de "III"`;
+  const systemPrompt = `Eres un narrador de historias para dormir. Cada historia tuya suena diferente a la anterior.
 
-  const userPrompt = `Genera una historia para dormir de aproximadamente 2500-3000 palabras (para 12-15 minutos de narración lenta) basada en:
+ESTILO:
+- Contemplativo y sensorial: sonidos, aromas, texturas, temperaturas
+- Pausas naturales con "..." pero NO en cada párrafo — varía el ritmo
+- El ritmo decrece gradualmente hacia el final
+- Poético pero sencillo
+
+REGLAS ANTI-PATRÓN (críticas):
+- NUNCA empieces con "Bienvenido a este espacio de calma" ni "Cierra tus ojos" ni "Respira profundamente"
+- NO uses la estructura: relajación → historia → reflexión → bendición. Varía
+- Algunas historias pueden terminar con silencio, no con bendición
+- Varía la longitud de los párrafos: algunos de una línea, otros largos y envolventes
+- NO repitas frases como "un lugar sagrado creado solo para ti"
+- Incluye algún detalle inesperado que sorprenda suavemente (un sabor, un color inusual, un pensamiento del personaje)
+
+REGLAS TTS:
+- NUNCA abreviaciones bíblicas (escribe "Génesis" NO "Gn.", "Juan" NO "Jn.")
+- Referencias bíblicas legibles: "el Salmo veintitrés" en lugar de "Salmo 23"
+- Números como palabras: "tres" no "3", "cuarenta" no "40"
+- Sin símbolos: ":", ";", "&" — usa palabras`;
+
+  const userPrompt = `Historia para dormir (~2500-3000 palabras, 12-15 min narración lenta):
 
 Título: ${titulo}
 Tema: ${tema}
 
-Requisitos específicos:
-1. Comienza con una invitación a relajarse y respirar profundamente
-2. Desarrolla la historia bíblica con muchos detalles sensoriales
-3. Incluye descripciones extensas del ambiente (naturaleza, clima, sonidos)
-4. Añade reflexiones espirituales que inviten a la paz interior
-5. El ritmo narrativo debe ser muy lento y contemplativo
-6. Incluye momentos de silencio descritos ("...el silencio envolvía todo...")
-7. Termina con palabras de paz y bendición para el sueño
+APERTURA OBLIGATORIA: ${apertura}
 
-IMPORTANTE PARA AUDIO:
-- Todas las referencias bíblicas deben ser legibles en voz alta
-- Nunca uses abreviaciones (Gn., Ex., Jn., Mt., etc.)
-- Escribe números como palabras (veintitrés, no 23)
-- Si mencionas capítulos/versículos, usa formato hablado natural
+Desarrolla la historia bíblica con libertad creativa. No sigas una fórmula. Deja que la narración respire, que haya momentos de pura descripción sensorial y momentos de diálogo interno del personaje. El final debe llegar como un susurro, no como un cierre formal.
 
-Escribe SOLO el contenido de la historia, sin título ni metadatos.`;
+Escribe SOLO el contenido, sin título ni metadatos.`;
 
   const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
@@ -203,36 +205,28 @@ Escribe SOLO el contenido de la historia, sin título ni metadatos.`;
 }
 
 async function expandExistingStory(titulo: string, contenidoActual: string): Promise<string> {
-  const systemPrompt = `Eres un narrador experto en crear historias bíblicas para dormir.
-Tu tarea es expandir y enriquecer una historia existente para que dure 12-15 minutos de narración.
+  const systemPrompt = `Eres un narrador de historias para dormir. Reescribes y expandes historias existentes dándoles vida propia.
 
-REGLAS CRÍTICAS PARA AUDIO TTS:
-- NUNCA uses abreviaciones de libros bíblicos (escribe "Génesis" NO "Gn.", "Juan" NO "Jn.")
-- Escribe las referencias bíblicas de forma legible: "el Salmo veintitrés" en lugar de "Salmo 23"
-- Formato hablado para citas: "el capítulo tres del Evangelio de Juan" en lugar de "Juan 3:16"
-- Escribe números como palabras: "tres" en lugar de "3"
-- Los números romanos deben escribirse: "segundo" en lugar de "II"`;
+REGLAS:
+- Si la historia original empieza con "Bienvenido a este espacio" o "Cierra tus ojos", ELIMINA eso y empieza de otra forma
+- Añade detalles sensoriales ricos pero variados — no solo visuales, incluye olores, sabores, texturas
+- Varía el ritmo: párrafos cortos y largos intercalados
+- Incluye algún pensamiento interno del personaje bíblico
+- El final no tiene que ser una bendición formal — puede ser silencio, una imagen, una sensación
 
-  const userPrompt = `Expande esta historia para dormir a aproximadamente 2500-3000 palabras:
+REGLAS TTS:
+- NUNCA abreviaciones bíblicas (escribe "Génesis" NO "Gn.", "Juan" NO "Jn.")
+- Referencias legibles: "el Salmo veintitrés" en lugar de "Salmo 23"
+- Números como palabras: "tres" no "3"
+- Sin símbolos especiales`;
+
+  const userPrompt = `Reescribe y expande esta historia para dormir a ~2500-3000 palabras:
 
 Título: ${titulo}
 Historia actual:
 ${contenidoActual}
 
-Mantén la esencia de la historia pero:
-1. Añade muchas más descripciones sensoriales detalladas
-2. Incluye pausas y momentos de silencio ("...el silencio envolvía todo...")
-3. Desarrolla más el ambiente y la atmósfera
-4. Añade reflexiones espirituales suaves
-5. Expande los diálogos y pensamientos de los personajes
-6. El ritmo debe ser muy lento y contemplativo
-7. Comienza con invitación a relajarse
-8. Termina con bendición para el sueño
-
-IMPORTANTE PARA AUDIO:
-- Corrige cualquier abreviación bíblica existente (Gn., Jn., Mt., etc.)
-- Convierte números a palabras donde sea natural
-- Las referencias bíblicas deben ser legibles en voz alta
+Mantén la esencia pero dale una voz nueva. No copies la estructura original si es formulaica. Sorprende con la apertura. Desarrolla momentos que la original solo menciona. Deja que la narración respire.
 
 Escribe SOLO el contenido expandido, sin título ni metadatos.`;
 

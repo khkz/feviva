@@ -78,26 +78,39 @@ serve(async (req) => {
       ? `Es el patrono de un país, así que incluye peticiones por la nación, su pueblo y sus gobernantes.`
       : '';
 
-    const systemPrompt = `Eres un experto en liturgia y oración católica. Escribes oraciones que siguen la tradición de la Iglesia, son respetuosas, 
-y ayudan a los fieles a conectar con Dios a través de la intercesión de los santos. 
-Las oraciones deben ser en español de América Latina, con un tono reverente pero accesible.`;
+    // Variación estructural para que no todas las oraciones suenen iguales
+    const estilos = [
+      { tipo: "conversacional", instruccion: "Escribe como si hablaras directamente con el santo, de tú a tú. Como una conversación íntima." },
+      { tipo: "contemplativa", instruccion: "Escribe una oración pausada, poética, con imágenes. Que invite al silencio interior." },
+      { tipo: "urgente", instruccion: "Escribe como alguien que necesita ayuda ahora. Directa, sincera, sin adornos." },
+      { tipo: "agradecida", instruccion: "Empieza agradeciendo antes de pedir. El tono es de quien ya ha recibido mucho." },
+      { tipo: "narrativa", instruccion: "Entrelaza la petición con un momento de la vida del santo. Que la oración cuente algo." },
+    ];
+    const estilo = estilos[Math.floor(Math.random() * estilos.length)];
 
-    const userPrompt = `Escribe una oración católica para invocar la intercesión de ${saint.name}.
+    const systemPrompt = `Escribes oraciones católicas con alma. NO fórmulas genéricas. Cada oración debe tener personalidad propia.
 
-Información del santo:
+REGLAS:
+- NO sigas siempre el patrón "invocación → mención de virtud → petición → amén". Varía la estructura
+- Algunas oraciones pueden ser muy cortas (50 palabras). Otras más largas (200). Varía
+- Incluye algo ÚNICO de este santo — un detalle, una imagen, una frase que solo aplique a él/ella
+- Evita: "te pedimos humildemente", "concédenos la gracia de", "por tu santa intercesión" en TODAS las oraciones. Úsalos solo a veces
+- El "Amén" final es opcional — algunas pueden terminar con una imagen o un silencio
+- Español latinoamericano, reverente pero no rebuscado`;
+
+    const userPrompt = `Estilo para esta oración: ${estilo.tipo}. ${estilo.instruccion}
+
+Escribe una oración a ${saint.name}.
+
+Sobre el santo:
 - Festividad: ${saint.feast_day} de ${getMonthName(saint.feast_month)}
 - Categoría: ${saint.category}
 ${saint.tags ? `- Características: ${saint.tags.join(', ')}` : ''}
-${saint.description ? `- Breve biografía: ${saint.description.substring(0, 200)}...` : ''}
+${saint.description ? `- Algo de su vida: ${saint.description.substring(0, 200)}...` : ''}
 ${countryInfo}
 
-La oración debe:
-1. Comenzar invocando al santo por su nombre
-2. Mencionar algún aspecto de su vida o virtudes
-3. Pedir su intercesión para necesidades específicas relacionadas con su vida
-4. Terminar con "Amén"
-
-Longitud: 100-200 palabras. No uses viñetas ni encabezados, escribe la oración de forma continua.`;
+Busca un "gancho" único: un momento de su vida, una frase que dijo, una imagen que lo represente. Construye la oración alrededor de eso.
+Longitud: entre 60 y 200 palabras. Escríbela de forma continua.`;
 
     console.log(`Generating prayer for saint: ${saint.name}`);
 
