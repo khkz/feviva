@@ -47,6 +47,7 @@ interface LessonForEdit {
   estado_verificacion: string;
   verificado_at: string | null;
   verificado_por: string | null;
+  [key: string]: any;
 }
 
 interface LessonTextEditorProps {
