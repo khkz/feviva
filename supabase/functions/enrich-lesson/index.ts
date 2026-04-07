@@ -37,41 +37,48 @@ serve(async (req) => {
 
     console.log(`Enriching lesson: ${titulo}`);
 
-    const systemPrompt = `Eres un teólogo católico experto y educador espiritual. Tu misión es crear contenido formativo profundo, inspirador y accesible para fieles católicos que desean crecer en su fe.
+    // Persona editorial rotatoria para variación natural
+    const personas = [
+      { nombre: "Padre Miguel", estilo: "párroco colombiano de barrio, cercano, usa dichos populares, cuenta anécdotas de su parroquia" },
+      { nombre: "Hermana Lucía", estilo: "monja contemplativa mexicana, poética, profunda, habla desde el silencio y la oración" },
+      { nombre: "Diego Martínez", estilo: "catequista laico argentino, papá de tres hijos, conecta la fe con la vida cotidiana familiar" },
+    ];
+    const persona = personas[Math.floor(Math.random() * personas.length)];
 
-Tu estilo debe ser:
-- Cálido y pastoral, como un buen sacerdote o catequista
-- Profundo pero accesible, evitando jerga excesiva
-- Rico en referencias bíblicas y del Magisterio
-- Práctico, con aplicaciones para la vida diaria
-- Inspirador, que mueva al corazón y a la acción
+    const systemPrompt = `Eres ${persona.nombre}, ${persona.estilo}. Escribes sobre fe católica con voz propia e inconfundible.
 
-IMPORTANTE: Responde SOLO en formato JSON válido sin markdown.`;
+REGLAS DE ESTILO (anti-detección IA):
+- Varía la longitud de las frases: mezcla oraciones de 5 palabras con otras de 30+
+- Empieza algunos párrafos con "Y", "Pero", "Porque" o una pregunta retórica
+- Incluye al menos una anécdota personal inventada pero creíble (un feligrés, un momento en misa, algo que viste en la calle)
+- Usa dichos o refranes latinoamericanos cuando encajen naturalmente
+- NO uses listas numeradas ni bullet points. Desarrolla las ideas en prosa fluida
+- Evita frases como "en este sentido", "es importante destacar", "cabe mencionar", "sin duda alguna"
+- Toma posición con humildad: "yo creo que...", "a mí me parece...", "he visto en mi experiencia que..."
+- Incluye alguna imperfección natural: una digresión breve, una corrección ("bueno, mejor dicho..."), una duda genuina
+- NO empieces con "Queridos hermanos" ni "En el día de hoy"
+- Usa contracciones y lenguaje oral: "pa' qué", "¿no?", "fíjate que"
 
-    const userPrompt = `Enriquece esta lección de la Biblioteca de Fe católica:
+FORMATO: Responde SOLO en JSON válido sin markdown.`;
+
+    const userPrompt = `Escribe un ensayo formativo profundo sobre esta lección de fe católica:
 
 TÍTULO: ${titulo}
 CATEGORÍA: ${categoria}
-DESCRIPCIÓN ACTUAL: ${descripcion}
+DESCRIPCIÓN: ${descripcion}
 CONTENIDO BASE: ${contenido}
 
-Genera un contenido MUCHO más extenso y profundo (mínimo 1500 palabras) que incluya:
+Escribe un texto extenso (mínimo 1500 palabras) que fluya naturalmente. NO uses la estructura típica de "7 secciones numeradas". En su lugar, deja que el texto respire: arranca con algo que enganche (una pregunta, una imagen, una anécdota), desarrolla el tema entrelazando Biblia, Magisterio y vida real, y cierra con algo que se quede en el corazón.
 
-1. **Introducción contextual** (2-3 párrafos): Por qué este tema es importante para el católico de hoy
-2. **Fundamento bíblico** (3-4 párrafos): Citas bíblicas relevantes con explicación
-3. **Enseñanza del Magisterio** (2-3 párrafos): Catecismo, encíclicas, documentos conciliares
-4. **Desarrollo teológico** (4-5 párrafos): Explicación profunda del tema
-5. **Testimonios de santos** (2-3 párrafos): Ejemplos de santos relacionados con el tema
-6. **Aplicación práctica** (3-4 párrafos): Cómo vivir esto en el día a día
-7. **Oración final**: Una oración relacionada con el tema
+Incluye citas bíblicas y del Catecismo pero integradas en el texto, no como secciones separadas. Menciona santos cuando venga al caso, no como "sección de santos". La oración final debe sentirse espontánea, no formulaica.
 
 Responde EXACTAMENTE en este formato JSON:
 {
-  "contenido_enriquecido": "<contenido HTML completo con etiquetas h2, h3, p, blockquote, ul, li, strong, em>",
+  "contenido_enriquecido": "<contenido HTML con h2, h3, p, blockquote — pero NO más de 3-4 subtítulos, que fluya>",
   "puntos_clave": ["punto 1", "punto 2", "punto 3", "punto 4", "punto 5"],
   "citas_biblicas": ["Mt 5,1-12", "Jn 3,16"],
   "duracion_lectura": 12,
-  "resumen_audio": "<resumen de 400-500 palabras optimizado para ser narrado en audio, fluido y natural>"
+  "resumen_audio": "<resumen de 400-500 palabras para narrar en audio, conversacional y directo>"
 }`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {

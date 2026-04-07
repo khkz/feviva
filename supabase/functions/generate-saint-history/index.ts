@@ -77,27 +77,39 @@ serve(async (req) => {
       ? `Este santo es el patrono de ${saint.country_code}. Incluye información sobre por qué es el patrono de ese país y cómo se celebra su festividad allí.`
       : '';
 
-    const systemPrompt = `Eres un experto en hagiografía católica. Escribe biografías de santos precisas, inspiradoras y accesibles para el público general hispanohablante. 
-Mantén un tono reverente pero no excesivamente formal. Incluye datos históricos verificables cuando sea posible.
-Escribe en español de América Latina.`;
+    // Variación de enfoque narrativo para evitar patrones repetitivos
+    const enfoques = [
+      "Cuenta la historia como si estuvieras sentado con un amigo en un café, compartiendo algo que te fascina.",
+      "Narra como si fuera el inicio de una novela histórica: arranca con una escena concreta, un momento decisivo.",
+      "Escríbelo como una carta a alguien que nunca ha oído de este santo y necesita conocerlo.",
+      "Cuenta la historia empezando por el final — por qué importa hoy — y luego retrocede al origen.",
+      "Narra como un abuelo que le cuenta a su nieto la historia de alguien que admira profundamente.",
+    ];
+    const enfoque = enfoques[Math.floor(Math.random() * enfoques.length)];
 
-    const userPrompt = `Escribe una biografía completa de ${saint.name} para una aplicación católica.
+    const systemPrompt = `Eres un narrador de historias de santos. NO escribes fichas enciclopédicas. Cuentas vidas humanas con sus luces, sombras, dudas y grandezas.
 
-Información conocida:
+REGLAS ANTI-IA:
+- NUNCA empieces con "[Nombre] fue un/una..." — eso es Wikipedia, no narración
+- Varía la longitud de las oraciones. Algunas muy cortas. Otras que se extiendan con detalles sensoriales
+- Incluye al menos un detalle humano concreto: qué comía, cómo era su risa, una manía, un defecto
+- Usa preguntas retóricas: "¿Te imaginas...?", "¿Qué harías tú en su lugar?"
+- Permite alguna digresión breve que haga el texto sentirse vivo
+- Evita: "cabe destacar", "es importante señalar", "sin duda alguna", "en definitiva"
+- NO uses listas, viñetas ni estructura numerada
+- Español latinoamericano natural, no académico`;
+
+    const userPrompt = `${enfoque}
+
+Escribe sobre ${saint.name} para una app católica latinoamericana.
+
+Datos conocidos:
 - Festividad: ${saint.feast_day} de ${getMonthName(saint.feast_month)}
 - Categoría: ${saint.category}
 ${saint.tags ? `- Etiquetas: ${saint.tags.join(', ')}` : ''}
 ${countryInfo}
 
-Estructura la biografía en 300-500 palabras incluyendo:
-1. Datos biográficos (nacimiento, época, lugar)
-2. Vida y vocación
-3. Obras, milagros o hechos destacados
-4. Muerte y canonización
-5. Por qué es importante para los católicos hoy
-${saint.category === 'patron_country' ? '6. Importancia como patrono nacional y tradiciones asociadas' : ''}
-
-Escribe de forma fluida sin usar encabezados ni viñetas. El texto debe fluir naturalmente.`;
+Extensión: 300-500 palabras. Todo en prosa fluida, sin encabezados ni viñetas. Que al terminar de leer, el lector sienta que conoció a una persona real, no que leyó un artículo.`;
 
     console.log(`Generating history for saint: ${saint.name}`);
 
