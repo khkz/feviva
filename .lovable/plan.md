@@ -1,77 +1,56 @@
+## Plan: Fase 2B — Cápsulas Virales
 
+### Concepto
+Micro-contenido visual diario con datos impactantes (IA/tech vs fe humana) diseñado para compartir en WhatsApp e Instagram. Cada cápsula es una "tarjeta" visualmente atractiva con un dato + reflexión breve + CTA sutil a ElRugido.
 
-## Plan: Fase 2A — SEO Público (Páginas Indexables + Sitemap Dinámico)
+### Arquitectura
 
-### Objetivo
-Llevar las páginas de contenido de ~530 URLs actuales a **700+** páginas indexables, creando rutas públicas para Evangelio del día y Novenas, añadiendo Schema.org a la landing, y expandiendo el sitemap.
+#### 1. Tabla `daily_capsules` (migración)
+- `id`, `fecha` (unique), `dato_impactante` (texto corto del dato), `reflexion` (1-2 frases), `fuente` (URL/referencia), `categoria` (tech_vs_fe, dato_historico, pregunta_provocadora), `emoji_icon`, `color_accent`, `share_count` (tracking), `created_at`
+- RLS: lectura pública (sin auth), escritura solo admin
 
-### Estado actual
-- **Ya público**: `/santos` (420+ santos), `/oraciones` (150+ oraciones), `/santo/:slug`, `/oracion/:slug` — con Schema.org
-- **Protegido (requiere auth)**: `/evangelio`, `/novenas`, `/frontera-final`
-- **Sitemap**: Edge function dinámica ya existe con santos + oraciones (~530 URLs)
-- **Landing**: Sin Schema.org (FAQPage, Organization)
+#### 2. Página pública `/capsula-del-dia`
+- Ruta pública indexable (SEO)
+- Muestra la cápsula de hoy con diseño visual impactante
+- Botones de compartir: WhatsApp, Instagram (copiar), Twitter/X
+- Schema.org `Article` + meta OG dinámicos
+- Preview de cápsulas anteriores (últimas 7)
+- CTA: "Recibe una cápsula cada día" → `/auth`
 
----
+#### 3. Componente `CapsuleCard.tsx`
+- Tarjeta visual con gradiente, dato grande, reflexión, logo ElRugido
+- Optimizada para captura de pantalla (aspecto IG Story 9:16 y Post 1:1)
+- Animación sutil con framer-motion
 
-### Sub-tarea 1: Evangelio del Día público (`/evangelio-del-dia`)
+#### 4. Widget en Dashboard
+- Mini-card de la cápsula del día en el dashboard de usuarios registrados
+- Botón "Compartir" integrado con Web Share API
 
-Crear nueva página pública `src/pages/EvangelioPublic.tsx`:
-- Reutiliza `useDailyGospel` para obtener el contenido
-- Muestra texto del evangelio, reflexión y santo del día (sin audio — audio requiere auth)
-- CTA: "Escucha la reflexión en audio" → redirige a `/auth`
-- Schema.org `Article` + `BreadcrumbList`
-- Meta tags OG dinámicos con fecha
-- Ruta: `/evangelio-del-dia` (pública, sin ProtectedRoute)
-- Ruta existente `/evangelio` sigue protegida (versión completa con audio)
+#### 5. Generación automática (Edge Function)
+- Edge function `generate-daily-capsule` que usa IA para generar cápsulas
+- Se puede llamar desde admin o programar con cron
+- Genera dato + reflexión + categoría automáticamente
 
-### Sub-tarea 2: Novenas públicas (`/novenas-publicas`, `/novena/:id`)
+#### 6. Seed inicial
+- 7 cápsulas iniciales insertadas vía SQL para tener contenido desde el día 1
 
-Crear `src/pages/NovenasPublic.tsx`:
-- Lista de novenas con imagen, título, descripción
-- Schema.org `ItemList`
-- CTA: "Empieza esta novena" → `/auth`
-
-Crear `src/pages/NovenaPublicPage.tsx`:
-- Muestra descripción + Día 1 del texto (como preview)
-- Schema.org `Article` + `HowTo` (9 pasos)
-- CTA: "Continúa los 9 días" → `/auth`
-
-### Sub-tarea 3: Schema.org en Landing
-
-Añadir a `Index.tsx`:
-- `Organization` schema (nombre, logo, URL)
-- `FAQPage` schema con 5 preguntas frecuentes sobre la app
-- `WebApplication` schema
-
-### Sub-tarea 4: Expandir Sitemap
-
-Actualizar `generate-sitemap/index.ts`:
-- Añadir `/evangelio-del-dia` (changefreq: daily, priority: 0.9)
-- Añadir `/novenas-publicas` + cada `/novena/:id`
-- Añadir artículos de `frontera_articulos` como URLs públicas
-- Meta: 700+ URLs indexables
-
-### Sub-tarea 5: Rutas en App.tsx
-
-- Añadir rutas públicas: `/evangelio-del-dia`, `/novenas-publicas`, `/novena/:id`
-- Sin `ProtectedRoute`
-
----
-
-### Archivos a crear/modificar
+### Archivos
 
 | Archivo | Acción |
 |---|---|
-| `src/pages/EvangelioPublic.tsx` | Crear — página pública del evangelio |
-| `src/pages/NovenasPublic.tsx` | Crear — listado público de novenas |
-| `src/pages/NovenaPublicPage.tsx` | Crear — detalle público de novena |
-| `src/pages/Index.tsx` | Añadir Schema.org (Organization, FAQ, WebApp) |
-| `src/App.tsx` | Añadir 3 rutas públicas |
-| `supabase/functions/generate-sitemap/index.ts` | Expandir con evangelio + novenas |
+| Migración SQL | Crear tabla `daily_capsules` con RLS pública |
+| `src/pages/CapsulaDelDia.tsx` | Página pública con SEO |
+| `src/components/capsules/CapsuleCard.tsx` | Tarjeta visual compartible |
+| `src/components/capsules/CapsuleShareButtons.tsx` | Botones de compartir |
+| `src/hooks/useDailyCapsule.tsx` | Hook para obtener cápsula del día |
+| `src/pages/Dashboard.tsx` | Añadir widget de cápsula |
+| `src/App.tsx` | Ruta `/capsula-del-dia` |
+| `supabase/functions/generate-sitemap/index.ts` | Añadir `/capsula-del-dia` |
+| `supabase/functions/generate-daily-capsule/index.ts` | Generación con IA |
 
 ### Resultado esperado
-- De ~530 a 700+ URLs indexables
-- Todas con Schema.org estructurado
-- Embudo: contenido gratis (texto) → registro (audio/interacción)
-- Posicionamiento en Google para "evangelio de hoy", "novena a [santo]", "oración católica"
-
+- 1 pieza de micro-contenido viral diaria
+- Optimizada para captura de pantalla en WhatsApp/IG
+- Tracking de compartidos
+- SEO indexable con Schema.org
+- Embudo: cápsula viral → visita web → registro
