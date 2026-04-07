@@ -638,10 +638,15 @@ export const AdminContent = () => {
             <TabsContent value="contenido" className="space-y-4 mt-4">
               <LessonTextEditor 
                 lessons={lessons.map(l => ({
-                  ...l,
+                  id: l.id,
+                  titulo: l.titulo,
                   categoria: (l as any).categoria || '',
                   contenido: (l as any).contenido || '',
+                  contenido_enriquecido: l.contenido_enriquecido || null,
+                  audio_url: l.audio_url || null,
+                  resumen_audio: l.resumen_audio || null,
                   estado_verificacion: (l as any).estado_verificacion || 'sin_verificar',
+                  verificado_at: l.verificado_at || null,
                   verificado_por: (l as any).verificado_por || null,
                 }))}
                 onRefresh={fetchContent}
