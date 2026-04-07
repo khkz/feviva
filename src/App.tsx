@@ -56,6 +56,7 @@ const HistoriasDeFe = lazy(() => import("./pages/HistoriasDeFe"));
 const EvangelioPublic = lazy(() => import("./pages/EvangelioPublic"));
 const NovenasPublic = lazy(() => import("./pages/NovenasPublic"));
 const NovenaPublicPage = lazy(() => import("./pages/NovenaPublicPage"));
+const CapsulaDelDia = lazy(() => import("./pages/CapsulaDelDia"));
 
 // Frontera Final
 const FronteraFinal = lazy(() => import("./pages/FronteraFinal"));
@@ -135,6 +136,7 @@ const App = () => (
                   <Route path="/evangelio-del-dia" element={<EvangelioPublic />} />
                   <Route path="/novenas-publicas" element={<NovenasPublic />} />
                   <Route path="/novena/:id" element={<NovenaPublicPage />} />
+                  <Route path="/capsula-del-dia" element={<CapsulaDelDia />} />
                   <Route path="/search" element={<ProtectedRoute><KnowledgeSearch /></ProtectedRoute>} />
                   <Route path="/historias-de-fe" element={<ProtectedRoute><HistoriasDeFe /></ProtectedRoute>} />
                   <Route path="/frontera-final" element={<ProtectedRoute><FronteraFinal /></ProtectedRoute>} />
