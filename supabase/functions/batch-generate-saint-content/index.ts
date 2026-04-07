@@ -14,10 +14,14 @@ serve(async (req) => {
   }
 
   try {
-    const authHeader = req.headers.get('Authorization');
+    // Auth check
     const adminKey = req.headers.get('X-Admin-Api-Key');
     const ADMIN_KEY = Deno.env.get('ADMIN_API_KEY');
-    if (adminKey && ADMIN_KEY && adminKey === ADMIN_KEY) { /* Admin OK */ }
+    const authHeader = req.headers.get('Authorization');
+    const isInternalCall = req.headers.get('X-Internal-Call') === 'true';
+    
+    if (isInternalCall && adminKey && ADMIN_KEY && adminKey === ADMIN_KEY) { /* OK */ }
+    else if (adminKey && ADMIN_KEY && adminKey === ADMIN_KEY) { /* Admin OK */ }
     else if (authHeader?.startsWith('Bearer ')) {
       const _ac = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_ANON_KEY')!, { global: { headers: { Authorization: authHeader } } });
       const { error: authErr } = await _ac.auth.getUser(authHeader.replace('Bearer ', ''));
@@ -27,39 +31,31 @@ serve(async (req) => {
     }
 
     const { 
-      contentType = 'history', // 'history' | 'prayer' | 'both'
+      contentType = 'history',
+      forceRegenerate = false,
       onlyPatrons = false,
       countryCode = null,
-      limit = 10
+      offset = 0,
+      limit = 5,
+      autoChain = false  // When true, auto-triggers next batch
     } = await req.json();
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Build query based on content type needed
     let query = supabase
       .from('calendar_saints')
-      .select('id, name, description, prayer_id, category, country_code');
+      .select('id, name, description, prayer_id, category, country_code, feast_day, feast_month, tags')
+      .order('feast_month', { ascending: true })
+      .order('feast_day', { ascending: true })
+      .range(offset, offset + limit - 1);
 
-    if (onlyPatrons) {
-      query = query.eq('category', 'patron_country');
-    }
+    if (onlyPatrons) query = query.eq('category', 'patron_country');
+    if (countryCode) query = query.eq('country_code', countryCode);
 
-    if (countryCode) {
-      query = query.eq('country_code', countryCode);
-    }
-
-    // Note: We can't filter by description length in the query,
-    // so we'll fetch all and filter in code for history
-    if (contentType === 'prayer') {
-      query = query.is('prayer_id', null);
-    }
-    // For 'history' and 'both', we need to check description length in code
-
-    query = query.limit(limit);
-
-    const { data: allSaints, error: saintsError } = await query;
+    const { data: saints, error: saintsError } = await query;
 
     if (saintsError) {
       return new Response(
@@ -68,109 +64,141 @@ serve(async (req) => {
       );
     }
 
-    // Filter saints that need content based on type
-    let saints = allSaints || [];
-    
-    if (contentType === 'history' || contentType === 'both') {
-      // Filter to only saints with no/short description (< 100 chars)
-      saints = saints.filter(s => 
-        !s.description || s.description.length < 100
-      );
-    }
-    
-    // Apply limit after filtering
-    saints = saints.slice(0, limit);
-
-    if (saints.length === 0) {
+    if (!saints || saints.length === 0) {
+      console.log(`✅ ALL DONE! Processed all saints up to offset ${offset}`);
       return new Response(
-        JSON.stringify({ 
-          success: true, 
-          message: 'No saints need content generation',
-          processed: 0
-        }),
+        JSON.stringify({ success: true, message: 'All saints processed', processed: 0, offset, complete: true }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log(`Processing ${saints.length} saints for ${contentType} generation`);
+    console.log(`[Batch offset=${offset}] Processing ${saints.length} saints, forceRegenerate=${forceRegenerate}`);
 
-    const results = {
-      processed: 0,
-      historyGenerated: 0,
-      prayerGenerated: 0,
-      errors: [] as { saintId: string; saintName: string; error: string }[],
-    };
+    const enfoques = [
+      "Cuenta la historia como si estuvieras sentado con un amigo en un café, compartiendo algo que te fascina.",
+      "Narra como si fuera el inicio de una novela histórica: arranca con una escena concreta, un momento decisivo.",
+      "Escríbelo como una carta a alguien que nunca ha oído de este santo y necesita conocerlo.",
+      "Cuenta la historia empezando por el final — por qué importa hoy — y luego retrocede al origen.",
+      "Narra como un abuelo que le cuenta a su nieto la historia de alguien que admira profundamente.",
+    ];
+
+    const systemPrompt = `Eres un narrador de historias de santos. NO escribes fichas enciclopédicas. Cuentas vidas humanas con sus luces, sombras, dudas y grandezas.
+
+REGLAS ANTI-IA:
+- NUNCA empieces con "[Nombre] fue un/una..." — eso es Wikipedia, no narración
+- Varía la longitud de las oraciones. Algunas muy cortas. Otras que se extiendan con detalles sensoriales
+- Incluye al menos un detalle humano concreto: qué comía, cómo era su risa, una manía, un defecto
+- Usa preguntas retóricas: "¿Te imaginas...?", "¿Qué harías tú en su lugar?"
+- Permite alguna digresión breve que haga el texto sentirse vivo
+- Evita: "cabe destacar", "es importante señalar", "sin duda alguna", "en definitiva"
+- NO uses listas, viñetas ni estructura numerada
+- Español latinoamericano natural, no académico`;
+
+    const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+    const results = { processed: 0, generated: 0, skipped: 0, errors: [] as string[] };
 
     for (const saint of saints) {
-      console.log(`Processing: ${saint.name}`);
-
-      // Generate history if needed
-      if ((contentType === 'history' || contentType === 'both') && 
-          (!saint.description || saint.description.length < 50)) {
-        try {
-          const historyResponse = await supabase.functions.invoke('generate-saint-history', {
-            body: { saintId: saint.id }
-          });
-
-          if (historyResponse.error) {
-            results.errors.push({
-              saintId: saint.id,
-              saintName: saint.name,
-              error: `History: ${historyResponse.error.message}`
-            });
-          } else if (!historyResponse.data?.skipped) {
-            results.historyGenerated++;
-          }
-        } catch (e) {
-          results.errors.push({
-            saintId: saint.id,
-            saintName: saint.name,
-            error: `History: ${e instanceof Error ? e.message : 'Unknown error'}`
-          });
-        }
-        
-        // Delay between API calls to avoid rate limiting
-        await delay(2000);
+      if (!forceRegenerate && saint.description && saint.description.length > 100) {
+        results.skipped++;
+        results.processed++;
+        continue;
       }
 
-      // Generate prayer if needed
-      if ((contentType === 'prayer' || contentType === 'both') && !saint.prayer_id) {
-        try {
-          const prayerResponse = await supabase.functions.invoke('generate-saint-prayer', {
-            body: { saintId: saint.id }
-          });
+      const enfoque = enfoques[Math.floor(Math.random() * enfoques.length)];
+      const countryInfo = saint.country_code 
+        ? `Este santo es el patrono de ${saint.country_code}. Incluye información sobre por qué es el patrono de ese país.`
+        : '';
 
-          if (prayerResponse.error) {
-            results.errors.push({
-              saintId: saint.id,
-              saintName: saint.name,
-              error: `Prayer: ${prayerResponse.error.message}`
-            });
-          } else if (!prayerResponse.data?.skipped) {
-            results.prayerGenerated++;
-          }
-        } catch (e) {
-          results.errors.push({
-            saintId: saint.id,
-            saintName: saint.name,
-            error: `Prayer: ${e instanceof Error ? e.message : 'Unknown error'}`
-          });
+      const userPrompt = `${enfoque}
+
+Escribe sobre ${saint.name} para una app católica latinoamericana.
+
+Datos conocidos:
+- Festividad: ${saint.feast_day} de ${months[saint.feast_month - 1] || ''}
+- Categoría: ${saint.category}
+${saint.tags ? `- Etiquetas: ${saint.tags.join(', ')}` : ''}
+${countryInfo}
+
+Extensión: 300-500 palabras. Todo en prosa fluida, sin encabezados ni viñetas.`;
+
+      try {
+        const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${lovableApiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+          }),
+        });
+
+        if (!response.ok) {
+          const errText = await response.text();
+          results.errors.push(`${saint.name}: API ${response.status}`);
+          console.error(`✗ ${saint.name}: ${response.status}`);
+          if (response.status === 429) await delay(10000);
+          results.processed++;
+          continue;
         }
-        
-        // Delay between API calls
-        await delay(2000);
+
+        const aiData = await response.json();
+        const content = aiData.choices?.[0]?.message?.content;
+
+        if (content) {
+          const { error: updateErr } = await supabase
+            .from('calendar_saints')
+            .update({ description: content.trim() })
+            .eq('id', saint.id);
+
+          if (updateErr) {
+            results.errors.push(`${saint.name}: DB error`);
+          } else {
+            results.generated++;
+            console.log(`✓ ${saint.name} (${content.length} chars)`);
+          }
+        }
+      } catch (e) {
+        results.errors.push(`${saint.name}: ${e instanceof Error ? e.message : 'Unknown'}`);
       }
 
       results.processed++;
+      await delay(1500);
     }
 
-    console.log(`Batch complete. Processed: ${results.processed}, Histories: ${results.historyGenerated}, Prayers: ${results.prayerGenerated}, Errors: ${results.errors.length}`);
+    const nextOffset = offset + saints.length;
+    const hasMore = saints.length === limit;
+
+    console.log(`[Batch offset=${offset}] Done: ${results.generated} generated, ${results.errors.length} errors. Next: ${nextOffset}`);
+
+    // Auto-chain: trigger next batch in background
+    if (autoChain && hasMore) {
+      const selfUrl = `${supabaseUrl}/functions/v1/batch-generate-saint-content`;
+      fetch(selfUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabaseKey}`,
+          'apikey': Deno.env.get('SUPABASE_ANON_KEY')!,
+          'X-Admin-Api-Key': ADMIN_KEY || '',
+          'X-Internal-Call': 'true',
+        },
+        body: JSON.stringify({
+          contentType, forceRegenerate, onlyPatrons, countryCode,
+          offset: nextOffset, limit, autoChain: true
+        }),
+      }).catch(err => console.error('Auto-chain failed:', err));
+      
+      console.log(`🔄 Auto-chained next batch at offset ${nextOffset}`);
+    }
 
     return new Response(
-      JSON.stringify({ 
-        success: true, 
-        ...results
-      }),
+      JSON.stringify({ success: true, ...results, offset, nextOffset, hasMore }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
