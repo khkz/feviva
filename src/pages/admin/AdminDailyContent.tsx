@@ -17,6 +17,7 @@ import {
 import { format, subDays, addDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
+import { DailyContentViewer } from '@/components/admin/DailyContentViewer';
 
 interface DailyContentRecord {
   id: string;
@@ -314,6 +315,10 @@ export const AdminDailyContent = () => {
                               Generado: {format(new Date(day.content.created_at), 'HH:mm:ss')}
                             </div>
                           )}
+                          <DailyContentViewer 
+                            content={day.content}
+                            dateLabel={format(new Date(day.date), "d 'de' MMMM", { locale: es })}
+                          />
                         </div>
                       )}
                     </div>

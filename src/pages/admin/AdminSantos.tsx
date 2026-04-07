@@ -61,6 +61,7 @@ interface CalendarSaint {
   id: string;
   name: string;
   description: string | null;
+  description_source: string | null;
   feast_day: number;
   feast_month: number;
   category: string;
@@ -69,6 +70,8 @@ interface CalendarSaint {
   prayer_id: string | null;
   tags: string[] | null;
   created_at: string | null;
+  estado_verificacion: string;
+  fuente_descripcion: string | null;
 }
 
 interface BatchProgress {
@@ -906,19 +909,20 @@ export default function AdminSantos() {
                 <TableHead className="w-[80px] text-center">Historia</TableHead>
                 <TableHead className="w-[80px] text-center">Oración</TableHead>
                 <TableHead className="w-[80px] text-center">Imagen</TableHead>
+                <TableHead className="w-[80px] text-center">Fuente</TableHead>
                 <TableHead className="w-[160px]">Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8">
+                  <TableCell colSpan={9} className="text-center py-8">
                     <Loader2 className="h-6 w-6 animate-spin mx-auto" />
                   </TableCell>
                 </TableRow>
               ) : paginatedSaints.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                     No se encontraron santos con los filtros actuales
                   </TableCell>
                 </TableRow>
@@ -954,7 +958,14 @@ export default function AdminSantos() {
                       </TableCell>
                       <TableCell className="text-center">
                         {hasHistory ? (
-                          <Check className="h-4 w-4 text-green-600 mx-auto" />
+                          <div className="flex items-center justify-center gap-1">
+                            <Check className="h-4 w-4 text-green-600" />
+                            {saint.estado_verificacion === 'verificado' ? (
+                              <Badge className="text-[10px] px-1 bg-green-500/10 text-green-600">✅</Badge>
+                            ) : (
+                              <Badge className="text-[10px] px-1 bg-amber-500/10 text-amber-600">⏳</Badge>
+                            )}
+                          </div>
                         ) : (
                           <X className="h-4 w-4 text-muted-foreground/40 mx-auto" />
                         )}
@@ -972,6 +983,14 @@ export default function AdminSantos() {
                         ) : (
                           <X className="h-4 w-4 text-muted-foreground/40 mx-auto" />
                         )}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Badge variant="outline" className="text-[10px]">
+                          {saint.fuente_descripcion === 'verificada_humano' ? '👤 Humano' :
+                           saint.fuente_descripcion === 'wikipedia' ? '📖 Wiki' :
+                           saint.description_source?.includes('wikipedia') ? '📖 Wiki' :
+                           '🤖 IA'}
+                        </Badge>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
@@ -1158,6 +1177,15 @@ export default function AdminSantos() {
                   </Badge>
                 )}
                 <Badge variant="outline">{categoryLabels[viewingSaint.category]}</Badge>
+                <Badge variant="outline" className="text-xs">
+                  Fuente: {viewingSaint.fuente_descripcion === 'verificada_humano' ? '👤 Humano' :
+                    viewingSaint.description_source?.includes('wikipedia') ? '📖 Wikipedia' : '🤖 IA'}
+                </Badge>
+                {viewingSaint.estado_verificacion === 'verificado' ? (
+                  <Badge className="bg-green-500/10 text-green-600 border-green-500/30">✅ Verificado</Badge>
+                ) : (
+                  <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/30">⏳ Sin verificar</Badge>
+                )}
               </div>
 
               {/* Description */}
@@ -1167,13 +1195,35 @@ export default function AdminSantos() {
                   Historia
                 </h4>
                 {viewingSaint.description ? (
-                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                    {viewingSaint.description}
-                  </p>
+                  <ScrollArea className="max-h-[300px]">
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                      {viewingSaint.description}
+                    </p>
+                  </ScrollArea>
                 ) : (
                   <p className="text-sm text-muted-foreground italic">Sin historia registrada</p>
                 )}
               </div>
+
+              {/* Mark as verified */}
+              {viewingSaint.description && viewingSaint.estado_verificacion !== 'verificado' && (
+                <Button
+                  onClick={async () => {
+                    const { data: { user } } = await supabase.auth.getUser();
+                    await supabase.from('calendar_saints').update({
+                      estado_verificacion: 'verificado',
+                      verificado_por: user?.id,
+                      fuente_descripcion: 'verificada_humano',
+                    }).eq('id', viewingSaint.id);
+                    toast.success('Santo marcado como verificado');
+                    queryClient.invalidateQueries({ queryKey: ['admin-calendar-saints'] });
+                    setViewingSaint(null);
+                  }}
+                  className="w-full bg-green-600 hover:bg-green-700"
+                >
+                  ✅ Marcar como verificado por humano
+                </Button>
+              )}
 
               {/* Prayer link */}
               {viewingSaint.prayer_id && (

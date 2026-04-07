@@ -1,97 +1,73 @@
+## Plan: Panel Admin Pro — Editor de Contenido Fidedigno
 
+### Diagnóstico del Panel Actual
 
-## Auditoría de Contenido IA + Plan de Humanización por Fases
+**Lo que funciona bien:**
+- Dashboard con métricas generales ✅
+- Santos: gestión completa (historias, oraciones, imágenes) ✅
+- Contenido: gestión de audio y procesamiento ✅
+- Feedback: analytics y alertas ✅
+- Usuarios: roles y actividad ✅
 
-### Diagnóstico: 10 fuentes de contenido analizadas
+**Lo que falta (crítico):**
+1. ❌ No hay editor/visor de texto para revisar contenido de lecciones
+2. ❌ No hay indicador de "texto verificado por humano" vs "generado por IA"
+3. ❌ No hay forma de editar biografías de santos inline
+4. ❌ No hay indicador de desincronización audio-texto (audio viejo + texto nuevo)
+5. ❌ No hay workflow de verificación doctrinal
+6. ❌ No hay visor del contenido diario (reflexiones, tips, oraciones)
 
-He revisado todas las Edge Functions generadoras, el contenido ya almacenado en la base de datos, y los textos estáticos de la plataforma. Aquí el veredicto:
+### Sobre los textos regenerados (respuesta honesta)
 
----
+Los textos de lecciones regenerados:
+- **Citas bíblicas**: REALES (Mt 5,1-12, Jn 3,16, etc.) — verificables
+- **Referencias al Catecismo**: REALES (CIC 1234, etc.)
+- **Anécdotas de "Padre Miguel", "Hermana Lucía"**: 100% INVENTADAS por IA
+- **Marco narrativo y opiniones**: INVENTADO por IA
+- **Dichos populares**: Algunos reales, otros fabricados
 
-### FASE 1: Contenido con ALTO riesgo de detección IA (prioridad inmediata)
+**Conclusión**: Los textos son ~60% fidedignos (citas) y ~40% ficción narrativa. Necesitamos un sistema para que un revisor humano pueda verificar y corregir.
 
-**1A. `enrich-lesson/index.ts` — Lecciones de la Biblioteca**
-- **Problema**: Prompt genérico sin persona editorial. Pide "cálido y pastoral" pero sin anti-patrones ni voz propia. Estructura rígida de 7 secciones numeradas que cualquier detector marca como IA
-- **Evidencia en DB**: El contenido enriquecido usa "Queridos hermanos", "nos adentramos en el Sancta Sanctorum" — lenguaje formalmente perfecto, sin imperfecciones humanas
-- **Fix**: Reescribir prompt con persona del Padre Miguel (ya existe en `generate-daily-content`), romper la estructura de 7 bloques, pedir variación
+### Implementación por Fases
 
-**1B. `generate-saint-history/index.ts` — Biografías de 420+ santos**
-- **Problema**: Prompt básico sin personalidad. "Escribe biografías precisas, inspiradoras y accesibles" es exactamente lo que genera texto IA genérico
-- **Evidencia en DB**: Las biografías cortas suenan a Wikipedia resumida ("fue un fraile franciscano conventual polaco que murió voluntariamente...")
-- **Fix**: Inyectar voz narrativa, pedir que cuente como historia no como ficha, incluir detalles sensoriales/humanos
+#### Fase A: Editor de Contenido con Vista Previa (Lecciones)
+- Panel "Lecciones" con vista previa del texto enriquecido (HTML renderizado)
+- Editor inline para corregir textos directamente
+- Badge de estado: `sin_verificar` | `verificado` | `desincronizado_audio`
+- Indicador de que el audio NO corresponde al texto actual
+- Botón para marcar como "Verificado por humano"
 
-**1C. `generate-saint-prayer/index.ts` — Oraciones de santos**
-- **Problema**: Prompt pide estructura litúrgica estándar (invocación, mención, petición, amén). Genera oraciones genéricas e intercambiables
-- **Fix**: Pedir que cada oración tenga un "gancho" único del santo, variación en estructura, algunas más cortas y directas
+#### Fase B: Editor de Biografías de Santos
+- Vista previa de la biografía actual
+- Editor de texto con guardado directo
+- Badge: `wikipedia` | `ia_generada` | `verificada_humano`
+- Filtro rápido: "solo sin verificar"
 
-**1D. `generate-sleep-stories/index.ts` — Historias para dormir**
-- **Problema**: Aunque tiene buen sistema prompt con detalles sensoriales, la estructura es siempre idéntica: "Cierra tus ojos... respira... historia... bendición". Todas las 29 historias siguen el mismo patrón
-- **Evidencia en DB**: "Bienvenido a este espacio de calma y refugio... un lugar sagrado creado solo para ti..."
-- **Fix**: Crear 5-6 aperturas distintas, variar estructura narrativa, algunos que empiecen in medias res
+#### Fase C: Visor de Contenido Diario
+- Expandir la vista del contenido diario para ver textos completos
+- Reflexiones, tips, oraciones de laudes/completas
+- Editor inline para corregir antes de publicar
 
----
+#### Fase D: Sistema de Verificación Doctrinal
+- Nueva columna `verificado_por` y `verificado_at` en tablas clave
+- Workflow: IA genera → Admin revisa → Marca como verificado
+- Dashboard de "contenido pendiente de revisión"
 
-### FASE 2: Contenido con riesgo MEDIO (ya parcialmente humanizado)
+### Archivos a crear/modificar
 
-**2A. `generate-daily-content/index.ts` — Contenido diario**
-- **Estado**: Ya tiene persona "Padre Miguel" con anti-patrones. Parcialmente humanizado
-- **Problema residual**: El contenido en DB aún suena académico: "Este pasaje, situado en el inicio de nuestro caminar cuaresmal..." — no suena a párroco colombiano
-- **Fix**: Reforzar anti-patrones, añadir más ejemplos concretos de tono, subir temperature a 0.9
-
-**2B. `generate-daily-capsule/index.ts` — Cápsulas virales**
-- **Estado**: Ya tiene guías de estilo por categoría
-- **Problema residual**: Las cápsulas en DB son correctas pero predecibles. "Aún con toda la IA del mundo, nadie ha replicado algo tan simple como la risa de un niño" — suena a frase de LinkedIn
-- **Fix**: Añadir más variación, pedir datos más específicos/oscuros, evitar frases motivacionales
-
-**2C. `generate-gratitude-reflection/index.ts` — Reflexiones de gratitud**
-- **Estado**: Prompt decente pero sin persona editorial
-- **Fix**: Añadir voz del Padre Miguel, anti-patrones
-
----
-
-### FASE 3: Contenido con riesgo BAJO (textos estáticos)
-
-**3A. `debate-coach/index.ts` — Coach de debate**
-- **Estado**: Bien diseñado con personas distintas (ateo, agnóstico, herido). Conversacional por naturaleza
-- **Fix menor**: Añadir más variación en respuestas, evitar frases recurrentes
-
-**3B. `apostle-path-ai/index.ts` — Ruta del apóstol**
-- **Estado**: Prompts funcionales, contenido interactivo
-- **Fix menor**: Personalizar más las respuestas con datos del usuario
-
-**3C. Landing page y componentes estáticos**
-- **Estado**: Ya mejorado en la iteración anterior (stats reales, testimonios marcados como ejemplos, E-E-A-T)
-- **Problema residual**: `UserNeedsSection.tsx` tiene "testimonials" inventados inline ("Ahora oro cada mañana sin falta", "Duermo mejor que nunca")
-- **Fix**: Eliminar o marcar como aspiracionales
-
----
-
-### Plan de implementación
-
-**Fase 1 (esta sesión)**: Reescribir los 4 prompts de alto riesgo
-| Archivo | Cambio principal |
+| Archivo | Cambio |
 |---|---|
-| `supabase/functions/enrich-lesson/index.ts` | Persona "Padre Miguel", romper estructura rígida de 7 bloques, anti-patrones |
-| `supabase/functions/generate-saint-history/index.ts` | Voz narrativa, contar como historia, detalles humanos |
-| `supabase/functions/generate-saint-prayer/index.ts` | Variación estructural, ganchos únicos por santo |
-| `supabase/functions/generate-sleep-stories/index.ts` | 6 aperturas distintas rotativas, variación de estructura |
+| `src/pages/admin/AdminContent.tsx` | Agregar tab "Editor de Texto" con preview HTML y editor inline |
+| `src/pages/admin/AdminSantos.tsx` | Mejorar visor/editor de biografías |
+| `src/pages/admin/AdminDailyContent.tsx` | Expandir con visor de textos completos |
+| Migración DB | Agregar `verificado_por`, `estado_verificacion` a `library_lessons` y `calendar_saints` |
 
-**Fase 2 (siguiente sesión)**: Refinar los 3 prompts de riesgo medio
-| Archivo | Cambio principal |
-|---|---|
-| `supabase/functions/generate-daily-content/index.ts` | Reforzar anti-patrones, subir temperature |
-| `supabase/functions/generate-daily-capsule/index.ts` | Datos más oscuros/específicos, menos LinkedIn |
-| `supabase/functions/generate-gratitude-reflection/index.ts` | Persona editorial, anti-patrones |
-
-**Fase 3 (posterior)**: Textos estáticos + regeneración
-| Acción | Detalle |
-|---|---|
-| `src/components/landing/UserNeedsSection.tsx` | Eliminar testimonios ficticios inline |
-| Regenerar contenido existente | Re-ejecutar generadores con nuevos prompts para las biografías y lecciones ya almacenadas |
+### Lo que NO haremos (por ahora)
+- No regeneramos audios de lecciones (ya están creados con texto viejo)
+- No creamos un sistema de IA para verificar IA (sería circular)
+- El trabajo de verificación es HUMANO, el admin solo facilita la herramienta
 
 ### Resultado esperado
-- 10/10 fuentes de contenido con prompts humanizados
-- Contenido nuevo generado indistinguible de escritor humano
-- Variación estilística que evita patrones detectables
-- Base para regenerar el contenido existente con los nuevos prompts
-
+- Admin puede ver, editar y verificar TODOS los textos de la plataforma
+- Indicador claro de qué contenido es fidedigno vs pendiente de revisión
+- Alerta visual cuando audio y texto están desincronizados
