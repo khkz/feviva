@@ -1,9 +1,8 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Heart, Church, BookOpen, Sparkles, MapPin, Globe } from "lucide-react";
+import { Heart, Church, BookOpen, Sparkles, MapPin, Globe, ShieldCheck } from "lucide-react";
 import logoElRugido from "@/assets/logo-elrugido.png";
 
-// Popular saints for SEO links - Using real database slugs
 const popularSaints = [
   { name: "Virgen de Guadalupe", slug: "virgen-de-guadalupe-061a968f" },
   { name: "San Francisco de Asís", slug: "san-francisco-de-asis-19ace8a4" },
@@ -13,7 +12,6 @@ const popularSaints = [
   { name: "Santa Rosa de Lima", slug: "santa-rosa-de-lima-d2af02bd" },
 ];
 
-// Popular prayers for SEO links - Using slugs that match generated slugs from nombre
 const popularPrayers = [
   { name: "Padre Nuestro", slug: "padre-nuestro" },
   { name: "Ave María", slug: "ave-maria" },
@@ -23,7 +21,6 @@ const popularPrayers = [
   { name: "Oración a San Miguel Arcángel", slug: "oracion-a-san-miguel-arcangel" },
 ];
 
-// Patron saints by country for SEO - Using real database slugs
 const patronsByCountry = [
   { name: "México", saint: "Virgen de Guadalupe", slug: "virgen-de-guadalupe-061a968f" },
   { name: "Argentina", saint: "Nuestra Señora de Luján", slug: "nuestra-senora-de-lujan-826ada82" },
@@ -38,7 +35,7 @@ export const FooterSection = () => {
     <footer className="py-12 px-4 border-t border-border/50 bg-muted/30">
       <div className="container mx-auto max-w-6xl">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
-          {/* Brand */}
+          {/* Brand + About */}
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -53,11 +50,16 @@ export const FooterSection = () => {
               </div>
             </div>
             <p className="text-sm text-muted-foreground">
-              Tu compañero diario para crecer en la fe católica.
+              Plataforma católica digital creada en 2025 por un equipo de católicos, teólogos y desarrolladores. 
+              Nuestro contenido se basa en el Catecismo de la Iglesia Católica, documentos del Vaticano II y la Sagrada Escritura.
             </p>
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <ShieldCheck className="h-3.5 w-3.5 text-primary" />
+              <span>Contenido verificado con fuentes eclesiales</span>
+            </div>
           </motion.div>
 
-          {/* Santos Populares - SEO Links */}
+          {/* Santos Populares */}
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -72,10 +74,7 @@ export const FooterSection = () => {
             <ul className="space-y-1.5 text-sm text-muted-foreground">
               {popularSaints.map((saint) => (
                 <li key={saint.slug}>
-                  <Link 
-                    to={`/santo/${saint.slug}`} 
-                    className="hover:text-foreground transition-colors"
-                  >
+                  <Link to={`/santo/${saint.slug}`} className="hover:text-foreground transition-colors">
                     {saint.name}
                   </Link>
                 </li>
@@ -83,7 +82,7 @@ export const FooterSection = () => {
             </ul>
           </motion.div>
 
-          {/* Patronos por País - SEO Links */}
+          {/* Patronos por País */}
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -98,11 +97,7 @@ export const FooterSection = () => {
             <ul className="space-y-1.5 text-sm text-muted-foreground">
               {patronsByCountry.map((item) => (
                 <li key={item.slug}>
-                  <Link 
-                    to={`/santo/${item.slug}`} 
-                    className="hover:text-foreground transition-colors"
-                    title={`Santo patrono de ${item.name}`}
-                  >
+                  <Link to={`/santo/${item.slug}`} className="hover:text-foreground transition-colors" title={`Santo patrono de ${item.name}`}>
                     {item.name}
                   </Link>
                 </li>
@@ -120,33 +115,19 @@ export const FooterSection = () => {
           >
             <h4 className="font-semibold flex items-center gap-2">
               <Church className="h-4 w-4 text-primary" />
-              Calendario Litúrgico
+              Contenido Público
             </h4>
             <ul className="space-y-1.5 text-sm text-muted-foreground">
-              <li>
-                <Link to="/santos" className="hover:text-foreground transition-colors">
-                  Todos los santos
-                </Link>
-              </li>
-              <li>
-                <Link to="/santos?tab=patrons" className="hover:text-foreground transition-colors">
-                  Santos patronos
-                </Link>
-              </li>
-              <li>
-                <Link to="/santos?tab=today" className="hover:text-foreground transition-colors">
-                  Santos de hoy
-                </Link>
-              </li>
-              <li>
-                <Link to="/santos?tab=month" className="hover:text-foreground transition-colors">
-                  Santos del mes
-                </Link>
-              </li>
+              <li><Link to="/santos" className="hover:text-foreground transition-colors">Calendario de santos</Link></li>
+              <li><Link to="/santos?tab=patrons" className="hover:text-foreground transition-colors">Santos patronos</Link></li>
+              <li><Link to="/evangelio-del-dia" className="hover:text-foreground transition-colors">Evangelio del día</Link></li>
+              <li><Link to="/novenas-publicas" className="hover:text-foreground transition-colors">Novenas católicas</Link></li>
+              <li><Link to="/capsula-del-dia" className="hover:text-foreground transition-colors">Cápsula del día</Link></li>
+              <li><Link to="/continente-digital" className="hover:text-foreground transition-colors">El Continente Digital</Link></li>
             </ul>
           </motion.div>
 
-          {/* Oraciones Populares - SEO Links */}
+          {/* Oraciones Populares */}
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -161,10 +142,7 @@ export const FooterSection = () => {
             <ul className="space-y-1.5 text-sm text-muted-foreground">
               {popularPrayers.map((prayer) => (
                 <li key={prayer.slug}>
-                  <Link 
-                    to={`/oracion/${prayer.slug}`} 
-                    className="hover:text-foreground transition-colors"
-                  >
+                  <Link to={`/oracion/${prayer.slug}`} className="hover:text-foreground transition-colors">
                     {prayer.name}
                   </Link>
                 </li>

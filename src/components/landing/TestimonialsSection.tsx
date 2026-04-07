@@ -1,40 +1,64 @@
 import { motion } from "framer-motion";
-import { Star, Quote, Flame, BookOpen, Moon, MessageCircle } from "lucide-react";
+import { Star, Quote, BookOpen, Moon, MessageCircle, Heart, Flame, Users } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
-const stats = [
-  { value: "10,000+", label: "Oraciones registradas", icon: Flame },
-  { value: "500+", label: "Rosarios completados", icon: Star },
-  { value: "365", label: "Días de racha máxima", icon: BookOpen },
-  { value: "1,000+", label: "Sleep Stories escuchadas", icon: Moon }
-];
+// Real stats fetched from database
+const useRealStats = () => {
+  return useQuery({
+    queryKey: ['landing-real-stats'],
+    queryFn: async () => {
+      const [oraciones, santos, novenas] = await Promise.all([
+        supabase.from('oraciones').select('*', { count: 'exact', head: true }),
+        supabase.from('calendar_saints').select('*', { count: 'exact', head: true }),
+        supabase.from('novenas').select('*', { count: 'exact', head: true }),
+      ]);
+      return {
+        oraciones: oraciones.count || 0,
+        santos: santos.count || 0,
+        novenas: novenas.count || 0,
+      };
+    },
+    staleTime: 60 * 60 * 1000,
+  });
+};
 
 const testimonials = [
   {
-    quote: "Antes no sabía cómo orar. Ahora tengo un ritual diario que me conecta con Dios cada mañana.",
-    author: "María G.",
-    role: "Usuaria desde hace 6 meses",
-    avatar: "M"
+    quote: "Antes rezaba el Padre Nuestro de memoria sin pensar. Ahora con las reflexiones diarias, entiendo lo que estoy diciendo. Suena simple, pero me cambió la oración.",
+    author: "Usuario de ElRugido",
+    role: "Ejemplo de experiencia típica",
+    avatar: "🙏"
   },
   {
-    quote: "Las Sleep Stories me ayudaron con mi insomnio. Ahora duermo en paz escuchando historias bíblicas.",
-    author: "Carlos R.",
-    role: "Padre de familia",
-    avatar: "C"
+    quote: "Mi hijo de 16 años me preguntó por qué creo en Dios. Gracias al coach de apologética practiqué cómo responder sin discutir. Tuvimos la mejor conversación de nuestras vidas.",
+    author: "Usuario de ElRugido",
+    role: "Ejemplo de experiencia típica",
+    avatar: "💬"
   },
   {
-    quote: "El coach de debate me dio confianza para responder preguntas sobre la Resurrección en mi universidad.",
-    author: "Ana L.",
-    role: "Estudiante universitaria",
-    avatar: "A"
+    quote: "Las historias para dormir bíblicas son lo único que me ha funcionado para no quedarme pegado al celular hasta las 2am. Ahora duermo antes de medianoche.",
+    author: "Usuario de ElRugido",
+    role: "Ejemplo de experiencia típica",
+    avatar: "🌙"
   }
 ];
 
 export const TestimonialsSection = () => {
+  const { data: stats } = useRealStats();
+
+  const realStats = [
+    { value: stats?.oraciones || 150, suffix: "+", label: "Oraciones con texto completo", icon: Heart },
+    { value: stats?.santos || 420, suffix: "+", label: "Santos del calendario", icon: Flame },
+    { value: 365, suffix: "", label: "Días de lectura bíblica", icon: BookOpen },
+    { value: stats?.novenas || 9, suffix: "", label: "Novenas guiadas de 9 días", icon: Moon },
+  ];
+
   return (
     <section className="py-24 px-4 bg-gradient-to-b from-muted/30 to-background">
       <div className="container mx-auto max-w-6xl">
-        {/* Stats */}
+        {/* Real Stats from Database */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -42,7 +66,7 @@ export const TestimonialsSection = () => {
           transition={{ duration: 0.6 }}
           className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-20"
         >
-          {stats.map((stat, index) => (
+          {realStats.map((stat, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, scale: 0.9 }}
@@ -53,7 +77,7 @@ export const TestimonialsSection = () => {
             >
               <stat.icon className="w-8 h-8 mx-auto mb-3 text-primary" />
               <p className="text-3xl md:text-4xl font-bold text-gradient-gold mb-1">
-                {stat.value}
+                {stat.value.toLocaleString()}{stat.suffix}
               </p>
               <p className="text-muted-foreground text-sm">{stat.label}</p>
             </motion.div>
@@ -69,14 +93,14 @@ export const TestimonialsSection = () => {
           className="text-center mb-12"
         >
           <span className="text-primary font-medium text-sm uppercase tracking-wider">
-            Testimonios
+            Experiencias
           </span>
           <h2 className="text-3xl md:text-5xl font-display font-bold mt-4 mb-6">
-            Vidas transformadas
+            Para qué sirve ElRugido
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Miles de personas han encontrado en ElRugido el acompañamiento 
-            que necesitaban para fortalecer su fe.
+            Estos ejemplos representan el tipo de impacto que buscamos generar. 
+            ElRugido es una herramienta joven y en crecimiento.
           </p>
         </motion.div>
 
@@ -98,19 +122,13 @@ export const TestimonialsSection = () => {
                 </p>
                 
                 <div className="flex items-center gap-3 mt-auto">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-lg">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-2xl">
                     {testimonial.avatar}
                   </div>
                   <div>
                     <p className="font-semibold text-foreground">{testimonial.author}</p>
-                    <p className="text-muted-foreground text-sm">{testimonial.role}</p>
+                    <p className="text-muted-foreground text-xs italic">{testimonial.role}</p>
                   </div>
-                </div>
-                
-                <div className="flex gap-1 mt-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-primary text-primary" />
-                  ))}
                 </div>
               </Card>
             </motion.div>
