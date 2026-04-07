@@ -377,8 +377,10 @@ export type Database = {
           created_at: string | null
           description: string | null
           description_source: string | null
+          estado_verificacion: string
           feast_day: number
           feast_month: number
+          fuente_descripcion: string | null
           id: string
           image_url: string | null
           name: string
@@ -386,6 +388,7 @@ export type Database = {
           slug: string | null
           tags: string[] | null
           updated_at: string | null
+          verificado_por: string | null
         }
         Insert: {
           category?: string
@@ -393,8 +396,10 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_source?: string | null
+          estado_verificacion?: string
           feast_day: number
           feast_month: number
+          fuente_descripcion?: string | null
           id?: string
           image_url?: string | null
           name: string
@@ -402,6 +407,7 @@ export type Database = {
           slug?: string | null
           tags?: string[] | null
           updated_at?: string | null
+          verificado_por?: string | null
         }
         Update: {
           category?: string
@@ -409,8 +415,10 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_source?: string | null
+          estado_verificacion?: string
           feast_day?: number
           feast_month?: number
+          fuente_descripcion?: string | null
           id?: string
           image_url?: string | null
           name?: string
@@ -418,6 +426,7 @@ export type Database = {
           slug?: string | null
           tags?: string[] | null
           updated_at?: string | null
+          verificado_por?: string | null
         }
         Relationships: [
           {
@@ -1236,9 +1245,11 @@ export type Database = {
           categoria: string
           contenido: string
           contenido_enriquecido: string | null
+          contenido_enriquecido_hash: string | null
           created_at: string | null
           descripcion: string
           duracion_estimada: number | null
+          estado_verificacion: string
           id: string
           language: string | null
           nivel: number
@@ -1248,15 +1259,18 @@ export type Database = {
           titulo: string
           verificacion_data: Json | null
           verificado_at: string | null
+          verificado_por: string | null
         }
         Insert: {
           audio_url?: string | null
           categoria: string
           contenido: string
           contenido_enriquecido?: string | null
+          contenido_enriquecido_hash?: string | null
           created_at?: string | null
           descripcion: string
           duracion_estimada?: number | null
+          estado_verificacion?: string
           id?: string
           language?: string | null
           nivel: number
@@ -1266,15 +1280,18 @@ export type Database = {
           titulo: string
           verificacion_data?: Json | null
           verificado_at?: string | null
+          verificado_por?: string | null
         }
         Update: {
           audio_url?: string | null
           categoria?: string
           contenido?: string
           contenido_enriquecido?: string | null
+          contenido_enriquecido_hash?: string | null
           created_at?: string | null
           descripcion?: string
           duracion_estimada?: number | null
+          estado_verificacion?: string
           id?: string
           language?: string | null
           nivel?: number
@@ -1284,6 +1301,7 @@ export type Database = {
           titulo?: string
           verificacion_data?: Json | null
           verificado_at?: string | null
+          verificado_por?: string | null
         }
         Relationships: []
       }
@@ -2704,8 +2722,10 @@ export type Database = {
           created_at: string | null
           description: string | null
           description_source: string | null
+          estado_verificacion: string
           feast_day: number
           feast_month: number
+          fuente_descripcion: string | null
           id: string
           image_url: string | null
           name: string
@@ -2713,6 +2733,7 @@ export type Database = {
           slug: string | null
           tags: string[] | null
           updated_at: string | null
+          verificado_por: string | null
         }[]
         SetofOptions: {
           from: "*"
