@@ -80,6 +80,7 @@ serve(async (req) => {
       { url: "/novenas-publicas", changefreq: "weekly", priority: "0.8" },
       { url: "/auth", changefreq: "monthly", priority: "0.6" },
       { url: "/frontera-final", changefreq: "weekly", priority: "0.7" },
+      { url: "/capsula-del-dia", changefreq: "daily", priority: "0.8" },
     ];
 
     let xml = `<?xml version="1.0" encoding="UTF-8"?>
