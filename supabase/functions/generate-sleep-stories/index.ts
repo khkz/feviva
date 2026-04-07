@@ -205,36 +205,28 @@ Escribe SOLO el contenido, sin título ni metadatos.`;
 }
 
 async function expandExistingStory(titulo: string, contenidoActual: string): Promise<string> {
-  const systemPrompt = `Eres un narrador experto en crear historias bíblicas para dormir.
-Tu tarea es expandir y enriquecer una historia existente para que dure 12-15 minutos de narración.
+  const systemPrompt = `Eres un narrador de historias para dormir. Reescribes y expandes historias existentes dándoles vida propia.
 
-REGLAS CRÍTICAS PARA AUDIO TTS:
-- NUNCA uses abreviaciones de libros bíblicos (escribe "Génesis" NO "Gn.", "Juan" NO "Jn.")
-- Escribe las referencias bíblicas de forma legible: "el Salmo veintitrés" en lugar de "Salmo 23"
-- Formato hablado para citas: "el capítulo tres del Evangelio de Juan" en lugar de "Juan 3:16"
-- Escribe números como palabras: "tres" en lugar de "3"
-- Los números romanos deben escribirse: "segundo" en lugar de "II"`;
+REGLAS:
+- Si la historia original empieza con "Bienvenido a este espacio" o "Cierra tus ojos", ELIMINA eso y empieza de otra forma
+- Añade detalles sensoriales ricos pero variados — no solo visuales, incluye olores, sabores, texturas
+- Varía el ritmo: párrafos cortos y largos intercalados
+- Incluye algún pensamiento interno del personaje bíblico
+- El final no tiene que ser una bendición formal — puede ser silencio, una imagen, una sensación
 
-  const userPrompt = `Expande esta historia para dormir a aproximadamente 2500-3000 palabras:
+REGLAS TTS:
+- NUNCA abreviaciones bíblicas (escribe "Génesis" NO "Gn.", "Juan" NO "Jn.")
+- Referencias legibles: "el Salmo veintitrés" en lugar de "Salmo 23"
+- Números como palabras: "tres" no "3"
+- Sin símbolos especiales`;
+
+  const userPrompt = `Reescribe y expande esta historia para dormir a ~2500-3000 palabras:
 
 Título: ${titulo}
 Historia actual:
 ${contenidoActual}
 
-Mantén la esencia de la historia pero:
-1. Añade muchas más descripciones sensoriales detalladas
-2. Incluye pausas y momentos de silencio ("...el silencio envolvía todo...")
-3. Desarrolla más el ambiente y la atmósfera
-4. Añade reflexiones espirituales suaves
-5. Expande los diálogos y pensamientos de los personajes
-6. El ritmo debe ser muy lento y contemplativo
-7. Comienza con invitación a relajarse
-8. Termina con bendición para el sueño
-
-IMPORTANTE PARA AUDIO:
-- Corrige cualquier abreviación bíblica existente (Gn., Jn., Mt., etc.)
-- Convierte números a palabras donde sea natural
-- Las referencias bíblicas deben ser legibles en voz alta
+Mantén la esencia pero dale una voz nueva. No copies la estructura original si es formulaica. Sorprende con la apertura. Desarrolla momentos que la original solo menciona. Deja que la narración respire.
 
 Escribe SOLO el contenido expandido, sin título ni metadatos.`;
 
