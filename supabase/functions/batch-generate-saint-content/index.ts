@@ -14,14 +14,14 @@ serve(async (req) => {
   }
 
   try {
-    // Auth: accept admin key, authenticated user, or service-role calls
+    // Auth check
     const adminKey = req.headers.get('X-Admin-Api-Key');
     const ADMIN_KEY = Deno.env.get('ADMIN_API_KEY');
     const authHeader = req.headers.get('Authorization');
-    const isServiceRole = authHeader?.includes('service_role');
+    const isInternalCall = req.headers.get('X-Internal-Call') === 'true';
     
-    if (adminKey && ADMIN_KEY && adminKey === ADMIN_KEY) { /* Admin OK */ }
-    else if (isServiceRole) { /* Service role OK - internal call */ }
+    if (isInternalCall && adminKey && ADMIN_KEY && adminKey === ADMIN_KEY) { /* OK */ }
+    else if (adminKey && ADMIN_KEY && adminKey === ADMIN_KEY) { /* Admin OK */ }
     else if (authHeader?.startsWith('Bearer ')) {
       const _ac = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_ANON_KEY')!, { global: { headers: { Authorization: authHeader } } });
       const { error: authErr } = await _ac.auth.getUser(authHeader.replace('Bearer ', ''));
@@ -36,7 +36,8 @@ serve(async (req) => {
       onlyPatrons = false,
       countryCode = null,
       offset = 0,
-      limit = 10
+      limit = 5,
+      autoChain = false  // When true, auto-triggers next batch
     } = await req.json();
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -48,13 +49,11 @@ serve(async (req) => {
       .from('calendar_saints')
       .select('id, name, description, prayer_id, category, country_code, feast_day, feast_month, tags')
       .order('feast_month', { ascending: true })
-      .order('feast_day', { ascending: true });
+      .order('feast_day', { ascending: true })
+      .range(offset, offset + limit - 1);
 
     if (onlyPatrons) query = query.eq('category', 'patron_country');
     if (countryCode) query = query.eq('country_code', countryCode);
-
-    // Use range for pagination
-    query = query.range(offset, offset + limit - 1);
 
     const { data: saints, error: saintsError } = await query;
 
@@ -66,13 +65,14 @@ serve(async (req) => {
     }
 
     if (!saints || saints.length === 0) {
+      console.log(`✅ ALL DONE! Processed all saints up to offset ${offset}`);
       return new Response(
-        JSON.stringify({ success: true, message: 'No more saints to process', processed: 0, offset }),
+        JSON.stringify({ success: true, message: 'All saints processed', processed: 0, offset, complete: true }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log(`Processing ${saints.length} saints (offset ${offset}) for ${contentType}, forceRegenerate=${forceRegenerate}`);
+    console.log(`[Batch offset=${offset}] Processing ${saints.length} saints, forceRegenerate=${forceRegenerate}`);
 
     const enfoques = [
       "Cuenta la historia como si estuvieras sentado con un amigo en un café, compartiendo algo que te fascina.",
@@ -99,7 +99,6 @@ REGLAS ANTI-IA:
     const results = { processed: 0, generated: 0, skipped: 0, errors: [] as string[] };
 
     for (const saint of saints) {
-      // Skip if already has content and not forcing
       if (!forceRegenerate && saint.description && saint.description.length > 100) {
         results.skipped++;
         results.processed++;
@@ -142,11 +141,8 @@ Extensión: 300-500 palabras. Todo en prosa fluida, sin encabezados ni viñetas.
         if (!response.ok) {
           const errText = await response.text();
           results.errors.push(`${saint.name}: API ${response.status}`);
-          console.error(`Error for ${saint.name}: ${response.status} ${errText}`);
-          if (response.status === 429) {
-            console.log("Rate limited, waiting 10s...");
-            await delay(10000);
-          }
+          console.error(`✗ ${saint.name}: ${response.status}`);
+          if (response.status === 429) await delay(10000);
           results.processed++;
           continue;
         }
@@ -161,32 +157,48 @@ Extensión: 300-500 palabras. Todo en prosa fluida, sin encabezados ni viñetas.
             .eq('id', saint.id);
 
           if (updateErr) {
-            results.errors.push(`${saint.name}: DB update failed`);
+            results.errors.push(`${saint.name}: DB error`);
           } else {
             results.generated++;
             console.log(`✓ ${saint.name} (${content.length} chars)`);
           }
-        } else {
-          results.errors.push(`${saint.name}: No content generated`);
         }
       } catch (e) {
         results.errors.push(`${saint.name}: ${e instanceof Error ? e.message : 'Unknown'}`);
       }
 
       results.processed++;
-      await delay(2000);
+      await delay(1500);
     }
 
-    console.log(`Batch done. Generated: ${results.generated}, Skipped: ${results.skipped}, Errors: ${results.errors.length}`);
+    const nextOffset = offset + saints.length;
+    const hasMore = saints.length === limit;
+
+    console.log(`[Batch offset=${offset}] Done: ${results.generated} generated, ${results.errors.length} errors. Next: ${nextOffset}`);
+
+    // Auto-chain: trigger next batch in background
+    if (autoChain && hasMore) {
+      const selfUrl = `${supabaseUrl}/functions/v1/batch-generate-saint-content`;
+      fetch(selfUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabaseKey}`,
+          'apikey': Deno.env.get('SUPABASE_ANON_KEY')!,
+          'X-Admin-Api-Key': ADMIN_KEY || '',
+          'X-Internal-Call': 'true',
+        },
+        body: JSON.stringify({
+          contentType, forceRegenerate, onlyPatrons, countryCode,
+          offset: nextOffset, limit, autoChain: true
+        }),
+      }).catch(err => console.error('Auto-chain failed:', err));
+      
+      console.log(`🔄 Auto-chained next batch at offset ${nextOffset}`);
+    }
 
     return new Response(
-      JSON.stringify({ 
-        success: true,
-        ...results,
-        offset,
-        nextOffset: offset + saints.length,
-        hasMore: saints.length === limit
-      }),
+      JSON.stringify({ success: true, ...results, offset, nextOffset, hasMore }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
