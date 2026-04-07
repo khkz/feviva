@@ -61,6 +61,7 @@ interface CalendarSaint {
   id: string;
   name: string;
   description: string | null;
+  description_source: string | null;
   feast_day: number;
   feast_month: number;
   category: string;
@@ -69,6 +70,8 @@ interface CalendarSaint {
   prayer_id: string | null;
   tags: string[] | null;
   created_at: string | null;
+  estado_verificacion: string;
+  fuente_descripcion: string | null;
 }
 
 interface BatchProgress {
