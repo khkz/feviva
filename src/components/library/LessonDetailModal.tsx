@@ -105,9 +105,9 @@ export function LessonDetailModal({
     );
   };
 
-  const handleGenerateAudio = async () => {
+  const handleGenerateAudio = async (forceRegenerate = false) => {
     const textForAudio = enrichedContent?.resumen_audio || lesson.descripcion + ". " + lesson.contenido.replace(/<[^>]*>/g, '').slice(0, 2000);
-    await generateAudio(textForAudio);
+    await generateAudio(textForAudio, forceRegenerate);
   };
 
   const handlePlayAudio = async () => {
@@ -433,7 +433,7 @@ export function LessonDetailModal({
           
           {!hasAudio && enrichedContent?.resumen_audio && (
             <Button
-              onClick={handleGenerateAudio}
+              onClick={() => handleGenerateAudio(false)}
               disabled={isGeneratingAudio}
               variant="outline"
               className="glass-button gap-2"
@@ -447,6 +447,27 @@ export function LessonDetailModal({
                 <>
                   <Headphones className="h-4 w-4" />
                   Generar Audio
+                </>
+              )}
+            </Button>
+          )}
+
+          {hasAudio && (
+            <Button
+              onClick={() => handleGenerateAudio(true)}
+              disabled={isGeneratingAudio}
+              variant="outline"
+              className="glass-button gap-2 text-amber-400 border-amber-400/30"
+            >
+              {isGeneratingAudio ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Regenerando audio...
+                </>
+              ) : (
+                <>
+                  <Headphones className="h-4 w-4" />
+                  Regenerar Audio
                 </>
               )}
             </Button>
