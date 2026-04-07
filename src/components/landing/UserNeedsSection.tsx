@@ -124,9 +124,8 @@ export const UserNeedsSection = () => {
                       <span className="line-clamp-1">{need.solution}</span>
                     </div>
 
-                    {/* Mini testimonial */}
-                    <p className="text-xs text-emerald-400/80 italic">
-                      — "{need.testimonial}"
+                    <p className="text-xs text-muted-foreground/70 mt-1">
+                      {need.feature}
                     </p>
                   </div>
                 </div>
