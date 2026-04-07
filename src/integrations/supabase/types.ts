@@ -602,6 +602,45 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_capsules: {
+        Row: {
+          categoria: string
+          color_accent: string
+          created_at: string
+          dato_impactante: string
+          emoji_icon: string
+          fecha: string
+          fuente: string | null
+          id: string
+          reflexion: string
+          share_count: number
+        }
+        Insert: {
+          categoria?: string
+          color_accent?: string
+          created_at?: string
+          dato_impactante: string
+          emoji_icon?: string
+          fecha: string
+          fuente?: string | null
+          id?: string
+          reflexion: string
+          share_count?: number
+        }
+        Update: {
+          categoria?: string
+          color_accent?: string
+          created_at?: string
+          dato_impactante?: string
+          emoji_icon?: string
+          fecha?: string
+          fuente?: string | null
+          id?: string
+          reflexion?: string
+          share_count?: number
+        }
+        Relationships: []
+      }
       daily_content: {
         Row: {
           audio_completas_url: string | null
