@@ -190,7 +190,10 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     const audio = audioRef.current;
     if (!audio) return;
 
-    const handleTimeUpdate = () => setCurrentTime(audio.currentTime);
+    const handleTimeUpdate = () => {
+      setCurrentTime(audio.currentTime);
+      writeSessionProgress(currentItem, audio.currentTime, audio.duration);
+    };
     const handleLoadedMetadata = () => {
       setDuration(audio.duration);
       audio.playbackRate = playbackRate;
@@ -205,20 +208,22 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
       audio.removeEventListener("ended", handleEnded);
     };
-  }, [playbackRate, handleEnded]);
+  }, [playbackRate, handleEnded, currentItem]);
 
   // Play a single item (adds to queue as single item)
   const play = useCallback((item: AudioQueueItem) => {
+    const resumeTime = readSessionProgress(item);
     setQueue([item]);
     setCurrentIndex(0);
     setCurrentItem(item);
     setAudioUrl(item.audioUrl);
     setIsMinimized(false);
-    setCurrentTime(0);
+    setCurrentTime(resumeTime);
     
     if (item.audioUrl && audioRef.current) {
       audioRef.current.src = item.audioUrl;
       audioRef.current.load();
+      audioRef.current.currentTime = resumeTime;
       audioRef.current.play().then(() => setIsPlaying(true)).catch(console.error);
     }
   }, []);
@@ -235,11 +240,13 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     setCurrentItem(firstItem);
     setAudioUrl(firstItem.audioUrl);
     setIsMinimized(false);
-    setCurrentTime(0);
+    const resumeTime = readSessionProgress(firstItem);
+    setCurrentTime(resumeTime);
     
     if (firstItem.audioUrl && audioRef.current) {
       audioRef.current.src = firstItem.audioUrl;
       audioRef.current.load();
+      audioRef.current.currentTime = resumeTime;
       audioRef.current.play().then(() => setIsPlaying(true)).catch(console.error);
     }
   }, []);
