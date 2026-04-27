@@ -97,6 +97,7 @@ export function useOracionAudio({ oracionId, nombre, texto, existingAudioUrl }: 
         type: 'oracion',
         originalData: { texto },
       });
+      audioPlayer.minimize();
 
       if (!cachedUrl && url) {
         getAudioWithCache(url).then(cached => {
