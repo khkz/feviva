@@ -337,14 +337,16 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     if (currentIndex < queue.length - 1) {
       const nextIndex = currentIndex + 1;
       const nextItem = queue[nextIndex];
+      const resumeTime = readSessionProgress(nextItem);
       setCurrentIndex(nextIndex);
       setCurrentItem(nextItem);
       setAudioUrl(nextItem.audioUrl);
-      setCurrentTime(0);
+      setCurrentTime(resumeTime);
       
       if (nextItem.audioUrl && audioRef.current) {
         audioRef.current.src = nextItem.audioUrl;
         audioRef.current.load();
+        audioRef.current.currentTime = resumeTime;
         audioRef.current.play().then(() => setIsPlaying(true)).catch(console.error);
       }
     }
@@ -360,14 +362,16 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     if (currentIndex > 0) {
       const prevIndex = currentIndex - 1;
       const prevItem = queue[prevIndex];
+      const resumeTime = readSessionProgress(prevItem);
       setCurrentIndex(prevIndex);
       setCurrentItem(prevItem);
       setAudioUrl(prevItem.audioUrl);
-      setCurrentTime(0);
+      setCurrentTime(resumeTime);
       
       if (prevItem.audioUrl && audioRef.current) {
         audioRef.current.src = prevItem.audioUrl;
         audioRef.current.load();
+        audioRef.current.currentTime = resumeTime;
         audioRef.current.play().then(() => setIsPlaying(true)).catch(console.error);
       }
     }
