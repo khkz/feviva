@@ -1,18 +1,39 @@
 import { useNavigate } from "react-router-dom";
-import { Hand, BookOpen, Flame, Moon, Play, MessageSquare, Library } from "lucide-react";
+import { Hand, BookOpen, Flame, Moon, Play, MessageSquare, Library, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 
 const actions = [
   { 
+    icon: Hand, 
+    label: "Orar ahora", 
+    path: "/oraciones/app",
+    gradient: "from-amber-400 to-orange-500",
+    bgGradient: "from-amber-500/20 to-orange-500/20"
+  },
+  { 
+    icon: Play, 
+    label: "Evangelio", 
+    path: "/evangelio",
+    gradient: "from-yellow-400 to-amber-500",
+    bgGradient: "from-yellow-500/20 to-amber-500/20"
+  },
+  { 
     icon: BookOpen, 
-    label: "Estudiar", 
+    label: "Lecciones", 
     path: "/library",
     gradient: "from-secondary to-amber-600",
     bgGradient: "from-secondary/20 to-amber-500/20"
   },
   { 
+    icon: Sparkles, 
+    label: "Santos", 
+    path: "/santos/app",
+    gradient: "from-sky-400 to-cyan-600",
+    bgGradient: "from-sky-500/20 to-cyan-600/20"
+  },
+  { 
     icon: MessageSquare, 
-    label: "Practicar", 
+    label: "Defender", 
     path: "/coach",
     gradient: "from-purple-400 to-purple-600",
     bgGradient: "from-purple-500/20 to-purple-600/20"
@@ -23,20 +44,6 @@ const actions = [
     path: "/cards",
     gradient: "from-emerald-400 to-emerald-600",
     bgGradient: "from-emerald-500/20 to-emerald-600/20"
-  },
-  { 
-    icon: Play, 
-    label: "Evangelio", 
-    path: "/evangelio",
-    gradient: "from-yellow-400 to-amber-500",
-    bgGradient: "from-yellow-500/20 to-amber-500/20"
-  },
-  { 
-    icon: Hand, 
-    label: "Orar", 
-    path: "/oraciones/app",
-    gradient: "from-amber-400 to-orange-500",
-    bgGradient: "from-amber-500/20 to-orange-500/20"
   },
   { 
     icon: Flame, 
@@ -82,9 +89,10 @@ export function QuickActions() {
     <section className="px-5 -mt-3 relative z-20 lg:px-0 lg:mt-0">
       {/* Section Title */}
       <div className="mb-3 lg:mb-4">
-        <h2 className="font-heading text-sm lg:text-base font-semibold text-foreground/80">
-          Tu Formación
+        <h2 className="font-heading text-base lg:text-lg font-semibold text-foreground">
+          Accesos rápidos
         </h2>
+        <p className="text-xs text-muted-foreground mt-0.5 lg:hidden">Lo esencial de hoy, en un toque.</p>
       </div>
 
       {/* Mobile: Horizontal scroll with fade indicators */}
@@ -105,7 +113,7 @@ export function QuickActions() {
             <motion.button
               key={action.path}
               onClick={() => navigate(action.path)}
-              className="group flex-shrink-0 flex flex-col items-center gap-2 p-3 rounded-2xl glass-button min-w-[76px] active:scale-95 active:opacity-80 transition-all"
+              className="group flex-shrink-0 flex flex-col items-center gap-2 p-3 rounded-2xl glass-button min-w-[86px] active:scale-95 active:opacity-80 transition-all"
               variants={itemVariants}
               whileTap={{ scale: 0.95 }}
             >
@@ -127,7 +135,7 @@ export function QuickActions() {
 
       {/* Desktop: Full grid */}
       <motion.div 
-        className="hidden lg:grid grid-cols-7 gap-4"
+        className="hidden lg:grid grid-cols-4 xl:grid-cols-7 gap-4"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
