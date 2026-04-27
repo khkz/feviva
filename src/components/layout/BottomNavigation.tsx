@@ -1,13 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Compass, BookOpen, Rocket, User } from "lucide-react";
+import { Home, Hand, BookOpen, Sparkles, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
 const navItems = [
   { path: "/dashboard", icon: Home, label: "Inicio" },
-  { path: "/oraciones/app", icon: Compass, label: "Orar" },
-  { path: "/frontera-final", icon: Rocket, label: "Cosmos" },
+  { path: "/oraciones/app", icon: Hand, label: "Orar" },
   { path: "/library", icon: BookOpen, label: "Aprender" },
+  { path: "/santos/app", icon: Sparkles, label: "Santos" },
   { path: "/profile", icon: User, label: "Perfil" },
 ];
 
@@ -17,7 +17,9 @@ export function BottomNavigation() {
   const getActiveIndex = () => {
     return navItems.findIndex((item) => 
       location.pathname === item.path || 
-      (item.path === "/oraciones/app" && ["/oraciones/app", "/rosario", "/novenas"].includes(location.pathname))
+      (item.path === "/oraciones/app" && ["/oraciones/app", "/rosario", "/novenas", "/sleep-stories"].includes(location.pathname)) ||
+      (item.path === "/library" && ["/library", "/apostle-path", "/bible-plan", "/coach"].some((path) => location.pathname.startsWith(path))) ||
+      (item.path === "/santos/app" && ["/santos", "/santos/app", "/santo"].some((path) => location.pathname.startsWith(path)))
     );
   };
 
