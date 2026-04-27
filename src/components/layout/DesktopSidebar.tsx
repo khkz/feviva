@@ -15,7 +15,8 @@ import {
   Route,
   Flower2,
   GraduationCap,
-  Rocket
+  Rocket,
+  Sparkles
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import logoElRugido from "@/assets/logo-elrugido.png";
@@ -33,6 +34,7 @@ const mainNavItems: NavItem[] = [
   { path: "/oraciones/app", icon: Hand, label: "Oraciones" },
   { path: "/rosario", icon: Flower2, label: "Rosario" },
   { path: "/novenas", icon: Flame, label: "Novenas" },
+  { path: "/santos/app", icon: Sparkles, label: "Santos" },
   { path: "/sleep-stories", icon: Moon, label: "Dormir" },
 ];
 
@@ -87,7 +89,9 @@ export function DesktopSidebar({ userName = "Peregrino", userLevel = 1, userStre
           </p>
           <div className="space-y-1">
             {mainNavItems.map((item) => {
-              const isActive = location.pathname === item.path;
+              const isActive = location.pathname === item.path ||
+                (item.path === "/oraciones/app" && location.pathname.startsWith("/oracion")) ||
+                (item.path === "/santos/app" && (location.pathname.startsWith("/santos") || location.pathname.startsWith("/santo")));
               return (
                 <Link
                   key={item.path}
@@ -124,7 +128,7 @@ export function DesktopSidebar({ userName = "Peregrino", userLevel = 1, userStre
           </p>
           <div className="space-y-1">
             {secondaryNavItems.map((item) => {
-              const isActive = location.pathname === item.path;
+              const isActive = location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
               return (
                 <Link
                   key={item.path}
