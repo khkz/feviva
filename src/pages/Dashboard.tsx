@@ -196,20 +196,7 @@ const Dashboard = () => {
             </div>
           )}
 
-          {/* Core 3: Always visible */}
-          {showSoulTriage && <SoulTriageHero />}
-
-          <NextStepCard 
-            currentLevel={stats?.nivel || 1}
-            completedLessons={Math.floor((stats?.puntos_totales || 0) / 100)}
-            totalLessons={10}
-          />
-
-          {showDailyMission && (
-            <Suspense fallback={<CardSkeleton height="h-48" />}>
-              <DailyMission />
-            </Suspense>
-          )}
+          {showQuickActions && <QuickActions />}
 
           {showDailyRoutine && (
             <Suspense fallback={<CardSkeleton height="h-40" />}>
@@ -217,7 +204,20 @@ const Dashboard = () => {
             </Suspense>
           )}
 
-          {showQuickActions && <QuickActions />}
+          {showDailyMission && (
+            <Suspense fallback={<CardSkeleton height="h-48" />}>
+              <DailyMission />
+            </Suspense>
+          )}
+
+          <NextStepCard 
+            currentLevel={stats?.nivel || 1}
+            completedLessons={Math.floor((stats?.puntos_totales || 0) / 100)}
+            totalLessons={10}
+          />
+
+          {/* Core 3: Always visible */}
+          {showSoulTriage && <SoulTriageHero />}
 
           {/* Tu Día Espiritual — always visible */}
           {showSaintAndGospel && (
