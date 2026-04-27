@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAudioCache } from "@/hooks/useAudioCache";
+import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
 
 interface UseOracionAudioProps {
   oracionId: string;
@@ -13,13 +14,17 @@ interface UseOracionAudioProps {
 export function useOracionAudio({ oracionId, nombre, texto, existingAudioUrl }: UseOracionAudioProps) {
   const { toast } = useToast();
   const { getAudioWithCache } = useAudioCache();
+  const audioPlayer = useAudioPlayer();
   const [audioUrl, setAudioUrl] = useState<string | null>(existingAudioUrl || null);
   const [cachedUrl, setCachedUrl] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const isGeneratingRef = useRef(false);
+
+  const isCurrentPrayer = audioPlayer.currentItem?.type === 'oracion' && audioPlayer.currentItem.id === oracionId;
+  const isPlaying = isCurrentPrayer && audioPlayer.isPlaying;
+  const progress = isCurrentPrayer && audioPlayer.duration > 0
+    ? (audioPlayer.currentTime / audioPlayer.duration) * 100
+    : 0;
 
   // Pre-cache audio if URL exists
   useEffect(() => {
@@ -84,30 +89,16 @@ export function useOracionAudio({ oracionId, nombre, texto, existingAudioUrl }: 
     }
 
     try {
-      // Create or reuse audio element
-      if (!audioRef.current || audioRef.current.src !== url) {
-        if (audioRef.current) {
-          audioRef.current.pause();
-        }
-        audioRef.current = new Audio(url);
-        
-        audioRef.current.onended = () => {
-          setIsPlaying(false);
-          setProgress(0);
-        };
-        
-        audioRef.current.ontimeupdate = () => {
-          if (audioRef.current) {
-            const pct = (audioRef.current.currentTime / audioRef.current.duration) * 100;
-            setProgress(pct);
-          }
-        };
-      }
+      audioPlayer.play({
+        id: oracionId,
+        title: nombre,
+        subtitle: "Oración",
+        audioUrl: url,
+        type: 'oracion',
+        originalData: { texto },
+      });
+      audioPlayer.minimize();
 
-      await audioRef.current.play();
-      setIsPlaying(true);
-      
-      // Cache in background (non-blocking)
       if (!cachedUrl && url) {
         getAudioWithCache(url).then(cached => {
           if (cached) setCachedUrl(cached);
@@ -121,14 +112,11 @@ export function useOracionAudio({ oracionId, nombre, texto, existingAudioUrl }: 
         variant: "destructive",
       });
     }
-  }, [audioUrl, cachedUrl, generateAudio, getAudioWithCache, toast]);
+  }, [audioUrl, cachedUrl, generateAudio, getAudioWithCache, audioPlayer, oracionId, nombre, texto, toast]);
 
   const pause = useCallback(() => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    }
-  }, []);
+    if (isCurrentPrayer) audioPlayer.pause();
+  }, [audioPlayer, isCurrentPrayer]);
 
   const toggle = useCallback(() => {
     if (isPlaying) {
@@ -139,13 +127,8 @@ export function useOracionAudio({ oracionId, nombre, texto, existingAudioUrl }: 
   }, [isPlaying, play, pause]);
 
   const stop = useCallback(() => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-      setIsPlaying(false);
-      setProgress(0);
-    }
-  }, []);
+    if (isCurrentPrayer) audioPlayer.close();
+  }, [audioPlayer, isCurrentPrayer]);
 
   return {
     audioUrl,

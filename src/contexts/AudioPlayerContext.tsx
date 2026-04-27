@@ -60,6 +60,44 @@ interface AudioPlayerContextType extends AudioPlayerState {
 
 const AudioPlayerContext = createContext<AudioPlayerContextType | null>(null);
 
+const SESSION_PROGRESS_KEY = "elrugido.audio.sessionProgress";
+
+const getProgressKey = (item: AudioQueueItem) => `${item.type}:${item.id}`;
+
+const readSessionProgress = (item: AudioQueueItem | null) => {
+  if (!item || typeof window === "undefined") return 0;
+  try {
+    const progress = JSON.parse(sessionStorage.getItem(SESSION_PROGRESS_KEY) || "{}");
+    const savedTime = Number(progress[getProgressKey(item)] || 0);
+    return Number.isFinite(savedTime) ? savedTime : 0;
+  } catch {
+    return 0;
+  }
+};
+
+const writeSessionProgress = (item: AudioQueueItem | null, time: number, duration: number) => {
+  if (!item || typeof window === "undefined" || !Number.isFinite(time) || time < 1) return;
+  if (Number.isFinite(duration) && duration > 0 && duration - time < 5) return;
+  try {
+    const progress = JSON.parse(sessionStorage.getItem(SESSION_PROGRESS_KEY) || "{}");
+    progress[getProgressKey(item)] = time;
+    sessionStorage.setItem(SESSION_PROGRESS_KEY, JSON.stringify(progress));
+  } catch {
+    // Session progress is a convenience feature; playback should never fail because storage is unavailable.
+  }
+};
+
+const clearSessionProgress = (item: AudioQueueItem | null) => {
+  if (!item || typeof window === "undefined") return;
+  try {
+    const progress = JSON.parse(sessionStorage.getItem(SESSION_PROGRESS_KEY) || "{}");
+    delete progress[getProgressKey(item)];
+    sessionStorage.setItem(SESSION_PROGRESS_KEY, JSON.stringify(progress));
+  } catch {
+    // Ignore storage errors.
+  }
+};
+
 export function AudioPlayerProvider({ children }: { children: React.ReactNode }) {
   const audioRef = useRef<HTMLAudioElement>(null);
   
@@ -103,6 +141,8 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
 
   // Handle audio ended - with queue and repeat logic
   const handleEnded = useCallback(() => {
+    clearSessionProgress(currentItem);
+
     if (repeatMode === 'one') {
       // Repeat current track
       if (audioRef.current) {
@@ -145,14 +185,17 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       // Stop playing
       setIsPlaying(false);
     }
-  }, [repeatMode, currentIndex, queue]);
+  }, [repeatMode, currentIndex, queue, currentItem]);
 
   // Audio event handlers
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    const handleTimeUpdate = () => setCurrentTime(audio.currentTime);
+    const handleTimeUpdate = () => {
+      setCurrentTime(audio.currentTime);
+      writeSessionProgress(currentItem, audio.currentTime, audio.duration);
+    };
     const handleLoadedMetadata = () => {
       setDuration(audio.duration);
       audio.playbackRate = playbackRate;
@@ -167,20 +210,22 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
       audio.removeEventListener("ended", handleEnded);
     };
-  }, [playbackRate, handleEnded]);
+  }, [playbackRate, handleEnded, currentItem]);
 
   // Play a single item (adds to queue as single item)
   const play = useCallback((item: AudioQueueItem) => {
+    const resumeTime = readSessionProgress(item);
     setQueue([item]);
     setCurrentIndex(0);
     setCurrentItem(item);
     setAudioUrl(item.audioUrl);
     setIsMinimized(false);
-    setCurrentTime(0);
+    setCurrentTime(resumeTime);
     
     if (item.audioUrl && audioRef.current) {
       audioRef.current.src = item.audioUrl;
       audioRef.current.load();
+      audioRef.current.currentTime = resumeTime;
       audioRef.current.play().then(() => setIsPlaying(true)).catch(console.error);
     }
   }, []);
@@ -197,11 +242,13 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     setCurrentItem(firstItem);
     setAudioUrl(firstItem.audioUrl);
     setIsMinimized(false);
-    setCurrentTime(0);
+    const resumeTime = readSessionProgress(firstItem);
+    setCurrentTime(resumeTime);
     
     if (firstItem.audioUrl && audioRef.current) {
       audioRef.current.src = firstItem.audioUrl;
       audioRef.current.load();
+      audioRef.current.currentTime = resumeTime;
       audioRef.current.play().then(() => setIsPlaying(true)).catch(console.error);
     }
   }, []);
@@ -290,14 +337,16 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     if (currentIndex < queue.length - 1) {
       const nextIndex = currentIndex + 1;
       const nextItem = queue[nextIndex];
+      const resumeTime = readSessionProgress(nextItem);
       setCurrentIndex(nextIndex);
       setCurrentItem(nextItem);
       setAudioUrl(nextItem.audioUrl);
-      setCurrentTime(0);
+      setCurrentTime(resumeTime);
       
       if (nextItem.audioUrl && audioRef.current) {
         audioRef.current.src = nextItem.audioUrl;
         audioRef.current.load();
+        audioRef.current.currentTime = resumeTime;
         audioRef.current.play().then(() => setIsPlaying(true)).catch(console.error);
       }
     }
@@ -313,14 +362,16 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     if (currentIndex > 0) {
       const prevIndex = currentIndex - 1;
       const prevItem = queue[prevIndex];
+      const resumeTime = readSessionProgress(prevItem);
       setCurrentIndex(prevIndex);
       setCurrentItem(prevItem);
       setAudioUrl(prevItem.audioUrl);
-      setCurrentTime(0);
+      setCurrentTime(resumeTime);
       
       if (prevItem.audioUrl && audioRef.current) {
         audioRef.current.src = prevItem.audioUrl;
         audioRef.current.load();
+        audioRef.current.currentTime = resumeTime;
         audioRef.current.play().then(() => setIsPlaying(true)).catch(console.error);
       }
     }
