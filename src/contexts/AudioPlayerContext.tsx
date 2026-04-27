@@ -141,6 +141,8 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
 
   // Handle audio ended - with queue and repeat logic
   const handleEnded = useCallback(() => {
+    clearSessionProgress(currentItem);
+
     if (repeatMode === 'one') {
       // Repeat current track
       if (audioRef.current) {
@@ -183,7 +185,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       // Stop playing
       setIsPlaying(false);
     }
-  }, [repeatMode, currentIndex, queue]);
+  }, [repeatMode, currentIndex, queue, currentItem]);
 
   // Audio event handlers
   useEffect(() => {
