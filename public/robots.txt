@@ -50,10 +50,14 @@ User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /api/
-Disallow: /dashboard/
+Disallow: /dashboard
+Disallow: /onboarding
+Disallow: /coach
+Disallow: /cards
+Disallow: /habits
 
-# Sitemaps - Dynamic sitemap via Edge Function
-Sitemap: https://duggdnqpemwojkojfyei.supabase.co/functions/v1/generate-sitemap
+# Sitemap
+Sitemap: https://elrugido.com/sitemap.xml
 
 # Host preferido
 Host: https://elrugido.com
