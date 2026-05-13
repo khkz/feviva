@@ -1,0 +1,20 @@
+# ElRugido
+
+> Plataforma católica digital de formación espiritual: oración diaria, evangelio del día, santos, novenas, apologética con coach IA y plan bíblico de 365 días. Gratis y accesible como PWA.
+
+ElRugido ayuda a católicos a "estar siempre dispuestos a dar razón de su esperanza" (1 Pedro 3:15) combinando contenido doctrinalmente fiel (Magisterio y Biblia, sin invención) con herramientas modernas: oraciones con audio, biografías históricas de santos, debates simulados con IA y micro-cápsulas diarias que conectan fe, tecnología y humanidad.
+
+## Pages
+
+- [Inicio](/): Resumen de la plataforma y acceso a las funciones diarias.
+- [Santos](/santos): Calendario litúrgico con más de 420 santos, biografías y festividades.
+- [Oraciones](/oraciones): Más de 150 oraciones católicas con texto y audio.
+- [Evangelio del día](/evangelio-del-dia): Lectura del Evangelio diario con reflexión y video.
+- [Novenas](/novenas-publicas): Novenas guiadas de 9 días a María, José, Espíritu Santo y más.
+- [Cápsula del día](/capsula-del-dia): Micro-dato diario verificable sobre fe, tecnología y humanidad.
+- [Frontera Final](/frontera-final): Guías sobre fe, ciencia y vida digital con discernimiento católico.
+
+## Optional
+
+- [Crear cuenta](/auth): Registro gratuito para audio guiado, seguimiento de hábitos y coach de apologética.
+- [Instalar app](/install): Instrucciones para instalar ElRugido como PWA.

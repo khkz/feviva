@@ -62,7 +62,7 @@ const SantosPublic = () => {
   return (
     <>
       <Helmet>
-        <title>Santos del Calendario Litúrgico | ElRugido - Vidas, Oraciones y Festividades</title>
+        <title>Santos del Calendario Litúrgico | ElRugido</title>
         <meta
           name="description"
           content={`Descubre ${stats?.total || 400}+ santos del calendario católico. Historias, oraciones y festividades de santos patronos, mártires, doctores de la Iglesia y más.`}

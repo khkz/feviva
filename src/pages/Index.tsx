@@ -49,7 +49,7 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>ElRugido — Oración diaria, santos, novenas y apologética católica</title>
+        <title>ElRugido — Oración, santos y apologética católica</title>
         <meta name="description" content="Plataforma católica con 150+ oraciones, 420+ santos, evangelio del día, novenas guiadas, coach IA de apologética y plan bíblico de 365 días. Gratis." />
         <meta property="og:title" content="ElRugido — Tu compañero de fe digital" />
         <meta property="og:description" content="Oraciones católicas, evangelio del día, santos, novenas guiadas y coach de apologética. Todo gratis." />
