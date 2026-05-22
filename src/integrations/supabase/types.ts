@@ -383,6 +383,7 @@ export type Database = {
           fuente_descripcion: string | null
           id: string
           image_url: string | null
+          legacy_slug: string | null
           name: string
           prayer_id: string | null
           slug: string | null
@@ -402,6 +403,7 @@ export type Database = {
           fuente_descripcion?: string | null
           id?: string
           image_url?: string | null
+          legacy_slug?: string | null
           name: string
           prayer_id?: string | null
           slug?: string | null
@@ -421,6 +423,7 @@ export type Database = {
           fuente_descripcion?: string | null
           id?: string
           image_url?: string | null
+          legacy_slug?: string | null
           name?: string
           prayer_id?: string | null
           slug?: string | null
@@ -2728,6 +2731,7 @@ export type Database = {
           fuente_descripcion: string | null
           id: string
           image_url: string | null
+          legacy_slug: string | null
           name: string
           prayer_id: string | null
           slug: string | null
