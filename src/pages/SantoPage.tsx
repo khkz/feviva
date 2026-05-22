@@ -29,23 +29,44 @@ import { countryFlags, countryNames, formatFeastDate, getCountryContinent, conti
 
 export default function SantoPage() {
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
-  // Fetch saint by slug
+  // Fetch saint by canonical slug; fall back to legacy_slug for old shared URLs
   const { data: saint, isLoading, error } = useQuery({
     queryKey: ['saint', slug],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Try canonical slug first
+      const { data: bySlug } = await supabase
         .from('calendar_saints')
         .select('*')
         .eq('slug', slug)
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
-      return data;
+      if (bySlug) return bySlug;
+
+      // Fallback: legacy slug (old URLs with UUID suffix)
+      const { data: byLegacy, error: legacyErr } = await supabase
+        .from('calendar_saints')
+        .select('*')
+        .eq('legacy_slug', slug)
+        .maybeSingle();
+
+      if (legacyErr) throw legacyErr;
+      if (!byLegacy) throw new Error('Saint not found');
+      return byLegacy;
     },
     enabled: !!slug,
   });
+
+  // 301-style client redirect when accessed via legacy slug
+  useEffect(() => {
+    if (saint && slug && saint.slug && saint.slug !== slug) {
+      navigate(`/santo/${saint.slug}`, { replace: true });
+    }
+  }, [saint, slug, navigate]);
+
+
 
   // Fetch prayer if saint has one
   const { data: prayer } = useQuery({
