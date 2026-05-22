@@ -138,6 +138,8 @@ const App = () => (
                   <Route path="/novenas-publicas" element={<NovenasPublic />} />
                   <Route path="/novena/:id" element={<NovenaPublicPage />} />
                   <Route path="/capsula-del-dia" element={<CapsulaDelDia />} />
+                  <Route path="/sobre-nosotros" element={<SobreNosotros />} />
+                  <Route path="/about" element={<SobreNosotros />} />
                   <Route path="/search" element={<ProtectedRoute><KnowledgeSearch /></ProtectedRoute>} />
                   <Route path="/historias-de-fe" element={<ProtectedRoute><HistoriasDeFe /></ProtectedRoute>} />
                   <Route path="/frontera-final" element={<ProtectedRoute><FronteraFinal /></ProtectedRoute>} />
