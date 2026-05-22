@@ -1,6 +1,4 @@
-import { useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-// ... keep existing code (other imports until useState)
 import { useQuery } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
