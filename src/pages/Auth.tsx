@@ -45,23 +45,18 @@ const Auth = () => {
     const invite = searchParams.get("invite");
     if (invite) {
       setInviteCode(invite);
-      // Fetch invitation details
+      // Fetch invitation details via secure RPC (does not expose sender_id or other rows)
       supabase
-        .from('gift_invitations')
-        .select('recipient_name, sender_id, profiles!gift_invitations_sender_id_fkey(nombre)')
-        .eq('invite_code', invite)
-        .eq('status', 'sent')
-        .maybeSingle()
+        .rpc('get_gift_invitation_by_code', { p_code: invite })
         .then(({ data }) => {
-          if (data) {
-            // Set the recipient email if available
-            if (data.recipient_name) {
-              setSignupName(data.recipient_name);
-            }
+          const row = Array.isArray(data) ? data[0] : data;
+          if (row?.recipient_name) {
+            setSignupName(row.recipient_name);
           }
         });
     }
   }, [searchParams]);
+
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
@@ -209,20 +204,15 @@ const Auth = () => {
 
       if (error) throw error;
 
-      // Mark invitation as accepted if there was an invite code
+      // Mark invitation as accepted if there was an invite code (secure RPC)
       if (inviteCode && signUpData.user) {
         try {
-          await supabase
-            .from('gift_invitations')
-            .update({
-              status: 'accepted',
-              accepted_at: new Date().toISOString(),
-            })
-            .eq('invite_code', inviteCode);
+          await supabase.rpc('accept_gift_invitation', { p_code: inviteCode });
         } catch (inviteError) {
           console.error("Error updating invitation:", inviteError);
         }
       }
+
 
       // Send welcome email via edge function
       try {

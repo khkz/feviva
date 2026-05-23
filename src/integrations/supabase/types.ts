@@ -2685,6 +2685,7 @@ export type Database = {
       }
     }
     Functions: {
+      accept_gift_invitation: { Args: { p_code: string }; Returns: boolean }
       calculate_level: { Args: { puntos: number }; Returns: number }
       check_feedback_alerts: {
         Args: never
@@ -2700,6 +2701,13 @@ export type Database = {
       generate_prayer_slug: { Args: { nombre: string }; Returns: string }
       generate_referral_code: { Args: never; Returns: string }
       generate_saint_slug: { Args: { name_input: string }; Returns: string }
+      get_gift_invitation_by_code: {
+        Args: { p_code: string }
+        Returns: {
+          recipient_name: string
+          sender_name: string
+        }[]
+      }
       get_or_create_referral_code: {
         Args: { p_user_id: string }
         Returns: string
