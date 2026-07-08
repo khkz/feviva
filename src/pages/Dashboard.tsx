@@ -20,6 +20,7 @@ import { NextStepCard } from "@/components/dashboard/NextStepCard";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { StreakBanner } from "@/components/dashboard/StreakBanner";
 import { CoachHighlightCard } from "@/components/dashboard/CoachHighlightCard";
+import { ReferralDashboardCard } from "@/components/dashboard/ReferralDashboardCard";
 import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { GospelCard } from "@/components/gospel/GospelCard";
 import { FronteraFinalCard } from "@/components/dashboard/FronteraFinalCard";
@@ -407,7 +408,11 @@ const Dashboard = () => {
                   <PracticeRemindersCard />
                 </Suspense>
               )}
+
+              {/* Invita y gana — 7 días de acceso Apóstol por amigo referido */}
+              <ReferralDashboardCard />
             </div>
+
           </section>
         </div>
 

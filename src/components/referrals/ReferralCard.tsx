@@ -77,9 +77,10 @@ export const ReferralCard = () => {
             <div>
               <CardTitle className="text-xl">Invita y Gana</CardTitle>
               <CardDescription>
-                Gana 100 puntos por cada amigo que se una
+                Por cada amigo que se una, ganás <strong>7 días de acceso Apóstol</strong> (Premium). Se te acumulan hasta que activemos la suscripción.
               </CardDescription>
             </div>
+
           </div>
         </CardHeader>
         <CardContent>
@@ -168,9 +169,9 @@ export const ReferralCard = () => {
                   <p className="text-sm text-muted-foreground">Amigos invitados</p>
                 </div>
                 <div className="bg-secondary/20 rounded-lg p-4 text-center">
-                  <Sparkles className="h-8 w-8 mx-auto mb-2 text-secondary" />
-                  <p className="text-3xl font-bold">{stats?.totalPoints || 0}</p>
-                  <p className="text-sm text-muted-foreground">Puntos ganados</p>
+                  <Crown className="h-8 w-8 mx-auto mb-2 text-secondary" />
+                  <p className="text-3xl font-bold">{(stats?.totalReferrals || 0) * 7}</p>
+                  <p className="text-sm text-muted-foreground">Días Apóstol acumulados</p>
                 </div>
               </div>
 
@@ -189,7 +190,7 @@ export const ReferralCard = () => {
                         <span className="text-sm">Nuevo amigo</span>
                       </div>
                       <Badge variant="secondary">
-                        +{ref.points_awarded} pts
+                        +7 días Apóstol
                       </Badge>
                     </div>
                   ))}
@@ -197,10 +198,11 @@ export const ReferralCard = () => {
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
                   <Users className="h-12 w-12 mx-auto mb-3 opacity-30" />
-                  <p>Aún no tienes referidos</p>
-                  <p className="text-sm">¡Comparte tu código y gana puntos!</p>
+                  <p>Aún no tenés referidos</p>
+                  <p className="text-sm">¡Compartí tu código y sumá días Apóstol!</p>
                 </div>
               )}
+
             </TabsContent>
 
             {/* Tab: Leaderboard */}
