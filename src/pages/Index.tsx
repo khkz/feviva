@@ -137,7 +137,7 @@ const Index = () => {
                 className="flex items-center justify-center gap-2 text-sm text-muted-foreground"
               >
                 <Users className="w-4 h-4 text-primary" />
-                <span>Sumate a la comunidad que entrena su fe.</span>
+                <span>Súmate a la comunidad que entrena su fe.</span>
               </motion.div>
             </motion.div>
           </div>

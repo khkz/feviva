@@ -191,6 +191,11 @@ export const FooterSection = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/planes" className="hover:text-foreground transition-colors">
+                  Planes
+                </Link>
+              </li>
+              <li>
                 <Link
                   to="/sobre-nosotros"
                   className="hover:text-foreground transition-colors inline-flex items-center gap-1.5"
