@@ -7,6 +7,7 @@ import coachImage from "@/assets/coach-section.jpg";
 import libraryImage from "@/assets/library-section.jpg";
 import communityImage from "@/assets/community-section.jpg";
 import habitsImage from "@/assets/habits-section.jpg";
+import { PremiumBadge } from "@/components/shared/PremiumBadge";
 
 interface ExploreItem {
   icon: LucideIcon;
@@ -16,6 +17,9 @@ interface ExploreItem {
   image: string;
   badge?: string;
   stats?: string;
+  /** Anticipación de valor: marcada como Premium en el futuro. Hoy sigue accesible. */
+  premium?: boolean;
+  premiumLabel?: string;
 }
 
 const exploreItems: ExploreItem[] = [
