@@ -13,6 +13,8 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import logoElRugido from '@/assets/logo-elrugido.png';
 import { FooterSection } from '@/components/landing/FooterSection';
+import { useIsAuthed } from '@/hooks/useIsAuthed';
+
 
 // Category configuration
 const CATEGORY_CONFIG: Record<string, { icon: typeof Cross; color: string }> = {
