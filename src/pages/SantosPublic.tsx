@@ -125,9 +125,15 @@ const SantosPublic = () => {
               <img src={logoElRugido} alt="ElRugido" className="w-8 h-8" />
               <span className="font-display font-bold text-lg">ElRugido</span>
             </Link>
-            <Button onClick={() => navigate('/auth')} size="sm">
-              Crear cuenta gratis
-            </Button>
+            {isAuthed ? (
+              <Button onClick={() => navigate('/dashboard')} size="sm" variant="outline">
+                Ir a mi Dashboard
+              </Button>
+            ) : (
+              <Button onClick={() => navigate('/auth')} size="sm">
+                Crear cuenta gratis
+              </Button>
+            )}
           </div>
         </header>
 
