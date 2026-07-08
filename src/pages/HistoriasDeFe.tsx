@@ -462,7 +462,9 @@ const HistoriasDeFe = () => {
         <BottomNavigation />
       </div>
     </div>
+    </>
   );
+
 };
 
 export default HistoriasDeFe;
