@@ -365,7 +365,7 @@ const Habits = () => {
                     {habit.racha_maxima > 0 && (
                       <div className="text-xs text-muted-foreground flex items-center gap-1">
                         <Award className="w-3 h-3" />
-                        Racha máxima: {habit.racha_maxima} días
+                        Racha máxima: {dias(habit.racha_maxima)}
                       </div>
                     )}
                   </CardContent>
