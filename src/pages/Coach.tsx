@@ -917,7 +917,7 @@ const Coach = () => {
   if (!debateStarted) {
     return (
       <div className="min-h-screen bg-background flex">
-        <DesktopSidebar userName="Usuario" userLevel={1} userStreak={0} />
+        <DesktopSidebar />
         
         <div className="flex-1 lg:pl-64 pb-20 lg:pb-0">
           {/* Quota exceeded alert */}
@@ -1187,7 +1187,7 @@ const Coach = () => {
 
   return (
     <div className="min-h-screen bg-background flex">
-      <DesktopSidebar userName="Usuario" userLevel={1} userStreak={0} />
+      <DesktopSidebar />
       
       <div className="flex-1 lg:pl-64 flex flex-col pb-20 lg:pb-0">
         {/* Header */}

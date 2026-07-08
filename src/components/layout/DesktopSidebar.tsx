@@ -20,6 +20,9 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUserStats } from "@/hooks/useUserStats";
+import { useUserProfile } from "@/hooks/useUserProfile";
+import { dias } from "@/lib/pluralize";
+import { Skeleton } from "@/components/ui/skeleton";
 import logoElRugido from "@/assets/logo-elrugido.png";
 
 interface NavItem {
@@ -54,11 +57,14 @@ interface DesktopSidebarProps {
   userStreak?: number;
 }
 
-export function DesktopSidebar({ userName = "Peregrino", userLevel, userStreak }: DesktopSidebarProps) {
+export function DesktopSidebar({ userName, userLevel, userStreak }: DesktopSidebarProps) {
   const location = useLocation();
   const { stats } = useUserStats();
+  const { displayName, isLoading: profileLoading } = useUserProfile();
   const effectiveStreak = stats?.racha_actual_dias ?? userStreak ?? 0;
   const effectiveLevel = stats?.nivel ?? userLevel ?? 1;
+  // Fuente única: siempre preferir el perfil real; nunca "Peregrino" como fallback.
+  const effectiveName = displayName ?? (userName && userName.trim() && userName !== "Peregrino" && userName !== "Usuario" ? userName : null);
 
   return (
     <motion.aside
@@ -171,12 +177,18 @@ export function DesktopSidebar({ userName = "Peregrino", userLevel, userStreak }
             </div>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-medium text-sm text-foreground truncate group-hover:text-primary transition-colors">
-              {userName}
-            </p>
+            {effectiveName ? (
+              <p className="font-medium text-sm text-foreground truncate group-hover:text-primary transition-colors">
+                {effectiveName}
+              </p>
+            ) : profileLoading ? (
+              <Skeleton className="h-4 w-24" />
+            ) : (
+              <Skeleton className="h-4 w-24" />
+            )}
             <p className="text-xs text-muted-foreground flex items-center gap-1">
               <Flame className="w-3 h-3 text-orange-500" />
-              {effectiveStreak} {effectiveStreak === 1 ? 'día' : 'días'} de racha
+              {dias(effectiveStreak)} de racha
             </p>
           </div>
         </Link>

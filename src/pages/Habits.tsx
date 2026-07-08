@@ -14,6 +14,7 @@ import { es } from "date-fns/locale";
 import { motion } from "framer-motion";
 import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
+import { dias } from "@/lib/pluralize";
 
 interface Habit {
   id: string;
@@ -173,7 +174,7 @@ const Habits = () => {
 
     toast({
       title: "¡Bien hecho!",
-      description: `Hábito completado. Racha: ${newRacha} días`,
+      description: `Hábito completado. Racha: ${dias(newRacha)}`,
     });
   };
 
@@ -364,7 +365,7 @@ const Habits = () => {
                     {habit.racha_maxima > 0 && (
                       <div className="text-xs text-muted-foreground flex items-center gap-1">
                         <Award className="w-3 h-3" />
-                        Racha máxima: {habit.racha_maxima} días
+                        Racha máxima: {dias(habit.racha_maxima)}
                       </div>
                     )}
                   </CardContent>
