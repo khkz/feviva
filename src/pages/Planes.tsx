@@ -53,7 +53,7 @@ const Planes = () => {
       <header className="border-b border-border/50">
         <div className="container mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <img src={logoElRugido} alt="ElRugido" className="w-9 h-9" />
+            <img src={logoElRugido} alt="ElRugido - App de fe y apologética católica" className="w-9 h-9" />
             <span className="font-display font-bold text-lg">ElRugido</span>
           </Link>
           <Link to="/auth" className="text-sm text-muted-foreground hover:text-foreground">
