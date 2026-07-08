@@ -410,9 +410,9 @@ const Auth = () => {
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
             <div className="flex flex-col items-center justify-center gap-2 mb-2">
-              <img src={logoElRugido} alt="ElRugido" className="w-16 h-16" />
+              <img src={logoElRugido} alt="ElRugido - App de fe y apologética católica" className="w-16 h-16" />
               <h1 className="font-heading text-3xl font-bold text-primary">
-                ElRugido
+                ElRugido — Accede a tu formación católica
               </h1>
               <span className="text-xs text-muted-foreground">elrugido.com</span>
             </div>
