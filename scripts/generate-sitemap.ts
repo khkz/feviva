@@ -72,6 +72,7 @@ async function main() {
     { loc: `${BASE_URL}/capsula-del-dia`, lastmod: today, changefreq: "daily", priority: "0.8" },
     { loc: `${BASE_URL}/frontera-final`, lastmod: today, changefreq: "weekly", priority: "0.7" },
     { loc: `${BASE_URL}/auth`, lastmod: today, changefreq: "monthly", priority: "0.5" },
+    { loc: `${BASE_URL}/planes`, lastmod: today, changefreq: "monthly", priority: "0.7" },
   ];
 
   const [saints, oraciones, novenas, articulos] = await Promise.all([

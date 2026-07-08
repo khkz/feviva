@@ -260,9 +260,9 @@ const Auth = () => {
         >
           <div className="text-center mb-8">
             <div className="flex flex-col items-center justify-center gap-2 mb-4">
-              <img src={logoElRugido} alt="ElRugido" className="w-20 h-20" />
+              <img src={logoElRugido} alt="ElRugido - App de fe y apologética católica" className="w-20 h-20" />
               <h1 className="font-heading text-4xl font-bold text-white">
-                ElRugido
+                ElRugido — Accede a tu formación católica
               </h1>
               <span className="text-sm text-white/60">elrugido.com</span>
             </div>
@@ -298,6 +298,7 @@ const Auth = () => {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
+                      aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -356,9 +357,9 @@ const Auth = () => {
             transition={{ duration: 0.8 }}
           >
             <div className="flex flex-col items-start gap-3 mb-8">
-              <img src={logoElRugido} alt="ElRugido" className="w-24 h-24" />
+              <img src={logoElRugido} alt="ElRugido - App de fe y apologética católica" className="w-24 h-24" />
               <h1 className="font-heading text-5xl font-bold text-white">
-                ElRugido
+                ElRugido — Accede a tu formación católica
               </h1>
               <span className="text-sm text-white/60">elrugido.com</span>
             </div>
@@ -410,9 +411,9 @@ const Auth = () => {
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
             <div className="flex flex-col items-center justify-center gap-2 mb-2">
-              <img src={logoElRugido} alt="ElRugido" className="w-16 h-16" />
+              <img src={logoElRugido} alt="ElRugido - App de fe y apologética católica" className="w-16 h-16" />
               <h1 className="font-heading text-3xl font-bold text-primary">
-                ElRugido
+                ElRugido — Accede a tu formación católica
               </h1>
               <span className="text-xs text-muted-foreground">elrugido.com</span>
             </div>
@@ -502,6 +503,7 @@ const Auth = () => {
                           <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
+                            aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                           >
                             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -640,6 +642,7 @@ const Auth = () => {
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
+                          aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                         >
                           {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}

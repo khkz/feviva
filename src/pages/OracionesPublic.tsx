@@ -206,7 +206,7 @@ const OracionesPublic = () => {
         <header className="border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
           <div className="container mx-auto px-4 py-4 flex items-center justify-between">
             <Link to="/" className="flex items-center gap-2">
-              <img src={logoElRugido} alt="ElRugido" className="w-8 h-8" />
+              <img src={logoElRugido} alt="ElRugido - App de fe y apologética católica" className="w-8 h-8" />
               <span className="font-display font-bold text-lg">ElRugido</span>
             </Link>
             <div className="flex items-center gap-2">
