@@ -8,10 +8,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useDailyGospel } from "@/hooks/useDailyGospel";
 import { useDailyContent } from "@/hooks/useDailyContent";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useIsAuthed } from "@/hooks/useIsAuthed";
 
 const EvangelioPublic = () => {
   const { activeGospel, isLoading } = useDailyGospel();
   const { content: dailyContent } = useDailyContent();
+  const isAuthed = useIsAuthed();
+
 
   const today = new Date();
   const formattedDate = format(today, "EEEE d 'de' MMMM, yyyy", { locale: es });
@@ -64,6 +67,37 @@ const EvangelioPublic = () => {
     ]
   };
 
+  const schemaFaq = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "¿Qué es el Evangelio del día?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "El Evangelio del día es la lectura del Evangelio que la Iglesia Católica proclama en la Misa de cada jornada, siguiendo el calendario litúrgico. Meditarlo diariamente ayuda a conocer y seguir a Cristo.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "¿Quién comenta el Evangelio en ElRugido?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Las reflexiones del Evangelio del día en ElRugido las ofrece el P. Luis Zazano, sacerdote católico, en formato de video breve.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "¿Puedo escucharlo o guardarlo?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "El texto y la reflexión del día son de libre lectura. El audio guiado y el historial personal se activan al crear una cuenta gratuita.",
+        },
+      },
+    ],
+  };
+
   return (
     <>
       <Helmet>
@@ -75,6 +109,7 @@ const EvangelioPublic = () => {
         <meta property="og:url" content="https://elrugido.com/evangelio-del-dia" />
         <link rel="canonical" href="https://elrugido.com/evangelio-del-dia" />
         <script type="application/ld+json">{JSON.stringify(schemaBreadcrumb)}</script>
+        <script type="application/ld+json">{JSON.stringify(schemaFaq)}</script>
         {schemaArticle && <script type="application/ld+json">{JSON.stringify(schemaArticle)}</script>}
       </Helmet>
 
@@ -86,17 +121,25 @@ const EvangelioPublic = () => {
               <ChevronLeft className="w-4 h-4" />
               <span className="text-sm">Inicio</span>
             </Link>
-            <Link to="/auth">
-              <Button size="sm" variant="default">Crear cuenta gratis</Button>
-            </Link>
+            {!isAuthed && (
+              <Link to="/auth">
+                <Button size="sm" variant="default">Crear cuenta gratis</Button>
+              </Link>
+            )}
           </div>
         </header>
 
         <main className="container mx-auto px-4 py-8 max-w-3xl">
-          {/* Citable definition for LLMs */}
-          <div className="sr-only" aria-hidden="false">
-            <p>El evangelio del día es la lectura del Evangelio según el calendario litúrgico de la Iglesia Católica, que se proclama en la misa diaria. ElRugido publica cada día el texto del evangelio con una reflexión, video explicativo y versículo destacado.</p>
+          {/* Respuesta corta AEO/GEO — visible y citable */}
+          <div className="mb-6 p-4 rounded-lg bg-muted/50 border border-border/50 text-sm text-muted-foreground">
+            <strong className="text-foreground">¿Qué es el Evangelio del día?</strong>{" "}
+            Es la lectura del Evangelio proclamada en la Misa de hoy según el calendario
+            litúrgico católico. En ElRugido publicamos cada día el texto, un versículo
+            destacado y una reflexión en video del P. Luis Zazano para meditarlo en pocos
+            minutos.
           </div>
+
+
 
           {/* Title */}
           <div className="text-center mb-8">

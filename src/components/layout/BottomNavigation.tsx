@@ -17,7 +17,7 @@ export function BottomNavigation() {
   const getActiveIndex = () => {
     return navItems.findIndex((item) => 
       location.pathname === item.path || 
-      (item.path === "/oraciones/app" && ["/oraciones/app", "/rosario", "/novenas", "/sleep-stories"].includes(location.pathname)) ||
+      (item.path === "/oraciones/app" && ["/oraciones/app", "/rosario", "/novenas", "/novenas/app", "/sleep-stories"].includes(location.pathname)) ||
       (item.path === "/library" && ["/library", "/apostle-path", "/bible-plan", "/coach"].some((path) => location.pathname.startsWith(path))) ||
       (item.path === "/santos/app" && ["/santos", "/santos/app", "/santo"].some((path) => location.pathname.startsWith(path)))
     );

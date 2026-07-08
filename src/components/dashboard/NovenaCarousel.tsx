@@ -76,7 +76,7 @@ export function NovenaCarousel({ novenas, getProgress, loading }: NovenaCarousel
           {activeNovenas.length > 0 ? "Continúa tu Camino" : "Novenas Destacadas"}
         </h2>
         <motion.button 
-          onClick={() => navigate("/novenas")}
+          onClick={() => navigate("/novenas/app")}
           className="flex items-center gap-1 text-sm text-primary"
           whileHover={{ x: 3 }}
           whileTap={{ scale: 0.95 }}
@@ -100,7 +100,7 @@ export function NovenaCarousel({ novenas, getProgress, loading }: NovenaCarousel
           return (
             <motion.button
               key={novena.id}
-              onClick={() => navigate("/novenas")}
+              onClick={() => navigate("/novenas/app")}
               className="flex-shrink-0 w-44 glass-card rounded-2xl overflow-hidden text-left"
               variants={cardVariants}
               whileHover={{ scale: 1.02, y: -4 }}
@@ -159,7 +159,7 @@ export function NovenaCarousel({ novenas, getProgress, loading }: NovenaCarousel
           return (
             <motion.button
               key={novena.id}
-              onClick={() => navigate("/novenas")}
+              onClick={() => navigate("/novenas/app")}
               className="glass-card rounded-2xl overflow-hidden text-left group"
               variants={cardVariants}
               whileHover={{ scale: 1.02, y: -4 }}

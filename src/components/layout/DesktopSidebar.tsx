@@ -37,7 +37,7 @@ const mainNavItems: NavItem[] = [
   { path: "/bible-plan", icon: BookOpen, label: "Biblia 365" },
   { path: "/oraciones/app", icon: Hand, label: "Oraciones" },
   { path: "/rosario", icon: Flower2, label: "Rosario" },
-  { path: "/novenas", icon: Flame, label: "Novenas" },
+  { path: "/novenas/app", icon: Flame, label: "Novenas" },
   { path: "/santos/app", icon: Sparkles, label: "Santos" },
   { path: "/sleep-stories", icon: Moon, label: "Dormir" },
 ];

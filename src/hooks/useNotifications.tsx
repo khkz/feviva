@@ -158,7 +158,7 @@ export const useNotifications = () => {
             "¡Es hora de orar! 🙏",
             `Continúa con el día ${p.dia_actual} de ${novenaTitle}`,
             () => {
-              window.location.href = "/novenas";
+              window.location.href = "/novenas/app";
             }
           );
           

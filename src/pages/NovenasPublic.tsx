@@ -6,8 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
+import { useIsAuthed } from "@/hooks/useIsAuthed";
 
 const NovenasPublic = () => {
+  const isAuthed = useIsAuthed();
+
   const { data: novenas, isLoading } = useQuery({
     queryKey: ["novenas-public"],
     queryFn: async () => {
@@ -38,6 +41,37 @@ const NovenasPublic = () => {
     "inLanguage": "es"
   };
 
+  const schemaFaq = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "¿Qué es una novena?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Una novena es una oración católica de nueve días consecutivos por una intención concreta. Su origen está en los nueve días que la Virgen María y los apóstoles oraron entre la Ascensión y Pentecostés (Hch 1,14).",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "¿Cómo se reza una novena?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Se elige la novena, se reza cada día la oración propuesta y una reflexión breve, manteniendo la misma intención durante los nueve días. Puede acompañarse con la Eucaristía y la Confesión.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "¿Qué novenas puedo rezar en ElRugido?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Ofrecemos novenas al Sagrado Corazón, al Espíritu Santo, a la Virgen María, a San José, a Santa Rita y otras, con guía diaria y opción de audio para usuarios registrados.",
+        },
+      },
+    ],
+  };
+
   const categoriaLabel: Record<string, string> = {
     mariana: "Mariana",
     cristologica: "Cristológica",
@@ -53,9 +87,10 @@ const NovenasPublic = () => {
         <meta name="description" content="Reza novenas católicas guiadas: Virgen María, Sagrado Corazón, Espíritu Santo, San José y más. Nueve días de oración con reflexión diaria." />
         <meta property="og:title" content="Novenas Católicas — Oraciones de 9 días" />
         <meta property="og:description" content="Colección de novenas católicas guiadas para rezar durante nueve días." />
-        <meta property="og:url" content="https://elrugido.com/novenas-publicas" />
-        <link rel="canonical" href="https://elrugido.com/novenas-publicas" />
+        <meta property="og:url" content="https://elrugido.com/novenas" />
+        <link rel="canonical" href="https://elrugido.com/novenas" />
         <script type="application/ld+json">{JSON.stringify(schemaItemList)}</script>
+        <script type="application/ld+json">{JSON.stringify(schemaFaq)}</script>
       </Helmet>
 
       <div className="min-h-screen bg-background">
@@ -65,11 +100,14 @@ const NovenasPublic = () => {
               <ChevronLeft className="w-4 h-4" />
               <span className="text-sm">Inicio</span>
             </Link>
-            <Link to="/auth">
-              <Button size="sm" variant="default">Crear cuenta gratis</Button>
-            </Link>
+            {!isAuthed && (
+              <Link to="/auth">
+                <Button size="sm" variant="default">Crear cuenta gratis</Button>
+              </Link>
+            )}
           </div>
         </header>
+
 
         <main className="container mx-auto px-4 py-8 max-w-4xl">
           {/* Citable definition for LLMs */}
@@ -129,21 +167,34 @@ const NovenasPublic = () => {
             </div>
           )}
 
-          {/* CTA */}
-          <Card className="mt-10 bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
-            <CardContent className="pt-6 text-center">
-              <h3 className="text-lg font-bold text-foreground mb-2">Reza con guía diaria</h3>
-              <p className="text-muted-foreground mb-4 text-sm">
-                Crea tu cuenta gratuita para llevar seguimiento de tus novenas, recibir recordatorios y acceder al audio.
-              </p>
-              <Link to="/auth">
-                <Button size="lg" className="group">
-                  Empieza gratis
+          {/* CTA sólo para no logueados; los logueados van a /novenas/app */}
+          {isAuthed === false && (
+            <Card className="mt-10 bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
+              <CardContent className="pt-6 text-center">
+                <h3 className="text-lg font-bold text-foreground mb-2">Reza con guía diaria</h3>
+                <p className="text-muted-foreground mb-4 text-sm">
+                  Crea tu cuenta gratuita para llevar seguimiento de tus novenas, recibir recordatorios y acceder al audio.
+                </p>
+                <Link to="/auth">
+                  <Button size="lg" className="group">
+                    Empieza gratis
+                    <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          )}
+          {isAuthed && (
+            <div className="mt-10 text-center">
+              <Link to="/novenas/app">
+                <Button size="lg" variant="secondary" className="group">
+                  Abrir mi seguimiento de novenas
                   <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
-            </CardContent>
-          </Card>
+            </div>
+          )}
+
         </main>
 
         <footer className="border-t border-border/40 py-6 mt-12">

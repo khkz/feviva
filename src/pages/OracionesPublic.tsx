@@ -13,6 +13,8 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import logoElRugido from '@/assets/logo-elrugido.png';
 import { FooterSection } from '@/components/landing/FooterSection';
+import { useIsAuthed } from '@/hooks/useIsAuthed';
+
 
 // Category configuration
 const CATEGORY_CONFIG: Record<string, { icon: typeof Cross; color: string }> = {
@@ -43,9 +45,11 @@ interface Oracion {
 
 const OracionesPublic = () => {
   const navigate = useNavigate();
+  const isAuthed = useIsAuthed();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showFilters, setShowFilters] = useState(false);
+
 
   // Fetch all prayers
   const { data: oraciones = [], isLoading } = useQuery({
@@ -161,7 +165,41 @@ const OracionesPublic = () => {
             })),
           })}
         </script>
+        {/* FAQ para AEO/GEO */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: [
+              {
+                '@type': 'Question',
+                name: '¿Qué es el libro de oraciones católicas de ElRugido?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Es una colección de más de 150 oraciones católicas tradicionales —Padre Nuestro, Ave María, oraciones a los santos, oraciones para diferentes momentos del día— con texto completo y audio guiado para acompañar tu vida espiritual.',
+                },
+              },
+              {
+                '@type': 'Question',
+                name: '¿Puedo leer las oraciones sin cuenta?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Sí. El texto completo de todas las oraciones es de libre lectura. El audio guiado, marcar favoritas y el seguimiento personal se desbloquean al crear una cuenta gratuita.',
+                },
+              },
+              {
+                '@type': 'Question',
+                name: '¿Cómo elegir qué oración rezar?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Puedes empezar por las oraciones fundamentales (Padre Nuestro, Ave María, Gloria, Credo), buscar por categoría —marianas, a los santos, para la mañana o la noche— o usar el buscador por palabra clave.',
+                },
+              },
+            ],
+          })}
+        </script>
       </Helmet>
+
 
       <div className="min-h-screen bg-background">
         {/* Header */}
@@ -175,9 +213,17 @@ const OracionesPublic = () => {
               <Link to="/santos">
                 <Button variant="ghost" size="sm">Santos</Button>
               </Link>
-              <Button onClick={() => navigate('/auth')} size="sm">
-                Crear cuenta gratis
-              </Button>
+              {!isAuthed && (
+                <Button onClick={() => navigate('/auth')} size="sm">
+                  Crear cuenta gratis
+                </Button>
+              )}
+              {isAuthed && (
+                <Button onClick={() => navigate('/oraciones/app')} size="sm" variant="secondary">
+                  Abrir mi libro
+                </Button>
+              )}
+
             </div>
           </div>
         </header>
@@ -216,8 +262,23 @@ const OracionesPublic = () => {
           </div>
         </section>
 
+        {/* Respuesta corta AEO/GEO */}
+        <section className="px-4 pt-6">
+          <div className="container mx-auto max-w-4xl">
+            <div className="p-4 rounded-lg bg-muted/50 border border-border/50 text-sm text-muted-foreground">
+              <strong className="text-foreground">¿Qué es este libro de oraciones?</strong>{" "}
+              Es una colección de oraciones católicas tradicionales —desde las
+              fundamentales (Padre Nuestro, Ave María, Gloria, Credo) hasta oraciones a
+              los santos y para distintos momentos del día— con texto completo de
+              libre lectura. El audio guiado y el seguimiento personal se activan al
+              crear una cuenta gratuita.
+            </div>
+          </div>
+        </section>
+
         {/* Stats */}
         <section className="py-8 px-4 border-b border-border/50">
+
           <div className="container mx-auto max-w-5xl">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center p-4 rounded-lg bg-muted/30">
@@ -331,12 +392,12 @@ const OracionesPublic = () => {
                     {hasActiveFilters ? 'Resultados' : 'Todas las Oraciones'}
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {filteredOraciones.slice(0, 24).map((prayer) => (
+                    {(isAuthed ? filteredOraciones : filteredOraciones.slice(0, 24)).map((prayer) => (
                       <PrayerCard key={prayer.id} prayer={prayer} />
                     ))}
                   </div>
 
-                  {filteredOraciones.length > 24 && (
+                  {!isAuthed && filteredOraciones.length > 24 && (
                     <div className="mt-8 text-center">
                       <p className="text-muted-foreground mb-4">
                         Mostrando 24 de {filteredOraciones.length} oraciones
@@ -353,23 +414,26 @@ const OracionesPublic = () => {
           </div>
         </section>
 
-        {/* CTA Section */}
-        <section className="py-16 px-4 bg-gradient-to-b from-transparent to-primary/5">
-          <div className="container mx-auto max-w-3xl text-center">
-            <BookOpen className="h-12 w-12 mx-auto mb-4 text-primary" />
-            <h2 className="text-2xl md:text-3xl font-display font-bold mb-4">
-              Ora con audio guiado
-            </h2>
-            <p className="text-muted-foreground mb-6">
-              Únete a ElRugido para acceder a oraciones con audio, rosarios interactivos,
-              novenas y mucho más contenido para fortalecer tu vida espiritual.
-            </p>
-            <Button onClick={() => navigate('/auth')} size="lg" className="gap-2">
-              Comenzar gratis
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </section>
+        {/* CTA Section — sólo para no logueados */}
+        {isAuthed === false && (
+          <section className="py-16 px-4 bg-gradient-to-b from-transparent to-primary/5">
+            <div className="container mx-auto max-w-3xl text-center">
+              <BookOpen className="h-12 w-12 mx-auto mb-4 text-primary" />
+              <h2 className="text-2xl md:text-3xl font-display font-bold mb-4">
+                Ora con audio guiado
+              </h2>
+              <p className="text-muted-foreground mb-6">
+                Únete a ElRugido para acceder a oraciones con audio, rosarios interactivos,
+                novenas y mucho más contenido para fortalecer tu vida espiritual.
+              </p>
+              <Button onClick={() => navigate('/auth')} size="lg" className="gap-2">
+                Comenzar gratis
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </section>
+        )}
+
 
         <FooterSection />
       </div>
