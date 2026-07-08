@@ -167,9 +167,14 @@ export const SaintOfTheDayCard = ({ userCountryCode }: SaintOfTheDayCardProps) =
 
             {/* Description preview */}
             {saint.description && (
-              <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                {saint.description}
-              </p>
+              <>
+                <Badge variant="outline" className="text-[10px] mb-2 border-amber-500/40 text-amber-700 dark:text-amber-300">
+                  Relato inspirado · dramatización
+                </Badge>
+                <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                  {saint.description}
+                </p>
+              </>
             )}
 
             {/* Tags */}
