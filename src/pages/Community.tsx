@@ -17,6 +17,7 @@ import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { CommentSection } from "@/components/community/CommentSection";
 import { FeaturedTestimonials } from "@/components/community/FeaturedTestimonials";
+import { ListRowsSkeleton } from "@/components/shared/PageSkeletons";
 
 interface Post {
   id: string;
