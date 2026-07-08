@@ -167,21 +167,34 @@ const NovenasPublic = () => {
             </div>
           )}
 
-          {/* CTA */}
-          <Card className="mt-10 bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
-            <CardContent className="pt-6 text-center">
-              <h3 className="text-lg font-bold text-foreground mb-2">Reza con guía diaria</h3>
-              <p className="text-muted-foreground mb-4 text-sm">
-                Crea tu cuenta gratuita para llevar seguimiento de tus novenas, recibir recordatorios y acceder al audio.
-              </p>
-              <Link to="/auth">
-                <Button size="lg" className="group">
-                  Empieza gratis
+          {/* CTA sólo para no logueados; los logueados van a /novenas/app */}
+          {isAuthed === false && (
+            <Card className="mt-10 bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
+              <CardContent className="pt-6 text-center">
+                <h3 className="text-lg font-bold text-foreground mb-2">Reza con guía diaria</h3>
+                <p className="text-muted-foreground mb-4 text-sm">
+                  Crea tu cuenta gratuita para llevar seguimiento de tus novenas, recibir recordatorios y acceder al audio.
+                </p>
+                <Link to="/auth">
+                  <Button size="lg" className="group">
+                    Empieza gratis
+                    <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          )}
+          {isAuthed && (
+            <div className="mt-10 text-center">
+              <Link to="/novenas/app">
+                <Button size="lg" variant="secondary" className="group">
+                  Abrir mi seguimiento de novenas
                   <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
-            </CardContent>
-          </Card>
+            </div>
+          )}
+
         </main>
 
         <footer className="border-t border-border/40 py-6 mt-12">
