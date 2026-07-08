@@ -47,6 +47,7 @@ const Library = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { incrementLessons } = useUserStats();
+  const { isAdmin } = useAdminAuth();
 
   // Check for lesson query parameter to open directly
   const lessonParam = searchParams.get('lesson');
