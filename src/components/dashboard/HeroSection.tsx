@@ -289,7 +289,7 @@ export function HeroSection({ userName, verse, stats }: HeroSectionProps) {
                 >
                   <Flame className="w-8 h-8 text-orange-500 mx-auto mb-2" />
                   <p className="text-3xl font-bold text-white">{stats.streak}</p>
-                  <p className="text-white/60 text-sm">días de estudio</p>
+                  <p className="text-white/60 text-sm">{stats.streak === 1 ? 'día' : 'días'} de estudio</p>
                 </motion.div>
 
                 {/* Preparation Level */}
