@@ -149,9 +149,10 @@ export const useReferrals = () => {
   const getWhatsAppMessage = () => {
     const link = getShareLink();
     return encodeURIComponent(
-      `¡Te invito a El Rugido! 🦁✝️\n\nUna app católica con santos, oraciones, novenas y mucho más.\n\nÚnete con mi código: ${referralCode}\n\n${link}`
+      `¡Te invito a ElRugido! 🦁✝️\n\nUna app católica con santos, oraciones, novenas, evangelio del día y un coach de apologética.\n\nSi te unís con mi código, yo sumo 7 días de acceso Apóstol (Premium) 🙌\n\nCódigo: ${referralCode}\n${link}`
     );
   };
+
 
   // Copiar código al portapapeles
   const copyCode = async () => {
