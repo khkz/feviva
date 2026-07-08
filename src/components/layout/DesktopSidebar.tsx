@@ -167,7 +167,7 @@ export function DesktopSidebar({ userName = "Peregrino", userLevel, userStreak }
               <User className="w-5 h-5 text-primary" />
             </div>
             <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center border-2 border-background">
-              {userLevel}
+              {effectiveLevel}
             </div>
           </div>
           <div className="flex-1 min-w-0">
@@ -176,7 +176,7 @@ export function DesktopSidebar({ userName = "Peregrino", userLevel, userStreak }
             </p>
             <p className="text-xs text-muted-foreground flex items-center gap-1">
               <Flame className="w-3 h-3 text-orange-500" />
-              {userStreak} días de racha
+              {effectiveStreak} {effectiveStreak === 1 ? 'día' : 'días'} de racha
             </p>
           </div>
         </Link>
