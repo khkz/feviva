@@ -65,7 +65,7 @@ const Profile = () => {
     pais: "",
     country_code: undefined,
     iglesia: "",
-    perfil_doctrinal: "evangelico",
+    perfil_doctrinal: "catolico",
     edad_segmento: undefined,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
