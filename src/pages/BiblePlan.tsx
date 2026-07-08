@@ -60,7 +60,7 @@ const BiblePlan = () => {
   const isViewingToday = selectedDay === null || selectedDay === userProgress?.dia_actual;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background animate-fade-in">
       <DesktopSidebar />
       
       <div className="lg:ml-64 pb-24 lg:pb-8">
