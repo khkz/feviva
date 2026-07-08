@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
@@ -13,10 +13,27 @@ import { useSantos } from '@/hooks/useSantos';
 import { countryFlags, countryNames, continentNames, countriesByContinent, monthNames } from '@/lib/countryMappings';
 import logoElRugido from '@/assets/logo-elrugido.png';
 import { FooterSection } from '@/components/landing/FooterSection';
+import { supabase } from '@/integrations/supabase/client';
 
 const SantosPublic = () => {
   const navigate = useNavigate();
   const { allSaints, patronSaints, saintsThisMonth, stats, isLoading, searchQuery, setSearchQuery } = useSantos();
+
+  // Sesión: cuando hay usuario logueado se ocultan CTAs de registro y el límite de 24.
+  const [isAuthed, setIsAuthed] = useState<boolean | null>(null);
+  useEffect(() => {
+    let mounted = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (mounted) setIsAuthed(!!data.session);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_evt, session) => {
+      setIsAuthed(!!session);
+    });
+    return () => {
+      mounted = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
   
   const [selectedContinent, setSelectedContinent] = useState<string>('all');
   const [selectedMonth, setSelectedMonth] = useState<string>('all');
