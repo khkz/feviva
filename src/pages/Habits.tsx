@@ -174,7 +174,7 @@ const Habits = () => {
 
     toast({
       title: "¡Bien hecho!",
-      description: `Hábito completado. Racha: ${newRacha} días`,
+      description: `Hábito completado. Racha: ${dias(newRacha)}`,
     });
   };
 
