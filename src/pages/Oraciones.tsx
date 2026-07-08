@@ -14,6 +14,7 @@ import { useOraciones } from "@/hooks/useOraciones";
 import { useAudioCache } from "@/hooks/useAudioCache";
 import { useAudioPlayer, AudioQueueItem } from "@/contexts/AudioPlayerContext";
 import { cn } from "@/lib/utils";
+import { ListRowsSkeleton, CardGridSkeleton } from "@/components/shared/PageSkeletons";
 
 const containerVariants = {
   hidden: { opacity: 0 },
