@@ -33,6 +33,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { PremiumBadge } from "@/components/shared/PremiumBadge";
 
 type RosarioStep = "inicio" | "credo" | "padres" | "misterio" | "gloria" | "final";
 
@@ -231,8 +232,9 @@ export default function Rosario() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex-1">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <h1 className="font-heading text-lg font-bold text-foreground">Santo Rosario</h1>
+              <PremiumBadge label="Premium · completo" />
               {step !== "inicio" && (
                 <Moon className="h-4 w-4 text-secondary" />
               )}

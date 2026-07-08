@@ -7,6 +7,7 @@ import coachImage from "@/assets/coach-section.jpg";
 import libraryImage from "@/assets/library-section.jpg";
 import communityImage from "@/assets/community-section.jpg";
 import habitsImage from "@/assets/habits-section.jpg";
+import { PremiumBadge } from "@/components/shared/PremiumBadge";
 
 interface ExploreItem {
   icon: LucideIcon;
@@ -16,6 +17,9 @@ interface ExploreItem {
   image: string;
   badge?: string;
   stats?: string;
+  /** Anticipación de valor: marcada como Premium en el futuro. Hoy sigue accesible. */
+  premium?: boolean;
+  premiumLabel?: string;
 }
 
 const exploreItems: ExploreItem[] = [
@@ -26,7 +30,9 @@ const exploreItems: ExploreItem[] = [
     path: "/apostle-path",
     image: coachImage,
     badge: "Popular",
-    stats: `${STAGES.length} etapas`
+    stats: `${STAGES.length} etapas`,
+    premium: true,
+    premiumLabel: "Premium · completa",
   },
   {
     icon: Shield,
@@ -54,7 +60,9 @@ const exploreItems: ExploreItem[] = [
     description: "Entrena con IA para conversaciones reales",
     path: "/coach",
     image: coachImage,
-    stats: "Ilimitado"
+    stats: "Ilimitado",
+    premium: true,
+    premiumLabel: "Premium · avanzado",
   },
   {
     icon: BookOpen,
@@ -62,7 +70,9 @@ const exploreItems: ExploreItem[] = [
     description: "40+ lecciones en audio sobre doctrina católica",
     path: "/library",
     image: libraryImage,
-    stats: "40+ lecciones"
+    stats: "40+ lecciones",
+    premium: true,
+    premiumLabel: "Premium · completa",
   },
   {
     icon: Users,
@@ -175,6 +185,12 @@ export function ExploreGrid() {
                   <item.icon className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
                 </div>
                 <span className="font-bold text-white text-base lg:text-lg">{item.label}</span>
+                {item.premium && (
+                  <PremiumBadge
+                    label={item.premiumLabel || "Premium"}
+                    className="ml-auto bg-secondary/25 text-secondary border-secondary/50"
+                  />
+                )}
               </motion.div>
               <p className="text-white/80 text-sm lg:text-base leading-relaxed line-clamp-2 group-hover:text-white transition-colors">
                 {item.description}

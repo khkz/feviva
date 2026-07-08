@@ -38,6 +38,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import logoElRugido from "@/assets/logo-elrugido.png";
+import { PremiumBadge } from "@/components/shared/PremiumBadge";
 
 // Theme definitions with icons for UI
 const THEME_OPTIONS = [
@@ -328,14 +329,17 @@ const SleepStories = () => {
               className="h-8 w-auto lg:hidden"
             />
             <div>
-              <motion.h1 
-                className="text-2xl font-bold"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-              >
-                Historias para Dormir
-              </motion.h1>
+              <div className="flex items-center gap-2 flex-wrap">
+                <motion.h1 
+                  className="text-2xl font-bold"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  Historias para Dormir
+                </motion.h1>
+                <PremiumBadge size="md" />
+              </div>
               <motion.p 
                 className="text-sm text-muted-foreground"
                 initial={{ opacity: 0 }}

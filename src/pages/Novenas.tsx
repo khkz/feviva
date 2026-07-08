@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, BookOpen, Sparkles, Loader2, HelpCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import { PremiumBadge } from "@/components/shared/PremiumBadge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -219,7 +220,10 @@ const Novenas = () => {
                   <ArrowLeft className="h-5 w-5" />
                 </motion.button>
                 <div>
-                  <h1 className="text-2xl lg:text-4xl font-bold font-heading">Novenas</h1>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h1 className="text-2xl lg:text-4xl font-bold font-heading">Novenas</h1>
+                    <PremiumBadge label="Premium · completas" size="md" />
+                  </div>
                   <p className="text-muted-foreground text-sm lg:text-base mt-1">
                     9 días de oración continua para tus intenciones
                   </p>
