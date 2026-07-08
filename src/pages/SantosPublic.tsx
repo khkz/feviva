@@ -310,23 +310,25 @@ const SantosPublic = () => {
           </div>
         </section>
 
-        {/* CTA Section */}
-        <section className="py-16 px-4 bg-gradient-to-b from-transparent to-primary/5">
-          <div className="container mx-auto max-w-3xl text-center">
-            <Church className="h-12 w-12 mx-auto mb-4 text-primary" />
-            <h2 className="text-2xl md:text-3xl font-display font-bold mb-4">
-              Profundiza en tu fe
-            </h2>
-            <p className="text-muted-foreground mb-6">
-              Únete a ElRugido para acceder a oraciones guiadas con audio, rosarios interactivos,
-              novenas y mucho más contenido para fortalecer tu vida espiritual.
-            </p>
-            <Button onClick={() => navigate('/auth')} size="lg" className="gap-2">
-              Comenzar gratis
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </section>
+        {/* CTA Section — solo para visitantes no logueados */}
+        {!isAuthed && (
+          <section className="py-16 px-4 bg-gradient-to-b from-transparent to-primary/5">
+            <div className="container mx-auto max-w-3xl text-center">
+              <Church className="h-12 w-12 mx-auto mb-4 text-primary" />
+              <h2 className="text-2xl md:text-3xl font-display font-bold mb-4">
+                Profundiza en tu fe
+              </h2>
+              <p className="text-muted-foreground mb-6">
+                Únete a ElRugido para acceder a oraciones guiadas con audio, rosarios interactivos,
+                novenas y mucho más contenido para fortalecer tu vida espiritual.
+              </p>
+              <Button onClick={() => navigate('/auth')} size="lg" className="gap-2">
+                Comenzar gratis
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </section>
+        )}
 
         <FooterSection />
       </div>
