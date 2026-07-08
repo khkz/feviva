@@ -93,6 +93,38 @@
       ]
     }
     </script>
+
+    <!-- Organization (sitewide) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "ElRugido",
+      "url": "https://elrugido.com",
+      "logo": "https://elrugido.com/logo-elrugido.png",
+      "foundingDate": "2025",
+      "description": "Plataforma católica de formación espiritual y apologética.",
+      "sameAs": []
+    }
+    </script>
+
+    <!-- WebSite (sitewide, enables sitelinks searchbox) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "ElRugido",
+      "url": "https://elrugido.com",
+      "inLanguage": "es",
+      "publisher": { "@type": "Organization", "name": "ElRugido", "url": "https://elrugido.com" },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://elrugido.com/santos?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+
     
     <!-- FAQ Schema for AI Snippets -->
     <script type="application/ld+json">

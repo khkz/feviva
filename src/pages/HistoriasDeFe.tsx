@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
+import { PageSeo } from "@/components/seo/PageSeo";
 
 interface Story {
   id: string;
@@ -322,7 +323,14 @@ const HistoriasDeFe = () => {
   };
 
   return (
+    <>
+      <PageSeo
+        title="Historias de Fe — Testimonios reales"
+        description="Testimonios reales de conversión y encuentro con Dios: religiosos, laicos y familias que comparten cómo la fe transformó sus vidas."
+        path="/historias-de-fe"
+      />
     <div className="min-h-screen flex w-full">
+
       <DesktopSidebar />
       <div className="flex-1 lg:ml-64 pb-20 md:pb-8">
         {/* Hero */}
@@ -454,7 +462,9 @@ const HistoriasDeFe = () => {
         <BottomNavigation />
       </div>
     </div>
+    </>
   );
+
 };
 
 export default HistoriasDeFe;

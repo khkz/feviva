@@ -27,7 +27,12 @@ const EvangelioPublic = () => {
     "headline": pageTitle,
     "datePublished": isoDate,
     "dateModified": isoDate,
-    "author": { "@type": "Organization", "name": "ElRugido", "url": "https://elrugido.com" },
+    "author": {
+      "@type": "Person",
+      "name": "P. Luis Zazano",
+      "jobTitle": "Sacerdote católico · Reflexiones del Evangelio",
+      "affiliation": { "@type": "Organization", "name": "ElRugido", "url": "https://elrugido.com" }
+    },
     "publisher": {
       "@type": "Organization",
       "name": "ElRugido",
