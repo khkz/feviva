@@ -139,8 +139,7 @@ const EvangelioPublic = () => {
             minutos.
           </div>
 
-            <p>El evangelio del día es la lectura del Evangelio según el calendario litúrgico de la Iglesia Católica, que se proclama en la misa diaria. ElRugido publica cada día el texto del evangelio con una reflexión, video explicativo y versículo destacado.</p>
-          </div>
+
 
           {/* Title */}
           <div className="text-center mb-8">
