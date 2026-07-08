@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Heart, Church, BookOpen, Sparkles, MapPin, Globe, ShieldCheck } from "lucide-react";
+import { Heart, Church, BookOpen, Sparkles, MapPin, ShieldCheck, Instagram, Mail, Scale } from "lucide-react";
 import logoElRugido from "@/assets/logo-elrugido.png";
 
 const popularSaints = [
@@ -34,7 +34,7 @@ export const FooterSection = () => {
   return (
     <footer className="py-12 px-4 border-t border-border/50 bg-muted/30">
       <div className="container mx-auto max-w-6xl">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 mb-8">
           {/* Brand + About */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -150,6 +150,53 @@ export const FooterSection = () => {
               <li>
                 <Link to="/oraciones" className="hover:text-foreground transition-colors font-medium text-primary">
                   Ver todas →
+                </Link>
+              </li>
+            </ul>
+          </motion.div>
+
+          {/* Conecta */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+            className="space-y-3"
+          >
+            <h4 className="font-semibold flex items-center gap-2">
+              <Mail className="h-4 w-4 text-primary" />
+              Conecta
+            </h4>
+            <ul className="space-y-1.5 text-sm text-muted-foreground">
+              <li>
+                <a
+                  href="https://instagram.com/elrugido"
+                  target="_blank"
+                  rel="noopener noreferrer nofollow"
+                  className="hover:text-foreground transition-colors inline-flex items-center gap-1.5"
+                >
+                  <Instagram className="h-3.5 w-3.5" /> @elrugido
+                </a>
+              </li>
+              <li>
+                <a
+                  href="mailto:hola@elrugido.com"
+                  className="hover:text-foreground transition-colors inline-flex items-center gap-1.5"
+                >
+                  <Mail className="h-3.5 w-3.5" /> hola@elrugido.com
+                </a>
+              </li>
+              <li>
+                <Link to="/sobre-nosotros" className="hover:text-foreground transition-colors">
+                  Sobre nosotros
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/sobre-nosotros"
+                  className="hover:text-foreground transition-colors inline-flex items-center gap-1.5"
+                >
+                  <Scale className="h-3.5 w-3.5" /> Aviso legal
                 </Link>
               </li>
             </ul>
