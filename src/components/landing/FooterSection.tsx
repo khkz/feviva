@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Heart, Church, BookOpen, Sparkles, MapPin, Globe, ShieldCheck } from "lucide-react";
+import { Heart, Church, BookOpen, Sparkles, MapPin, ShieldCheck, Instagram, Mail, Scale } from "lucide-react";
 import logoElRugido from "@/assets/logo-elrugido.png";
 
 const popularSaints = [
