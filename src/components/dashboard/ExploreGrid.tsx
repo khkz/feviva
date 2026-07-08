@@ -31,11 +31,13 @@ const exploreItems: ExploreItem[] = [
   {
     icon: Shield,
     label: "Apologética 101",
-    description: "Responde las 10 objeciones más comunes",
-    path: "/apologetics-intro",
+    description: "Fundamentos y objeciones más comunes. Muy pronto disponible.",
+    // El módulo aún no existe: mientras tanto redirigimos a la Biblioteca
+    // para evitar cualquier 404.
+    path: "/library",
     image: libraryImage,
-    badge: "Nuevo",
-    stats: "10 lecciones"
+    badge: "Muy pronto",
+    stats: "Próximamente"
   },
   {
     icon: Bot,
