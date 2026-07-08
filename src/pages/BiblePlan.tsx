@@ -84,7 +84,7 @@ const BiblePlan = () => {
                     </div>
                     <div>
                       <h1 className="text-lg lg:text-xl font-bold text-white">La Biblia en 365 Días</h1>
-                      <p className="text-amber-200/80 text-xs lg:text-sm">The Great Adventure</p>
+                      <p className="text-amber-200/80 text-xs lg:text-sm">La Gran Aventura</p>
                     </div>
                   </div>
                   <ReminderButton practice="biblia" className="text-white hover:bg-white/10" />
