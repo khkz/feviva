@@ -54,8 +54,11 @@ interface DesktopSidebarProps {
   userStreak?: number;
 }
 
-export function DesktopSidebar({ userName = "Peregrino", userLevel = 1, userStreak = 0 }: DesktopSidebarProps) {
+export function DesktopSidebar({ userName = "Peregrino", userLevel, userStreak }: DesktopSidebarProps) {
   const location = useLocation();
+  const { stats } = useUserStats();
+  const effectiveStreak = stats?.racha_actual_dias ?? userStreak ?? 0;
+  const effectiveLevel = stats?.nivel ?? userLevel ?? 1;
 
   return (
     <motion.aside
