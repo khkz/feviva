@@ -167,9 +167,14 @@ export const SaintOfTheDayCard = ({ userCountryCode }: SaintOfTheDayCardProps) =
 
             {/* Description preview */}
             {saint.description && (
-              <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                {saint.description}
-              </p>
+              <>
+                <Badge variant="outline" className="text-[10px] mb-2 border-amber-500/40 text-amber-700 dark:text-amber-300">
+                  Relato inspirado · dramatización
+                </Badge>
+                <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                  {saint.description}
+                </p>
+              </>
             )}
 
             {/* Tags */}
@@ -256,7 +261,23 @@ export const SaintOfTheDayCard = ({ userCountryCode }: SaintOfTheDayCardProps) =
                 className="w-full h-48 object-cover object-top rounded-lg"
               />
             )}
-            <p className="text-sm leading-relaxed">{saint.description}</p>
+            <div>
+              <Badge variant="outline" className="text-[10px] mb-2 border-amber-500/40 text-amber-700 dark:text-amber-300">
+                Relato inspirado · dramatización
+              </Badge>
+              <p className="text-sm leading-relaxed">{saint.description}</p>
+            </div>
+            <div className="rounded-lg border border-border/60 bg-muted/40 p-3 space-y-1">
+              <p className="text-xs font-semibold text-foreground">Datos verificables</p>
+              <ul className="text-xs text-muted-foreground space-y-0.5 list-disc pl-4">
+                <li><span className="font-medium text-foreground">Nombre:</span> {saint.name}</li>
+                <li><span className="font-medium text-foreground">Fiesta litúrgica:</span> {formatDate(saint.feast_month, saint.feast_day)}</li>
+                {saint.tags && saint.tags.length > 0 && (
+                  <li><span className="font-medium text-foreground">Reconocido/a por:</span> {saint.tags.slice(0, 4).map(t => t.replace(/_/g, ' ')).join(', ')}</li>
+                )}
+                <li className="italic">Canonizado/a por la Iglesia Católica.</li>
+              </ul>
+            </div>
             {saint.tags && saint.tags.length > 0 && (
               <div>
                 <p className="text-sm font-medium mb-2">Patronazgos:</p>

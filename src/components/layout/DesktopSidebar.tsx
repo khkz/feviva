@@ -19,6 +19,7 @@ import {
   Sparkles
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useUserStats } from "@/hooks/useUserStats";
 import logoElRugido from "@/assets/logo-elrugido.png";
 
 interface NavItem {
@@ -53,8 +54,11 @@ interface DesktopSidebarProps {
   userStreak?: number;
 }
 
-export function DesktopSidebar({ userName = "Peregrino", userLevel = 1, userStreak = 0 }: DesktopSidebarProps) {
+export function DesktopSidebar({ userName = "Peregrino", userLevel, userStreak }: DesktopSidebarProps) {
   const location = useLocation();
+  const { stats } = useUserStats();
+  const effectiveStreak = stats?.racha_actual_dias ?? userStreak ?? 0;
+  const effectiveLevel = stats?.nivel ?? userLevel ?? 1;
 
   return (
     <motion.aside
@@ -163,7 +167,7 @@ export function DesktopSidebar({ userName = "Peregrino", userLevel = 1, userStre
               <User className="w-5 h-5 text-primary" />
             </div>
             <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center border-2 border-background">
-              {userLevel}
+              {effectiveLevel}
             </div>
           </div>
           <div className="flex-1 min-w-0">
@@ -172,7 +176,7 @@ export function DesktopSidebar({ userName = "Peregrino", userLevel = 1, userStre
             </p>
             <p className="text-xs text-muted-foreground flex items-center gap-1">
               <Flame className="w-3 h-3 text-orange-500" />
-              {userStreak} días de racha
+              {effectiveStreak} {effectiveStreak === 1 ? 'día' : 'días'} de racha
             </p>
           </div>
         </Link>

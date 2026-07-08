@@ -190,7 +190,7 @@ export function ProgressCard({
                 </motion.div>
                 <div>
                   <span className="text-xl font-bold text-orange-600 dark:text-orange-400">{racha}</span>
-                  <p className="text-xs text-orange-600/70 dark:text-orange-400/70">días</p>
+                  <p className="text-xs text-orange-600/70 dark:text-orange-400/70">{racha === 1 ? 'día' : 'días'}</p>
                 </div>
               </motion.div>
 

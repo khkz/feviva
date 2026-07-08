@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { MessageCircle, BookOpen, Users, Target, Route, Shield, Sparkles, Bot } from "lucide-react";
+import { STAGES } from "@/hooks/useApostlePath";
 import { motion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 import coachImage from "@/assets/coach-section.jpg";
@@ -21,11 +22,11 @@ const exploreItems: ExploreItem[] = [
   {
     icon: Route,
     label: "Ruta del Apóstol",
-    description: "12 etapas para defender tu fe con confianza",
+    description: `${STAGES.length} etapas para defender tu fe con confianza`,
     path: "/apostle-path",
     image: coachImage,
     badge: "Popular",
-    stats: "12 etapas"
+    stats: `${STAGES.length} etapas`
   },
   {
     icon: Shield,

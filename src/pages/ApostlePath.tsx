@@ -156,7 +156,7 @@ const ApostlePath = () => {
             Ruta del Apóstol
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Tu camino de formación apologética. Completa las 5 etapas para convertirte en un apóstol preparado para defender y compartir tu fe.
+            Tu camino de formación apologética. Completa las {stages.length} etapas para convertirte en un apóstol preparado para defender y compartir tu fe.
           </p>
           
           {/* Overall Progress */}
