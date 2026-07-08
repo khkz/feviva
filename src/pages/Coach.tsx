@@ -18,6 +18,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { ExportLightCard } from "@/components/shared/ExportLightCard";
+import { PaywallModal } from "@/components/shared/PaywallModal";
 
 interface Message {
   role: "user" | "assistant";
@@ -362,6 +363,7 @@ const Coach = () => {
   const [selectedPupiloTema, setSelectedPupiloTema] = useState(pupiloTemas[0]);
   const [debateStarted, setDebateStarted] = useState(false);
   const [evaluation, setEvaluation] = useState<Evaluation | null>(null);
+  const [showPaywall, setShowPaywall] = useState(false);
   const [pupiloEvaluation, setPupiloEvaluation] = useState<PupiloEvaluation | null>(null);
   const [debateId, setDebateId] = useState<string | null>(null);
   const [suggestion, setSuggestion] = useState<Suggestion | null>(null);
@@ -661,6 +663,14 @@ const Coach = () => {
 
       // Update user stats
       await incrementDebates();
+
+      // Show promotional paywall after user's FIRST completed debate (once)
+      try {
+        if (!localStorage.getItem("elrugido_paywall_first_debate_shown")) {
+          localStorage.setItem("elrugido_paywall_first_debate_shown", "1");
+          setTimeout(() => setShowPaywall(true), 800);
+        }
+      } catch (_) { /* ignore storage errors */ }
 
       toast({
         title: "Evaluación completada",
