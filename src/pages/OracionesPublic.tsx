@@ -213,9 +213,17 @@ const OracionesPublic = () => {
               <Link to="/santos">
                 <Button variant="ghost" size="sm">Santos</Button>
               </Link>
-              <Button onClick={() => navigate('/auth')} size="sm">
-                Crear cuenta gratis
-              </Button>
+              {!isAuthed && (
+                <Button onClick={() => navigate('/auth')} size="sm">
+                  Crear cuenta gratis
+                </Button>
+              )}
+              {isAuthed && (
+                <Button onClick={() => navigate('/oraciones/app')} size="sm" variant="secondary">
+                  Abrir mi libro
+                </Button>
+              )}
+
             </div>
           </div>
         </header>
