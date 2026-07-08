@@ -141,6 +141,9 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const auth = await verifyAdmin(req, corsHeaders);
+  if (!auth.ok) return auth.response;
+
   try {
     const { storyId } = await req.json();
 
