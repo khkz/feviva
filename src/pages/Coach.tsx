@@ -1646,6 +1646,7 @@ const Coach = () => {
       </div>
       
       <BottomNavigation />
+      <PaywallModal open={showPaywall} onClose={() => setShowPaywall(false)} />
     </div>
   );
 };
