@@ -96,7 +96,7 @@ export default function Santos() {
   return (
     <div className="min-h-screen bg-background flex">
       {/* Desktop Sidebar */}
-      <DesktopSidebar userName="" userLevel={1} userStreak={0} />
+      <DesktopSidebar />
 
       {/* Main Content */}
       <div className="flex-1 lg:ml-64 pb-20">
