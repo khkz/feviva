@@ -92,10 +92,10 @@ export const YouTubePlayer = ({ videoId, dia, channelUrl = "https://www.youtube.
         {/* Day info with better readability */}
         <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
           <p className="text-white font-semibold text-base drop-shadow-lg">
-            Día {dia} - La Biblia en 365 Días
+            Día {dia} — La Biblia en un Año
           </p>
-          <p className="text-white/70 text-xs mt-0.5">
-            Toca para reproducir
+          <p className="text-white/80 text-xs mt-0.5">
+            Ascension · Fray Sergio Serrano, OP · Toca para reproducir
           </p>
         </div>
       </motion.div>
