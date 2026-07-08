@@ -263,6 +263,11 @@ const Dashboard = () => {
                 <DailyMission />
               </Suspense>
             )}
+
+            {/* Coach al centro: función estrella, acceso grande y recurrente */}
+            <div className="mt-4">
+              <CoachHighlightCard streak={stats?.racha_actual_dias} />
+            </div>
           </section>
 
           {/* ============ HOY ============ */}
