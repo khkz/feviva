@@ -260,9 +260,9 @@ const Auth = () => {
         >
           <div className="text-center mb-8">
             <div className="flex flex-col items-center justify-center gap-2 mb-4">
-              <img src={logoElRugido} alt="ElRugido" className="w-20 h-20" />
+              <img src={logoElRugido} alt="ElRugido - App de fe y apologética católica" className="w-20 h-20" />
               <h1 className="font-heading text-4xl font-bold text-white">
-                ElRugido
+                ElRugido — Accede a tu formación católica
               </h1>
               <span className="text-sm text-white/60">elrugido.com</span>
             </div>
