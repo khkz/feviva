@@ -43,7 +43,7 @@ export function HeroSection({ userName, verse, stats }: HeroSectionProps) {
   const rank = stats ? getDefenderRank(stats.level) : null;
 
   return (
-    <section className="relative overflow-hidden lg:min-h-[380px]">
+    <section className="relative overflow-hidden lg:min-h-[220px]">
       {/* Background Image with Dark-Gold Overlay */}
       <div className="absolute inset-0">
         <OptimizedImage 
@@ -85,7 +85,7 @@ export function HeroSection({ userName, verse, stats }: HeroSectionProps) {
       {/* Content - Different layouts for mobile and desktop */}
       <div className="relative z-10 h-full">
         {/* Mobile Layout */}
-        <div className="lg:hidden h-[38vh] min-h-[300px] flex flex-col justify-end p-5 pb-6">
+        <div className="lg:hidden min-h-[160px] flex flex-col justify-end p-5 pb-5 pt-16">
           {/* Animated Lion Logo with Voice Waves */}
           <motion.div 
             className="absolute top-5 left-5 flex items-center gap-3"
@@ -199,7 +199,7 @@ export function HeroSection({ userName, verse, stats }: HeroSectionProps) {
         </div>
 
         {/* Desktop Layout */}
-        <div className="hidden lg:flex items-end min-h-[380px] p-8 pb-10">
+        <div className="hidden lg:flex items-end min-h-[220px] p-8 pb-6">
           <div className="flex-1 max-w-7xl mx-auto grid grid-cols-12 gap-8 items-end">
             {/* Left: Greeting & Verse */}
             <motion.div 
