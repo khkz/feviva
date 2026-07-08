@@ -224,8 +224,26 @@ const Habits = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Target className="w-12 h-12 animate-pulse text-primary" />
+      <div className="min-h-screen flex w-full bg-background">
+        <DesktopSidebar />
+        <div className="flex-1 lg:ml-64 pb-20 md:pb-8">
+          <div className="relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-secondary/60" />
+            <div className="relative z-10 container mx-auto px-4 py-6">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-white/10 animate-pulse" />
+                <div className="space-y-2">
+                  <div className="h-6 w-40 bg-white/20 rounded animate-pulse" />
+                  <div className="h-3 w-56 bg-white/10 rounded animate-pulse" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <main className="container mx-auto px-4 py-8 max-w-4xl -mt-4 relative z-10">
+            <CardGridSkeleton count={6} />
+          </main>
+        </div>
+        <BottomNavigation />
       </div>
     );
   }
