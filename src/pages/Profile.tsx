@@ -92,7 +92,7 @@ const Profile = () => {
         pais: data.pais || "",
         country_code: data.country_code || undefined,
         iglesia: data.iglesia || "",
-        perfil_doctrinal: data.perfil_doctrinal || "evangelico",
+        perfil_doctrinal: data.perfil_doctrinal || "catolico",
         edad_segmento: data.edad_segmento || undefined,
       });
     }
