@@ -30,7 +30,9 @@ const exploreItems: ExploreItem[] = [
     path: "/apostle-path",
     image: coachImage,
     badge: "Popular",
-    stats: `${STAGES.length} etapas`
+    stats: `${STAGES.length} etapas`,
+    premium: true,
+    premiumLabel: "Premium · completa",
   },
   {
     icon: Shield,
@@ -58,7 +60,9 @@ const exploreItems: ExploreItem[] = [
     description: "Entrena con IA para conversaciones reales",
     path: "/coach",
     image: coachImage,
-    stats: "Ilimitado"
+    stats: "Ilimitado",
+    premium: true,
+    premiumLabel: "Premium · avanzado",
   },
   {
     icon: BookOpen,
@@ -66,7 +70,9 @@ const exploreItems: ExploreItem[] = [
     description: "40+ lecciones en audio sobre doctrina católica",
     path: "/library",
     image: libraryImage,
-    stats: "40+ lecciones"
+    stats: "40+ lecciones",
+    premium: true,
+    premiumLabel: "Premium · completa",
   },
   {
     icon: Users,
