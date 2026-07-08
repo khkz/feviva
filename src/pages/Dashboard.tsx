@@ -185,7 +185,7 @@ const Dashboard = () => {
           {/* Admin Access */}
           {isAdmin && (
             <div className="px-5 py-2 lg:px-0">
-              <Button 
+              <Button
                 onClick={() => navigate('/admin')}
                 variant="outline"
                 size="sm"
@@ -197,80 +197,102 @@ const Dashboard = () => {
             </div>
           )}
 
-          {showQuickActions && <QuickActions />}
+          {/* ============ ACCIÓN DEL DÍA — sobre el pliegue ============ */}
+          <section className="px-5 lg:px-0 pt-3 pb-2 lg:pt-6">
+            <div className="mb-2">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-secondary/80">
+                Tu acción de hoy
+              </p>
+            </div>
+            <NextStepCard
+              currentLevel={stats?.nivel || 1}
+              completedLessons={Math.floor((stats?.puntos_totales || 0) / 100)}
+              totalLessons={10}
+            />
+            {showDailyMission && (
+              <Suspense fallback={<CardSkeleton height="h-48" />}>
+                <DailyMission />
+              </Suspense>
+            )}
+          </section>
 
-          {showDailyRoutine && (
-            <Suspense fallback={<CardSkeleton height="h-40" />}>
-              <DailyRoutineCard />
-            </Suspense>
-          )}
+          {/* ============ HOY ============ */}
+          <section className="lg:px-0 mt-2">
+            <div className="px-5 lg:px-0 mb-3">
+              <h2 className="font-heading text-xl font-bold text-foreground">Hoy</h2>
+            </div>
 
-          {showDailyMission && (
-            <Suspense fallback={<CardSkeleton height="h-48" />}>
-              <DailyMission />
-            </Suspense>
-          )}
+            <div className="space-y-4">
+              <StreakBanner streak={stats?.racha_actual_dias || 0} />
 
-          <NextStepCard 
-            currentLevel={stats?.nivel || 1}
-            completedLessons={Math.floor((stats?.puntos_totales || 0) / 100)}
-            totalLessons={10}
-          />
+              {showSoulTriage && <SoulTriageHero />}
 
-          {/* Core 3: Always visible */}
-          {showSoulTriage && <SoulTriageHero />}
-
-          {/* Tu Día Espiritual — always visible */}
-          {showSaintAndGospel && (
-            <section className="px-5 lg:px-0 mb-6">
-              <h2 className="font-heading text-xl font-bold text-foreground mb-4">
-                Tu Día Espiritual
-              </h2>
-              
-              <div className="space-y-4 lg:hidden">
-                <SaintOfTheDayCard userCountryCode={profile?.country_code} />
-                <GospelCard />
-                {showFeaturedContent && (
-                  <Suspense fallback={<CardSkeleton height="h-64" />}>
-                    <FeaturedContent hideTitle />
-                  </Suspense>
-                )}
-              </div>
-              
-              <div className="hidden lg:grid lg:grid-cols-3 lg:gap-6">
-                <div className="lg:col-span-1 space-y-4">
-                  <SaintOfTheDayCard userCountryCode={profile?.country_code} />
-                  <GospelCard />
+              {showSaintAndGospel && (
+                <div className="px-5 lg:px-0">
+                  <div className="space-y-4 lg:hidden">
+                    <GospelCard />
+                    <SaintOfTheDayCard userCountryCode={profile?.country_code} />
+                  </div>
+                  <div className="hidden lg:grid lg:grid-cols-2 lg:gap-6">
+                    <GospelCard />
+                    <SaintOfTheDayCard userCountryCode={profile?.country_code} />
+                  </div>
                 </div>
-                <div className="lg:col-span-2">
-                  {showFeaturedContent && (
-                    <Suspense fallback={<CardSkeleton height="h-64" />}>
-                      <FeaturedContent hideTitle />
-                    </Suspense>
-                  )}
-                </div>
-              </div>
-            </section>
-          )}
-
-          {/* Progressive content */}
-          <div className="lg:grid lg:grid-cols-3 lg:gap-6">
-            <div className="lg:col-span-2 space-y-6">
-              {showFrontera && (
-                <section className="px-5 lg:px-0">
-                  <FronteraFinalCard />
-                </section>
               )}
 
-              {showDailyChallenge && (
-                <Suspense fallback={<CardSkeleton height="h-48" />}>
-                  <DailyChallenge />
+              <Suspense fallback={null}>
+                <div className="px-5 lg:px-0">
+                  <DailyCapsuleWidget />
+                </div>
+              </Suspense>
+
+              {showQuickActions && <QuickActions />}
+            </div>
+          </section>
+
+          {/* ============ FORMACIÓN ============ */}
+          <section className="mt-8">
+            <div className="px-5 lg:px-0 mb-3">
+              <h2 className="font-heading text-xl font-bold text-foreground">Formación</h2>
+              <p className="text-xs text-muted-foreground mt-1">
+                Ruta del Apóstol, Coach IA, Biblioteca, Apologética 101 y Pupilo Digital.
+              </p>
+            </div>
+
+            {showExploreGrid && (
+              <Suspense fallback={<CardSkeleton height="h-96" />}>
+                <ExploreGrid />
+              </Suspense>
+            )}
+
+            {showFrontera && (
+              <div className="px-5 lg:px-0 mt-4">
+                <FronteraFinalCard />
+              </div>
+            )}
+
+            {showFeaturedContent && (
+              <div className="mt-4">
+                <Suspense fallback={<CardSkeleton height="h-64" />}>
+                  <FeaturedContent hideTitle />
                 </Suspense>
-              )}
+              </div>
+            )}
+          </section>
 
-              {showExploreGrid && (
-                <Suspense fallback={<CardSkeleton height="h-96" />}>
-                  <ExploreGrid />
+          {/* ============ ORACIÓN ============ */}
+          <section className="mt-8">
+            <div className="px-5 lg:px-0 mb-3">
+              <h2 className="font-heading text-xl font-bold text-foreground">Oración</h2>
+              <p className="text-xs text-muted-foreground mt-1">
+                Rosario, Novenas, Oraciones, Historias para Dormir y Diario de Gratitud.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              {showDailyRoutine && (
+                <Suspense fallback={<CardSkeleton height="h-40" />}>
+                  <DailyRoutineCard />
                 </Suspense>
               )}
 
@@ -283,30 +305,27 @@ const Dashboard = () => {
                   />
                 </Suspense>
               )}
+
+              {showGratitude && (
+                <div className="px-5 lg:px-0">
+                  <Suspense fallback={<CardSkeleton height="h-24" />}>
+                    <GratitudePrompt />
+                  </Suspense>
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* ============ PROGRESO ============ */}
+          <section className="mt-8 mb-6">
+            <div className="px-5 lg:px-0 mb-3">
+              <h2 className="font-heading text-xl font-bold text-foreground">Progreso</h2>
+              <p className="text-xs text-muted-foreground mt-1">
+                Tu nivel, XP, rachas, desafío diario y logros.
+              </p>
             </div>
 
-            <div className="lg:col-span-1 space-y-4 px-5 lg:px-0 mt-6 lg:mt-0">
-              <Suspense fallback={null}>
-                <DailyCapsuleWidget />
-              </Suspense>
-              {showGratitude && (
-                <Suspense fallback={<CardSkeleton height="h-24" />}>
-                  <GratitudePrompt />
-                </Suspense>
-              )}
-
-              {showStreaks && (
-                <Suspense fallback={<CardSkeleton height="h-32" />}>
-                  <PracticeStreaksCard />
-                </Suspense>
-              )}
-
-              {showReminders && (
-                <Suspense fallback={<CardSkeleton height="h-32" />}>
-                  <PracticeRemindersCard />
-                </Suspense>
-              )}
-
+            <div className="px-5 lg:px-0 grid lg:grid-cols-2 gap-4">
               {stats && (
                 <ProgressCard
                   nivel={stats.nivel}
@@ -316,9 +335,28 @@ const Dashboard = () => {
                   racha={stats.racha_actual_dias}
                 />
               )}
+
+              {showStreaks && (
+                <Suspense fallback={<CardSkeleton height="h-32" />}>
+                  <PracticeStreaksCard />
+                </Suspense>
+              )}
+
+              {showDailyChallenge && (
+                <Suspense fallback={<CardSkeleton height="h-48" />}>
+                  <DailyChallenge />
+                </Suspense>
+              )}
+
+              {showReminders && (
+                <Suspense fallback={<CardSkeleton height="h-32" />}>
+                  <PracticeRemindersCard />
+                </Suspense>
+              )}
             </div>
-          </div>
+          </section>
         </div>
+
 
         <BottomNavigation />
       </div>
