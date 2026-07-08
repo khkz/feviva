@@ -408,7 +408,11 @@ const Dashboard = () => {
                   <PracticeRemindersCard />
                 </Suspense>
               )}
+
+              {/* Invita y gana — 7 días de acceso Apóstol por amigo referido */}
+              <ReferralDashboardCard />
             </div>
+
           </section>
         </div>
 
