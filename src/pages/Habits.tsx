@@ -250,7 +250,7 @@ const Habits = () => {
   }
 
   return (
-    <div className="min-h-screen flex w-full">
+    <div className="min-h-screen flex w-full animate-fade-in">
       <DesktopSidebar />
       <div className="flex-1 lg:ml-64 pb-20 md:pb-8">
       {/* Hero Header */}
