@@ -277,105 +277,15 @@ const Community = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          <Tabs defaultValue="all" className="mb-6" onValueChange={setSelectedType}>
-            <TabsList className="grid w-full grid-cols-4 glass-card border-border/50">
-              <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Todos</TabsTrigger>
-              <TabsTrigger value="testimonio" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Testimonios</TabsTrigger>
-              <TabsTrigger value="peticion_oracion" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Oración</TabsTrigger>
-              <TabsTrigger value="reflexion" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Reflexiones</TabsTrigger>
-            </TabsList>
-          </Tabs>
+          <Card className="glass-card border-border/50 text-center">
+            <CardHeader>
+              <CardTitle>El muro abierto llega pronto</CardTitle>
+              <CardDescription>
+                Estamos curando la comunidad para asegurar contenido edificante. Mientras tanto, disfruta de las Historias de Fe reales de arriba. Cuando alcancemos masa crítica, reactivaremos el feed de testimonios, peticiones y reflexiones.
+              </CardDescription>
+            </CardHeader>
+          </Card>
         </motion.div>
-
-        {filteredPosts.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            <Card className="glass-card border-border/50">
-              <CardHeader>
-                <CardTitle>No hay publicaciones aún</CardTitle>
-                <CardDescription>
-                  Sé el primero en compartir algo con la comunidad
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </motion.div>
-        ) : (
-          <motion.div 
-            className="space-y-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            {filteredPosts.map((post, index) => (
-              <motion.div
-                key={post.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.1 * index }}
-              >
-                <Card className="glass-card border-border/50 hover:shadow-medium transition-smooth">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                            <span className="font-medium text-primary">
-                              {post.profiles?.nombre?.[0]?.toUpperCase() || "?"}
-                            </span>
-                          </div>
-                          <div>
-                            <p className="font-medium">{post.profiles?.nombre || "Anónimo"}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {formatDistanceToNow(new Date(post.created_at), { 
-                                addSuffix: true,
-                                locale: es 
-                              })}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                      <Badge variant={postTypeColors[post.tipo as keyof typeof postTypeColors] as any}>
-                        {postTypeLabels[post.tipo as keyof typeof postTypeLabels]}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <p className="whitespace-pre-wrap">{post.contenido}</p>
-                    
-                    <div className="flex items-center gap-4 pt-2 border-t border-border/50">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => likePost(post.id)}
-                        className="gap-2 hover:bg-primary/10"
-                      >
-                        <ThumbsUp className="w-4 h-4" />
-                        {post.likes_count > 0 && <span>{post.likes_count}</span>}
-                      </Button>
-                      
-                      {post.tipo === "peticion_oracion" && (
-                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                          <Heart className="w-4 h-4 text-secondary" />
-                          <span>Orando por ti</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Comments Section */}
-                    <CommentSection
-                      postId={post.id}
-                      isOpen={openComments === post.id}
-                      onToggle={() => setOpenComments(openComments === post.id ? null : post.id)}
-                    />
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
-        )}
       </main>
       <BottomNavigation />
       </div>
