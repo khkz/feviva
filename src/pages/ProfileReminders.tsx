@@ -56,7 +56,7 @@ const STEPS = [
     icon: Book,
     practice: 'biblia',
     defaultHour: '08:00',
-    description: 'Lee la Biblia en 365 días con The Great Adventure.',
+    description: 'Lee la Biblia en 365 días con La Gran Aventura.',
     benefit: 'La Palabra de Dios iluminará tu camino cada día.'
   },
   { 

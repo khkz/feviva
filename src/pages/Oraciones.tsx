@@ -245,7 +245,7 @@ export default function Oraciones() {
           <Link to="/sleep">
             <Button variant="secondary" size="sm" className="gap-2 whitespace-nowrap glass-button border-0 rounded-xl h-10">
               <Moon className="h-4 w-4" />
-              Sleep Stories
+              Historias para Dormir
             </Button>
           </Link>
           {isAuthenticated && favoritasOraciones.length > 0 && (

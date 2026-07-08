@@ -50,7 +50,7 @@ const journeySteps = [
     title: "Descanso",
     subtitle: "Paz Interior",
     items: [
-      "Sleep Stories bíblicas",
+      "Historias para Dormir bíblicas",
       "Sonidos ambientales",
       "Meditaciones guiadas",
       "Timer de sueño"
