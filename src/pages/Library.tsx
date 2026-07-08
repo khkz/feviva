@@ -12,6 +12,7 @@ import { useUserStats } from "@/hooks/useUserStats";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { LessonDetailModal } from "@/components/library/LessonDetailModal";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
 
 interface Lesson {
   id: string;
