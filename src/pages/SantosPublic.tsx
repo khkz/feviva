@@ -289,12 +289,12 @@ const SantosPublic = () => {
                   {hasActiveFilters ? 'Resultados' : 'Todos los Santos'}
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {filteredSaints.slice(0, 24).map((saint) => (
+                  {(isAuthed ? filteredSaints : filteredSaints.slice(0, 24)).map((saint) => (
                     <SaintCard key={saint.id} saint={saint} />
                   ))}
                 </div>
 
-                {filteredSaints.length > 24 && (
+                {!isAuthed && filteredSaints.length > 24 && (
                   <div className="mt-8 text-center">
                     <p className="text-muted-foreground mb-4">
                       Mostrando 24 de {filteredSaints.length} santos
