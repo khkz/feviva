@@ -177,12 +177,18 @@ export function DesktopSidebar({ userName, userLevel, userStreak }: DesktopSideb
             </div>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-medium text-sm text-foreground truncate group-hover:text-primary transition-colors">
-              {userName}
-            </p>
+            {effectiveName ? (
+              <p className="font-medium text-sm text-foreground truncate group-hover:text-primary transition-colors">
+                {effectiveName}
+              </p>
+            ) : profileLoading ? (
+              <Skeleton className="h-4 w-24" />
+            ) : (
+              <Skeleton className="h-4 w-24" />
+            )}
             <p className="text-xs text-muted-foreground flex items-center gap-1">
               <Flame className="w-3 h-3 text-orange-500" />
-              {effectiveStreak} {effectiveStreak === 1 ? 'día' : 'días'} de racha
+              {dias(effectiveStreak)} de racha
             </p>
           </div>
         </Link>
