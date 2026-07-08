@@ -185,6 +185,12 @@ export function ExploreGrid() {
                   <item.icon className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
                 </div>
                 <span className="font-bold text-white text-base lg:text-lg">{item.label}</span>
+                {item.premium && (
+                  <PremiumBadge
+                    label={item.premiumLabel || "Premium"}
+                    className="ml-auto bg-secondary/25 text-secondary border-secondary/50"
+                  />
+                )}
               </motion.div>
               <p className="text-white/80 text-sm lg:text-base leading-relaxed line-clamp-2 group-hover:text-white transition-colors">
                 {item.description}
