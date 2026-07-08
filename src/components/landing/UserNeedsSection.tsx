@@ -18,7 +18,7 @@ const needs = [
     icon: Moon,
     title: "Busco paz interior",
     problem: "Ansiedad, estrés, no puedo dormir bien",
-    solution: "Sleep Stories y sonidos de relajación",
+    solution: "Historias para Dormir y sonidos de relajación",
     feature: "29 historias para dormir + ambient sounds",
     color: "from-indigo-500/20 to-purple-500/20",
     iconColor: "text-indigo-400",
