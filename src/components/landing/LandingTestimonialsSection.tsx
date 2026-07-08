@@ -64,8 +64,9 @@ export const LandingTestimonialsSection = () => {
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-secondary to-secondary/70 text-primary font-bold text-sm flex items-center justify-center">
                     {t.initials}
                   </div>
-                  <div>
-                    <p className="text-sm font-semibold">{t.author}</p>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold truncate">{t.author}</p>
+                    <p className="text-xs text-muted-foreground truncate">{t.role}</p>
                   </div>
                 </div>
               </Card>
