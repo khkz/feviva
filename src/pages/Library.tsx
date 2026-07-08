@@ -441,6 +441,7 @@ const Library = () => {
               </Button>
             )}
           </motion.div>
+          )}
 
           {/* Progress Card */}
           <motion.div 
