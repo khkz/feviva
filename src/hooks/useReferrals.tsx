@@ -121,14 +121,15 @@ export const useReferrals = () => {
       
       return result;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast({
         title: '¡Código aplicado!',
-        description: `Has recibido un regalo de bienvenida. Tu amigo ganó ${data.points_awarded} puntos.`,
+        description: 'Le sumamos a tu amigo 7 días de acceso Apóstol (Premium) que se activarán cuando lancemos la suscripción.',
       });
       queryClient.invalidateQueries({ queryKey: ['referral-stats'] });
       queryClient.invalidateQueries({ queryKey: ['referral-leaderboard'] });
     },
+
     onError: (error: Error) => {
       toast({
         title: 'Error',
