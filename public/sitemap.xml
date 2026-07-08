@@ -4236,6 +4236,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://elrugido.com/oracion/oracion-a-santo-tomas-de-aquino</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://elrugido.com/oracion/oracion-de-san-ignacio-suscipe</loc>
     <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
@@ -4254,22 +4260,10 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://elrugido.com/oracion/oracion-a-santa-lucia</loc>
-    <lastmod>2026-01-16</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://elrugido.com/oracion/oracion-a-san-miguel-arcangel</loc>
     <lastmod>2026-03-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-judas-tadeo</loc>
-    <lastmod>2026-03-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
   </url>
   <url>
     <loc>https://elrugido.com/oracion/accion-de-gracias-despues-de-comer</loc>
@@ -4278,14 +4272,14 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://elrugido.com/oracion/bendicion-de-los-alimentos</loc>
-    <lastmod>2026-01-15</lastmod>
+    <loc>https://elrugido.com/oracion/oracion-a-santa-lucia</loc>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://elrugido.com/oracion/oracion-a-virgen-de-la-vang</loc>
-    <lastmod>2026-01-16</lastmod>
+    <loc>https://elrugido.com/oracion/bendicion-de-los-alimentos</loc>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -4302,8 +4296,8 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-antonio-de-padua</loc>
-    <lastmod>2026-03-27</lastmod>
+    <loc>https://elrugido.com/oracion/oracion-a-san-roberto-belarmino</loc>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -4320,20 +4314,8 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://elrugido.com/oracion/oracion-a-maria-auxiliadora-de-australia</loc>
-    <lastmod>2026-01-16</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://elrugido.com/oracion/por-la-familia</loc>
     <lastmod>2026-01-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-jose</loc>
-    <lastmod>2026-03-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -4346,6 +4328,12 @@
   <url>
     <loc>https://elrugido.com/oracion/por-vocaciones</loc>
     <lastmod>2026-01-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-santo-tomas-apostol</loc>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -4363,7 +4351,7 @@
   </url>
   <url>
     <loc>https://elrugido.com/oracion/oracion-a-santo-tomas-apostol-de-india</loc>
-    <lastmod>2026-01-16</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -4386,12 +4374,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://elrugido.com/oracion/visita-al-santisimo</loc>
-    <lastmod>2026-01-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://elrugido.com/oracion/ave-maria</loc>
     <lastmod>2026-03-27</lastmod>
     <changefreq>monthly</changefreq>
@@ -4399,7 +4381,7 @@
   </url>
   <url>
     <loc>https://elrugido.com/oracion/oracion-a-san-marcos-evangelista</loc>
-    <lastmod>2026-01-17</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -4428,6 +4410,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-martin-de-porres</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://elrugido.com/oracion/oracion-a-la-virgen-de-caacupe</loc>
     <lastmod>2026-03-27</lastmod>
     <changefreq>monthly</changefreq>
@@ -4440,20 +4428,44 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-pio-de-pietrelcina</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-isidoro-de-sevilla</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://elrugido.com/oracion/oracion-a-la-virgen-de-copacabana</loc>
     <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-jose-de-canada</loc>
-    <lastmod>2026-01-17</lastmod>
+    <loc>https://elrugido.com/oracion/oracion-a-san-judas-tadeo</loc>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://elrugido.com/oracion/oracion-a-inmaculada-concepcion-de-portugal</loc>
-    <lastmod>2026-01-17</lastmod>
+    <loc>https://elrugido.com/oracion/oracion-a-virgen-de-la-vang</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-antonio-de-padua</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-mateo</loc>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -4464,14 +4476,32 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-willibrord</loc>
-    <lastmod>2026-01-17</lastmod>
+    <loc>https://elrugido.com/oracion/oracion-a-maria-auxiliadora-de-australia</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-jose</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-jose-de-canada</loc>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://elrugido.com/oracion/oracion-a-la-virgen-de-el-viejo</loc>
     <lastmod>2026-03-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-inmaculada-concepcion-de-portugal</loc>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -4488,6 +4518,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-willibrord</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://elrugido.com/oracion/oracion-al-cristo-negro-de-esquipulas</loc>
     <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
@@ -4495,13 +4531,25 @@
   </url>
   <url>
     <loc>https://elrugido.com/oracion/oracion-a-epifania-del-senor</loc>
-    <lastmod>2026-01-17</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://elrugido.com/oracion/oracion-a-santa-isabel-ana-seton</loc>
-    <lastmod>2026-01-17</lastmod>
+    <loc>https://elrugido.com/oracion/oracion-a-san-gregorio-magno</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-cayetano</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-pablo-de-malta</loc>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -4524,224 +4572,122 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-gregorio-magno</loc>
-    <lastmod>2026-03-27</lastmod>
+    <loc>https://elrugido.com/oracion/oracion-a-santa-isabel-ana-seton</loc>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://elrugido.com/oracion/oracion-a-san-bonifacio</loc>
-    <lastmod>2026-01-17</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-cayetano</loc>
-    <lastmod>2026-01-18</lastmod>
+    <loc>https://elrugido.com/oracion/oracion-a-san-pedro-canisio</loc>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-pablo-de-malta</loc>
-    <lastmod>2026-01-18</lastmod>
+    <loc>https://elrugido.com/oracion/oracion-a-san-expedito</loc>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://elrugido.com/oracion/oracion-a-san-basilio-magno-y-san-gregorio-nacianceno</loc>
-    <lastmod>2026-03-27</lastmod>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-anselmo</loc>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://elrugido.com/oracion/oracion-a-el-santisimo-nombre-de-jesus</loc>
-    <lastmod>2026-01-17</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://elrugido.com/oracion/oracion-a-santa-maria-madre-de-dios</loc>
-    <lastmod>2026-01-17</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://elrugido.com/oracion/oracion-a-santa-juana-de-arco</loc>
-    <lastmod>2026-01-17</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://elrugido.com/oracion/oracion-a-san-olaf</loc>
-    <lastmod>2026-01-17</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://elrugido.com/oracion/oracion-a-santa-brigida-de-suecia</loc>
-    <lastmod>2026-01-17</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://elrugido.com/oracion/oracion-a-san-juan-nepomuceno-neumann</loc>
-    <lastmod>2026-01-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-benito-de-nursia</loc>
-    <lastmod>2026-03-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-jose-de-austria</loc>
-    <lastmod>2026-01-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-casimiro</loc>
-    <lastmod>2026-01-18</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://elrugido.com/oracion/oracion-a-san-juan-crisostomo</loc>
-    <lastmod>2026-03-27</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://elrugido.com/oracion/oracion-a-virgen-de-los-dolores-de-eslovaquia</loc>
-    <lastmod>2026-01-17</lastmod>
+    <loc>https://elrugido.com/oracion/oracion-a-san-benito-de-nursia</loc>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://elrugido.com/oracion/oracion-a-virgen-de-cz-stochowa</loc>
-    <lastmod>2026-01-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-esteban-de-hungria</loc>
-    <lastmod>2026-01-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-simon</loc>
-    <lastmod>2026-03-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-hilario-de-poitiers</loc>
-    <lastmod>2026-03-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-andres-de-grecia</loc>
-    <lastmod>2026-01-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-miguel-de-ucrania</loc>
-    <lastmod>2026-01-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-nicolas-de-flue</loc>
-    <lastmod>2026-01-17</lastmod>
+    <loc>https://elrugido.com/oracion/oracion-a-san-jeronimo</loc>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://elrugido.com/oracion/oracion-a-san-jorge-de-inglaterra</loc>
-    <lastmod>2026-01-17</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-david-de-gales</loc>
-    <lastmod>2026-01-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-andres-de-escocia</loc>
-    <lastmod>2026-01-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-virgen-del-perpetuo-socorro-de-haiti</loc>
-    <lastmod>2026-01-16</lastmod>
+    <loc>https://elrugido.com/oracion/oracion-a-san-alfonso-maria-de-ligorio</loc>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://elrugido.com/oracion/oracion-a-virgen-del-libano</loc>
-    <lastmod>2026-01-16</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-jorge-de-etiopia</loc>
-    <lastmod>2026-01-17</lastmod>
+    <loc>https://elrugido.com/oracion/oracion-a-san-jose-de-austria</loc>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-beda-el-venerable</loc>
-    <lastmod>2026-03-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-inmaculada-concepcion-de-filipinas</loc>
-    <lastmod>2026-01-16</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-virgen-de-la-asuncion-de-nueva-zelanda</loc>
-    <lastmod>2026-01-16</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-peregrino-laziosi</loc>
-    <lastmod>2026-01-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-bernardo-de-claraval</loc>
-    <lastmod>2026-03-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-miguel-de-papua-nueva-guinea</loc>
-    <lastmod>2026-01-16</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-andres-kim-taegon</loc>
-    <lastmod>2026-01-16</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-enrique-de-upsala</loc>
-    <lastmod>2026-01-16</lastmod>
+    <loc>https://elrugido.com/oracion/visita-al-santisimo</loc>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -4752,8 +4698,8 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://elrugido.com/oracion/oracion-a-virgen-reina-de-nigeria</loc>
-    <lastmod>2026-01-16</lastmod>
+    <loc>https://elrugido.com/oracion/oracion-a-san-casimiro</loc>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -4765,7 +4711,7 @@
   </url>
   <url>
     <loc>https://elrugido.com/oracion/oracion-a-san-francisco-de-asis</loc>
-    <lastmod>2026-03-27</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -4777,13 +4723,7 @@
   </url>
   <url>
     <loc>https://elrugido.com/oracion/oracion-a-san-canuto-iv</loc>
-    <lastmod>2026-01-16</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-inmaculada-concepcion-de-estados-unidos</loc>
-    <lastmod>2026-01-16</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -4813,25 +4753,7 @@
   </url>
   <url>
     <loc>https://elrugido.com/oracion/oracion-a-santa-maria-magdalena</loc>
-    <lastmod>2026-03-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-ignacio-de-loyola</loc>
-    <lastmod>2026-01-16</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-santa-rita-de-casia</loc>
-    <lastmod>2026-01-16</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-juan-pablo-ii</loc>
-    <lastmod>2026-01-16</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -4842,8 +4764,14 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-blas</loc>
-    <lastmod>2026-01-16</lastmod>
+    <loc>https://elrugido.com/oracion/oracion-a-virgen-de-los-dolores-de-eslovaquia</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-virgen-de-cz-stochowa</loc>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -4854,38 +4782,8 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://elrugido.com/oracion/oracion-a-santo-tomas-de-aquino</loc>
-    <lastmod>2026-03-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-juan-apostol</loc>
-    <lastmod>2026-03-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-roberto-belarmino</loc>
-    <lastmod>2026-03-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-santo-tomas-apostol</loc>
-    <lastmod>2026-03-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-martin-de-porres</loc>
-    <lastmod>2026-01-20</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-pio-de-pietrelcina</loc>
-    <lastmod>2026-01-20</lastmod>
+    <loc>https://elrugido.com/oracion/oracion-a-san-blas</loc>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -4896,56 +4794,110 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-juan-apostol</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://elrugido.com/oracion/oracion-a-nuestra-senora-de-guadalupe</loc>
-    <lastmod>2026-01-20</lastmod>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-esteban-de-hungria</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-simon</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-hilario-de-poitiers</loc>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://elrugido.com/oracion/oracion-a-san-alberto-magno</loc>
-    <lastmod>2026-03-27</lastmod>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-andres-de-grecia</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-miguel-de-ucrania</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-nicolas-de-flue</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-david-de-gales</loc>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://elrugido.com/oracion/oracion-a-san-pedro-damian</loc>
-    <lastmod>2026-03-27</lastmod>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-andres-de-escocia</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-virgen-del-perpetuo-socorro-de-haiti</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-jorge-de-etiopia</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-beda-el-venerable</loc>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://elrugido.com/oracion/oracion-a-san-cirilo-de-alejandria</loc>
-    <lastmod>2026-03-27</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://elrugido.com/oracion/oracion-a-san-lorenzo-de-brindis</loc>
-    <lastmod>2026-03-27</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://elrugido.com/oracion/oracion-a-san-atanasio</loc>
-    <lastmod>2026-03-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-isidoro-de-sevilla</loc>
-    <lastmod>2026-03-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-mateo</loc>
-    <lastmod>2026-03-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-pedro-canisio</loc>
-    <lastmod>2026-03-27</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -4956,44 +4908,86 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://elrugido.com/oracion/oracion-a-inmaculada-concepcion-de-filipinas</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-virgen-de-la-asuncion-de-nueva-zelanda</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://elrugido.com/oracion/oracion-a-san-ambrosio</loc>
-    <lastmod>2026-03-27</lastmod>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-peregrino-laziosi</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-bernardo-de-claraval</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-miguel-de-papua-nueva-guinea</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-andres-kim-taegon</loc>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://elrugido.com/oracion/oracion-a-san-bartolome</loc>
-    <lastmod>2026-03-27</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-expedito</loc>
-    <lastmod>2026-01-20</lastmod>
+    <loc>https://elrugido.com/oracion/oracion-a-san-enrique-de-upsala</loc>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-anselmo</loc>
-    <lastmod>2026-03-27</lastmod>
+    <loc>https://elrugido.com/oracion/oracion-a-virgen-reina-de-nigeria</loc>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-jeronimo</loc>
-    <lastmod>2026-03-27</lastmod>
+    <loc>https://elrugido.com/oracion/oracion-a-inmaculada-concepcion-de-estados-unidos</loc>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://elrugido.com/oracion/oracion-a-santa-teresa-de-jesus</loc>
-    <lastmod>2026-03-27</lastmod>
+    <loc>https://elrugido.com/oracion/oracion-a-san-ignacio-de-loyola</loc>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-buenaventura</loc>
-    <lastmod>2026-03-27</lastmod>
+    <loc>https://elrugido.com/oracion/oracion-a-santa-rita-de-casia</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-juan-pablo-ii</loc>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -5010,32 +5004,20 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-matias</loc>
-    <lastmod>2026-03-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://elrugido.com/oracion/oracion-a-santa-catalina-de-siena</loc>
-    <lastmod>2026-03-27</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://elrugido.com/oracion/oracion-a-san-francisco-de-sales</loc>
-    <lastmod>2026-03-27</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://elrugido.com/oracion/oracion-a-san-juan-de-la-cruz</loc>
-    <lastmod>2026-03-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/oracion/oracion-a-san-alfonso-maria-de-ligorio</loc>
-    <lastmod>2026-03-27</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -5120,6 +5102,24 @@
   <url>
     <loc>https://elrugido.com/oracion/oracion-a-la-virgen-de-coromoto</loc>
     <lastmod>2026-03-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-santa-teresa-de-jesus</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-buenaventura</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-matias</loc>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
