@@ -13,7 +13,7 @@ const chatTurns = [
   },
   {
     role: "coach" as const,
-    text: "Buen inicio. Sumá una distinción entre mal moral y mal físico, y cerrá con la respuesta cristiana: Dios entra en el sufrimiento en la cruz.",
+    text: "Suma una distinción entre mal moral y mal físico, y cierra con la respuesta cristiana: Dios entra en el sufrimiento en la cruz.",
   },
 ];
 
