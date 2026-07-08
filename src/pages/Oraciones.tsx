@@ -268,12 +268,9 @@ export default function Oraciones() {
 
         {/* Content */}
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center h-64 gap-4">
-            <div className="relative">
-              <div className="absolute inset-0 bg-secondary/30 rounded-full blur-xl animate-pulse" />
-              <Loader2 className="h-10 w-10 animate-spin text-primary relative z-10" />
-            </div>
-            <p className="text-muted-foreground text-sm">Cargando oraciones...</p>
+          <div className="px-4 py-4 space-y-6">
+            <CardGridSkeleton count={4} />
+            <ListRowsSkeleton count={6} />
           </div>
         ) : searchQuery ? (
           // Search results
