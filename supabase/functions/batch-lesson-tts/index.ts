@@ -243,6 +243,9 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const auth = await verifyAdmin(req, corsHeaders);
+  if (!auth.ok) return auth.response;
+
   try {
     // Parse request body for limit, forceRegenerate, and voice parameters
     let limit = 1; // Default to 1 lesson per batch (TTS takes longer)
