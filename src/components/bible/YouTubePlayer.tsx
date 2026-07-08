@@ -92,10 +92,10 @@ export const YouTubePlayer = ({ videoId, dia, channelUrl = "https://www.youtube.
         {/* Day info with better readability */}
         <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
           <p className="text-white font-semibold text-base drop-shadow-lg">
-            Día {dia} - La Biblia en 365 Días
+            Día {dia} — La Biblia en un Año
           </p>
-          <p className="text-white/70 text-xs mt-0.5">
-            Toca para reproducir
+          <p className="text-white/80 text-xs mt-0.5">
+            Ascension · Fray Sergio Serrano, OP · Toca para reproducir
           </p>
         </div>
       </motion.div>
@@ -103,18 +103,32 @@ export const YouTubePlayer = ({ videoId, dia, channelUrl = "https://www.youtube.
   }
 
   return (
-    <motion.div 
-      className="aspect-video rounded-xl overflow-hidden shadow-lg"
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-    >
-      <iframe
-        src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
-        title={`Video del día ${dia}`}
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-        className="w-full h-full"
-      />
-    </motion.div>
+    <div className="space-y-2">
+      <motion.div 
+        className="aspect-video rounded-xl overflow-hidden shadow-lg"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+      >
+        <iframe
+          src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
+          title={`Video del día ${dia} - La Biblia en un Año (Ascension, Fray Sergio Serrano OP)`}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          className="w-full h-full"
+        />
+      </motion.div>
+      <p className="text-xs text-muted-foreground text-center px-2">
+        Video de{" "}
+        <a
+          href={channelUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-primary"
+        >
+          Ascension — "La Biblia en un Año"
+        </a>
+        {" "}con Fray Sergio Serrano, OP. Reproducido vía YouTube.
+      </p>
+    </div>
   );
 };

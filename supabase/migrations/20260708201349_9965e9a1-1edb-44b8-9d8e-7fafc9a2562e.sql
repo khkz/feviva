@@ -1,0 +1,1 @@
+DELETE FROM public.posts WHERE id = '6f928563-61f4-4860-bf0f-14e9ba6b1ee8';

@@ -2,24 +2,28 @@ import { motion } from "framer-motion";
 import { Quote, ShieldCheck } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
+// Testimonios reales tomados de "Historias de Fe" (sección Comunidad)
 const testimonials = [
   {
     quote:
-      "Practiqué con el coach una semana. Cuando mi cuñado me sacó el tema en la sobremesa, no discutí: escuché y respondí con calma. Fue otro nivel de conversación.",
-    author: "Testimonio de un usuario",
-    initials: "MP",
+      "Buscando a una amiga por los conventos de Murcia, Dios me encontró a mí. Pasé nueve días en la hospedería y sentí por primera vez una paz que no venía de fuera, sino de dentro. Hoy llevo 17 años como Hermana Pobre de Santa Clara. Cristo es la felicidad. Descúbrelo, que te lo digo yo, vale la pena.",
+    author: "Hermana Leo",
+    role: "Hermanas Pobres de Santa Clara · Murcia, España",
+    initials: "L",
   },
   {
     quote:
-      "Nunca supe cómo empezar a defender lo que creo sin ponerme a la defensiva. En 10 minutos al día, aprendí a distinguir un argumento de una descalificación.",
-    author: "Testimonio de un usuario",
-    initials: "JR",
+      "En una librería, una luz caía sobre una Biblia didáctica con una palmera en la portada — Tamara significa palmera en hebreo. La compré y esa noche empecé a leerla. Descubrí el amor de Jesús a través de la Virgen, me confesé, me confirmé, y aquí estoy.",
+    author: "Tamara Falcó",
+    role: "Diseñadora y comunicadora · Madrid",
+    initials: "TF",
   },
   {
     quote:
-      "El coach no te dice lo que quieres oír: te corrige. Eso me obligó a estudiar de verdad la fe, no solo a repetirla.",
-    author: "Testimonio de un usuario",
-    initials: "LS",
+      "Pasé 257 días secuestrado en un cuarto de un metro por tres. Un día oí una voz: 'Ofrécemelo. Es lo único que depende de ti.' Recuperé mi libertad interior. En Nochebuena recé con mis secuestradores y fue la Navidad más feliz de mi vida.",
+    author: "Bosco Gutiérrez",
+    role: "Arquitecto, esposo y padre de 9 hijos · México",
+    initials: "BG",
   },
 ];
 
@@ -60,8 +64,9 @@ export const LandingTestimonialsSection = () => {
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-secondary to-secondary/70 text-primary font-bold text-sm flex items-center justify-center">
                     {t.initials}
                   </div>
-                  <div>
-                    <p className="text-sm font-semibold">{t.author}</p>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold truncate">{t.author}</p>
+                    <p className="text-xs text-muted-foreground truncate">{t.role}</p>
                   </div>
                 </div>
               </Card>
