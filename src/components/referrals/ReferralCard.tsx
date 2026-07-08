@@ -77,9 +77,10 @@ export const ReferralCard = () => {
             <div>
               <CardTitle className="text-xl">Invita y Gana</CardTitle>
               <CardDescription>
-                Gana 100 puntos por cada amigo que se una
+                Por cada amigo que se una, ganás <strong>7 días de acceso Apóstol</strong> (Premium). Se te acumulan hasta que activemos la suscripción.
               </CardDescription>
             </div>
+
           </div>
         </CardHeader>
         <CardContent>
