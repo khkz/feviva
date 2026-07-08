@@ -430,7 +430,7 @@ export const UserActivityModal = ({ userId, userName, onClose }: UserActivityMod
                           <Moon className="h-5 w-5 text-indigo-500" />
                         </div>
                         <div>
-                          <p className="font-medium">Sleep Stories</p>
+                          <p className="font-medium">Historias para Dormir</p>
                           <p className="text-sm text-muted-foreground">
                             {sleepCount} escuchadas
                           </p>
