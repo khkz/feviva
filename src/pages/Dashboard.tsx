@@ -1,5 +1,6 @@
 import { useEffect, useState, lazy, Suspense, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { BookOpen, Shield } from "lucide-react";
 import { FirstDayExperience } from "@/components/ftue/FirstDayExperience";
@@ -69,6 +70,47 @@ const Dashboard = () => {
   useDailyGospel();
   useSaintOfDay(profile?.country_code);
   useDailyCapsule();
+
+  // Prefetch datos de páginas internas (oraciones, rosario, comunidad)
+  // para que al navegar aparezcan al instante en lugar de en blanco.
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    const idle = (cb: () => void) =>
+      (typeof window !== "undefined" && (window as any).requestIdleCallback)
+        ? (window as any).requestIdleCallback(cb, { timeout: 2500 })
+        : setTimeout(cb, 800);
+
+    idle(() => {
+      queryClient.prefetchQuery({
+        queryKey: ["oraciones"],
+        queryFn: async () => {
+          const { data } = await supabase
+            .from("oraciones")
+            .select("*")
+            .order("orden", { ascending: true })
+            .limit(3000);
+          return data ?? [];
+        },
+        staleTime: 5 * 60 * 1000,
+      });
+      queryClient.prefetchQuery({
+        queryKey: ["rosario-misterios"],
+        queryFn: async () => {
+          const { data } = await supabase.from("rosario_misterios").select("*");
+          return data ?? [];
+        },
+        staleTime: 60 * 60 * 1000,
+      });
+      queryClient.prefetchQuery({
+        queryKey: ["rosario-oraciones"],
+        queryFn: async () => {
+          const { data } = await supabase.from("rosario_oraciones").select("*");
+          return data ?? [];
+        },
+        staleTime: 60 * 60 * 1000,
+      });
+    });
+  }, [queryClient]);
 
   // Progressive disclosure: determine user maturity level
   const userMaturity = useMemo(() => {

@@ -13,6 +13,7 @@ import { BibleTextViewer } from '@/components/bible/BibleTextViewer';
 import { BibleNotes } from '@/components/bible/BibleNotes';
 import { ReadingCalendar } from '@/components/bible/ReadingCalendar';
 import { ReminderButton } from '@/components/shared/ReminderButton';
+import { BiblePlanSkeleton } from '@/components/shared/PageSkeletons';
 
 const BiblePlan = () => {
   const navigate = useNavigate();
@@ -21,10 +22,12 @@ const BiblePlan = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }}>
-          <Book className="w-8 h-8 text-primary" />
-        </motion.div>
+      <div className="min-h-screen bg-background">
+        <DesktopSidebar />
+        <div className="lg:ml-64 pb-24 lg:pb-8">
+          <BiblePlanSkeleton />
+        </div>
+        <BottomNavigation />
       </div>
     );
   }
@@ -57,7 +60,7 @@ const BiblePlan = () => {
   const isViewingToday = selectedDay === null || selectedDay === userProgress?.dia_actual;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background animate-fade-in">
       <DesktopSidebar />
       
       <div className="lg:ml-64 pb-24 lg:pb-8">
