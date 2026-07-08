@@ -219,7 +219,10 @@ const Novenas = () => {
                   <ArrowLeft className="h-5 w-5" />
                 </motion.button>
                 <div>
-                  <h1 className="text-2xl lg:text-4xl font-bold font-heading">Novenas</h1>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h1 className="text-2xl lg:text-4xl font-bold font-heading">Novenas</h1>
+                    <PremiumBadge label="Premium · completas" size="md" />
+                  </div>
                   <p className="text-muted-foreground text-sm lg:text-base mt-1">
                     9 días de oración continua para tus intenciones
                   </p>
