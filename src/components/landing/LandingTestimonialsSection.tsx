@@ -7,21 +7,18 @@ const testimonials = [
     quote:
       "Practiqué con el coach una semana. Cuando mi cuñado me sacó el tema en la sobremesa, no discutí: escuché y respondí con calma. Fue otro nivel de conversación.",
     author: "Testimonio de un usuario",
-    role: "Argentina",
     initials: "MP",
   },
   {
     quote:
       "Nunca supe cómo empezar a defender lo que creo sin ponerme a la defensiva. En 10 minutos al día, aprendí a distinguir un argumento de una descalificación.",
     author: "Testimonio de un usuario",
-    role: "México",
     initials: "JR",
   },
   {
     quote:
-      "El coach no te dice lo que querés oír: te corrige. Eso me obligó a estudiar de verdad la fe, no solo a repetirla.",
+      "El coach no te dice lo que quieres oír: te corrige. Eso me obligó a estudiar de verdad la fe, no solo a repetirla.",
     author: "Testimonio de un usuario",
-    role: "España",
     initials: "LS",
   },
 ];
@@ -65,7 +62,6 @@ export const LandingTestimonialsSection = () => {
                   </div>
                   <div>
                     <p className="text-sm font-semibold">{t.author}</p>
-                    <p className="text-xs text-muted-foreground">{t.role}</p>
                   </div>
                 </div>
               </Card>
@@ -82,7 +78,7 @@ export const LandingTestimonialsSection = () => {
         >
           <ShieldCheck className="w-5 h-5 text-secondary flex-shrink-0" />
           <p className="text-sm md:text-base text-foreground">
-            Contenido <strong>fiel al Magisterio</strong>, revisado por nuestro asesor teológico.
+            Contenido basado en el Catecismo, la Sagrada Escritura y el Magisterio de la Iglesia.
           </p>
         </motion.div>
       </div>

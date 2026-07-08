@@ -50,12 +50,11 @@ export const FooterSection = () => {
               </div>
             </div>
             <p className="text-sm text-muted-foreground">
-              Plataforma católica digital creada en 2025 por un equipo de católicos, teólogos y desarrolladores. 
-              Nuestro contenido se basa en el Catecismo de la Iglesia Católica, documentos del Vaticano II y la Sagrada Escritura.
+              Plataforma católica digital para ayudarte a conocer y defender tu fe. Nuestro contenido se basa en el Catecismo de la Iglesia Católica, la Sagrada Escritura y documentos del Magisterio.
             </p>
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <ShieldCheck className="h-3.5 w-3.5 text-primary" />
-              <span>Contenido verificado con fuentes eclesiales</span>
+              <span>Basado en fuentes católicas oficiales.</span>
             </div>
           </motion.div>
 
