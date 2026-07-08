@@ -14,6 +14,7 @@ import { es } from "date-fns/locale";
 import { motion } from "framer-motion";
 import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
+import { dias } from "@/lib/pluralize";
 
 interface Habit {
   id: string;
