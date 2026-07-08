@@ -1,0 +1,1 @@
+UPDATE public.daily_capsules SET dato_impactante = 'Gran parte de lo que se vuelve viral se comparte sin verificar si es verdad.' WHERE id = '9b90810e-9a77-4ecb-b798-41c96ac215d2';
