@@ -8,10 +8,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useDailyGospel } from "@/hooks/useDailyGospel";
 import { useDailyContent } from "@/hooks/useDailyContent";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useIsAuthed } from "@/hooks/useIsAuthed";
 
 const EvangelioPublic = () => {
   const { activeGospel, isLoading } = useDailyGospel();
   const { content: dailyContent } = useDailyContent();
+  const isAuthed = useIsAuthed();
+
 
   const today = new Date();
   const formattedDate = format(today, "EEEE d 'de' MMMM, yyyy", { locale: es });
