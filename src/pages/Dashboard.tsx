@@ -172,14 +172,13 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <DesktopSidebar 
-        userName={profile?.nombre || "Peregrino"}
         userLevel={stats?.nivel || 1}
         userStreak={stats?.racha_actual_dias || 0}
       />
 
       <div className="lg:ml-64 pb-24 lg:pb-8">
         <HeroSection 
-          userName={profile?.nombre || "Peregrino"} 
+          userName={profile?.nombre || ""} 
           verse={dailyVerse}
           stats={stats ? {
             streak: stats.racha_actual_dias,
