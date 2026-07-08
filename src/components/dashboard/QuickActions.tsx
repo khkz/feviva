@@ -48,7 +48,7 @@ const actions = [
   { 
     icon: Flame, 
     label: "Novenas", 
-    path: "/novenas",
+    path: "/novenas/app",
     gradient: "from-red-400 to-rose-500",
     bgGradient: "from-red-500/20 to-pink-500/20"
   },

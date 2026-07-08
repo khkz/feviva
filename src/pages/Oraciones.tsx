@@ -236,7 +236,7 @@ export default function Oraciones() {
               Santo Rosario
             </Button>
           </Link>
-          <Link to="/novenas">
+          <Link to="/novenas/app">
             <Button variant="secondary" size="sm" className="gap-2 whitespace-nowrap glass-button border-0 rounded-xl h-10">
               <Calendar className="h-4 w-4" />
               Novenas
