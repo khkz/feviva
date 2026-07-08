@@ -41,6 +41,37 @@ const NovenasPublic = () => {
     "inLanguage": "es"
   };
 
+  const schemaFaq = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "¿Qué es una novena?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Una novena es una oración católica de nueve días consecutivos por una intención concreta. Su origen está en los nueve días que la Virgen María y los apóstoles oraron entre la Ascensión y Pentecostés (Hch 1,14).",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "¿Cómo se reza una novena?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Se elige la novena, se reza cada día la oración propuesta y una reflexión breve, manteniendo la misma intención durante los nueve días. Puede acompañarse con la Eucaristía y la Confesión.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "¿Qué novenas puedo rezar en ElRugido?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Ofrecemos novenas al Sagrado Corazón, al Espíritu Santo, a la Virgen María, a San José, a Santa Rita y otras, con guía diaria y opción de audio para usuarios registrados.",
+        },
+      },
+    ],
+  };
+
   const categoriaLabel: Record<string, string> = {
     mariana: "Mariana",
     cristologica: "Cristológica",
@@ -56,9 +87,10 @@ const NovenasPublic = () => {
         <meta name="description" content="Reza novenas católicas guiadas: Virgen María, Sagrado Corazón, Espíritu Santo, San José y más. Nueve días de oración con reflexión diaria." />
         <meta property="og:title" content="Novenas Católicas — Oraciones de 9 días" />
         <meta property="og:description" content="Colección de novenas católicas guiadas para rezar durante nueve días." />
-        <meta property="og:url" content="https://elrugido.com/novenas-publicas" />
-        <link rel="canonical" href="https://elrugido.com/novenas-publicas" />
+        <meta property="og:url" content="https://elrugido.com/novenas" />
+        <link rel="canonical" href="https://elrugido.com/novenas" />
         <script type="application/ld+json">{JSON.stringify(schemaItemList)}</script>
+        <script type="application/ld+json">{JSON.stringify(schemaFaq)}</script>
       </Helmet>
 
       <div className="min-h-screen bg-background">
@@ -68,11 +100,14 @@ const NovenasPublic = () => {
               <ChevronLeft className="w-4 h-4" />
               <span className="text-sm">Inicio</span>
             </Link>
-            <Link to="/auth">
-              <Button size="sm" variant="default">Crear cuenta gratis</Button>
-            </Link>
+            {!isAuthed && (
+              <Link to="/auth">
+                <Button size="sm" variant="default">Crear cuenta gratis</Button>
+              </Link>
+            )}
           </div>
         </header>
+
 
         <main className="container mx-auto px-4 py-8 max-w-4xl">
           {/* Citable definition for LLMs */}
