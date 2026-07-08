@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
@@ -13,10 +13,27 @@ import { useSantos } from '@/hooks/useSantos';
 import { countryFlags, countryNames, continentNames, countriesByContinent, monthNames } from '@/lib/countryMappings';
 import logoElRugido from '@/assets/logo-elrugido.png';
 import { FooterSection } from '@/components/landing/FooterSection';
+import { supabase } from '@/integrations/supabase/client';
 
 const SantosPublic = () => {
   const navigate = useNavigate();
   const { allSaints, patronSaints, saintsThisMonth, stats, isLoading, searchQuery, setSearchQuery } = useSantos();
+
+  // Sesión: cuando hay usuario logueado se ocultan CTAs de registro y el límite de 24.
+  const [isAuthed, setIsAuthed] = useState<boolean | null>(null);
+  useEffect(() => {
+    let mounted = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (mounted) setIsAuthed(!!data.session);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_evt, session) => {
+      setIsAuthed(!!session);
+    });
+    return () => {
+      mounted = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
   
   const [selectedContinent, setSelectedContinent] = useState<string>('all');
   const [selectedMonth, setSelectedMonth] = useState<string>('all');
@@ -108,9 +125,15 @@ const SantosPublic = () => {
               <img src={logoElRugido} alt="ElRugido" className="w-8 h-8" />
               <span className="font-display font-bold text-lg">ElRugido</span>
             </Link>
-            <Button onClick={() => navigate('/auth')} size="sm">
-              Crear cuenta gratis
-            </Button>
+            {isAuthed ? (
+              <Button onClick={() => navigate('/dashboard')} size="sm" variant="outline">
+                Ir a mi Dashboard
+              </Button>
+            ) : (
+              <Button onClick={() => navigate('/auth')} size="sm">
+                Crear cuenta gratis
+              </Button>
+            )}
           </div>
         </header>
 
@@ -266,12 +289,12 @@ const SantosPublic = () => {
                   {hasActiveFilters ? 'Resultados' : 'Todos los Santos'}
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {filteredSaints.slice(0, 24).map((saint) => (
+                  {(isAuthed ? filteredSaints : filteredSaints.slice(0, 24)).map((saint) => (
                     <SaintCard key={saint.id} saint={saint} />
                   ))}
                 </div>
 
-                {filteredSaints.length > 24 && (
+                {!isAuthed && filteredSaints.length > 24 && (
                   <div className="mt-8 text-center">
                     <p className="text-muted-foreground mb-4">
                       Mostrando 24 de {filteredSaints.length} santos
@@ -287,23 +310,25 @@ const SantosPublic = () => {
           </div>
         </section>
 
-        {/* CTA Section */}
-        <section className="py-16 px-4 bg-gradient-to-b from-transparent to-primary/5">
-          <div className="container mx-auto max-w-3xl text-center">
-            <Church className="h-12 w-12 mx-auto mb-4 text-primary" />
-            <h2 className="text-2xl md:text-3xl font-display font-bold mb-4">
-              Profundiza en tu fe
-            </h2>
-            <p className="text-muted-foreground mb-6">
-              Únete a ElRugido para acceder a oraciones guiadas con audio, rosarios interactivos,
-              novenas y mucho más contenido para fortalecer tu vida espiritual.
-            </p>
-            <Button onClick={() => navigate('/auth')} size="lg" className="gap-2">
-              Comenzar gratis
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </section>
+        {/* CTA Section — solo para visitantes no logueados */}
+        {!isAuthed && (
+          <section className="py-16 px-4 bg-gradient-to-b from-transparent to-primary/5">
+            <div className="container mx-auto max-w-3xl text-center">
+              <Church className="h-12 w-12 mx-auto mb-4 text-primary" />
+              <h2 className="text-2xl md:text-3xl font-display font-bold mb-4">
+                Profundiza en tu fe
+              </h2>
+              <p className="text-muted-foreground mb-6">
+                Únete a ElRugido para acceder a oraciones guiadas con audio, rosarios interactivos,
+                novenas y mucho más contenido para fortalecer tu vida espiritual.
+              </p>
+              <Button onClick={() => navigate('/auth')} size="lg" className="gap-2">
+                Comenzar gratis
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </section>
+        )}
 
         <FooterSection />
       </div>
