@@ -148,7 +148,7 @@ const Dashboard = () => {
   if (!ftueCompleted && userMaturity === 0) {
     return (
       <FirstDayExperience
-        userName={profile?.nombre?.split(" ")[0] || "Peregrino"}
+        userName={profile?.nombre?.split(" ")[0] || ""}
         onComplete={handleFtueComplete}
       />
     );
