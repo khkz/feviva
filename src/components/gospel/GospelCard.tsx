@@ -83,7 +83,8 @@ export const GospelCard = ({ gospel: propGospel, title, subtitle, compact = fals
   }
 
   return (
-    <Card className="overflow-hidden border-0 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30">
+    <Card className="overflow-hidden border-0 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 animate-fade-in">
+
       <CardContent className="p-0">
         {/* Thumbnail */}
         <motion.div 
