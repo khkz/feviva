@@ -20,6 +20,9 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUserStats } from "@/hooks/useUserStats";
+import { useUserProfile } from "@/hooks/useUserProfile";
+import { dias } from "@/lib/pluralize";
+import { Skeleton } from "@/components/ui/skeleton";
 import logoElRugido from "@/assets/logo-elrugido.png";
 
 interface NavItem {
