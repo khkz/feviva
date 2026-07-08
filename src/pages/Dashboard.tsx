@@ -240,7 +240,7 @@ const Dashboard = () => {
                 </div>
               )}
 
-              <Suspense fallback={null}>
+              <Suspense fallback={<div className="px-5 lg:px-0"><CardSkeleton height="h-32" /></div>}>
                 <div className="px-5 lg:px-0">
                   <DailyCapsuleWidget />
                 </div>
