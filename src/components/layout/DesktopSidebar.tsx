@@ -19,6 +19,7 @@ import {
   Sparkles
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useUserStats } from "@/hooks/useUserStats";
 import logoElRugido from "@/assets/logo-elrugido.png";
 
 interface NavItem {
