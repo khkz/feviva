@@ -22,11 +22,11 @@ const exploreItems: ExploreItem[] = [
   {
     icon: Route,
     label: "Ruta del Apóstol",
-    description: "12 etapas para defender tu fe con confianza",
+    description: `${STAGES.length} etapas para defender tu fe con confianza`,
     path: "/apostle-path",
     image: coachImage,
     badge: "Popular",
-    stats: "12 etapas"
+    stats: `${STAGES.length} etapas`
   },
   {
     icon: Shield,
