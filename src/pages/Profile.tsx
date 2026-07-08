@@ -333,7 +333,11 @@ const Profile = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="perfil_doctrinal">Perfil Doctrinal *</Label>
+                  <Label htmlFor="perfil_doctrinal">¿Desde dónde vienes? *</Label>
+                  <p className="text-xs text-muted-foreground -mt-1">
+                    ElRugido es una plataforma católica, pero acoge a todos.
+                    Cuéntanos tu punto de partida para acompañarte mejor.
+                  </p>
                   <Select
                     value={formData.perfil_doctrinal}
                     onValueChange={(value: any) =>
@@ -344,10 +348,9 @@ const Profile = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-background/95 backdrop-blur-xl border-border/50">
-                      <SelectItem value="evangelico">Evangélico</SelectItem>
                       <SelectItem value="catolico">Católico</SelectItem>
-                      <SelectItem value="pentecostal">Pentecostal</SelectItem>
-                      <SelectItem value="no_denominacional">No Denominacional</SelectItem>
+                      <SelectItem value="evangelico">Cristiano de otra tradición</SelectItem>
+                      <SelectItem value="no_denominacional">Buscando o explorando</SelectItem>
                       <SelectItem value="otro">Otro</SelectItem>
                     </SelectContent>
                   </Select>
