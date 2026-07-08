@@ -165,7 +165,41 @@ const OracionesPublic = () => {
             })),
           })}
         </script>
+        {/* FAQ para AEO/GEO */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: [
+              {
+                '@type': 'Question',
+                name: '¿Qué es el libro de oraciones católicas de ElRugido?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Es una colección de más de 150 oraciones católicas tradicionales —Padre Nuestro, Ave María, oraciones a los santos, oraciones para diferentes momentos del día— con texto completo y audio guiado para acompañar tu vida espiritual.',
+                },
+              },
+              {
+                '@type': 'Question',
+                name: '¿Puedo leer las oraciones sin cuenta?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Sí. El texto completo de todas las oraciones es de libre lectura. El audio guiado, marcar favoritas y el seguimiento personal se desbloquean al crear una cuenta gratuita.',
+                },
+              },
+              {
+                '@type': 'Question',
+                name: '¿Cómo elegir qué oración rezar?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Puedes empezar por las oraciones fundamentales (Padre Nuestro, Ave María, Gloria, Credo), buscar por categoría —marianas, a los santos, para la mañana o la noche— o usar el buscador por palabra clave.',
+                },
+              },
+            ],
+          })}
+        </script>
       </Helmet>
+
 
       <div className="min-h-screen bg-background">
         {/* Header */}
