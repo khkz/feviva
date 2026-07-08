@@ -12,6 +12,7 @@ import { useUserStats } from "@/hooks/useUserStats";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { LessonDetailModal } from "@/components/library/LessonDetailModal";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
 
 interface Lesson {
   id: string;
@@ -46,6 +47,7 @@ const Library = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { incrementLessons } = useUserStats();
+  const { isAdmin } = useAdminAuth();
 
   // Check for lesson query parameter to open directly
   const lessonParam = searchParams.get('lesson');
@@ -389,7 +391,8 @@ const Library = () => {
             </div>
           </motion.div>
 
-          {/* Batch Action Buttons */}
+          {/* Batch Action Buttons — Admin only (server-side enforced) */}
+          {isAdmin && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -438,6 +441,7 @@ const Library = () => {
               </Button>
             )}
           </motion.div>
+          )}
 
           {/* Progress Card */}
           <motion.div 
