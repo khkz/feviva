@@ -225,47 +225,7 @@ const Community = () => {
                 <p className="text-white/80">Comparte y crece junto a otros creyentes</p>
               </div>
             </div>
-            <Dialog open={showNewPost} onOpenChange={setShowNewPost}>
-              <DialogTrigger asChild>
-                <Button className="glass-button bg-secondary/20 hover:bg-secondary/30 text-white border-secondary/30 gap-2">
-                  <Send className="w-4 h-4" />
-                  Nueva Publicación
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="bg-background/95 backdrop-blur-xl border-border/50">
-                <DialogHeader>
-                  <DialogTitle>Compartir con la Comunidad</DialogTitle>
-                  <DialogDescription>
-                    Comparte un testimonio, petición de oración o reflexión
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <Select value={newPostType} onValueChange={setNewPostType}>
-                    <SelectTrigger className="glass-button bg-background/50">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-background/95 backdrop-blur-xl border-border/50">
-                      <SelectItem value="testimonio">Testimonio</SelectItem>
-                      <SelectItem value="peticion_oracion">Petición de Oración</SelectItem>
-                      <SelectItem value="reflexion">Reflexión</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Textarea
-                    value={newPostContent}
-                    onChange={(e) => setNewPostContent(e.target.value)}
-                    placeholder="Escribe tu mensaje..."
-                    rows={6}
-                    className="glass-button bg-background/50"
-                  />
-                  <div className="glass-card p-3 rounded-lg text-sm text-muted-foreground">
-                    💡 Recuerda mantener un tono respetuoso y edificante
-                  </div>
-                  <Button onClick={createPost} className="w-full shadow-glow">
-                    Publicar
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
+            {/* Feed abierto oculto hasta alcanzar masa crítica */}
           </div>
         </motion.header>
       </div>
