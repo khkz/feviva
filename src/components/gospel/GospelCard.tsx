@@ -34,11 +34,23 @@ export const GospelCard = ({ gospel: propGospel, title, subtitle, compact = fals
 
   if (isLoading && !propGospel) {
     return (
-      <Card className="overflow-hidden">
-        <CardContent className="p-4 space-y-3">
-          <Skeleton className="h-5 w-32" />
-          <Skeleton className="h-4 w-48" />
-          <Skeleton className="h-10 w-full" />
+      <Card className="overflow-hidden border-0 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30">
+        <CardContent className="p-0">
+          {/* Thumbnail placeholder */}
+          <Skeleton className="w-full aspect-video rounded-none" />
+          {/* Content placeholder mimicking real layout */}
+          <div className="p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-5 w-5 rounded" />
+              <Skeleton className="h-5 w-40" />
+            </div>
+            <Skeleton className="h-4 w-56" />
+            <Skeleton className="h-3 w-32" />
+            <div className="flex gap-2 pt-1">
+              <Skeleton className="h-10 flex-1 rounded-md" />
+              <Skeleton className="h-10 w-12 rounded-md" />
+            </div>
+          </div>
         </CardContent>
       </Card>
     );
@@ -71,7 +83,8 @@ export const GospelCard = ({ gospel: propGospel, title, subtitle, compact = fals
   }
 
   return (
-    <Card className="overflow-hidden border-0 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30">
+    <Card className="overflow-hidden border-0 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 animate-fade-in">
+
       <CardContent className="p-0">
         {/* Thumbnail */}
         <motion.div 

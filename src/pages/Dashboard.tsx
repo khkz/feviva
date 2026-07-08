@@ -7,6 +7,9 @@ import { useUserStats } from "@/hooks/useUserStats";
 import { useNovenas } from "@/hooks/useNovenas";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { useDailyVerse } from "@/hooks/useDailyVerse";
+import { useDailyGospel } from "@/hooks/useDailyGospel";
+import { useSaintOfDay } from "@/hooks/useSaintOfDay";
+import { useDailyCapsule } from "@/hooks/useDailyCapsule";
 import { SaintOfTheDayCard } from "@/components/dashboard/SaintOfTheDayCard";
 import { SoulTriageHero } from "@/components/triage/SoulTriageHero";
 import { HeroSection } from "@/components/dashboard/HeroSection";
@@ -62,6 +65,10 @@ const Dashboard = () => {
   const { novenas, loading: novenasLoading, getProgressForNovena } = useNovenas();
   const { isAdmin } = useAdminAuth();
   const dailyVerse = useDailyVerse();
+  // Prefetch dashboard data early so cards appear instantly when they render
+  useDailyGospel();
+  useSaintOfDay(profile?.country_code);
+  useDailyCapsule();
 
   // Progressive disclosure: determine user maturity level
   const userMaturity = useMemo(() => {
@@ -240,7 +247,7 @@ const Dashboard = () => {
                 </div>
               )}
 
-              <Suspense fallback={null}>
+              <Suspense fallback={<div className="px-5 lg:px-0"><CardSkeleton height="h-32" /></div>}>
                 <div className="px-5 lg:px-0">
                   <DailyCapsuleWidget />
                 </div>

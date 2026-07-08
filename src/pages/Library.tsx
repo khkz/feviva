@@ -518,10 +518,19 @@ const Library = () => {
       {/* Lessons Grid */}
       <div className="px-5">
         {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="glass-card rounded-full w-16 h-16 flex items-center justify-center animate-pulse">
-              <BookOpen className="h-8 w-8 text-muted-foreground/50" />
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="glass-card rounded-2xl p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="h-9 w-9 rounded-xl bg-muted/60 animate-pulse" />
+                  <div className="h-5 w-14 rounded-full bg-muted/60 animate-pulse" />
+                </div>
+                <div className="h-5 w-3/4 rounded bg-muted/60 animate-pulse" />
+                <div className="h-3 w-full rounded bg-muted/50 animate-pulse" />
+                <div className="h-3 w-5/6 rounded bg-muted/50 animate-pulse" />
+                <div className="h-2 w-full rounded-full bg-muted/40 animate-pulse" />
+              </div>
+            ))}
           </div>
         ) : filteredLessons.length === 0 ? (
           <motion.div 
