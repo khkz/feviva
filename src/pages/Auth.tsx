@@ -356,9 +356,9 @@ const Auth = () => {
             transition={{ duration: 0.8 }}
           >
             <div className="flex flex-col items-start gap-3 mb-8">
-              <img src={logoElRugido} alt="ElRugido" className="w-24 h-24" />
+              <img src={logoElRugido} alt="ElRugido - App de fe y apologética católica" className="w-24 h-24" />
               <h1 className="font-heading text-5xl font-bold text-white">
-                ElRugido
+                ElRugido — Accede a tu formación católica
               </h1>
               <span className="text-sm text-white/60">elrugido.com</span>
             </div>
