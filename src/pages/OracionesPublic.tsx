@@ -45,9 +45,11 @@ interface Oracion {
 
 const OracionesPublic = () => {
   const navigate = useNavigate();
+  const isAuthed = useIsAuthed();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showFilters, setShowFilters] = useState(false);
+
 
   // Fetch all prayers
   const { data: oraciones = [], isLoading } = useQuery({
