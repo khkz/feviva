@@ -262,8 +262,23 @@ const OracionesPublic = () => {
           </div>
         </section>
 
+        {/* Respuesta corta AEO/GEO */}
+        <section className="px-4 pt-6">
+          <div className="container mx-auto max-w-4xl">
+            <div className="p-4 rounded-lg bg-muted/50 border border-border/50 text-sm text-muted-foreground">
+              <strong className="text-foreground">¿Qué es este libro de oraciones?</strong>{" "}
+              Es una colección de oraciones católicas tradicionales —desde las
+              fundamentales (Padre Nuestro, Ave María, Gloria, Credo) hasta oraciones a
+              los santos y para distintos momentos del día— con texto completo de
+              libre lectura. El audio guiado y el seguimiento personal se activan al
+              crear una cuenta gratuita.
+            </div>
+          </div>
+        </section>
+
         {/* Stats */}
         <section className="py-8 px-4 border-b border-border/50">
+
           <div className="container mx-auto max-w-5xl">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center p-4 rounded-lg bg-muted/30">
