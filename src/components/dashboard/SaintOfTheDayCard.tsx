@@ -278,6 +278,7 @@ export const SaintOfTheDayCard = ({ userCountryCode }: SaintOfTheDayCardProps) =
                 <li className="italic">Canonizado/a por la Iglesia Católica.</li>
               </ul>
             </div>
+            {saint.tags && saint.tags.length > 0 && (
               <div>
                 <p className="text-sm font-medium mb-2">Patronazgos:</p>
                 <div className="flex flex-wrap gap-1.5">
