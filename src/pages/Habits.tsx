@@ -15,6 +15,7 @@ import { motion } from "framer-motion";
 import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { dias } from "@/lib/pluralize";
+import { CardGridSkeleton } from "@/components/shared/PageSkeletons";
 
 interface Habit {
   id: string;
