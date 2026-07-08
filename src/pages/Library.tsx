@@ -391,7 +391,8 @@ const Library = () => {
             </div>
           </motion.div>
 
-          {/* Batch Action Buttons */}
+          {/* Batch Action Buttons — Admin only (server-side enforced) */}
+          {isAdmin && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
