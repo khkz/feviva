@@ -19,6 +19,7 @@ import { ProgressCard } from "@/components/dashboard/ProgressCard";
 import { NextStepCard } from "@/components/dashboard/NextStepCard";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { StreakBanner } from "@/components/dashboard/StreakBanner";
+import { CoachHighlightCard } from "@/components/dashboard/CoachHighlightCard";
 import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { GospelCard } from "@/components/gospel/GospelCard";
 import { FronteraFinalCard } from "@/components/dashboard/FronteraFinalCard";
