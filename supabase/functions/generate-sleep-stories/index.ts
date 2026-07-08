@@ -261,6 +261,9 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const auth = await verifyAdmin(req, corsHeaders);
+  if (!auth.ok) return auth.response;
+
   try {
     const { action, limit = 1, themeId } = await req.json();
     
