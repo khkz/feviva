@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, BookOpen, Sparkles, Loader2, HelpCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import { PremiumBadge } from "@/components/shared/PremiumBadge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
