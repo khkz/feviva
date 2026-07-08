@@ -65,6 +65,10 @@ const Dashboard = () => {
   const { novenas, loading: novenasLoading, getProgressForNovena } = useNovenas();
   const { isAdmin } = useAdminAuth();
   const dailyVerse = useDailyVerse();
+  // Prefetch dashboard data early so cards appear instantly when they render
+  useDailyGospel();
+  useSaintOfDay(profile?.country_code);
+  useDailyCapsule();
 
   // Progressive disclosure: determine user maturity level
   const userMaturity = useMemo(() => {
