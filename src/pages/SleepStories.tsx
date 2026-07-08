@@ -71,10 +71,11 @@ const SleepStories = () => {
   const navigate = useNavigate();
   const { stories, loading, generateAudio, saveProgress, refetch } = useSleepStories();
   const { queueJobs, stats: jobStats } = useProcessingJobs({ jobType: 'sleep_tts' });
-  const { isAdmin, isModerator } = useAdminAuth();
+  const { isAdmin } = useAdminAuth();
   const audioPlayer = useAudioPlayer();
   
-  const canManageContent = isAdmin || isModerator;
+  // Admin-only: content generation tools are strictly for admins (server-side enforced).
+  const canManageContent = isAdmin;
   const [isCreatingStories, setIsCreatingStories] = useState(false);
   const [isExpandingStories, setIsExpandingStories] = useState(false);
   const [themeDialogOpen, setThemeDialogOpen] = useState(false);
