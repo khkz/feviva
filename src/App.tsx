@@ -125,7 +125,10 @@ const App = () => (
                   <Route path="/rosario" element={<ProtectedRoute><Rosario /></ProtectedRoute>} />
                   <Route path="/sleep-stories" element={<ProtectedRoute><SleepStories /></ProtectedRoute>} />
                   <Route path="/sleep" element={<ProtectedRoute><SleepStories /></ProtectedRoute>} />
-                  <Route path="/novenas" element={<ProtectedRoute><Novenas /></ProtectedRoute>} />
+                  {/* Novenas: pública en /novenas (SEO/GEO) + interactiva en /novenas/app */}
+                  <Route path="/novenas" element={<NovenasPublic />} />
+                  <Route path="/novenas/app" element={<ProtectedRoute><Novenas /></ProtectedRoute>} />
+                  <Route path="/novenas-publicas" element={<Navigate to="/novenas" replace />} />
                   <Route path="/bible-plan" element={<ProtectedRoute><BiblePlan /></ProtectedRoute>} />
                   <Route path="/santos" element={<SantosPublic />} />
                   <Route path="/santos/app" element={<ProtectedRoute><Santos /></ProtectedRoute>} />
@@ -137,7 +140,7 @@ const App = () => (
                   <Route path="/evangelio/:fecha" element={<ProtectedRoute><DailyGospel /></ProtectedRoute>} />
                   <Route path="/install" element={<Install />} />
                   <Route path="/evangelio-del-dia" element={<EvangelioPublic />} />
-                  <Route path="/novenas-publicas" element={<NovenasPublic />} />
+
                   <Route path="/novena/:id" element={<NovenaPublicPage />} />
                   <Route path="/capsula-del-dia" element={<CapsulaDelDia />} />
                   <Route path="/sobre-nosotros" element={<SobreNosotros />} />
