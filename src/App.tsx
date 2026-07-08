@@ -19,6 +19,7 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import Planes from "./pages/Planes";
 
 // Lazy imports — all other pages
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -100,6 +101,7 @@ const App = () => (
                   {/* Sync routes */}
                   <Route path="/" element={<Index />} />
                   <Route path="/auth" element={<Auth />} />
+                  <Route path="/planes" element={<Planes />} />
 
                   {/* Lazy routes */}
                   <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
