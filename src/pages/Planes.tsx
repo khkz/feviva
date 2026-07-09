@@ -1,16 +1,48 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
-import { Check, Crown, Sparkles, Heart } from "lucide-react";
+import { Check, Crown, Sparkles, Heart, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FooterSection } from "@/components/landing/FooterSection";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 import logoElRugido from "@/assets/logo-elrugido.png";
 
 type Billing = "mensual" | "anual";
+type PlanKey = "apostol_mensual" | "apostol_anual" | "mecenas_mensual";
 
 const Planes = () => {
   const [billing, setBilling] = useState<Billing>("anual");
+  const [loadingPlan, setLoadingPlan] = useState<PlanKey | null>(null);
+  const navigate = useNavigate();
+
+  const handleCheckout = async (plan: PlanKey) => {
+    setLoadingPlan(plan);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({ title: "Necesitas iniciar sesión", description: "Te llevamos al registro para continuar." });
+        navigate("/auth");
+        return;
+      }
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: { plan, origin: window.location.origin },
+      });
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error("No se pudo crear la sesión de pago");
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Error inesperado";
+      toast({ title: "No pudimos abrir el pago", description: msg, variant: "destructive" });
+    } finally {
+      setLoadingPlan(null);
+    }
+  };
+
 
   const peregrinoFeatures = [
     "Evangelio y Santo del día",
@@ -126,8 +158,9 @@ const Planes = () => {
             cadence={apostolCadence}
             features={apostolFeatures}
             featuresIntro="Todo lo de Peregrino, y además:"
-            ctaLabel="Comenzar gratis"
-            ctaHref="/auth"
+            ctaLabel="Empezar 7 días gratis"
+            onCta={() => handleCheckout(billing === "mensual" ? "apostol_mensual" : "apostol_anual")}
+            loading={loadingPlan === "apostol_mensual" || loadingPlan === "apostol_anual"}
             badge="MÁS POPULAR"
           />
 
@@ -139,14 +172,16 @@ const Planes = () => {
             price="CLP $9.990"
             cadence="al mes"
             features={mecenasFeatures}
-            ctaLabel="Quiero ser Mecenas"
-            ctaHref="/auth"
+            ctaLabel="Empezar 7 días gratis"
+            onCta={() => handleCheckout("mecenas_mensual")}
+            loading={loadingPlan === "mecenas_mensual"}
           />
         </div>
 
         <p className="text-center text-xs text-muted-foreground mt-8 max-w-xl mx-auto">
-          Precios en pesos chilenos (CLP). Pronto habilitaremos el pago en línea.
+          Precios en pesos chilenos (CLP). Los planes de pago incluyen 7 días de prueba gratis; cancela cuando quieras.
         </p>
+
       </section>
 
       <FooterSection />
@@ -163,7 +198,9 @@ interface PlanCardProps {
   features: string[];
   featuresIntro?: string;
   ctaLabel: string;
-  ctaHref: string;
+  ctaHref?: string;
+  onCta?: () => void;
+  loading?: boolean;
   featured?: boolean;
   badge?: string;
 }
@@ -178,6 +215,8 @@ const PlanCard = ({
   featuresIntro,
   ctaLabel,
   ctaHref,
+  onCta,
+  loading,
   featured,
   badge,
 }: PlanCardProps) => (
@@ -218,15 +257,28 @@ const PlanCard = ({
       ))}
     </ul>
 
-    <Button
-      asChild
-      variant={featured ? "default" : "outline"}
-      className="w-full"
-      size="lg"
-    >
-      <Link to={ctaHref}>{ctaLabel}</Link>
-    </Button>
+    {onCta ? (
+      <Button
+        onClick={onCta}
+        disabled={loading}
+        variant={featured ? "default" : "outline"}
+        className="w-full"
+        size="lg"
+      >
+        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : ctaLabel}
+      </Button>
+    ) : (
+      <Button
+        asChild
+        variant={featured ? "default" : "outline"}
+        className="w-full"
+        size="lg"
+      >
+        <Link to={ctaHref ?? "/auth"}>{ctaLabel}</Link>
+      </Button>
+    )}
   </motion.div>
 );
 
 export default Planes;
+
