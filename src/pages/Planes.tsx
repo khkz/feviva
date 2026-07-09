@@ -1,16 +1,48 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
-import { Check, Crown, Sparkles, Heart } from "lucide-react";
+import { Check, Crown, Sparkles, Heart, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FooterSection } from "@/components/landing/FooterSection";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 import logoElRugido from "@/assets/logo-elrugido.png";
 
 type Billing = "mensual" | "anual";
+type PlanKey = "apostol_mensual" | "apostol_anual" | "mecenas_mensual";
 
 const Planes = () => {
   const [billing, setBilling] = useState<Billing>("anual");
+  const [loadingPlan, setLoadingPlan] = useState<PlanKey | null>(null);
+  const navigate = useNavigate();
+
+  const handleCheckout = async (plan: PlanKey) => {
+    setLoadingPlan(plan);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({ title: "Necesitas iniciar sesión", description: "Te llevamos al registro para continuar." });
+        navigate("/auth");
+        return;
+      }
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: { plan, origin: window.location.origin },
+      });
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error("No se pudo crear la sesión de pago");
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Error inesperado";
+      toast({ title: "No pudimos abrir el pago", description: msg, variant: "destructive" });
+    } finally {
+      setLoadingPlan(null);
+    }
+  };
+
 
   const peregrinoFeatures = [
     "Evangelio y Santo del día",
