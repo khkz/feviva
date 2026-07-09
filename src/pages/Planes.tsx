@@ -198,7 +198,9 @@ interface PlanCardProps {
   features: string[];
   featuresIntro?: string;
   ctaLabel: string;
-  ctaHref: string;
+  ctaHref?: string;
+  onCta?: () => void;
+  loading?: boolean;
   featured?: boolean;
   badge?: string;
 }
@@ -213,6 +215,8 @@ const PlanCard = ({
   featuresIntro,
   ctaLabel,
   ctaHref,
+  onCta,
+  loading,
   featured,
   badge,
 }: PlanCardProps) => (
@@ -253,15 +257,28 @@ const PlanCard = ({
       ))}
     </ul>
 
-    <Button
-      asChild
-      variant={featured ? "default" : "outline"}
-      className="w-full"
-      size="lg"
-    >
-      <Link to={ctaHref}>{ctaLabel}</Link>
-    </Button>
+    {onCta ? (
+      <Button
+        onClick={onCta}
+        disabled={loading}
+        variant={featured ? "default" : "outline"}
+        className="w-full"
+        size="lg"
+      >
+        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : ctaLabel}
+      </Button>
+    ) : (
+      <Button
+        asChild
+        variant={featured ? "default" : "outline"}
+        className="w-full"
+        size="lg"
+      >
+        <Link to={ctaHref ?? "/auth"}>{ctaLabel}</Link>
+      </Button>
+    )}
   </motion.div>
 );
 
 export default Planes;
+
