@@ -158,8 +158,9 @@ const Planes = () => {
             cadence={apostolCadence}
             features={apostolFeatures}
             featuresIntro="Todo lo de Peregrino, y además:"
-            ctaLabel="Comenzar gratis"
-            ctaHref="/auth"
+            ctaLabel="Empezar 7 días gratis"
+            onCta={() => handleCheckout(billing === "mensual" ? "apostol_mensual" : "apostol_anual")}
+            loading={loadingPlan === "apostol_mensual" || loadingPlan === "apostol_anual"}
             badge="MÁS POPULAR"
           />
 
@@ -171,14 +172,16 @@ const Planes = () => {
             price="CLP $9.990"
             cadence="al mes"
             features={mecenasFeatures}
-            ctaLabel="Quiero ser Mecenas"
-            ctaHref="/auth"
+            ctaLabel="Empezar 7 días gratis"
+            onCta={() => handleCheckout("mecenas_mensual")}
+            loading={loadingPlan === "mecenas_mensual"}
           />
         </div>
 
         <p className="text-center text-xs text-muted-foreground mt-8 max-w-xl mx-auto">
-          Precios en pesos chilenos (CLP). Pronto habilitaremos el pago en línea.
+          Precios en pesos chilenos (CLP). Los planes de pago incluyen 7 días de prueba gratis; cancela cuando quieras.
         </p>
+
       </section>
 
       <FooterSection />
