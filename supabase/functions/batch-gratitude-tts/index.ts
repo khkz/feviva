@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { verifyAdmin } from "../_shared/verifyAdmin.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -181,7 +182,11 @@ serve(async (req) => {
   }
 
   try {
+    const auth = await verifyAdmin(req, corsHeaders);
+    if (!auth.ok) return auth.response;
+
     const { limit = 1 } = await req.json();
+    
     
     if (!OPENAI_API_KEY) {
       throw new Error("OPENAI_API_KEY is not configured");

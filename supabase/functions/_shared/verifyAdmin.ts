@@ -1,42 +1,46 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 /**
- * Verify the caller is authenticated AND has the 'admin' role.
- * Returns { ok: true, userId } on success, or { ok: false, response } with a ready-to-return Response.
+ * Verify the caller is EITHER:
+ *   (a) the internal cron/service caller presenting the shared secret via
+ *       `X-Admin-Api-Key` (must match Deno env `ADMIN_API_KEY`), OR
+ *   (b) an authenticated user whose `user_roles` row includes 'admin'.
+ *
+ * Any other caller (anon, or a normal logged-in user) gets 401/403.
  */
 export async function verifyAdmin(req: Request, corsHeaders: Record<string, string>) {
-  const authHeader = req.headers.get("Authorization");
-  if (!authHeader?.startsWith("Bearer ")) {
-    return {
-      ok: false as const,
-      response: new Response(
-        JSON.stringify({ error: "Unauthorized: missing token" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      ),
-    };
+  const json = (status: number, error: string) =>
+    new Response(JSON.stringify({ error }), {
+      status,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+
+  // (a) Shared secret path — used by pg_cron and internal function-to-function calls.
+  const providedKey = req.headers.get("X-Admin-Api-Key");
+  const ADMIN_KEY = Deno.env.get("ADMIN_API_KEY");
+  const CRON_KEY = Deno.env.get("CRON_ADMIN_KEY");
+  if (providedKey && ((ADMIN_KEY && providedKey === ADMIN_KEY) || (CRON_KEY && providedKey === CRON_KEY))) {
+    return { ok: true as const, userId: "cron" as const };
   }
 
-  const supabase = createClient(
+  // (b) User path — requires a valid JWT AND the 'admin' role in user_roles.
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    return { ok: false as const, response: json(401, "Unauthorized: missing token") };
+  }
+
+  const token = authHeader.replace("Bearer ", "");
+  const anonClient = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_ANON_KEY")!,
     { global: { headers: { Authorization: authHeader } } },
   );
-
-  const token = authHeader.replace("Bearer ", "");
-  const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
-  if (claimsError || !claimsData?.claims) {
-    return {
-      ok: false as const,
-      response: new Response(
-        JSON.stringify({ error: "Unauthorized: invalid token" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      ),
-    };
+  const { data: claimsData, error: claimsError } = await anonClient.auth.getClaims(token);
+  if (claimsError || !claimsData?.claims?.sub) {
+    return { ok: false as const, response: json(401, "Unauthorized: invalid token") };
   }
-
   const userId = claimsData.claims.sub as string;
 
-  // Use service role to bypass RLS and read the user's roles reliably.
   const admin = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
@@ -47,24 +51,11 @@ export async function verifyAdmin(req: Request, corsHeaders: Record<string, stri
     .eq("user_id", userId);
 
   if (rolesError) {
-    return {
-      ok: false as const,
-      response: new Response(
-        JSON.stringify({ error: "Role lookup failed" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      ),
-    };
+    return { ok: false as const, response: json(500, "Role lookup failed") };
   }
-
   const isAdmin = (roles ?? []).some((r: { role: string }) => r.role === "admin");
   if (!isAdmin) {
-    return {
-      ok: false as const,
-      response: new Response(
-        JSON.stringify({ error: "Forbidden: admin role required" }),
-        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      ),
-    };
+    return { ok: false as const, response: json(403, "Forbidden: admin role required") };
   }
 
   return { ok: true as const, userId };

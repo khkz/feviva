@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { verifyAdmin } from "../_shared/verifyAdmin.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -625,17 +626,10 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   try {
-    const authHeader = req.headers.get('Authorization');
-    const adminKey = req.headers.get('X-Admin-Api-Key');
-    const ADMIN_KEY = Deno.env.get('ADMIN_API_KEY');
-    if (adminKey && ADMIN_KEY && adminKey === ADMIN_KEY) { /* Admin OK */ }
-    else if (authHeader?.startsWith('Bearer ')) {
-      const _ac = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_ANON_KEY')!, { global: { headers: { Authorization: authHeader } } });
-      const { error: authErr } = await _ac.auth.getUser(authHeader.replace('Bearer ', ''));
-      if (authErr) return new Response(JSON.stringify({ error: 'Token inválido' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    } else {
-      return new Response(JSON.stringify({ error: 'Autenticación requerida' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
+    const auth = await verifyAdmin(req, corsHeaders);
+    if (!auth.ok) return auth.response;
+
+
 
     const { job_type, action } = await req.json().catch(() => ({}));
     
