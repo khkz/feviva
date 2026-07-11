@@ -322,7 +322,9 @@ export default function AdminSantos() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['admin-calendar-saints'] });
-      toast.success(`Generadas ${data?.successCount || 0} imágenes`);
+      const ok = data?.successCount ?? data?.success ?? 0;
+      const failed = data?.failed ?? 0;
+      toast.success(`Generadas ${ok} imágenes${failed ? ` (${failed} fallidas)` : ''}`);
     },
     onError: (error) => {
       toast.error('Error en batch: ' + error.message);

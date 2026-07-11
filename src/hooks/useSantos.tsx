@@ -15,6 +15,9 @@ export interface CalendarSaint {
   tags: string[] | null;
   created_at: string | null;
   slug: string | null;
+  estado_verificacion?: string | null;
+  fuente_descripcion?: string | null;
+  description_source?: string | null;
 }
 
 interface UseSantosOptions {

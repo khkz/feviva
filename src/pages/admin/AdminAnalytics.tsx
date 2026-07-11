@@ -140,27 +140,36 @@ export const AdminAnalytics = () => {
               <CardTitle>Distribución de Contenido</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={contentStats}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, value }) => `${name}: ${value}`}
-                      outerRadius={100}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {contentStats.map((_, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
+              {/* Filtramos ceros: una Pie con todas las slices en 0 renderiza vacía. */}
+              {contentStats.filter(s => s.value > 0).length === 0 ? (
+                <p className="text-sm text-muted-foreground py-12 text-center">
+                  Aún no hay contenido para graficar.
+                </p>
+              ) : (
+                <div style={{ width: '100%', height: 320 }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={contentStats.filter(s => s.value > 0)}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, value }) => `${name}: ${value}`}
+                        outerRadius={100}
+                        fill="#8884d8"
+                        dataKey="value"
+                        nameKey="name"
+                        isAnimationActive={false}
+                      >
+                        {contentStats.filter(s => s.value > 0).map((_, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
