@@ -134,7 +134,7 @@ async function generatePremiumTTS(text: string, voice: string, instructions: str
         'Content-Type': 'application/json' 
       },
       body: JSON.stringify({ 
-        model: 'gpt-4o-mini-tts', 
+        model: 'gpt-4o-mini-tts-2025-12-15', 
         input: chunk, 
         voice,
         instructions,
@@ -175,7 +175,7 @@ async function generateStandardTTS(text: string, voice: string): Promise<Uint8Ar
     const response = await fetch('https://api.openai.com/v1/audio/speech', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${OPENAI_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'tts-1', input: chunk, voice, response_format: 'mp3' }),
+      body: JSON.stringify({ model: 'gpt-4o-mini-tts-2025-12-15', input: chunk, voice, response_format: 'mp3' }),
     });
     
     if (!response.ok) throw new Error(`OpenAI TTS error: ${await response.text()}`);
@@ -237,7 +237,7 @@ async function processSleepTTSPremium(targetId: string, voice: string = 'shimmer
   
   await supabase.from('sleep_stories').update({ audio_url: urlData.publicUrl }).eq('id', targetId);
   
-  return { audioUrl: urlData.publicUrl, voice, model: 'gpt-4o-mini-tts', premium: true };
+  return { audioUrl: urlData.publicUrl, voice, model: 'gpt-4o-mini-tts-2025-12-15', premium: true };
 }
 
 // Procesar TTS PREMIUM para lecciones
@@ -256,7 +256,7 @@ async function processLessonTTSPremium(targetId: string, voice: string = 'sage')
   
   await supabase.from('library_lessons').update({ audio_url: urlData.publicUrl }).eq('id', targetId);
   
-  return { audioUrl: urlData.publicUrl, voice, model: 'gpt-4o-mini-tts', premium: true };
+  return { audioUrl: urlData.publicUrl, voice, model: 'gpt-4o-mini-tts-2025-12-15', premium: true };
 }
 
 // Procesar TTS PREMIUM para oraciones
@@ -274,7 +274,7 @@ async function processOracionTTSPremium(targetId: string, voice: string = 'echo'
   
   await supabase.from('oraciones').update({ audio_url: urlData.publicUrl }).eq('id', targetId);
   
-  return { audioUrl: urlData.publicUrl, voice, model: 'gpt-4o-mini-tts', premium: true };
+  return { audioUrl: urlData.publicUrl, voice, model: 'gpt-4o-mini-tts-2025-12-15', premium: true };
 }
 
 // ============= SANITIZACIÓN ROBUSTA DE JSON =============

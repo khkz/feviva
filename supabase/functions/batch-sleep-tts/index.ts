@@ -242,7 +242,7 @@ Transmite paz, serenidad y seguridad en cada palabra.`;
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini-tts',
+        model: 'gpt-4o-mini-tts-2025-12-15',
         input: chunks[i],
         voice: voice,
         instructions: sleepInstructions,
@@ -379,7 +379,7 @@ serve(async (req) => {
       processed: results.length,
       remaining: remainingCount || 0,
       hasMore: (remainingCount || 0) > 0,
-      model: 'gpt-4o-mini-tts',
+      model: 'gpt-4o-mini-tts-2025-12-15',
       voice,
       results
     }), {

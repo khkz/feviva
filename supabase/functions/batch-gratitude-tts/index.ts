@@ -146,7 +146,7 @@ async function generateSpeech(text: string, voice: string = 'onyx'): Promise<Arr
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'tts-1-hd',
+        model: 'gpt-4o-mini-tts-2025-12-15',
         input: chunks[i],
         voice: voice,
         speed: 0.95,
