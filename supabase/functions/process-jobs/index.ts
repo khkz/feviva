@@ -192,10 +192,31 @@ async function generateStandardTTS(text: string, voice: string): Promise<Uint8Ar
   return combined;
 }
 
+// Error de "registro no encontrado" que NO debe reintentarse (marca job como failed inmediatamente).
+class NotFoundError extends Error {
+  readonly notFound = true;
+  constructor(msg: string) { super(msg); this.name = 'NotFoundError'; }
+}
+
+// Helpers de fetch resilientes (order estable + maybeSingle → tolera 0 o N filas sin lanzar excepción).
+async function fetchOneStable<T = Record<string, unknown>>(
+  table: string, columns: string, id: string, entityLabel: string
+): Promise<T> {
+  const { data, error } = await supabase
+    .from(table)
+    .select(columns)
+    .eq('id', id)
+    .order('created_at', { ascending: true })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw new Error(`${entityLabel}: error consultando (${error.message})`);
+  if (!data) throw new NotFoundError(`${entityLabel} no encontrada (id=${id})`);
+  return data as T;
+}
+
 // Procesar TTS para historias de sueño (estándar)
 async function processSleepTTS(targetId: string): Promise<Record<string, unknown>> {
-  const { data: story, error } = await supabase.from('sleep_stories').select('contenido').eq('id', targetId).single();
-  if (error || !story) throw new Error(`Historia no encontrada: ${error?.message}`);
+  const story = await fetchOneStable<{ contenido: string }>('sleep_stories', 'contenido', targetId, 'Historia');
   
   const audio = await generateStandardTTS(story.contenido, 'nova');
   const filename = `sleep-story-${targetId}.mp3`;
@@ -209,8 +230,9 @@ async function processSleepTTS(targetId: string): Promise<Record<string, unknown
 
 // Procesar TTS para lecciones (estándar)
 async function processLessonTTS(targetId: string): Promise<Record<string, unknown>> {
-  const { data: lesson, error } = await supabase.from('library_lessons').select('contenido, contenido_enriquecido').eq('id', targetId).single();
-  if (error || !lesson) throw new Error(`Lección no encontrada: ${error?.message}`);
+  const lesson = await fetchOneStable<{ contenido: string; contenido_enriquecido: string | null }>(
+    'library_lessons', 'contenido, contenido_enriquecido', targetId, 'Lección'
+  );
   
   const audio = await generateStandardTTS(lesson.contenido_enriquecido || lesson.contenido, 'onyx');
   const filename = `lesson-${targetId}.mp3`;
@@ -224,8 +246,9 @@ async function processLessonTTS(targetId: string): Promise<Record<string, unknow
 
 // Procesar TTS PREMIUM para historias de sueño
 async function processSleepTTSPremium(targetId: string, voice: string = 'shimmer'): Promise<Record<string, unknown>> {
-  const { data: story, error } = await supabase.from('sleep_stories').select('contenido, titulo').eq('id', targetId).single();
-  if (error || !story) throw new Error(`Historia no encontrada: ${error?.message}`);
+  const story = await fetchOneStable<{ contenido: string; titulo: string }>(
+    'sleep_stories', 'contenido, titulo', targetId, 'Historia'
+  );
   
   console.log(`[Premium Sleep TTS] Procesando: ${story.titulo} con voz ${voice}`);
   
@@ -242,8 +265,9 @@ async function processSleepTTSPremium(targetId: string, voice: string = 'shimmer
 
 // Procesar TTS PREMIUM para lecciones
 async function processLessonTTSPremium(targetId: string, voice: string = 'sage'): Promise<Record<string, unknown>> {
-  const { data: lesson, error } = await supabase.from('library_lessons').select('contenido, contenido_enriquecido, titulo').eq('id', targetId).single();
-  if (error || !lesson) throw new Error(`Lección no encontrada: ${error?.message}`);
+  const lesson = await fetchOneStable<{ contenido: string; contenido_enriquecido: string | null; titulo: string }>(
+    'library_lessons', 'contenido, contenido_enriquecido, titulo', targetId, 'Lección'
+  );
   
   console.log(`[Premium Lesson TTS] Procesando: ${lesson.titulo} con voz ${voice}`);
   
@@ -261,8 +285,9 @@ async function processLessonTTSPremium(targetId: string, voice: string = 'sage')
 
 // Procesar TTS PREMIUM para oraciones
 async function processOracionTTSPremium(targetId: string, voice: string = 'echo'): Promise<Record<string, unknown>> {
-  const { data: oracion, error } = await supabase.from('oraciones').select('texto, nombre').eq('id', targetId).single();
-  if (error || !oracion) throw new Error(`Oración no encontrada: ${error?.message}`);
+  const oracion = await fetchOneStable<{ texto: string; nombre: string }>(
+    'oraciones', 'texto, nombre', targetId, 'Oración'
+  );
   
   console.log(`[Premium Oracion TTS] Procesando: ${oracion.nombre} con voz ${voice}`);
   
