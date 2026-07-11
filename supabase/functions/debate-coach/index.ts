@@ -95,7 +95,7 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    // === Quota check for AI actions ===
+    // === Quota check for AI actions (con bypass Premium server-side) ===
     const aiActions = ['start', 'respond', 'suggest', 'evaluate'];
     if (aiActions.includes(action)) {
       const DAILY_LIMIT = 3;
@@ -113,39 +113,46 @@ serve(async (req) => {
       }
 
       if (userId) {
-        const today = new Date().toISOString().split('T')[0];
+        // Chequeo real de Premium contra la tabla subscribers (server-side).
+        // Un free NO puede saltarse el límite ni llamando directo a la API.
+        const { data: isPremium } = await supabaseAdmin
+          .rpc('has_active_subscription', { _user_id: userId });
 
-        // Get or create today's quota row
-        const { data: quota } = await supabaseAdmin
-          .from('usage_quotas')
-          .select('ai_generations')
-          .eq('user_id', userId)
-          .eq('date', today)
-          .maybeSingle();
+        if (!isPremium) {
+          const today = new Date().toISOString().split('T')[0];
 
-        const currentCount = quota?.ai_generations ?? 0;
+          const { data: quota } = await supabaseAdmin
+            .from('usage_quotas')
+            .select('ai_generations')
+            .eq('user_id', userId)
+            .eq('date', today)
+            .maybeSingle();
 
-        if (currentCount >= DAILY_LIMIT) {
-          return new Response(JSON.stringify({
-            error: 'Límite diario alcanzado',
-            message: `Has alcanzado el límite de ${DAILY_LIMIT} interacciones de IA por día. Vuelve mañana para seguir practicando.`,
-            limit: DAILY_LIMIT,
-            used: currentCount,
-          }), {
-            status: 429,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          });
+          const currentCount = quota?.ai_generations ?? 0;
+
+          if (currentCount >= DAILY_LIMIT) {
+            return new Response(JSON.stringify({
+              error: 'Límite diario alcanzado',
+              message: `Has alcanzado el límite gratuito de ${DAILY_LIMIT} interacciones de IA por día. Hazte Apóstol para usar el Coach sin límites.`,
+              limit: DAILY_LIMIT,
+              used: currentCount,
+              upgradeUrl: '/planes',
+            }), {
+              status: 402,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            });
+          }
+
+          await supabaseAdmin
+            .from('usage_quotas')
+            .upsert(
+              { user_id: userId, date: today, ai_generations: currentCount + 1, updated_at: new Date().toISOString() },
+              { onConflict: 'user_id,date' }
+            );
         }
-
-        // Increment counter (upsert)
-        await supabaseAdmin
-          .from('usage_quotas')
-          .upsert(
-            { user_id: userId, date: today, ai_generations: currentCount + 1, updated_at: new Date().toISOString() },
-            { onConflict: 'user_id,date' }
-          );
       }
     }
+
 
     const personaPrompt = personaPrompts[persona as keyof typeof personaPrompts] || personaPrompts.ateo_cientifico;
     const dificultadPrompt = dificultadPrompts[dificultad as keyof typeof dificultadPrompts] || dificultadPrompts.aprendiz;

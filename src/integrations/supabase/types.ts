@@ -2800,6 +2800,7 @@ export type Database = {
         Args: { p_code: string }
         Returns: string
       }
+      has_active_subscription: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
