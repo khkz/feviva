@@ -76,12 +76,16 @@ serve(async (req) => {
       console.log(`Processing ${i + 1}/${saints.length}: ${saint.name}`);
 
       try {
-        // Call generate-saint-image function
+        // Call generate-saint-image function con X-Admin-Api-Key (service role
+        // key NO es un JWT y falla en auth.getUser → "Token inválido").
+        const ADMIN_KEY = Deno.env.get('ADMIN_API_KEY') || '';
         const response = await fetch(`${supabaseUrl}/functions/v1/generate-saint-image`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${supabaseServiceKey}`,
+            'X-Admin-Api-Key': ADMIN_KEY,
+            'apikey': Deno.env.get('SUPABASE_ANON_KEY') || '',
           },
           body: JSON.stringify({ saintId: saint.id }),
         });
