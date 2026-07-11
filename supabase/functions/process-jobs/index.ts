@@ -373,15 +373,20 @@ async function processLessonContentEnrich(targetId: string): Promise<Record<stri
     throw new Error('LOVABLE_API_KEY no configurada');
   }
   
-  // Obtener lección actual
+  // Obtener lección actual (resiliente: maybeSingle + order estable)
   const { data: lesson, error } = await supabase
     .from('library_lessons')
     .select('titulo, descripcion, contenido, contenido_enriquecido, categoria')
     .eq('id', targetId)
-    .single();
+    .order('created_at', { ascending: true })
+    .limit(1)
+    .maybeSingle();
   
-  if (error || !lesson) {
-    throw new Error(`Lección no encontrada: ${error?.message}`);
+  if (error) {
+    throw new Error(`Error consultando lección: ${error.message}`);
+  }
+  if (!lesson) {
+    throw new NotFoundError(`Lección no encontrada (id=${targetId})`);
   }
   
   console.log(`[Content Enrich] Procesando: ${lesson.titulo}`);
