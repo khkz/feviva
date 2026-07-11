@@ -254,13 +254,18 @@ async function processLessonTTS(targetId: string): Promise<Record<string, unknow
     'library_lessons', 'contenido, contenido_enriquecido', targetId, 'Lección'
   );
   
-  const audio = await generateStandardTTS(lesson.contenido_enriquecido || lesson.contenido, 'onyx');
+  const rawSource = lesson.contenido_enriquecido || lesson.contenido;
+  const audio = await generateStandardTTS(rawSource, 'onyx');
   const filename = `lesson-${targetId}.mp3`;
   
   await supabase.storage.from('teachings-audio').upload(filename, audio, { contentType: 'audio/mpeg', upsert: true });
   const { data: urlData } = supabase.storage.from('teachings-audio').getPublicUrl(filename);
   
-  await supabase.from('library_lessons').update({ audio_url: urlData.publicUrl }).eq('id', targetId);
+  // Hash del texto limpio realmente narrado (mismo pipeline que generateStandardTTS)
+  const hash = await sha256Hex(cleanTextForSpanishTTS(rawSource));
+  await supabase.from('library_lessons')
+    .update({ audio_url: urlData.publicUrl, contenido_enriquecido_hash: hash })
+    .eq('id', targetId);
   return { audioUrl: urlData.publicUrl };
 }
 
