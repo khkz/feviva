@@ -192,10 +192,31 @@ async function generateStandardTTS(text: string, voice: string): Promise<Uint8Ar
   return combined;
 }
 
+// Error de "registro no encontrado" que NO debe reintentarse (marca job como failed inmediatamente).
+class NotFoundError extends Error {
+  readonly notFound = true;
+  constructor(msg: string) { super(msg); this.name = 'NotFoundError'; }
+}
+
+// Helpers de fetch resilientes (order estable + maybeSingle → tolera 0 o N filas sin lanzar excepción).
+async function fetchOneStable<T = Record<string, unknown>>(
+  table: string, columns: string, id: string, entityLabel: string
+): Promise<T> {
+  const { data, error } = await supabase
+    .from(table)
+    .select(columns)
+    .eq('id', id)
+    .order('created_at', { ascending: true })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw new Error(`${entityLabel}: error consultando (${error.message})`);
+  if (!data) throw new NotFoundError(`${entityLabel} no encontrada (id=${id})`);
+  return data as T;
+}
+
 // Procesar TTS para historias de sueño (estándar)
 async function processSleepTTS(targetId: string): Promise<Record<string, unknown>> {
-  const { data: story, error } = await supabase.from('sleep_stories').select('contenido').eq('id', targetId).single();
-  if (error || !story) throw new Error(`Historia no encontrada: ${error?.message}`);
+  const story = await fetchOneStable<{ contenido: string }>('sleep_stories', 'contenido', targetId, 'Historia');
   
   const audio = await generateStandardTTS(story.contenido, 'nova');
   const filename = `sleep-story-${targetId}.mp3`;
@@ -209,8 +230,9 @@ async function processSleepTTS(targetId: string): Promise<Record<string, unknown
 
 // Procesar TTS para lecciones (estándar)
 async function processLessonTTS(targetId: string): Promise<Record<string, unknown>> {
-  const { data: lesson, error } = await supabase.from('library_lessons').select('contenido, contenido_enriquecido').eq('id', targetId).single();
-  if (error || !lesson) throw new Error(`Lección no encontrada: ${error?.message}`);
+  const lesson = await fetchOneStable<{ contenido: string; contenido_enriquecido: string | null }>(
+    'library_lessons', 'contenido, contenido_enriquecido', targetId, 'Lección'
+  );
   
   const audio = await generateStandardTTS(lesson.contenido_enriquecido || lesson.contenido, 'onyx');
   const filename = `lesson-${targetId}.mp3`;
@@ -224,8 +246,9 @@ async function processLessonTTS(targetId: string): Promise<Record<string, unknow
 
 // Procesar TTS PREMIUM para historias de sueño
 async function processSleepTTSPremium(targetId: string, voice: string = 'shimmer'): Promise<Record<string, unknown>> {
-  const { data: story, error } = await supabase.from('sleep_stories').select('contenido, titulo').eq('id', targetId).single();
-  if (error || !story) throw new Error(`Historia no encontrada: ${error?.message}`);
+  const story = await fetchOneStable<{ contenido: string; titulo: string }>(
+    'sleep_stories', 'contenido, titulo', targetId, 'Historia'
+  );
   
   console.log(`[Premium Sleep TTS] Procesando: ${story.titulo} con voz ${voice}`);
   
@@ -242,8 +265,9 @@ async function processSleepTTSPremium(targetId: string, voice: string = 'shimmer
 
 // Procesar TTS PREMIUM para lecciones
 async function processLessonTTSPremium(targetId: string, voice: string = 'sage'): Promise<Record<string, unknown>> {
-  const { data: lesson, error } = await supabase.from('library_lessons').select('contenido, contenido_enriquecido, titulo').eq('id', targetId).single();
-  if (error || !lesson) throw new Error(`Lección no encontrada: ${error?.message}`);
+  const lesson = await fetchOneStable<{ contenido: string; contenido_enriquecido: string | null; titulo: string }>(
+    'library_lessons', 'contenido, contenido_enriquecido, titulo', targetId, 'Lección'
+  );
   
   console.log(`[Premium Lesson TTS] Procesando: ${lesson.titulo} con voz ${voice}`);
   
@@ -261,8 +285,9 @@ async function processLessonTTSPremium(targetId: string, voice: string = 'sage')
 
 // Procesar TTS PREMIUM para oraciones
 async function processOracionTTSPremium(targetId: string, voice: string = 'echo'): Promise<Record<string, unknown>> {
-  const { data: oracion, error } = await supabase.from('oraciones').select('texto, nombre').eq('id', targetId).single();
-  if (error || !oracion) throw new Error(`Oración no encontrada: ${error?.message}`);
+  const oracion = await fetchOneStable<{ texto: string; nombre: string }>(
+    'oraciones', 'texto, nombre', targetId, 'Oración'
+  );
   
   console.log(`[Premium Oracion TTS] Procesando: ${oracion.nombre} con voz ${voice}`);
   
@@ -348,15 +373,20 @@ async function processLessonContentEnrich(targetId: string): Promise<Record<stri
     throw new Error('LOVABLE_API_KEY no configurada');
   }
   
-  // Obtener lección actual
+  // Obtener lección actual (resiliente: maybeSingle + order estable)
   const { data: lesson, error } = await supabase
     .from('library_lessons')
     .select('titulo, descripcion, contenido, contenido_enriquecido, categoria')
     .eq('id', targetId)
-    .single();
+    .order('created_at', { ascending: true })
+    .limit(1)
+    .maybeSingle();
   
-  if (error || !lesson) {
-    throw new Error(`Lección no encontrada: ${error?.message}`);
+  if (error) {
+    throw new Error(`Error consultando lección: ${error.message}`);
+  }
+  if (!lesson) {
+    throw new NotFoundError(`Lección no encontrada (id=${targetId})`);
   }
   
   console.log(`[Content Enrich] Procesando: ${lesson.titulo}`);
@@ -553,10 +583,12 @@ async function processJob(job: ProcessingJob): Promise<void> {
     
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-    console.error(`[process-jobs] Error: ${errorMessage}`);
-    const newStatus = job.attempts + 1 >= job.max_attempts ? 'error' : 'pending';
-    await supabase.from('processing_jobs').update({ status: newStatus, error_message: errorMessage }).eq('id', job.id);
-    await logJobAttempt(job.id, job.attempts + 1, 'error', errorMessage);
+    const isNotFound = error instanceof NotFoundError || /no encontrada/i.test(errorMessage);
+    console.error(`[process-jobs] Error (${isNotFound ? 'NOT_FOUND' : 'RETRY'}): ${errorMessage}`);
+    // NotFound = fallo terminal (no reintentar). Otros = reintento hasta max_attempts.
+    const newStatus = isNotFound || job.attempts + 1 >= job.max_attempts ? 'error' : 'pending';
+    await supabase.from('processing_jobs').update({ status: newStatus, error_message: errorMessage, completed_at: isNotFound ? new Date().toISOString() : null }).eq('id', job.id);
+    await logJobAttempt(job.id, job.attempts + 1, 'error', errorMessage, { not_found: isNotFound });
   }
 }
 
@@ -578,6 +610,22 @@ serve(async (req) => {
 
     const { job_type, action } = await req.json().catch(() => ({}));
     
+    // 🔓 AUTO-LIBERACIÓN: jobs "processing" con started_at > 5 min → vuelven a pending (una vez).
+    // Evita que un job atascado (edge timeout, crash) tape la cola FIFO indefinidamente.
+    try {
+      const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+      const { data: stalled } = await supabase.from('processing_jobs')
+        .update({ status: 'pending', started_at: null, error_message: 'Auto-liberado: procesamiento atascado (>5min)' })
+        .eq('status', 'processing')
+        .lt('started_at', fiveMinAgo)
+        .select('id');
+      if (stalled && stalled.length > 0) {
+        console.log(`[process-jobs] Auto-liberados ${stalled.length} jobs atascados`);
+      }
+    } catch (e) {
+      console.warn('[process-jobs] Auto-liberación falló (no bloquea):', e);
+    }
+    
     if (action === 'reset-stalled') {
       const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
       const { data } = await supabase.from('processing_jobs')
@@ -587,6 +635,7 @@ serve(async (req) => {
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
     
+    // Busca próximo pendiente. Saltar jobs que ya excedieron max_attempts (por si quedaron en pending).
     let query = supabase.from('processing_jobs').select('*').eq('status', 'pending').order('created_at', { ascending: true }).limit(1);
     if (job_type) query = query.eq('job_type', job_type);
     
