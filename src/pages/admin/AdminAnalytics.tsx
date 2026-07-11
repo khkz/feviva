@@ -155,12 +155,14 @@ export const AdminAnalytics = () => {
               <CardTitle>Distribución de Contenido</CardTitle>
             </CardHeader>
             <CardContent>
-              {/* Filtramos ceros: una Pie con todas las slices en 0 renderiza vacía. */}
-              {contentStats.filter(s => s.value > 0).length === 0 ? (
+              {contentError ? (
+                <p className="text-sm text-destructive py-12 text-center">{contentError}</p>
+              ) : contentStats.filter(s => s.value > 0).length === 0 ? (
                 <p className="text-sm text-muted-foreground py-12 text-center">
                   Aún no hay contenido para graficar.
                 </p>
               ) : (
+
                 <div style={{ width: '100%', height: 320 }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
