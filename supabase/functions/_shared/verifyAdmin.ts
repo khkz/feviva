@@ -7,9 +7,6 @@ import { createClient } from "npm:@supabase/supabase-js@2";
  *   (b) an authenticated user whose `user_roles` row includes 'admin'.
  *
  * Any other caller (anon, or a normal logged-in user) gets 401/403.
- *
- * Returns { ok: true, userId | 'cron' } on success,
- * or { ok: false, response } with a ready-to-return Response.
  */
 export async function verifyAdmin(req: Request, corsHeaders: Record<string, string>) {
   const json = (status: number, error: string) =>
