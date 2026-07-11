@@ -244,10 +244,13 @@ async function generateAndUploadAudio(
       .from('teachings-audio')
       .getPublicUrl(filePath);
 
-    // Update lesson with audio URL
+    // Hash del texto limpio usado en el audio (detección de desincronización a futuro)
+    const contenidoHash = await sha256Hex(audioText);
+
+    // Update lesson with audio URL + hash
     const { error: updateError } = await supabase
       .from('library_lessons')
-      .update({ audio_url: urlData.publicUrl })
+      .update({ audio_url: urlData.publicUrl, contenido_enriquecido_hash: contenidoHash })
       .eq('id', id);
 
     if (updateError) {
