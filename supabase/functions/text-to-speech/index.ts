@@ -8,9 +8,33 @@ const corsHeaders = {
 
 const MAX_CHARS = 4000;
 
+// Normaliza HTML: convierte etiquetas de bloque en saltos/puntos, elimina el resto y decodifica entidades.
+function stripHtmlForTTS(input: string): string {
+  let s = input ?? '';
+  s = s.replace(/<(script|style)[\s\S]*?<\/\1>/gi, ' ');
+  s = s.replace(/<\s*br\s*\/?\s*>/gi, '\n');
+  s = s.replace(/<\/\s*(p|div|h[1-6]|section|article|header|footer|blockquote|tr)\s*>/gi, '.\n');
+  s = s.replace(/<\s*li[^>]*>/gi, '');
+  s = s.replace(/<\/\s*li\s*>/gi, '.\n');
+  s = s.replace(/<[^>]+>/g, ' ');
+  const entities: Record<string, string> = {
+    '&nbsp;': ' ', '&amp;': '&', '&quot;': '"', '&apos;': "'",
+    '&lt;': '<', '&gt;': '>', '&hellip;': '…', '&mdash;': '—',
+    '&ndash;': '–', '&laquo;': '«', '&raquo;': '»', '&iquest;': '¿',
+    '&iexcl;': '¡', '&aacute;': 'á', '&eacute;': 'é', '&iacute;': 'í',
+    '&oacute;': 'ó', '&uacute;': 'ú', '&ntilde;': 'ñ', '&Aacute;': 'Á',
+    '&Eacute;': 'É', '&Iacute;': 'Í', '&Oacute;': 'Ó', '&Uacute;': 'Ú',
+    '&Ntilde;': 'Ñ', '&uuml;': 'ü', '&Uuml;': 'Ü',
+  };
+  s = s.replace(/&[a-zA-Z]+;/g, (m) => entities[m] ?? ' ');
+  s = s.replace(/&#(\d+);/g, (_, n) => String.fromCharCode(parseInt(n, 10)));
+  s = s.replace(/&#x([0-9a-fA-F]+);/g, (_, n) => String.fromCharCode(parseInt(n, 16)));
+  return s;
+}
+
 // Limpia el texto para mejor pronunciación en español con pausas naturales
 function cleanTextForSpanishTTS(text: string): string {
-  let cleaned = text;
+  let cleaned = stripHtmlForTTS(text);
   
   // 1. Reemplazos para términos que causan problemas de pronunciación
   const replacements: Record<string, string> = {
