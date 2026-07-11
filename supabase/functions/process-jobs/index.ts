@@ -13,7 +13,7 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-const MAX_CHARS = 3800;
+const MAX_CHARS = 3500;
 
 interface ProcessingJob {
   id: string;
@@ -94,25 +94,41 @@ function cleanTextForSpanishTTS(text: string): string {
   return cleaned;
 }
 
-// Dividir texto en chunks respetando límites
+// Divide texto largo en trozos ≤ MAX_CHARS respetando límites naturales.
+// Prioridad: párrafo (\n\n) → oración (. ! ?) → línea (\n) → palabra (espacio).
+// Nunca corta a mitad de palabra ni deja un trozo > MAX_CHARS.
 function splitTextIntoChunks(text: string): string[] {
-  if (text.length <= MAX_CHARS) return [text];
-  
   const chunks: string[] = [];
-  const sentences = text.split(/(?<=[.!?])\s+/);
-  let currentChunk = '';
-  
-  for (const sentence of sentences) {
-    if ((currentChunk + ' ' + sentence).length > MAX_CHARS) {
-      if (currentChunk) chunks.push(currentChunk.trim());
-      currentChunk = sentence;
-    } else {
-      currentChunk = currentChunk ? currentChunk + ' ' + sentence : sentence;
+  let remaining = text.trim();
+
+  while (remaining.length > 0) {
+    if (remaining.length <= MAX_CHARS) { chunks.push(remaining); break; }
+    const searchArea = remaining.substring(0, MAX_CHARS);
+
+    let splitIndex = searchArea.lastIndexOf('\n\n');
+    if (splitIndex <= 0) {
+      const candidates = [
+        searchArea.lastIndexOf('. '), searchArea.lastIndexOf('? '), searchArea.lastIndexOf('! '),
+        searchArea.lastIndexOf('.\n'), searchArea.lastIndexOf('?\n'), searchArea.lastIndexOf('!\n'),
+      ];
+      splitIndex = Math.max(...candidates);
+      if (splitIndex > 0) splitIndex += 1;
     }
+    if (splitIndex <= 0) splitIndex = searchArea.lastIndexOf('\n');
+    if (splitIndex <= 0) splitIndex = searchArea.lastIndexOf(' ');
+    if (splitIndex <= 0) splitIndex = MAX_CHARS;
+
+    chunks.push(remaining.substring(0, splitIndex).trim());
+    remaining = remaining.substring(splitIndex).trim();
   }
-  
-  if (currentChunk) chunks.push(currentChunk.trim());
-  return chunks;
+  return chunks.filter(c => c.length > 0);
+}
+
+// SHA-256 hex del texto (para library_lessons.contenido_enriquecido_hash)
+async function sha256Hex(input: string): Promise<string> {
+  const buf = new TextEncoder().encode(input);
+  const h = await crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(h)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 // Generar TTS con modelo premium
@@ -163,32 +179,36 @@ async function generatePremiumTTS(text: string, voice: string, instructions: str
   return combined;
 }
 
-// Generar TTS estándar (modelo básico)
+// Generar TTS estándar (modelo básico) — usa el mismo splitter natural que premium.
+// Trocea por límites de párrafo/oración/palabra (nunca corta palabras) y concatena en un solo mp3.
 async function generateStandardTTS(text: string, voice: string): Promise<Uint8Array> {
-  const chunks: ArrayBuffer[] = [];
-  const chunkSize = 4000;
-  
-  for (let i = 0; i < text.length; i += chunkSize) {
-    const chunk = text.slice(i, i + chunkSize);
-    console.log(`[TTS] Chunk ${Math.floor(i / chunkSize) + 1}/${Math.ceil(text.length / chunkSize)}`);
-    
+  const cleanedText = cleanTextForSpanishTTS(text);
+  const chunks = splitTextIntoChunks(cleanedText);
+  const buffers: ArrayBuffer[] = [];
+
+  console.log(`[TTS Standard] ${chunks.length} chunks, voz ${voice}, total ${cleanedText.length} chars`);
+
+  for (let i = 0; i < chunks.length; i++) {
+    const chunk = chunks[i];
+    console.log(`[TTS Standard] Chunk ${i + 1}/${chunks.length} (${chunk.length} chars)`);
+
     const response = await fetch('https://api.openai.com/v1/audio/speech', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${OPENAI_API_KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ model: 'gpt-4o-mini-tts-2025-12-15', input: chunk, voice, response_format: 'mp3' }),
     });
-    
+
     if (!response.ok) throw new Error(`OpenAI TTS error: ${await response.text()}`);
-    chunks.push(await response.arrayBuffer());
+    buffers.push(await response.arrayBuffer());
+
+    // Pequeña pausa entre chunks para respetar rate limits
+    if (i < chunks.length - 1) await new Promise(r => setTimeout(r, 150));
   }
-  
-  const totalLength = chunks.reduce((acc, c) => acc + c.byteLength, 0);
+
+  const totalLength = buffers.reduce((acc, c) => acc + c.byteLength, 0);
   const combined = new Uint8Array(totalLength);
   let offset = 0;
-  for (const chunk of chunks) {
-    combined.set(new Uint8Array(chunk), offset);
-    offset += chunk.byteLength;
-  }
+  for (const buf of buffers) { combined.set(new Uint8Array(buf), offset); offset += buf.byteLength; }
   return combined;
 }
 
@@ -234,13 +254,18 @@ async function processLessonTTS(targetId: string): Promise<Record<string, unknow
     'library_lessons', 'contenido, contenido_enriquecido', targetId, 'Lección'
   );
   
-  const audio = await generateStandardTTS(lesson.contenido_enriquecido || lesson.contenido, 'onyx');
+  const rawSource = lesson.contenido_enriquecido || lesson.contenido;
+  const audio = await generateStandardTTS(rawSource, 'onyx');
   const filename = `lesson-${targetId}.mp3`;
   
   await supabase.storage.from('teachings-audio').upload(filename, audio, { contentType: 'audio/mpeg', upsert: true });
   const { data: urlData } = supabase.storage.from('teachings-audio').getPublicUrl(filename);
   
-  await supabase.from('library_lessons').update({ audio_url: urlData.publicUrl }).eq('id', targetId);
+  // Hash del texto limpio realmente narrado (mismo pipeline que generateStandardTTS)
+  const hash = await sha256Hex(cleanTextForSpanishTTS(rawSource));
+  await supabase.from('library_lessons')
+    .update({ audio_url: urlData.publicUrl, contenido_enriquecido_hash: hash })
+    .eq('id', targetId);
   return { audioUrl: urlData.publicUrl };
 }
 
@@ -278,7 +303,11 @@ async function processLessonTTSPremium(targetId: string, voice: string = 'sage')
   await supabase.storage.from('teachings-audio').upload(filename, audio, { contentType: 'audio/mpeg', upsert: true });
   const { data: urlData } = supabase.storage.from('teachings-audio').getPublicUrl(filename);
   
-  await supabase.from('library_lessons').update({ audio_url: urlData.publicUrl }).eq('id', targetId);
+  // Hash del texto limpio realmente narrado (mismo pipeline que generatePremiumTTS)
+  const hash = await sha256Hex(cleanTextForSpanishTTS(content));
+  await supabase.from('library_lessons')
+    .update({ audio_url: urlData.publicUrl, contenido_enriquecido_hash: hash })
+    .eq('id', targetId);
   
   return { audioUrl: urlData.publicUrl, voice, model: 'gpt-4o-mini-tts-2025-12-15', premium: true };
 }
