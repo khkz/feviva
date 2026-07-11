@@ -13,28 +13,43 @@ export const AdminAnalytics = () => {
   const [feedbackByType, setFeedbackByType] = useState<any[]>([]);
   const [userActivity, setUserActivity] = useState<any[]>([]);
   const [userGrowth, setUserGrowth] = useState<any[]>([]);
+  const [contentError, setContentError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        // Content stats
-        const [stories, novenas, lessons, oraciones, courses, movies] = await Promise.all([
-          supabase.from('sleep_stories').select('id', { count: 'exact' }),
-          supabase.from('novenas').select('id', { count: 'exact' }),
-          supabase.from('library_lessons').select('id', { count: 'exact' }),
-          supabase.from('oraciones').select('id', { count: 'exact' }),
-          supabase.from('courses').select('id', { count: 'exact' }),
-          supabase.from('movies').select('id', { count: 'exact' })
-        ]);
+        // Content stats — usamos head:true para traer SOLO el count exacto,
+        // así no pesa la fila entera y no depende de que el SELECT devuelva
+        // datos. Logueamos cada error individual para no fallar en silencio.
+        const tables = [
+          { key: 'sleep_stories', label: 'Historias' },
+          { key: 'novenas', label: 'Novenas' },
+          { key: 'library_lessons', label: 'Lecciones' },
+          { key: 'oraciones', label: 'Oraciones' },
+          { key: 'courses', label: 'Cursos' },
+          { key: 'movies', label: 'Películas' },
+          { key: 'calendar_saints', label: 'Santos' },
+        ] as const;
 
-        setContentStats([
-          { name: 'Historias', value: stories.count || 0 },
-          { name: 'Novenas', value: novenas.count || 0 },
-          { name: 'Lecciones', value: lessons.count || 0 },
-          { name: 'Oraciones', value: oraciones.count || 0 },
-          { name: 'Cursos', value: courses.count || 0 },
-          { name: 'Películas', value: movies.count || 0 }
-        ]);
+        const counts = await Promise.all(
+          tables.map(async (t) => {
+            const { count, error } = await supabase
+              .from(t.key as any)
+              .select('*', { count: 'exact', head: true });
+            if (error) {
+              console.error(`[analytics] count ${t.key} failed:`, error);
+              return { name: t.label, value: 0, error: error.message };
+            }
+            return { name: t.label, value: count ?? 0 };
+          }),
+        );
+
+        const withErrors = counts.filter((c) => (c as any).error);
+        if (withErrors.length && counts.every((c) => c.value === 0)) {
+          setContentError('No se pudo cargar el contenido (revisa permisos de RLS).');
+        }
+        setContentStats(counts.map(({ name, value }) => ({ name, value })));
+
 
         // Feedback by type
         const { data: feedback } = await supabase
