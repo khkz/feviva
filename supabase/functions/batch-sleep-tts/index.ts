@@ -284,7 +284,11 @@ serve(async (req) => {
   }
 
   try {
+    const auth = await verifyAdmin(req, corsHeaders);
+    if (!auth.ok) return auth.response;
+
     const { limit = 1, forceRegenerate = false, voice = 'shimmer' } = await req.json();
+    
     
     if (!OPENAI_API_KEY) {
       throw new Error("OPENAI_API_KEY is not configured");
