@@ -184,7 +184,7 @@ serve(async (req) => {
     const audioBuffers: ArrayBuffer[] = [];
 
     // Select model based on usePremium flag
-    const model = usePremium ? 'gpt-4o-mini-tts' : 'tts-1-hd';
+    const model = usePremium ? 'gpt-4o-mini-tts-2025-12-15' : 'gpt-4o-mini-tts-2025-12-15';
     const responseFormat = usePremium ? 'mp3' : 'opus';
 
     // Generate audio for each chunk

@@ -163,7 +163,7 @@ async function generateAndUploadAudio(
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini-tts',
+          model: 'gpt-4o-mini-tts-2025-12-15',
           input: chunk,
           voice: voice,
           instructions: lessonInstructions,
@@ -311,7 +311,7 @@ serve(async (req) => {
           remaining: 0,
           needsEnrichmentFirst,
           hasMore: false,
-          model: 'gpt-4o-mini-tts',
+          model: 'gpt-4o-mini-tts-2025-12-15',
           voice: 'sage',
           results: [] 
         }),
@@ -354,7 +354,7 @@ serve(async (req) => {
         errorCount, 
         remaining,
         hasMore: remaining > 0,
-        model: 'gpt-4o-mini-tts',
+        model: 'gpt-4o-mini-tts-2025-12-15',
         voice,
         results
       }),

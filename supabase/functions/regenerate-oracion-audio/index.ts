@@ -130,7 +130,7 @@ async function generateAudioForOracion(
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'tts-1-hd',
+          model: 'gpt-4o-mini-tts-2025-12-15',
           input: chunk,
           voice: voice,
           response_format: 'opus',
