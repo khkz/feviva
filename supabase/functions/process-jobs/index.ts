@@ -631,7 +631,8 @@ serve(async (req) => {
 
 
 
-    const { job_type, action } = await req.json().catch(() => ({}));
+    const { job_type, action, source } = await req.json().catch(() => ({}));
+    const isCronCall = source === 'pg_cron';
     
     // 🔓 AUTO-LIBERACIÓN: jobs "processing" con started_at > 5 min → vuelven a pending (una vez).
     // Evita que un job atascado (edge timeout, crash) tape la cola FIFO indefinidamente.
@@ -672,6 +673,30 @@ serve(async (req) => {
 
     const job = jobs[0] as ProcessingJob;
     await supabase.from('processing_jobs').update({ status: 'processing', started_at: new Date().toISOString() }).eq('id', job.id);
+
+    if (isCronCall) {
+      const pendingAfterClaim = Math.max((jobs.length || 1) - 1, 0);
+      const backgroundTask = (async () => {
+        try {
+          await processJob(job);
+        } catch (error) {
+          console.error('[process-jobs] Background error:', error);
+        }
+      })();
+
+      const edgeRuntime = (globalThis as unknown as { EdgeRuntime?: { waitUntil?: (promise: Promise<unknown>) => void } }).EdgeRuntime;
+      if (edgeRuntime?.waitUntil) {
+        edgeRuntime.waitUntil(backgroundTask);
+      }
+
+      return new Response(JSON.stringify({
+        message: `Encolado en background: ${job.target_title || job.job_type}`,
+        processed: 0,
+        claimed: 1,
+        remaining: pendingAfterClaim,
+      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
     await processJob(job);
 
     let countQuery = supabase.from('processing_jobs').select('*', { count: 'exact', head: true }).eq('status', 'pending');
