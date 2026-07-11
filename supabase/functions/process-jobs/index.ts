@@ -94,25 +94,41 @@ function cleanTextForSpanishTTS(text: string): string {
   return cleaned;
 }
 
-// Dividir texto en chunks respetando límites
+// Divide texto largo en trozos ≤ MAX_CHARS respetando límites naturales.
+// Prioridad: párrafo (\n\n) → oración (. ! ?) → línea (\n) → palabra (espacio).
+// Nunca corta a mitad de palabra ni deja un trozo > MAX_CHARS.
 function splitTextIntoChunks(text: string): string[] {
-  if (text.length <= MAX_CHARS) return [text];
-  
   const chunks: string[] = [];
-  const sentences = text.split(/(?<=[.!?])\s+/);
-  let currentChunk = '';
-  
-  for (const sentence of sentences) {
-    if ((currentChunk + ' ' + sentence).length > MAX_CHARS) {
-      if (currentChunk) chunks.push(currentChunk.trim());
-      currentChunk = sentence;
-    } else {
-      currentChunk = currentChunk ? currentChunk + ' ' + sentence : sentence;
+  let remaining = text.trim();
+
+  while (remaining.length > 0) {
+    if (remaining.length <= MAX_CHARS) { chunks.push(remaining); break; }
+    const searchArea = remaining.substring(0, MAX_CHARS);
+
+    let splitIndex = searchArea.lastIndexOf('\n\n');
+    if (splitIndex <= 0) {
+      const candidates = [
+        searchArea.lastIndexOf('. '), searchArea.lastIndexOf('? '), searchArea.lastIndexOf('! '),
+        searchArea.lastIndexOf('.\n'), searchArea.lastIndexOf('?\n'), searchArea.lastIndexOf('!\n'),
+      ];
+      splitIndex = Math.max(...candidates);
+      if (splitIndex > 0) splitIndex += 1;
     }
+    if (splitIndex <= 0) splitIndex = searchArea.lastIndexOf('\n');
+    if (splitIndex <= 0) splitIndex = searchArea.lastIndexOf(' ');
+    if (splitIndex <= 0) splitIndex = MAX_CHARS;
+
+    chunks.push(remaining.substring(0, splitIndex).trim());
+    remaining = remaining.substring(splitIndex).trim();
   }
-  
-  if (currentChunk) chunks.push(currentChunk.trim());
-  return chunks;
+  return chunks.filter(c => c.length > 0);
+}
+
+// SHA-256 hex del texto (para library_lessons.contenido_enriquecido_hash)
+async function sha256Hex(input: string): Promise<string> {
+  const buf = new TextEncoder().encode(input);
+  const h = await crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(h)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 // Generar TTS con modelo premium
