@@ -2823,6 +2823,7 @@ export type Database = {
         Args: { p_referral_code: string; p_referred_id: string }
         Returns: Json
       }
+      tick_process_jobs: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role:
