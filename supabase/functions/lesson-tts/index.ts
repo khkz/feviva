@@ -115,9 +115,12 @@ function cleanTextForSpanishTTS(text: string): string {
   return cleaned.trim();
 }
 
+// Divide texto largo en trozos ≤ MAX_CHARS respetando límites naturales.
+// Prioridad de corte: párrafo (\n\n) → oración (. ! ?) → línea (\n) → palabra (espacio).
+// Nunca corta a mitad de palabra ni deja un trozo > MAX_CHARS.
 function splitTextIntoChunks(text: string): string[] {
   const chunks: string[] = [];
-  let remaining = text;
+  let remaining = text.trim();
 
   while (remaining.length > 0) {
     if (remaining.length <= MAX_CHARS) {
@@ -125,31 +128,45 @@ function splitTextIntoChunks(text: string): string[] {
       break;
     }
 
-    let splitIndex = MAX_CHARS;
     const searchArea = remaining.substring(0, MAX_CHARS);
-    
-    const lastPeriod = searchArea.lastIndexOf('. ');
-    const lastQuestion = searchArea.lastIndexOf('? ');
-    const lastExclamation = searchArea.lastIndexOf('! ');
-    const lastNewline = searchArea.lastIndexOf('\n');
-    
-    splitIndex = Math.max(lastPeriod, lastQuestion, lastExclamation, lastNewline);
-    
+
+    // 1) Preferir corte por párrafo
+    let splitIndex = searchArea.lastIndexOf('\n\n');
+
+    // 2) Corte por oración (busca el último . ! ? seguido de espacio o fin de área)
+    if (splitIndex <= 0) {
+      const candidates = [
+        searchArea.lastIndexOf('. '),
+        searchArea.lastIndexOf('? '),
+        searchArea.lastIndexOf('! '),
+        searchArea.lastIndexOf('.\n'),
+        searchArea.lastIndexOf('?\n'),
+        searchArea.lastIndexOf('!\n'),
+      ];
+      splitIndex = Math.max(...candidates);
+      if (splitIndex > 0) splitIndex += 1; // incluir el signo
+    }
+
+    // 3) Corte por salto de línea simple
+    if (splitIndex <= 0) {
+      splitIndex = searchArea.lastIndexOf('\n');
+    }
+
+    // 4) Corte por palabra (último espacio) — nunca a mitad de palabra
     if (splitIndex <= 0) {
       splitIndex = searchArea.lastIndexOf(' ');
     }
-    
+
+    // 5) Último recurso: cortar exactamente en MAX_CHARS (caso patológico: no hay espacios)
     if (splitIndex <= 0) {
       splitIndex = MAX_CHARS;
-    } else {
-      splitIndex += 1;
     }
 
     chunks.push(remaining.substring(0, splitIndex).trim());
     remaining = remaining.substring(splitIndex).trim();
   }
 
-  return chunks;
+  return chunks.filter(c => c.length > 0);
 }
 
 function concatenateAudioBuffers(buffers: ArrayBuffer[]): Uint8Array {
