@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Church, BookOpen, Sparkles, Calendar, MapPin, ArrowLeft } from 'lucide-react';
+import { X, Church, BookOpen, Sparkles, Calendar, MapPin, ArrowLeft, ShieldAlert, CheckCircle2, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
