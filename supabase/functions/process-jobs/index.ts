@@ -583,10 +583,12 @@ async function processJob(job: ProcessingJob): Promise<void> {
     
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-    console.error(`[process-jobs] Error: ${errorMessage}`);
-    const newStatus = job.attempts + 1 >= job.max_attempts ? 'error' : 'pending';
-    await supabase.from('processing_jobs').update({ status: newStatus, error_message: errorMessage }).eq('id', job.id);
-    await logJobAttempt(job.id, job.attempts + 1, 'error', errorMessage);
+    const isNotFound = error instanceof NotFoundError || /no encontrada/i.test(errorMessage);
+    console.error(`[process-jobs] Error (${isNotFound ? 'NOT_FOUND' : 'RETRY'}): ${errorMessage}`);
+    // NotFound = fallo terminal (no reintentar). Otros = reintento hasta max_attempts.
+    const newStatus = isNotFound || job.attempts + 1 >= job.max_attempts ? 'error' : 'pending';
+    await supabase.from('processing_jobs').update({ status: newStatus, error_message: errorMessage, completed_at: isNotFound ? new Date().toISOString() : null }).eq('id', job.id);
+    await logJobAttempt(job.id, job.attempts + 1, 'error', errorMessage, { not_found: isNotFound });
   }
 }
 
