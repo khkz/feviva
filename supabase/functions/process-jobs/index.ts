@@ -179,32 +179,36 @@ async function generatePremiumTTS(text: string, voice: string, instructions: str
   return combined;
 }
 
-// Generar TTS estándar (modelo básico)
+// Generar TTS estándar (modelo básico) — usa el mismo splitter natural que premium.
+// Trocea por límites de párrafo/oración/palabra (nunca corta palabras) y concatena en un solo mp3.
 async function generateStandardTTS(text: string, voice: string): Promise<Uint8Array> {
-  const chunks: ArrayBuffer[] = [];
-  const chunkSize = 4000;
-  
-  for (let i = 0; i < text.length; i += chunkSize) {
-    const chunk = text.slice(i, i + chunkSize);
-    console.log(`[TTS] Chunk ${Math.floor(i / chunkSize) + 1}/${Math.ceil(text.length / chunkSize)}`);
-    
+  const cleanedText = cleanTextForSpanishTTS(text);
+  const chunks = splitTextIntoChunks(cleanedText);
+  const buffers: ArrayBuffer[] = [];
+
+  console.log(`[TTS Standard] ${chunks.length} chunks, voz ${voice}, total ${cleanedText.length} chars`);
+
+  for (let i = 0; i < chunks.length; i++) {
+    const chunk = chunks[i];
+    console.log(`[TTS Standard] Chunk ${i + 1}/${chunks.length} (${chunk.length} chars)`);
+
     const response = await fetch('https://api.openai.com/v1/audio/speech', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${OPENAI_API_KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ model: 'gpt-4o-mini-tts-2025-12-15', input: chunk, voice, response_format: 'mp3' }),
     });
-    
+
     if (!response.ok) throw new Error(`OpenAI TTS error: ${await response.text()}`);
-    chunks.push(await response.arrayBuffer());
+    buffers.push(await response.arrayBuffer());
+
+    // Pequeña pausa entre chunks para respetar rate limits
+    if (i < chunks.length - 1) await new Promise(r => setTimeout(r, 150));
   }
-  
-  const totalLength = chunks.reduce((acc, c) => acc + c.byteLength, 0);
+
+  const totalLength = buffers.reduce((acc, c) => acc + c.byteLength, 0);
   const combined = new Uint8Array(totalLength);
   let offset = 0;
-  for (const chunk of chunks) {
-    combined.set(new Uint8Array(chunk), offset);
-    offset += chunk.byteLength;
-  }
+  for (const buf of buffers) { combined.set(new Uint8Array(buf), offset); offset += buf.byteLength; }
   return combined;
 }
 
