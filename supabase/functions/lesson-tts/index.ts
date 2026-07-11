@@ -269,10 +269,17 @@ serve(async (req) => {
       .from('teachings-audio')
       .getPublicUrl(filePath);
 
-    // Update lesson with audio URL
+    // Hash del texto limpio usado en el audio (para detectar desincronización a futuro)
+    const contenidoHash = await (async () => {
+      const buf = new TextEncoder().encode(cleanedText);
+      const h = await crypto.subtle.digest('SHA-256', buf);
+      return Array.from(new Uint8Array(h)).map(b => b.toString(16).padStart(2, '0')).join('');
+    })();
+
+    // Update lesson with audio URL + hash
     const { error: updateError } = await supabase
       .from('library_lessons')
-      .update({ audio_url: urlData.publicUrl })
+      .update({ audio_url: urlData.publicUrl, contenido_enriquecido_hash: contenidoHash })
       .eq('id', lessonId);
 
     if (updateError) {
