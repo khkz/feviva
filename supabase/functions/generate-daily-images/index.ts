@@ -96,6 +96,9 @@ serve(async (req) => {
   }
 
   try {
+    const auth = await verifyAdmin(req, corsHeaders);
+    if (!auth.ok) return auth.response;
+
     // Parse request body for force parameter
     let force = false;
     try {
