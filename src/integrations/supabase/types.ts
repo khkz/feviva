@@ -2796,6 +2796,10 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      get_user_id_by_referral_code: {
+        Args: { p_code: string }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
