@@ -6,7 +6,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const MAX_CHARS = 4000;
+const MAX_CHARS = 3500;
 
 // Normaliza HTML: convierte etiquetas de bloque en saltos/puntos, elimina el resto y decodifica entidades.
 function stripHtmlForTTS(input: string): string {
