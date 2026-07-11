@@ -303,7 +303,11 @@ async function processLessonTTSPremium(targetId: string, voice: string = 'sage')
   await supabase.storage.from('teachings-audio').upload(filename, audio, { contentType: 'audio/mpeg', upsert: true });
   const { data: urlData } = supabase.storage.from('teachings-audio').getPublicUrl(filename);
   
-  await supabase.from('library_lessons').update({ audio_url: urlData.publicUrl }).eq('id', targetId);
+  // Hash del texto limpio realmente narrado (mismo pipeline que generatePremiumTTS)
+  const hash = await sha256Hex(cleanTextForSpanishTTS(content));
+  await supabase.from('library_lessons')
+    .update({ audio_url: urlData.publicUrl, contenido_enriquecido_hash: hash })
+    .eq('id', targetId);
   
   return { audioUrl: urlData.publicUrl, voice, model: 'gpt-4o-mini-tts-2025-12-15', premium: true };
 }
