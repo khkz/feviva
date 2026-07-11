@@ -133,8 +133,11 @@ serve(async (req) => {
       JSON.stringify({
         message: 'Batch generation complete',
         total: saints.length,
+        // Exponer varios alias para compatibilidad con el frontend.
         success: successCount,
+        successCount,
         failed: failCount,
+        summary: { total: saints.length, success: successCount, failed: failCount },
         results,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
