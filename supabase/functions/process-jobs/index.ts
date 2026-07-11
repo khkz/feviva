@@ -610,6 +610,22 @@ serve(async (req) => {
 
     const { job_type, action } = await req.json().catch(() => ({}));
     
+    // 🔓 AUTO-LIBERACIÓN: jobs "processing" con started_at > 5 min → vuelven a pending (una vez).
+    // Evita que un job atascado (edge timeout, crash) tape la cola FIFO indefinidamente.
+    try {
+      const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+      const { data: stalled } = await supabase.from('processing_jobs')
+        .update({ status: 'pending', started_at: null, error_message: 'Auto-liberado: procesamiento atascado (>5min)' })
+        .eq('status', 'processing')
+        .lt('started_at', fiveMinAgo)
+        .select('id');
+      if (stalled && stalled.length > 0) {
+        console.log(`[process-jobs] Auto-liberados ${stalled.length} jobs atascados`);
+      }
+    } catch (e) {
+      console.warn('[process-jobs] Auto-liberación falló (no bloquea):', e);
+    }
+    
     if (action === 'reset-stalled') {
       const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
       const { data } = await supabase.from('processing_jobs')
@@ -619,6 +635,7 @@ serve(async (req) => {
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
     
+    // Busca próximo pendiente. Saltar jobs que ya excedieron max_attempts (por si quedaron en pending).
     let query = supabase.from('processing_jobs').select('*').eq('status', 'pending').order('created_at', { ascending: true }).limit(1);
     if (job_type) query = query.eq('job_type', job_type);
     
