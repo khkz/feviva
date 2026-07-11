@@ -631,16 +631,18 @@ serve(async (req) => {
 
 
 
-    const { job_type, action } = await req.json().catch(() => ({}));
+    const { job_type, action, source } = await req.json().catch(() => ({}));
+    const isCronCall = source === 'pg_cron';
     
-    // 🔓 AUTO-LIBERACIÓN: jobs "processing" con started_at > 5 min → vuelven a pending (una vez).
+    // 🔓 AUTO-LIBERACIÓN: jobs "processing" con started_at > 30 min → vuelven a pending (una vez).
+    // Los audios largos pueden superar varios minutos; no liberar antes o se duplican.
     // Evita que un job atascado (edge timeout, crash) tape la cola FIFO indefinidamente.
     try {
-      const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+      const thirtyMinAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString();
       const { data: stalled } = await supabase.from('processing_jobs')
-        .update({ status: 'pending', started_at: null, error_message: 'Auto-liberado: procesamiento atascado (>5min)' })
+        .update({ status: 'pending', started_at: null, error_message: 'Auto-liberado: procesamiento atascado (>30min)' })
         .eq('status', 'processing')
-        .lt('started_at', fiveMinAgo)
+        .lt('started_at', thirtyMinAgo)
         .select('id');
       if (stalled && stalled.length > 0) {
         console.log(`[process-jobs] Auto-liberados ${stalled.length} jobs atascados`);
@@ -672,6 +674,30 @@ serve(async (req) => {
 
     const job = jobs[0] as ProcessingJob;
     await supabase.from('processing_jobs').update({ status: 'processing', started_at: new Date().toISOString() }).eq('id', job.id);
+
+    if (isCronCall) {
+      const pendingAfterClaim = Math.max((jobs.length || 1) - 1, 0);
+      const backgroundTask = (async () => {
+        try {
+          await processJob(job);
+        } catch (error) {
+          console.error('[process-jobs] Background error:', error);
+        }
+      })();
+
+      const edgeRuntime = (globalThis as unknown as { EdgeRuntime?: { waitUntil?: (promise: Promise<unknown>) => void } }).EdgeRuntime;
+      if (edgeRuntime?.waitUntil) {
+        edgeRuntime.waitUntil(backgroundTask);
+      }
+
+      return new Response(JSON.stringify({
+        message: `Encolado en background: ${job.target_title || job.job_type}`,
+        processed: 0,
+        claimed: 1,
+        remaining: pendingAfterClaim,
+      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
     await processJob(job);
 
     let countQuery = supabase.from('processing_jobs').select('*', { count: 'exact', head: true }).eq('status', 'pending');
