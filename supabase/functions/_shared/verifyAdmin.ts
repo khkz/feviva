@@ -18,7 +18,8 @@ export async function verifyAdmin(req: Request, corsHeaders: Record<string, stri
   // (a) Shared secret path — used by pg_cron and internal function-to-function calls.
   const providedKey = req.headers.get("X-Admin-Api-Key");
   const ADMIN_KEY = Deno.env.get("ADMIN_API_KEY");
-  if (providedKey && ADMIN_KEY && providedKey === ADMIN_KEY) {
+  const CRON_KEY = Deno.env.get("CRON_ADMIN_KEY");
+  if (providedKey && ((ADMIN_KEY && providedKey === ADMIN_KEY) || (CRON_KEY && providedKey === CRON_KEY))) {
     return { ok: true as const, userId: "cron" as const };
   }
 
