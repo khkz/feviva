@@ -1,10 +1,11 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Church, BookOpen, Sparkles, Calendar, MapPin, ArrowLeft, ShieldAlert, CheckCircle2, ExternalLink } from 'lucide-react';
+import { Church, BookOpen, Sparkles, Calendar, MapPin, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { CalendarSaint } from '@/hooks/useSantos';
 import { useNavigate } from 'react-router-dom';
+import { InspiredStoryBadge, VerifiableDataBlock } from './SaintCredibilityBlocks';
 
 // Country code to name mapping
 const countryNames: Record<string, string> = {
