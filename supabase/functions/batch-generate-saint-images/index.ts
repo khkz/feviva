@@ -51,7 +51,7 @@ serve(async (req) => {
       query = query.eq('country_code', countryCode);
     }
 
-    const requestedLimit = Math.min(Math.max(Number(limit) || 25, 1), 50);
+    const requestedLimit = Math.min(Math.max(Number(limit) || 8, 1), 25);
     query = query.limit(requestedLimit);
 
     const { data: saints, error: fetchError } = await query;

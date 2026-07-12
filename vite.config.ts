@@ -17,6 +17,7 @@ export default defineConfig(({ mode }) => ({
       registerType: "autoUpdate",
       injectRegister: null,
       includeAssets: ["favicon.ico", "logo-elrugido.png", "pwa-192x192.png", "pwa-512x512.png", "apple-touch-icon.png", "robots.txt"],
+      devOptions: { enabled: false },
       manifest: {
         name: "ElRugido - Fe Católica",
         short_name: "ElRugido",
@@ -82,10 +83,11 @@ export default defineConfig(({ mode }) => ({
           },
           {
             urlPattern: /^https:\/\/duggdnqpemwojkojfyei\.supabase\.co\/rest\/v1\/calendar_saints/,
-            handler: "StaleWhileRevalidate",
+            handler: "NetworkFirst",
             options: {
               cacheName: "saints-cache",
-              expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 },
+              networkTimeoutSeconds: 4,
+              expiration: { maxEntries: 50, maxAgeSeconds: 60 * 30 },
             },
           },
           {
