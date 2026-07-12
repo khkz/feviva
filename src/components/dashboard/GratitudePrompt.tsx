@@ -236,7 +236,7 @@ export function GratitudePrompt() {
             {entries.length > 0 && (
               <motion.button
                 onClick={() => setShowHistory(true)}
-                className="w-full mt-2 flex items-center justify-center gap-2 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                className="w-full mt-2 flex items-center justify-center gap-2 py-3 min-h-11 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-lg"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
