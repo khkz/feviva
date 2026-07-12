@@ -126,7 +126,7 @@ export function FeaturedContent({ hideTitle = false }: FeaturedContentProps) {
           <h2 className="font-heading text-xl font-bold text-foreground">
             Para Ti
           </h2>
-          <button className="text-sm text-primary font-medium hover:text-primary-hover transition-colors">
+          <button className="inline-flex items-center px-3 py-2 min-h-11 rounded-lg text-sm text-primary font-medium hover:text-primary-hover hover:bg-primary/5 transition-colors">
             Ver todo
           </button>
         </div>

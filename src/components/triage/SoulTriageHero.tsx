@@ -113,7 +113,7 @@ export function SoulTriageHero() {
                   onClick={() =>
                     setSelectedState(isSelected ? null : option.id)
                   }
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition-all duration-200 ${
+                  className={`flex items-center gap-2 px-4 py-3 min-h-11 rounded-xl border text-sm font-medium transition-all duration-200 ${
                     isSelected
                       ? `${option.bgColor} ${option.color} ring-1 ring-current/30 scale-105`
                       : `${option.bgColor} ${option.color}`
