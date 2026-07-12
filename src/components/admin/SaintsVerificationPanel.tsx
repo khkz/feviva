@@ -7,7 +7,32 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
-import { Loader2, ShieldCheck, AlertTriangle, HelpCircle, ExternalLink, RefreshCw, Play } from "lucide-react";
+import { Loader2, ShieldCheck, AlertTriangle, HelpCircle, ExternalLink, RefreshCw, Play, Wrench } from "lucide-react";
+
+// Mismos tokens que el edge function backfill-saint-sources para detectar fuentes falsas.
+const SUSPICIOUS_TOKENS = [
+  "santuario","catedral","procatedral","basilica","iglesia","parroquia",
+  "capilla","ermita","convento","monasterio","abadia","colegio",
+  "universidad","hospital","museo","estatua","puente","calle","plaza",
+  "isla","islas","municipio","canton","distrito",
+  "desambiguacion","club","futbol","pelicula",
+];
+const SUSPICIOUS_PREFIXES = ["anexo:"];
+function normalize(s: string) {
+  return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+function urlIsSuspicious(url: string | null): boolean {
+  if (!url) return false;
+  try {
+    const path = decodeURIComponent(new URL(url).pathname.replace(/^\/wiki\//, "")).replace(/_/g, " ");
+    const t = normalize(path);
+    if (SUSPICIOUS_PREFIXES.some((p) => t.startsWith(p))) return true;
+    const words = t.split(/[^a-z0-9]+/).filter(Boolean);
+    return words.some((w) => SUSPICIOUS_TOKENS.includes(w));
+  } catch {
+    return false;
+  }
+}
 
 interface VerifRow {
   id: string;
