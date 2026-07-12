@@ -1,4 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import { 
   Home, 
@@ -63,8 +65,20 @@ export function DesktopSidebar({ userName, userLevel, userStreak }: DesktopSideb
   const { displayName, isLoading: profileLoading } = useUserProfile();
   const effectiveStreak = stats?.racha_actual_dias ?? userStreak ?? 0;
   const effectiveLevel = stats?.nivel ?? userLevel ?? 1;
-  // Fuente única: siempre preferir el perfil real; nunca "Peregrino" como fallback.
   const effectiveName = displayName ?? (userName && userName.trim() && userName !== "Peregrino" && userName !== "Usuario" ? userName : null);
+
+  // Ocultar "Comunidad" mientras no haya posts publicados (evita sensación de app rota).
+  const [showCommunity, setShowCommunity] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    supabase.from("posts").select("*", { count: "exact", head: true }).then(({ count }) => {
+      if (alive) setShowCommunity((count ?? 0) > 0);
+    });
+    return () => { alive = false; };
+  }, []);
+  const visibleSecondary = secondaryNavItems.filter(
+    (i) => i.path !== "/community" || showCommunity
+  );
 
   return (
     <motion.aside
@@ -137,7 +151,7 @@ export function DesktopSidebar({ userName, userLevel, userStreak }: DesktopSideb
             Explorar
           </p>
           <div className="space-y-1">
-            {secondaryNavItems.map((item) => {
+            {visibleSecondary.map((item) => {
               const isActive = location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
               return (
                 <Link
