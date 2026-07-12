@@ -506,7 +506,7 @@ export default function SantoPage() {
                     <HandHeart className="h-6 w-6 text-primary" />
                     Oración a {saint.name}
                   </h2>
-                  <p className="text-foreground leading-relaxed whitespace-pre-line mb-6 italic">
+                  <p className="saint-story-body text-foreground whitespace-pre-line mb-6 italic">
                     {prayer.texto}
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3">
