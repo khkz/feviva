@@ -98,6 +98,26 @@ async function fetchEwtnPrayer(name: string): Promise<{ texto: string; url: stri
 }
 
 async function wikipediaUrl(name: string): Promise<string | null> {
+  const normalize = (value: string) => value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\b(san|santa|santo|santos|santas|beato|beata|beatos|beatas|de|del|la|las|el|los|y|en|of|the|saint|st)\b/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const isRelevantTitle = (title: string) => {
+    const sourceTokens = new Set(normalize(name).split(" ").filter((t) => t.length >= 4));
+    const titleTokens = new Set(normalize(title).split(" ").filter((t) => t.length >= 4));
+    if (sourceTokens.size === 0 || titleTokens.size === 0) return false;
+    let matches = 0;
+    sourceTokens.forEach((token) => {
+      if (titleTokens.has(token)) matches++;
+    });
+    return matches >= Math.min(2, sourceTokens.size);
+  };
+
   const clean = (value: string) => value
     .trim()
     .replace(/^(San|Santa|Santo|Beato|Beata|Santos|Santas|Beatos|Beatas)\s+/i, "")
@@ -139,7 +159,7 @@ async function wikipediaUrl(name: string): Promise<string | null> {
       const r = await fetch(searchApi, { headers: { "User-Agent": "ElRugidoBot/1.0" } });
       if (r.ok) {
         const j = await r.json();
-        const firstTitle = j?.query?.search?.[0]?.title;
+        const firstTitle = (j?.query?.search || []).map((item: { title?: string }) => item.title).find((title?: string) => title && isRelevantTitle(title));
         if (firstTitle) {
           const summary = `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(firstTitle.replace(/\s+/g, "_"))}`;
           const sr = await fetch(summary, { headers: { "User-Agent": "ElRugidoBot/1.0" } });
@@ -277,7 +297,8 @@ async function runBatch(batchSize: number, autoContinue: boolean): Promise<{
     .is("prayer_id", null);
   const remaining = count || 0;
 
-  // Auto-continuar en background si aún quedan
+  // Auto-continuar solo en llamadas síncronas/manuales; el modo background
+  // usa runUntilDone() para evitar solapes y duplicados por concurrencia.
   if (autoContinue && remaining > 0) {
     const url = `${SUPABASE_URL}/functions/v1/bulk-import-saint-prayers`;
     const nextCall = fetch(url, {
@@ -291,6 +312,30 @@ async function runBatch(batchSize: number, autoContinue: boolean): Promise<{
   }
 
   return { processed: (saints || []).length, success, failed, remaining, results };
+}
+
+async function runUntilDone(batchSize: number): Promise<{
+  processed: number;
+  success: number;
+  failed: number;
+  remaining: number;
+}> {
+  let processed = 0;
+  let success = 0;
+  let failed = 0;
+  let remaining = 0;
+
+  for (let i = 0; i < 20; i++) {
+    const summary = await runBatch(batchSize, false);
+    processed += summary.processed;
+    success += summary.success;
+    failed += summary.failed;
+    remaining = summary.remaining;
+    console.log("bulk-import-saint-prayers batch", JSON.stringify(summary));
+    if (summary.processed === 0 || remaining === 0) break;
+  }
+
+  return { processed, success, failed, remaining };
 }
 
 serve(async (req) => {
@@ -310,7 +355,7 @@ serve(async (req) => {
         .select("*", { count: "exact", head: true })
         .is("prayer_id", null);
 
-      const job = runBatch(batchSize, autoContinue).then((summary) => {
+      const job = runUntilDone(batchSize).then((summary) => {
         console.log("bulk-import-saint-prayers completed", JSON.stringify(summary));
       }).catch((error) => console.error("bulk-import-saint-prayers background error", error));
 
