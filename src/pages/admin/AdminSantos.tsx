@@ -555,6 +555,20 @@ export default function AdminSantos() {
         </Button>
       </div>
 
+      <Tabs defaultValue="gestion" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="gestion">Gestión</TabsTrigger>
+          <TabsTrigger value="verificacion" className="gap-1">
+            <ShieldCheck className="h-4 w-4" /> Verificación
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="verificacion">
+          <SaintsVerificationPanel />
+        </TabsContent>
+
+        <TabsContent value="gestion" className="space-y-6">
+
       {/* Stats Cards - Content Status */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card>
