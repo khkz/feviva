@@ -86,14 +86,7 @@ interface BatchProgress {
 
 const ITEMS_PER_PAGE = 20;
 
-const categoryLabels: Record<string, string> = {
-  feast: 'Fiesta',
-  memorial: 'Memorial',
-  optional_memorial: 'Memoria Opcional',
-  patron_country: 'Patrono Nacional',
-  solemnity: 'Solemnidad',
-  universal_helper: 'Auxiliador Universal',
-};
+import { SAINT_CATEGORY_LABELS as categoryLabels } from '@/lib/saintCategories';
 
 const countryFlags: Record<string, string> = {
   AR: '🇦🇷', BO: '🇧🇴', BR: '🇧🇷', CL: '🇨🇱', CO: '🇨🇴',
