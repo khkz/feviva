@@ -54,6 +54,8 @@ export default function SaintsVerificationPanel() {
   const done = counts.total - counts.sin;
   const pct = counts.total ? Math.round((done / counts.total) * 100) : 0;
 
+  const needsBackfill = rows.filter(r => !r.fuente_url).length;
+
   const runBatch = useMutation({
     mutationFn: async () => {
       const { data, error } = await supabase.functions.invoke("verify-saints-batch", {
@@ -87,6 +89,23 @@ export default function SaintsVerificationPanel() {
     },
     onSuccess: (r) => toast.success(`Terminado. Verificados ${r.processed}. Restantes: ${r.remaining}.`),
     onError: (e: Error) => toast.error("Loop error: " + e.message),
+  });
+
+  const runBackfillSources = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke("backfill-saint-sources", {
+        body: { batchSize: 20, background: true },
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      toast.success(
+        `Backfill lanzado en background. Faltan ${data?.beforeRemaining ?? "?"} santos por contrastar con Wikipedia.`
+      );
+      qc.invalidateQueries({ queryKey: ["saints-verification"] });
+    },
+    onError: (e: Error) => toast.error("Error backfill: " + e.message),
   });
 
   const discrepancias = rows.filter(r => r.estado_verificacion === "discrepancia");
@@ -148,6 +167,16 @@ export default function SaintsVerificationPanel() {
             <Button variant="outline" onClick={() => refetch()} disabled={isLoading} className="gap-2">
               <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
               Refrescar
+            </Button>
+            <Button
+              variant="default"
+              onClick={() => runBackfillSources.mutate()}
+              disabled={runBackfillSources.isPending || needsBackfill === 0}
+              className="gap-2 bg-amber-600 hover:bg-amber-700"
+              title="Consulta Wikipedia ES por cada santo, guarda fuente_url y contrasta la fecha de fiesta. No usa IA. No modifica feast_day/feast_month/tags."
+            >
+              {runBackfillSources.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <ExternalLink className="h-4 w-4" />}
+              Rellenar fuentes y contrastar ({needsBackfill})
             </Button>
           </div>
         </CardContent>

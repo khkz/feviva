@@ -18,6 +18,7 @@ export interface CalendarSaint {
   estado_verificacion?: string | null;
   fuente_descripcion?: string | null;
   description_source?: string | null;
+  fuente_url?: string | null;
 }
 
 interface UseSantosOptions {
