@@ -7,7 +7,32 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
-import { Loader2, ShieldCheck, AlertTriangle, HelpCircle, ExternalLink, RefreshCw, Play } from "lucide-react";
+import { Loader2, ShieldCheck, AlertTriangle, HelpCircle, ExternalLink, RefreshCw, Play, Wrench } from "lucide-react";
+
+// Mismos tokens que el edge function backfill-saint-sources para detectar fuentes falsas.
+const SUSPICIOUS_TOKENS = [
+  "santuario","catedral","procatedral","basilica","iglesia","parroquia",
+  "capilla","ermita","convento","monasterio","abadia","colegio",
+  "universidad","hospital","museo","estatua","puente","calle","plaza",
+  "isla","islas","municipio","canton","distrito",
+  "desambiguacion","club","futbol","pelicula",
+];
+const SUSPICIOUS_PREFIXES = ["anexo:"];
+function normalize(s: string) {
+  return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+function urlIsSuspicious(url: string | null): boolean {
+  if (!url) return false;
+  try {
+    const path = decodeURIComponent(new URL(url).pathname.replace(/^\/wiki\//, "")).replace(/_/g, " ");
+    const t = normalize(path);
+    if (SUSPICIOUS_PREFIXES.some((p) => t.startsWith(p))) return true;
+    const words = t.split(/[^a-z0-9]+/).filter(Boolean);
+    return words.some((w) => SUSPICIOUS_TOKENS.includes(w));
+  } catch {
+    return false;
+  }
+}
 
 interface VerifRow {
   id: string;
@@ -55,6 +80,12 @@ export default function SaintsVerificationPanel() {
   const pct = counts.total ? Math.round((done / counts.total) * 100) : 0;
 
   const needsBackfill = rows.filter(r => !r.fuente_url).length;
+  const suspiciousRows = rows.filter(r =>
+    r.fuente_url &&
+    r.estado_verificacion !== "discrepancia_corregida" &&
+    urlIsSuspicious(r.fuente_url)
+  );
+  const suspiciousCount = suspiciousRows.length;
 
   const runBatch = useMutation({
     mutationFn: async () => {
@@ -106,6 +137,23 @@ export default function SaintsVerificationPanel() {
       qc.invalidateQueries({ queryKey: ["saints-verification"] });
     },
     onError: (e: Error) => toast.error("Error backfill: " + e.message),
+  });
+
+  const runRepairSuspicious = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke("backfill-saint-sources", {
+        body: { batchSize: 20, background: true, mode: "repair" },
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      toast.success(
+        `Reparación lanzada en background. ${data?.beforeRemaining ?? "?"} fuentes dudosas a re-resolver.`
+      );
+      qc.invalidateQueries({ queryKey: ["saints-verification"] });
+    },
+    onError: (e: Error) => toast.error("Error reparación: " + e.message),
   });
 
   const discrepancias = rows.filter(r => r.estado_verificacion === "discrepancia");
@@ -177,6 +225,16 @@ export default function SaintsVerificationPanel() {
             >
               {runBackfillSources.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <ExternalLink className="h-4 w-4" />}
               Rellenar fuentes y contrastar ({needsBackfill})
+            </Button>
+            <Button
+              variant="default"
+              onClick={() => runRepairSuspicious.mutate()}
+              disabled={runRepairSuspicious.isPending || suspiciousCount === 0}
+              className="gap-2 bg-red-600 hover:bg-red-700"
+              title="Re-resuelve santos cuyo fuente_url apunta a un edificio, institución o lugar en vez de la persona. Los limpia y vuelve a buscar con la estrategia estricta."
+            >
+              {runRepairSuspicious.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wrench className="h-4 w-4" />}
+              Reparar fuentes dudosas ({suspiciousCount})
             </Button>
           </div>
         </CardContent>
