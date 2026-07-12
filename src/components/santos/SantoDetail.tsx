@@ -6,6 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { CalendarSaint } from '@/hooks/useSantos';
 import { useNavigate } from 'react-router-dom';
 import { InspiredStoryBadge, VerifiableDataBlock } from './SaintCredibilityBlocks';
+import { formatSaintTag } from '@/lib/saintTags';
 
 // Country code to name mapping
 const countryNames: Record<string, string> = {
