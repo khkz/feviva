@@ -17,6 +17,7 @@ const Planes = () => {
   const [billing, setBilling] = useState<Billing>("anual");
   const [loadingPlan, setLoadingPlan] = useState<PlanKey | null>(null);
   const navigate = useNavigate();
+  const isAuthed = useIsAuthed();
 
   const handleCheckout = async (plan: PlanKey) => {
     setLoadingPlan(plan);
