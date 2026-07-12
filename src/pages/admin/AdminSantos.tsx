@@ -307,29 +307,52 @@ export default function AdminSantos() {
     },
   });
 
-  // Batch generate images
+  // Batch generate images (fuerza refetch para que el contador se actualice)
   const batchImageMutation = useMutation({
     mutationFn: async () => {
       const { data, error } = await supabase.functions.invoke('batch-generate-saint-images', {
-        body: { 
+        body: {
           onlyPatrons: batchCategory === 'patron_country',
-          limit: batchLimit 
+          limit: batchLimit
         },
       });
-
       if (error) throw error;
       return data;
     },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['admin-calendar-saints'] });
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({ queryKey: ['admin-calendar-saints'] });
+      await refetch(); // fuerza refetch inmediato — fix del contador "8 faltan" persistente
       const ok = data?.successCount ?? data?.success ?? 0;
       const failed = data?.failed ?? 0;
-      toast.success(`Generadas ${ok} imágenes${failed ? ` (${failed} fallidas)` : ''}`);
+      toast.success(`Generadas ${ok} imágenes${failed ? ` (${failed} fallidas)` : ''}. Recuento actualizado.`);
     },
     onError: (error) => {
       toast.error('Error en batch: ' + error.message);
     },
   });
+
+  // Import masivo de oraciones (EWTN + Wikipedia, reanudable, background)
+  const bulkPrayersMutation = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke('bulk-import-saint-prayers', {
+        body: { batchSize: 25, autoContinue: true },
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: async (data) => {
+      await refetch();
+      toast.success(
+        `Lote inicial: ${data?.success || 0} oraciones creadas, ${data?.failed || 0} fallidas. ` +
+        `Quedan ${data?.remaining || 0}. Se sigue procesando en segundo plano — actualiza en 1-2 min.`,
+        { duration: 8000 }
+      );
+    },
+    onError: (error) => {
+      toast.error('Error importando oraciones: ' + error.message);
+    },
+  });
+
 
   // Import traditional prayers mutation
   const importTraditionalPrayersMutation = useMutation({
