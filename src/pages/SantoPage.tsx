@@ -480,7 +480,6 @@ export default function SantoPage() {
                         {saint.description}
                       </p>
                     </div>
-                    <VerifiableDataBlock saint={saint} />
                   </div>
                 )}
               </motion.div>
