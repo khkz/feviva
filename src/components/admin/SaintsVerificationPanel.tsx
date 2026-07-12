@@ -139,6 +139,23 @@ export default function SaintsVerificationPanel() {
     onError: (e: Error) => toast.error("Error backfill: " + e.message),
   });
 
+  const runRepairSuspicious = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke("backfill-saint-sources", {
+        body: { batchSize: 20, background: true, mode: "repair" },
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      toast.success(
+        `Reparación lanzada en background. ${data?.beforeRemaining ?? "?"} fuentes dudosas a re-resolver.`
+      );
+      qc.invalidateQueries({ queryKey: ["saints-verification"] });
+    },
+    onError: (e: Error) => toast.error("Error reparación: " + e.message),
+  });
+
   const discrepancias = rows.filter(r => r.estado_verificacion === "discrepancia");
   const sinFuente = rows.filter(r => r.estado_verificacion === "sin_fuente");
 
