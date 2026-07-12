@@ -393,6 +393,7 @@ export type Database = {
           updated_at: string | null
           verificado_at: string | null
           verificado_por: string | null
+          verificado_por_agente: string | null
         }
         Insert: {
           category?: string
@@ -416,6 +417,7 @@ export type Database = {
           updated_at?: string | null
           verificado_at?: string | null
           verificado_por?: string | null
+          verificado_por_agente?: string | null
         }
         Update: {
           category?: string
@@ -439,6 +441,7 @@ export type Database = {
           updated_at?: string | null
           verificado_at?: string | null
           verificado_por?: string | null
+          verificado_por_agente?: string | null
         }
         Relationships: [
           {
@@ -2800,6 +2803,7 @@ export type Database = {
           updated_at: string | null
           verificado_at: string | null
           verificado_por: string | null
+          verificado_por_agente: string | null
         }[]
         SetofOptions: {
           from: "*"
