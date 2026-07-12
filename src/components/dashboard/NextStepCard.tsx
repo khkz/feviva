@@ -140,7 +140,13 @@ export function NextStepCard({
           <div className="mb-4">
             <div className="flex items-center justify-between text-xs mb-2">
               <span className="text-white/60">Progreso del nivel</span>
-              <span className="text-secondary font-medium">{completedLessons}/{totalLessons} lecciones</span>
+              <button
+                onClick={() => navigate("/library")}
+                className="relative inline-flex items-center px-3 py-2 min-h-11 rounded-lg text-secondary font-medium hover:bg-white/5 text-xs"
+                aria-label={`Ver lecciones, ${completedLessons} de ${totalLessons} completadas`}
+              >
+                {completedLessons}/{totalLessons} lecciones
+              </button>
             </div>
             <Progress value={progress} className="h-2 bg-white/10" />
           </div>
