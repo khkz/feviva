@@ -469,14 +469,18 @@ export default function SantoPage() {
 
                 {/* Description preview on desktop */}
                 {saint.description && (
-                  <div className="hidden md:block">
-                    <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
-                      <BookOpen className="h-5 w-5 text-primary" />
-                      Historia de {saint.name}
-                    </h2>
-                    <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
-                      {saint.description}
-                    </p>
+                  <div className="hidden md:block space-y-4">
+                    <InspiredStoryBadge saint={saint} />
+                    <div>
+                      <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
+                        <BookOpen className="h-5 w-5 text-primary" />
+                        Historia de {saint.name}
+                      </h2>
+                      <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
+                        {saint.description}
+                      </p>
+                    </div>
+                    <VerifiableDataBlock saint={saint} />
                   </div>
                 )}
               </motion.div>
