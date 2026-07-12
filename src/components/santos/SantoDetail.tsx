@@ -197,23 +197,19 @@ export function SantoDetail({ saint, onClose }: SantoDetailProps) {
               </dl>
               <div className="pt-2 border-t text-xs text-muted-foreground">
                 <span className="font-medium text-foreground">Fuente: </span>
-                {saint.description_source ? (
-                  /^https?:\/\//.test(saint.description_source) ? (
-                    <a
-                      href={saint.description_source}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline inline-flex items-center gap-1"
-                    >
-                      {saint.description_source.replace(/^https?:\/\/(www\.)?/, '').split('/')[0]}
-                      <ExternalLink className="h-3 w-3" />
-                    </a>
-                  ) : (
-                    <span>{saint.description_source}</span>
-                  )
+                {saint.fuente_url ? (
+                  <a
+                    href={saint.fuente_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline inline-flex items-center gap-1"
+                  >
+                    Ver fuente en Wikipedia
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
                 ) : (
-                  <span className="italic">
-                    Sin fuente citada. Datos objetivos según el Martirologio Romano y tradición litúrgica.
+                  <span className="italic text-muted-foreground/70">
+                    Fuente pendiente de verificación
                   </span>
                 )}
               </div>
