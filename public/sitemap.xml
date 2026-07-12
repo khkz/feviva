@@ -3,61 +3,61 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://elrugido.com/</loc>
-    <lastmod>2026-07-11</lastmod>
+    <lastmod>2026-07-12</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://elrugido.com/sobre-nosotros</loc>
-    <lastmod>2026-07-11</lastmod>
+    <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://elrugido.com/santos</loc>
-    <lastmod>2026-07-11</lastmod>
+    <lastmod>2026-07-12</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://elrugido.com/oraciones</loc>
-    <lastmod>2026-07-11</lastmod>
+    <lastmod>2026-07-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://elrugido.com/evangelio-del-dia</loc>
-    <lastmod>2026-07-11</lastmod>
+    <lastmod>2026-07-12</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://elrugido.com/novenas</loc>
-    <lastmod>2026-07-11</lastmod>
+    <lastmod>2026-07-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://elrugido.com/capsula-del-dia</loc>
-    <lastmod>2026-07-11</lastmod>
+    <lastmod>2026-07-12</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://elrugido.com/frontera-final</loc>
-    <lastmod>2026-07-11</lastmod>
+    <lastmod>2026-07-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://elrugido.com/auth</loc>
-    <lastmod>2026-07-11</lastmod>
+    <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://elrugido.com/planes</loc>
-    <lastmod>2026-07-11</lastmod>
+    <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -99,6 +99,96 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-jose-cafasso-1768260789197.jpg</image:loc>
       <image:title>San José Cafasso</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-prudencio-de-troyes</loc>
+    <lastmod>2026-07-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-prudencio-de-troyes-1783825793845.webp</image:loc>
+      <image:title>San Prudencio de Troyes</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/santos-juan-fisher-y-tomas-moro</loc>
+    <lastmod>2026-07-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santos-juan-fisher-y-tomas-moro-1783825826992.webp</image:loc>
+      <image:title>Santos Juan Fisher y Tomás Moro</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/beato-dermicio-ohurley</loc>
+    <lastmod>2026-07-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/beato-dermicio-ohurley-1783825888470.webp</image:loc>
+      <image:title>Beato Dermicio OHurley</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/santos-arcangeles-miguel-gabriel-y-rafael</loc>
+    <lastmod>2026-07-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santos-arcangeles-miguel-gabriel-y-rafael-1783825918069.webp</image:loc>
+      <image:title>Santos Arcángeles Miguel, Gabriel y Rafael</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/santos-andres-dung-lac-y-companeros</loc>
+    <lastmod>2026-07-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santos-andres-dung-lac-y-companeros-1783825982300.webp</image:loc>
+      <image:title>Santos Andrés Dung-Lac y compañeros</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/santa-paula-isabel-cerioli</loc>
+    <lastmod>2026-07-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-paula-isabel-cerioli-1783829836349.webp</image:loc>
+      <image:title>Santa Paula Isabel Cerioli</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-raimundo-de-penafort</loc>
+    <lastmod>2026-07-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-raimundo-de-penafort-1768243637936.jpg</image:loc>
+      <image:title>San Raimundo de Peñafort</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-severino-de-norico</loc>
+    <lastmod>2026-07-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-severino-de-norico-1768243640840.jpg</image:loc>
+      <image:title>San Severino de Nórico</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-adrian-de-canterbury</loc>
+    <lastmod>2026-07-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-adrian-de-canterbury-1768243646920.jpg</image:loc>
+      <image:title>San Adrián de Canterbury</image:title>
     </image:image>
   </url>
   <url>
@@ -2142,16 +2232,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/san-severino-de-norico</loc>
-    <lastmod>2026-05-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-severino-de-norico-1768243640840.jpg</image:loc>
-      <image:title>San Severino de Nórico</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/santa-maria-madre-de-dios</loc>
     <lastmod>2026-05-22</lastmod>
     <changefreq>monthly</changefreq>
@@ -2319,16 +2399,6 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-valero-de-zaragoza-1768247396083.jpg</image:loc>
       <image:title>San Valero de Zaragoza</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/san-raimundo-de-penafort</loc>
-    <lastmod>2026-05-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-raimundo-de-penafort-1768243637936.jpg</image:loc>
-      <image:title>San Raimundo de Peñafort</image:title>
     </image:image>
   </url>
   <url>
@@ -2732,12 +2802,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/san-prudencio-de-troyes</loc>
-    <lastmod>2026-05-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/san-cristobal-magallanes-y-companeros</loc>
     <lastmod>2026-05-22</lastmod>
     <changefreq>monthly</changefreq>
@@ -2838,16 +2902,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/san-felix-de-nola</loc>
-    <lastmod>2026-05-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-felix-de-nola-1768243670604.jpg</image:loc>
-      <image:title>San Félix de Nola</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/san-juan-de-la-cruz</loc>
     <lastmod>2026-05-22</lastmod>
     <changefreq>monthly</changefreq>
@@ -2886,12 +2940,6 @@
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-norberto-1768260703326.jpg</image:loc>
       <image:title>San Norberto</image:title>
     </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/santos-juan-fisher-y-tomas-moro</loc>
-    <lastmod>2026-05-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
   </url>
   <url>
     <loc>https://elrugido.com/santo/san-arcadio-de-mauritania</loc>
@@ -2961,6 +3009,16 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-julia-billiart-1768248071593.jpg</image:loc>
       <image:title>Santa Julia Billiart</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-felix-de-nola</loc>
+    <lastmod>2026-07-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-felix-de-nola-1768243670604.jpg</image:loc>
+      <image:title>San Félix de Nola</image:title>
     </image:image>
   </url>
   <url>
@@ -3214,16 +3272,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/san-adrian-de-canterbury</loc>
-    <lastmod>2026-05-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-adrian-de-canterbury-1768243646920.jpg</image:loc>
-      <image:title>San Adrián de Canterbury</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/beata-francisca-schervier</loc>
     <lastmod>2026-05-22</lastmod>
     <changefreq>monthly</changefreq>
@@ -3404,18 +3452,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/san-carlos-lwanga-y-companeros</loc>
-    <lastmod>2026-05-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/beato-dermicio-ohurley</loc>
-    <lastmod>2026-05-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/santo-tomas-apostol</loc>
     <lastmod>2026-05-22</lastmod>
     <changefreq>monthly</changefreq>
@@ -3513,6 +3549,16 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/dedicacion-de-santa-maria-la-mayor-1768268381215.jpg</image:loc>
       <image:title>Dedicación de Santa María la Mayor</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-carlos-lwanga-y-companeros</loc>
+    <lastmod>2026-07-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-carlos-lwanga-y-companeros-1783825857796.webp</image:loc>
+      <image:title>San Carlos Lwanga y compañeros</image:title>
     </image:image>
   </url>
   <url>
@@ -3676,18 +3722,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/santos-arcangeles-miguel-gabriel-y-rafael</loc>
-    <lastmod>2026-05-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/santos-andres-kim-y-companeros</loc>
-    <lastmod>2026-05-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/san-sergio-de-radonez</loc>
     <lastmod>2026-05-22</lastmod>
     <changefreq>monthly</changefreq>
@@ -3695,6 +3729,16 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-sergio-de-radonez-1768268988888.jpg</image:loc>
       <image:title>San Sergio de Radonez</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/santos-andres-kim-y-companeros</loc>
+    <lastmod>2026-07-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santos-andres-kim-y-companeros-1783825947898.webp</image:loc>
+      <image:title>Santos Andrés Kim y compañeros</image:title>
     </image:image>
   </url>
   <url>
@@ -3888,12 +3932,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/santos-andres-dung-lac-y-companeros</loc>
-    <lastmod>2026-05-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/san-leonardo-de-puerto-mauricio</loc>
     <lastmod>2026-05-22</lastmod>
     <changefreq>monthly</changefreq>
@@ -3922,12 +3960,6 @@
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-juan-de-kety-1768271498874.jpg</image:loc>
       <image:title>San Juan de Kety</image:title>
     </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/santa-paula-isabel-cerioli</loc>
-    <lastmod>2026-05-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
   </url>
   <url>
     <loc>https://elrugido.com/santo/nuestra-senora-de-la-medalla-milagrosa</loc>
@@ -4500,8 +4532,20 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-raimundo-de-penafort</loc>
+    <lastmod>2026-07-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://elrugido.com/oracion/oracion-a-san-mateo</loc>
     <lastmod>2026-07-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-severino-de-norico</loc>
+    <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -4560,6 +4604,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-adrian-de-canterbury</loc>
+    <lastmod>2026-07-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://elrugido.com/oracion/oracion-al-cristo-negro-de-esquipulas</loc>
     <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
@@ -4580,6 +4630,12 @@
   <url>
     <loc>https://elrugido.com/oracion/oracion-a-san-pablo-de-malta</loc>
     <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://elrugido.com/oracion/oracion-a-san-felix-de-nola</loc>
+    <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>

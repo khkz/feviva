@@ -65,8 +65,7 @@ export default defineConfig(({ mode }) => ({
             },
           },
           {
-            urlPattern: ({ request, url }) =>
-              url.origin === self.location.origin && ["script", "style", "worker"].includes(request.destination),
+            urlPattern: /^https?:\/\/[^/]+\/assets\/.*\.(?:js|css|woff2?|png|svg|webp|jpg|ico)$/,
             handler: "CacheFirst",
             options: {
               cacheName: "static-assets-cache",
