@@ -332,6 +332,20 @@ async function processOracionTTSPremium(targetId: string, voice: string = 'echo'
   return { audioUrl: urlData.publicUrl, voice, model: 'gpt-4o-mini-tts-2025-12-15', premium: true };
 }
 
+// Procesar TTS para sesiones de gratitud (mismo pipeline limpio + chunking)
+async function processGratitudeTTS(targetId: string): Promise<Record<string, unknown>> {
+  const session = await fetchOneStable<{ numero: number; titulo: string; descripcion: string }>(
+    'gratitude_sessions', 'numero, titulo, descripcion', targetId, 'Sesión de gratitud'
+  );
+  const fullText = `Sesión ${session.numero}: ${session.titulo}.\n\n${session.descripcion}\n\nHoy tienes motivos para estar agradecido. Que Dios te bendiga.`;
+  const audio = await generateStandardTTS(fullText, 'onyx');
+  const filename = `gratitude-session-${session.numero}.mp3`;
+  await supabase.storage.from('teachings-audio').upload(filename, audio, { contentType: 'audio/mpeg', upsert: true });
+  const { data: urlData } = supabase.storage.from('teachings-audio').getPublicUrl(filename);
+  await supabase.from('gratitude_sessions').update({ audio_url: urlData.publicUrl }).eq('id', targetId);
+  return { audioUrl: urlData.publicUrl, numero: session.numero };
+}
+
 // ============= SANITIZACIÓN ROBUSTA DE JSON =============
 
 function sanitizeAndParseJsonResponse(rawContent: string): Record<string, unknown> {
@@ -598,6 +612,9 @@ async function processJob(job: ProcessingJob): Promise<void> {
         break;
       case 'oracion_tts_premium':
         result = await processOracionTTSPremium(job.target_id, voice || 'echo');
+        break;
+      case 'gratitude_tts':
+        result = await processGratitudeTTS(job.target_id);
         break;
       default:
         throw new Error(`Tipo de job no soportado: ${job.job_type}`);
