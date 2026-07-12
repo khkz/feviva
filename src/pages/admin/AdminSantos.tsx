@@ -337,7 +337,7 @@ export default function AdminSantos() {
   const bulkPrayersMutation = useMutation({
     mutationFn: async () => {
       const { data, error } = await supabase.functions.invoke('bulk-import-saint-prayers', {
-        body: { batchSize: 25, autoContinue: true },
+        body: { batchSize: 60, autoContinue: true, background: true },
       });
       if (error) throw error;
       return data;
@@ -345,8 +345,8 @@ export default function AdminSantos() {
     onSuccess: async (data) => {
       await refetch();
       toast.success(
-        `Lote inicial: ${data?.success || 0} oraciones creadas, ${data?.failed || 0} fallidas. ` +
-        `Quedan ${data?.remaining || 0}. Se sigue procesando en segundo plano — actualiza en 1-2 min.`,
+        `Importación aceptada: ${data?.beforeRemaining || stats.withoutPrayer} pendientes. ` +
+        `Procesa lotes de ${data?.batchSize || 60} en segundo plano — actualiza en 1-2 min.`,
         { duration: 8000 }
       );
     },

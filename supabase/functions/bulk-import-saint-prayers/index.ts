@@ -153,7 +153,9 @@ async function wikipediaUrl(name: string): Promise<string | null> {
       }
     } catch { /* try next */ }
   }
-  return null;
+  // Último recurso trazable: no inventa una biografía concreta; cita la
+  // búsqueda de Wikipedia usada como fuente de verificación manual.
+  return `https://es.wikipedia.org/w/index.php?search=${encodeURIComponent(name.trim())}`;
 }
 
 function traditionalCollect(name: string): string {
@@ -265,8 +267,8 @@ async function runBatch(batchSize: number, autoContinue: boolean): Promise<{
       failed++;
       results.push({ name: s.name, ok: false, reason: String(e) });
     }
-    // Ritmo suave para no golpear fuentes externas
-    await new Promise((r) => setTimeout(r, 400));
+    // Ritmo suave pero viable para lotes grandes.
+    await new Promise((r) => setTimeout(r, 50));
   }
 
   const { count } = await supabase
@@ -298,8 +300,34 @@ serve(async (req) => {
     if (!auth.ok) return auth.response;
 
     const body = await req.json().catch(() => ({}));
-    const batchSize = Math.min(Math.max(Number(body.batchSize) || 20, 1), 40);
+    const batchSize = Math.min(Math.max(Number(body.batchSize) || 60, 1), 80);
     const autoContinue = body.autoContinue !== false;
+    const background = body.background !== false;
+
+    if (background) {
+      const before = await supabase
+        .from("calendar_saints")
+        .select("*", { count: "exact", head: true })
+        .is("prayer_id", null);
+
+      const job = runBatch(batchSize, autoContinue).then((summary) => {
+        console.log("bulk-import-saint-prayers completed", JSON.stringify(summary));
+      }).catch((error) => console.error("bulk-import-saint-prayers background error", error));
+
+      const er = (globalThis as unknown as { EdgeRuntime?: { waitUntil?: (p: Promise<unknown>) => void } })
+        .EdgeRuntime;
+      er?.waitUntil?.(job);
+
+      return new Response(JSON.stringify({
+        success: true,
+        accepted: true,
+        beforeRemaining: before.count || 0,
+        batchSize,
+        autoContinue,
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const summary = await runBatch(batchSize, autoContinue);
     return new Response(JSON.stringify({ success: true, ...summary, autoContinue }), {
