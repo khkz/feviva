@@ -45,6 +45,12 @@ All colors MUST be HSL.
     --border: 207 20% 90%;
     --input: 207 20% 90%;
     --ring: 45 95% 58%;
+
+    /* Toasted amber for text on LIGHT backgrounds (WCAG AA ≥ 4.5:1 on white).
+       Use `text-gold-ink` instead of `text-secondary` whenever the label sits on
+       white / very light surfaces. The bright `--secondary` gold is reserved for
+       dark backgrounds (hero, primary cards). */
+    --gold-ink: 32 90% 30%;
     
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
