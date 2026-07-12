@@ -118,6 +118,9 @@ All colors MUST be HSL.
     --border: 207 20% 20%;
     --input: 207 20% 20%;
     --ring: 45 95% 58%;
+
+    /* On dark surfaces the bright gold has plenty of contrast already. */
+    --gold-ink: 45 95% 62%;
     
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
