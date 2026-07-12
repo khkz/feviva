@@ -476,8 +476,7 @@ export default function SantoPage() {
                 Historia de {saint.name}
               </h2>
               <div
-                className="text-foreground/90 whitespace-pre-line"
-                style={{ fontSize: "18px", lineHeight: 1.7 }}
+                className="saint-story-body text-foreground/90 whitespace-pre-line"
               >
                 {saint.description}
               </div>
