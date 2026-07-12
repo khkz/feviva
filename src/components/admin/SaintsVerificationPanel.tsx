@@ -54,6 +54,8 @@ export default function SaintsVerificationPanel() {
   const done = counts.total - counts.sin;
   const pct = counts.total ? Math.round((done / counts.total) * 100) : 0;
 
+  const needsBackfill = rows.filter(r => !r.fuente_url).length;
+
   const runBatch = useMutation({
     mutationFn: async () => {
       const { data, error } = await supabase.functions.invoke("verify-saints-batch", {
@@ -87,6 +89,23 @@ export default function SaintsVerificationPanel() {
     },
     onSuccess: (r) => toast.success(`Terminado. Verificados ${r.processed}. Restantes: ${r.remaining}.`),
     onError: (e: Error) => toast.error("Loop error: " + e.message),
+  });
+
+  const runBackfillSources = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke("backfill-saint-sources", {
+        body: { batchSize: 20, background: true },
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      toast.success(
+        `Backfill lanzado en background. Faltan ${data?.beforeRemaining ?? "?"} santos por contrastar con Wikipedia.`
+      );
+      qc.invalidateQueries({ queryKey: ["saints-verification"] });
+    },
+    onError: (e: Error) => toast.error("Error backfill: " + e.message),
   });
 
   const discrepancias = rows.filter(r => r.estado_verificacion === "discrepancia");
