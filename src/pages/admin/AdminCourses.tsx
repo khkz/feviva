@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
+import { AdminEmptyContent } from '@/components/admin/AdminEmptyContent';
 
 interface Course {
   id: string;
@@ -99,6 +100,15 @@ export const AdminCourses = () => {
           Nuevo Curso
         </Button>
       </div>
+
+      {courses.length === 0 && (
+        <AdminEmptyContent
+          title="Sin contenido — Cursos vacío"
+          hint="Aún no hay cursos cargados. En la app pública este módulo se oculta o muestra 'Próximamente' hasta que agregues al menos uno."
+        />
+      )}
+
+
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

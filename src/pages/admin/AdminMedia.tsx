@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AdminEmptyContent } from '@/components/admin/AdminEmptyContent';
 
 interface MediaItem {
   id: string;
@@ -94,6 +95,15 @@ export const AdminMedia = () => {
           Subir Media
         </Button>
       </div>
+
+      {activeTab === 'all' && media.length === 0 && (
+        <AdminEmptyContent
+          title="Sin contenido — Biblioteca de Medios vacía"
+          hint="Aún no hay medios subidos. Este módulo permanece oculto o silencioso en la app pública hasta que agregues contenido."
+        />
+      )}
+
+
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
