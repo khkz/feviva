@@ -26,6 +26,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { supabase } from '@/integrations/supabase/client';
 import { countryFlags, countryNames, formatFeastDate, getCountryContinent, continentCountries } from '@/lib/countryMappings';
+import { InspiredStoryBadge, VerifiableDataBlock } from '@/components/santos/SaintCredibilityBlocks';
 
 export default function SantoPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -200,9 +201,9 @@ export default function SantoPage() {
     "image": saint.image_url,
     "url": `https://elrugido.com/santo/${saint.slug}`,
     "sameAs": [
-      `https://es.wikipedia.org/wiki/${encodeURIComponent(saint.name.replace(/ /g, '_'))}`,
-      `https://www.catholic.org/saints/`
+      ...(saint.fuente_url ? [saint.fuente_url] : []),
     ],
+    ...(saint.fuente_url && { "citation": { "@type": "CreativeWork", "url": saint.fuente_url, "name": "Wikipedia en español" } }),
     "knowsAbout": saint.tags || [],
     "mainEntityOfPage": {
       "@type": "WebPage",
@@ -468,14 +469,18 @@ export default function SantoPage() {
 
                 {/* Description preview on desktop */}
                 {saint.description && (
-                  <div className="hidden md:block">
-                    <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
-                      <BookOpen className="h-5 w-5 text-primary" />
-                      Historia de {saint.name}
-                    </h2>
-                    <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
-                      {saint.description}
-                    </p>
+                  <div className="hidden md:block space-y-4">
+                    <InspiredStoryBadge saint={saint} />
+                    <div>
+                      <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
+                        <BookOpen className="h-5 w-5 text-primary" />
+                        Historia de {saint.name}
+                      </h2>
+                      <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
+                        {saint.description}
+                      </p>
+                    </div>
+                    <VerifiableDataBlock saint={saint} />
                   </div>
                 )}
               </motion.div>
@@ -490,17 +495,23 @@ export default function SantoPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
+              className="space-y-4"
             >
-              <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
-                <BookOpen className="h-5 w-5 text-primary" />
-                Historia de {saint.name}
-              </h2>
-              <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
-                {saint.description}
-              </p>
+              <InspiredStoryBadge saint={saint} />
+              <div>
+                <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
+                  <BookOpen className="h-5 w-5 text-primary" />
+                  Historia de {saint.name}
+                </h2>
+                <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
+                  {saint.description}
+                </p>
+              </div>
+              <VerifiableDataBlock saint={saint} />
             </motion.div>
           </section>
         )}
+
 
         {/* Prayer Section - PUBLIC */}
         {prayer && (
