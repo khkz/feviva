@@ -201,9 +201,9 @@ export default function SantoPage() {
     "image": saint.image_url,
     "url": `https://elrugido.com/santo/${saint.slug}`,
     "sameAs": [
-      `https://es.wikipedia.org/wiki/${encodeURIComponent(saint.name.replace(/ /g, '_'))}`,
-      `https://www.catholic.org/saints/`
+      ...(saint.fuente_url ? [saint.fuente_url] : []),
     ],
+    ...(saint.fuente_url && { "citation": { "@type": "CreativeWork", "url": saint.fuente_url, "name": "Wikipedia en español" } }),
     "knowsAbout": saint.tags || [],
     "mainEntityOfPage": {
       "@type": "WebPage",
