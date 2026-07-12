@@ -487,7 +487,7 @@ export default function SantoPage() {
           </div>
         </section>
 
-        {/* History Section - Mobile */}
+        {/* History Section - Mobile only (desktop version is inside hero) */}
         {saint.description && (
           <section className="md:hidden container mx-auto max-w-5xl px-4 py-6">
             <motion.div
@@ -506,10 +506,15 @@ export default function SantoPage() {
                   {saint.description}
                 </p>
               </div>
-              <VerifiableDataBlock saint={saint} />
             </motion.div>
           </section>
         )}
+
+        {/* Datos verificables — único en el DOM, visible en todos los viewports */}
+        <section className="container mx-auto max-w-5xl px-4 pb-6">
+          <VerifiableDataBlock saint={saint} />
+        </section>
+
 
 
         {/* Prayer Section - PUBLIC */}
