@@ -226,6 +226,16 @@ export default function SaintsVerificationPanel() {
               {runBackfillSources.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <ExternalLink className="h-4 w-4" />}
               Rellenar fuentes y contrastar ({needsBackfill})
             </Button>
+            <Button
+              variant="default"
+              onClick={() => runRepairSuspicious.mutate()}
+              disabled={runRepairSuspicious.isPending || suspiciousCount === 0}
+              className="gap-2 bg-red-600 hover:bg-red-700"
+              title="Re-resuelve santos cuyo fuente_url apunta a un edificio, institución o lugar en vez de la persona. Los limpia y vuelve a buscar con la estrategia estricta."
+            >
+              {runRepairSuspicious.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wrench className="h-4 w-4" />}
+              Reparar fuentes dudosas ({suspiciousCount})
+            </Button>
           </div>
         </CardContent>
       </Card>
