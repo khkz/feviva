@@ -87,7 +87,6 @@ interface BatchProgress {
 
 const ITEMS_PER_PAGE = 20;
 
-import { SAINT_CATEGORY_LABELS as categoryLabels } from '@/lib/saintCategories';
 
 const countryFlags: Record<string, string> = {
   AR: '🇦🇷', BO: '🇧🇴', BR: '🇧🇷', CL: '🇨🇱', CO: '🇨🇴',
