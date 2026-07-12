@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { SAINT_CATEGORY_LABELS as categoryLabels } from '@/lib/saintCategories';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -86,14 +87,6 @@ interface BatchProgress {
 
 const ITEMS_PER_PAGE = 20;
 
-const categoryLabels: Record<string, string> = {
-  feast: 'Fiesta',
-  memorial: 'Memorial',
-  optional_memorial: 'Memoria Opcional',
-  patron_country: 'Patrono Nacional',
-  solemnity: 'Solemnidad',
-  universal_helper: 'Auxiliador Universal',
-};
 
 const countryFlags: Record<string, string> = {
   AR: '🇦🇷', BO: '🇧🇴', BR: '🇧🇷', CL: '🇨🇱', CO: '🇨🇴',
