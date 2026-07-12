@@ -377,10 +377,12 @@ export type Database = {
           created_at: string | null
           description: string | null
           description_source: string | null
+          discrepancia_detalle: Json | null
           estado_verificacion: string
           feast_day: number
           feast_month: number
           fuente_descripcion: string | null
+          fuente_url: string | null
           id: string
           image_url: string | null
           legacy_slug: string | null
@@ -389,6 +391,7 @@ export type Database = {
           slug: string | null
           tags: string[] | null
           updated_at: string | null
+          verificado_at: string | null
           verificado_por: string | null
         }
         Insert: {
@@ -397,10 +400,12 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_source?: string | null
+          discrepancia_detalle?: Json | null
           estado_verificacion?: string
           feast_day: number
           feast_month: number
           fuente_descripcion?: string | null
+          fuente_url?: string | null
           id?: string
           image_url?: string | null
           legacy_slug?: string | null
@@ -409,6 +414,7 @@ export type Database = {
           slug?: string | null
           tags?: string[] | null
           updated_at?: string | null
+          verificado_at?: string | null
           verificado_por?: string | null
         }
         Update: {
@@ -417,10 +423,12 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_source?: string | null
+          discrepancia_detalle?: Json | null
           estado_verificacion?: string
           feast_day?: number
           feast_month?: number
           fuente_descripcion?: string | null
+          fuente_url?: string | null
           id?: string
           image_url?: string | null
           legacy_slug?: string | null
@@ -429,6 +437,7 @@ export type Database = {
           slug?: string | null
           tags?: string[] | null
           updated_at?: string | null
+          verificado_at?: string | null
           verificado_por?: string | null
         }
         Relationships: [
@@ -2775,10 +2784,12 @@ export type Database = {
           created_at: string | null
           description: string | null
           description_source: string | null
+          discrepancia_detalle: Json | null
           estado_verificacion: string
           feast_day: number
           feast_month: number
           fuente_descripcion: string | null
+          fuente_url: string | null
           id: string
           image_url: string | null
           legacy_slug: string | null
@@ -2787,6 +2798,7 @@ export type Database = {
           slug: string | null
           tags: string[] | null
           updated_at: string | null
+          verificado_at: string | null
           verificado_por: string | null
         }[]
         SetofOptions: {
