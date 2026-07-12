@@ -657,6 +657,20 @@ export default function AdminSantos() {
               )}
             </Button>
 
+            {/* MEGA IMPORT ORACIONES (EWTN + Wikipedia, resumable en background) */}
+            <Button
+              onClick={() => bulkPrayersMutation.mutate()}
+              disabled={bulkPrayersMutation.isPending || stats.withoutPrayer === 0}
+              className="gap-2 bg-amber-600 hover:bg-amber-700 text-white"
+            >
+              {bulkPrayersMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <BookHeart className="h-4 w-4" />
+              )}
+              🚀 Importar TODAS las oraciones ({stats.withoutPrayer})
+            </Button>
+
             <Button
               variant="outline"
               onClick={() => batchPrayerMutation.mutate()}
