@@ -168,6 +168,16 @@ export default function SaintsVerificationPanel() {
               <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
               Refrescar
             </Button>
+            <Button
+              variant="default"
+              onClick={() => runBackfillSources.mutate()}
+              disabled={runBackfillSources.isPending || needsBackfill === 0}
+              className="gap-2 bg-amber-600 hover:bg-amber-700"
+              title="Consulta Wikipedia ES por cada santo, guarda fuente_url y contrasta la fecha de fiesta. No usa IA. No modifica feast_day/feast_month/tags."
+            >
+              {runBackfillSources.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <ExternalLink className="h-4 w-4" />}
+              Rellenar fuentes y contrastar ({needsBackfill})
+            </Button>
           </div>
         </CardContent>
       </Card>
