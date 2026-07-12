@@ -98,16 +98,57 @@ async function fetchEwtnPrayer(name: string): Promise<{ texto: string; url: stri
 }
 
 async function wikipediaUrl(name: string): Promise<string | null> {
-  // Verifica que exista el artículo en es.wikipedia; si no, prueba en.wikipedia.
+  const clean = (value: string) => value
+    .trim()
+    .replace(/^(San|Santa|Santo|Beato|Beata|Santos|Santas|Beatos|Beatas)\s+/i, "")
+    .replace(/\s+y\s+compañeros(?:\s+mártires)?/i, "")
+    .replace(/\s+y\s+compañeras(?:\s+mártires)?/i, "")
+    .replace(/\s+mártir(?:es)?$/i, "")
+    .replace(/\s+apóstol$/i, "")
+    .replace(/\s+papa$/i, "")
+    .replace(/\s+obispo$/i, "")
+    .replace(/\s+doctor(?:a)?(?:\s+de\s+la\s+Iglesia)?$/i, "")
+    .replace(/\s+/g, " ");
+
+  const candidates = Array.from(new Set([
+    name.trim(),
+    clean(name),
+    clean(name).replace(/\bI\b/g, "I").replace(/\bII\b/g, "II").replace(/\bIII\b/g, "III"),
+  ].filter(Boolean)));
+
+  // Verifica artículo exacto; si falla, usa búsqueda de Wikipedia para nombres
+  // litúrgicos que no coinciden 1:1 con el título del artículo.
   for (const lang of ["es", "en"]) {
-    const title = encodeURIComponent(name.trim().replace(/\s+/g, "_"));
-    const api = `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${title}`;
+    for (const candidate of candidates) {
+      const title = encodeURIComponent(candidate.replace(/\s+/g, "_"));
+      const api = `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${title}`;
+      try {
+        const r = await fetch(api, { headers: { "User-Agent": "ElRugidoBot/1.0" } });
+        if (r.ok) {
+          const j = await r.json();
+          if (j?.type !== "disambiguation" && j?.content_urls?.desktop?.page) {
+            return j.content_urls.desktop.page as string;
+          }
+        }
+      } catch { /* try next */ }
+    }
+
+    const searchTerm = encodeURIComponent(candidates[0]);
+    const searchApi = `https://${lang}.wikipedia.org/w/api.php?action=query&list=search&srsearch=${searchTerm}&format=json&origin=*&srlimit=3`;
     try {
-      const r = await fetch(api, { headers: { "User-Agent": "ElRugidoBot/1.0" } });
+      const r = await fetch(searchApi, { headers: { "User-Agent": "ElRugidoBot/1.0" } });
       if (r.ok) {
         const j = await r.json();
-        if (j?.type !== "disambiguation" && j?.content_urls?.desktop?.page) {
-          return j.content_urls.desktop.page as string;
+        const firstTitle = j?.query?.search?.[0]?.title;
+        if (firstTitle) {
+          const summary = `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(firstTitle.replace(/\s+/g, "_"))}`;
+          const sr = await fetch(summary, { headers: { "User-Agent": "ElRugidoBot/1.0" } });
+          if (sr.ok) {
+            const sj = await sr.json();
+            if (sj?.type !== "disambiguation" && sj?.content_urls?.desktop?.page) {
+              return sj.content_urls.desktop.page as string;
+            }
+          }
         }
       }
     } catch { /* try next */ }
@@ -150,7 +191,7 @@ async function processOne(saint: { id: string; name: string }): Promise<
       .insert({
         nombre: `Oración a ${saint.name}`,
         texto: ew.texto,
-        categoria: "Santos",
+        categoria: "santos",
         es_tradicional: true,
         fuente: "EWTN — Biblioteca de Santos",
         fuente_url: ew.url,
@@ -173,7 +214,7 @@ async function processOne(saint: { id: string; name: string }): Promise<
       .insert({
         nombre: `Oración a ${saint.name}`,
         texto: traditionalCollect(saint.name),
-        categoria: "Santos",
+        categoria: "santos",
         es_tradicional: true,
         fuente: "Fórmula tradicional del Misal Romano (colecta genérica de santos) · Biografía: Wikipedia",
         fuente_url: wiki,
