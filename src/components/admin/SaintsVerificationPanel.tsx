@@ -80,6 +80,12 @@ export default function SaintsVerificationPanel() {
   const pct = counts.total ? Math.round((done / counts.total) * 100) : 0;
 
   const needsBackfill = rows.filter(r => !r.fuente_url).length;
+  const suspiciousRows = rows.filter(r =>
+    r.fuente_url &&
+    r.estado_verificacion !== "discrepancia_corregida" &&
+    urlIsSuspicious(r.fuente_url)
+  );
+  const suspiciousCount = suspiciousRows.length;
 
   const runBatch = useMutation({
     mutationFn: async () => {
