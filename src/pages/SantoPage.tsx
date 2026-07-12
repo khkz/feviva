@@ -495,17 +495,23 @@ export default function SantoPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
+              className="space-y-4"
             >
-              <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
-                <BookOpen className="h-5 w-5 text-primary" />
-                Historia de {saint.name}
-              </h2>
-              <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
-                {saint.description}
-              </p>
+              <InspiredStoryBadge saint={saint} />
+              <div>
+                <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
+                  <BookOpen className="h-5 w-5 text-primary" />
+                  Historia de {saint.name}
+                </h2>
+                <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
+                  {saint.description}
+                </p>
+              </div>
+              <VerifiableDataBlock saint={saint} />
             </motion.div>
           </section>
         )}
+
 
         {/* Prayer Section - PUBLIC */}
         {prayer && (
