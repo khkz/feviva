@@ -115,8 +115,8 @@ export function SantoDetail({ saint, onClose }: SantoDetailProps) {
             {saint.tags && saint.tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {saint.tags.map((tag) => (
-                  <Badge key={tag} variant="outline" className="text-xs capitalize">
-                    {tag.replace(/_/g, ' ')}
+                  <Badge key={tag} variant="outline" className="text-xs">
+                    {formatSaintTag(tag)}
                   </Badge>
                 ))}
               </div>

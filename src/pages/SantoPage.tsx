@@ -27,6 +27,7 @@ import { Separator } from '@/components/ui/separator';
 import { supabase } from '@/integrations/supabase/client';
 import { countryFlags, countryNames, formatFeastDate, getCountryContinent, continentCountries } from '@/lib/countryMappings';
 import { InspiredStoryBadge, VerifiableDataBlock } from '@/components/santos/SaintCredibilityBlocks';
+import { formatSaintTag } from '@/lib/saintTags';
 
 export default function SantoPage() {
   const { slug } = useParams<{ slug: string }>();
