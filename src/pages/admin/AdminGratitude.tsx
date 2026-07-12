@@ -157,6 +157,40 @@ export const AdminGratitude = () => {
     }
   };
 
+  // Encolar TODO en la cola de processing_jobs; el cron (tick_process_jobs)
+  // los procesa en background con el mismo pipeline nuevo (gpt-4o-mini-tts,
+  // limpieza de HTML, chunking).
+  const enqueueAllGratitudeTTS = async () => {
+    try {
+      const { data: sessions, error } = await supabase
+        .from('gratitude_sessions')
+        .select('id, numero, titulo')
+        .is('audio_url', null)
+        .order('numero');
+      if (error) throw error;
+      if (!sessions || sessions.length === 0) {
+        toast.info('Todas las sesiones ya tienen audio');
+        return;
+      }
+      const rows = sessions.map((s) => ({
+        job_type: 'gratitude_tts',
+        target_table: 'gratitude_sessions',
+        target_id: s.id,
+        target_title: `Gratitud #${s.numero}: ${s.titulo}`,
+        status: 'pending',
+        max_attempts: 3,
+      }));
+      const { error: insErr } = await supabase.from('processing_jobs').insert(rows);
+      if (insErr) throw insErr;
+      toast.success(`Encoladas ${rows.length} sesiones. El cron las procesa en segundo plano (~1/min).`);
+      await fetchStats();
+    } catch (err) {
+      console.error(err);
+      toast.error('Error encolando: ' + (err instanceof Error ? err.message : String(err)));
+    }
+  };
+
+
   const regenerateContent = async () => {
     setRegeneratingContent(true);
 
