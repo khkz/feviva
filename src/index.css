@@ -276,6 +276,23 @@ All colors MUST be HSL.
     @apply transition-all active:scale-[0.98] active:opacity-90;
   }
 
+  /* Tap target invisible de 44px CENTRADO sobre el botón.
+     Requiere que el elemento padre tenga position:relative (Button base ya lo tiene).
+     Se pinta con CSS puro para evitar problemas de compilación de utilidades
+     arbitrarias sobre pseudo-elementos. */
+  .tap-target-44 { position: relative; }
+  .tap-target-44::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    height: 44px;
+    min-width: 44px;
+    width: 100%;
+    pointer-events: auto;
+  }
+
   /* Fluid typography */
   .text-fluid-sm {
     font-size: clamp(0.875rem, 1.5vw + 0.25rem, 1rem);
