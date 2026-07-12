@@ -1056,7 +1056,7 @@ const Coach = () => {
                   {/* Difficulty Selector */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Nivel de Dificultad</label>
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 items-stretch">
                       {dificultades.map((dif) => {
                         const Icon = dif.icon;
                         const isSelected = selectedDificultad === dif.value;
@@ -1065,7 +1065,7 @@ const Coach = () => {
                           <button
                             key={dif.value}
                             onClick={() => setSelectedDificultad(dif.value)}
-                            className={`p-3 rounded-lg border-2 transition-all text-left ${
+                            className={`h-full p-3 rounded-lg border-2 transition-all text-left flex flex-col ${
                               isSelected 
                                 ? isTutorial 
                                   ? "border-blue-500 bg-blue-500/10" 
@@ -1077,12 +1077,14 @@ const Coach = () => {
                               <Icon className={`w-4 h-4 ${dif.color}`} />
                               <span className="font-medium text-sm">{dif.label}</span>
                             </div>
-                            <p className="text-xs text-muted-foreground">{dif.description}</p>
-                            {isTutorial && (
-                              <Badge className="mt-2 text-[10px] bg-blue-500/20 text-blue-600 border-blue-500/30">
-                                Recomendado para empezar
-                              </Badge>
-                            )}
+                            <p className="text-xs text-muted-foreground min-h-[2.5rem]">{dif.description}</p>
+                            <div className="mt-auto pt-2">
+                              {isTutorial && (
+                                <Badge className="text-[10px] whitespace-nowrap bg-blue-500/20 text-blue-600 border-blue-500/30">
+                                  Recomendado
+                                </Badge>
+                              )}
+                            </div>
                           </button>
                         );
                       })}

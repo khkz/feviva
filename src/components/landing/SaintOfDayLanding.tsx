@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSaintOfDay } from '@/hooks/useSaintOfDay';
 import { countryFlags, countryNames, monthNames } from '@/lib/countryMappings';
+import { formatSaintTag } from '@/lib/saintTags';
 
 export function SaintOfDayLanding() {
   const { saint, allSaintsToday, loading } = useSaintOfDay();
@@ -106,7 +107,7 @@ export function SaintOfDayLanding() {
                       )}
                       {saint.tags?.slice(0, 2).map((tag) => (
                         <Badge key={tag} variant="secondary">
-                          {tag}
+                          {formatSaintTag(tag)}
                         </Badge>
                       ))}
                     </div>

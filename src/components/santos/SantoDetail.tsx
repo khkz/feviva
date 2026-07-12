@@ -6,6 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { CalendarSaint } from '@/hooks/useSantos';
 import { useNavigate } from 'react-router-dom';
 import { InspiredStoryBadge, VerifiableDataBlock } from './SaintCredibilityBlocks';
+import { formatSaintTag } from '@/lib/saintTags';
 
 // Country code to name mapping
 const countryNames: Record<string, string> = {
@@ -115,8 +116,8 @@ export function SantoDetail({ saint, onClose }: SantoDetailProps) {
             {saint.tags && saint.tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {saint.tags.map((tag) => (
-                  <Badge key={tag} variant="outline" className="text-xs capitalize">
-                    {tag.replace(/_/g, ' ')}
+                  <Badge key={tag} variant="outline" className="text-xs">
+                    {formatSaintTag(tag)}
                   </Badge>
                 ))}
               </div>

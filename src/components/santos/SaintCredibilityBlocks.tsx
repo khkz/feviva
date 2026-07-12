@@ -2,6 +2,7 @@ import { ShieldAlert, CheckCircle2, ExternalLink } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { CalendarSaint } from '@/hooks/useSantos';
 import { formatSaintCategory } from '@/lib/saintCategories';
+import { formatSaintTag } from '@/lib/saintTags';
 
 // Country code to name mapping (subset)
 const countryNames: Record<string, string> = {
@@ -84,8 +85,8 @@ export function VerifiableDataBlock({ saint }: { saint: SaintLike }) {
         {saint.tags && saint.tags.length > 0 && (
           <div className="sm:col-span-2">
             <dt className="text-muted-foreground text-xs">Atributos</dt>
-            <dd className="font-medium capitalize">
-              {saint.tags.map((t) => t.replace(/_/g, ' ')).join(' · ')}
+            <dd className="font-medium">
+              {saint.tags.map(formatSaintTag).join(' · ')}
             </dd>
           </div>
         )}
