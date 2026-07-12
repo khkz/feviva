@@ -77,7 +77,7 @@ export function NovenaCarousel({ novenas, getProgress, loading }: NovenaCarousel
         </h2>
         <motion.button 
           onClick={() => navigate("/novenas/app")}
-          className="flex items-center gap-1 text-sm text-primary"
+          className="relative inline-flex items-center gap-1 text-sm text-primary px-3 py-2 min-h-11 rounded-lg hover:bg-primary/5"
           whileHover={{ x: 3 }}
           whileTap={{ scale: 0.95 }}
         >
