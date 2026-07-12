@@ -379,141 +379,116 @@ export default function SantoPage() {
           </ol>
         </nav>
 
-        {/* Hero Section */}
-        <section className="relative">
-          <div className="container mx-auto max-w-5xl px-4 pb-8 md:pb-12">
-            <div className="grid md:grid-cols-2 gap-8 items-start">
-              {/* Image */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-                className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10 shadow-xl"
-              >
-                {saint.image_url ? (
-                  <img
-                    src={saint.image_url}
-                    alt={`Imagen de ${saint.name}`}
-                    className="w-full h-auto max-h-[70vh] object-contain"
-                  />
-                ) : (
-                  <div className="aspect-[3/4] flex items-center justify-center">
-                    <Church className="h-24 w-24 text-muted-foreground/30" />
-                  </div>
-                )}
-                
-                {/* Country flag for patrons */}
-                {isPatron && saint.country_code && (
-                  <div className="absolute top-4 right-4 text-4xl drop-shadow-lg">
-                    {countryFlags[saint.country_code]}
-                  </div>
-                )}
-              </motion.div>
+        {/* Article — single centered reading column (~680px for optimal 60–75 CPL). */}
+        <article className="container mx-auto max-w-[680px] px-4 pb-8 md:pb-12">
+          {/* Featured image, integrated in the reading flow (no more empty side column). */}
+          <motion.figure
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10 shadow-xl mb-8"
+          >
+            {saint.image_url ? (
+              <img
+                src={saint.image_url}
+                alt={`Imagen de ${saint.name}`}
+                className="w-full h-auto max-h-[60vh] object-contain"
+              />
+            ) : (
+              <div className="aspect-[3/4] flex items-center justify-center">
+                <Church className="h-24 w-24 text-muted-foreground/30" />
+              </div>
+            )}
+            {isPatron && saint.country_code && (
+              <div className="absolute top-4 right-4 text-4xl drop-shadow-lg">
+                {countryFlags[saint.country_code]}
+              </div>
+            )}
+          </motion.figure>
 
-              {/* Content */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className="space-y-6"
-              >
-                <div>
-                  <h1 className="text-3xl md:text-4xl font-display font-bold mb-3">{saint.name}</h1>
-                  
-                  {isPatron && saint.country_code && (
-                    <p className="text-lg text-primary font-medium mb-4 flex items-center gap-2">
-                      <Globe className="h-5 w-5" />
-                      Patrono/a de {countryNames[saint.country_code]}
-                    </p>
-                  )}
+          {/* Title + meta */}
+          <motion.header
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="space-y-4 mb-8"
+          >
+            <h1 className="text-3xl md:text-4xl font-display font-bold leading-tight">
+              {saint.name}
+            </h1>
 
-                  <div className="flex flex-wrap gap-3">
-                    <Badge variant="secondary" className="gap-1.5 text-sm py-1 px-3">
-                      <Calendar className="h-4 w-4" />
-                      {formatFeastDate(saint.feast_month, saint.feast_day)}
-                    </Badge>
-                    
-                    {saint.country_code && (
-                      <Badge variant="outline" className="gap-1.5 text-sm py-1 px-3">
-                        <MapPin className="h-4 w-4" />
-                        {countryNames[saint.country_code] || saint.country_code}
-                      </Badge>
-                    )}
-                  </div>
-                </div>
+            {isPatron && saint.country_code && (
+              <p className="text-lg text-primary font-medium flex items-center gap-2">
+                <Globe className="h-5 w-5" />
+                Patrono/a de {countryNames[saint.country_code]}
+              </p>
+            )}
 
-                {/* Tags */}
-                {saint.tags && saint.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {saint.tags.map((tag, index) => (
-                      <Badge key={index} variant="outline" className="text-xs">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                )}
-
-                {/* Action buttons */}
-                <div className="flex flex-wrap gap-3">
-                  <Link to="/auth">
-                    <Button className="gap-2">
-                      <Sparkles className="h-4 w-4" />
-                      Rezar con audio guiado
-                    </Button>
-                  </Link>
-                  <Button variant="outline" className="gap-2" onClick={handleShare}>
-                    <Share2 className="h-4 w-4" />
-                    Compartir
-                  </Button>
-                </div>
-
-                {/* Description preview on desktop */}
-                {saint.description && (
-                  <div className="hidden md:block space-y-4">
-                    <InspiredStoryBadge saint={saint} />
-                    <div>
-                      <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
-                        <BookOpen className="h-5 w-5 text-primary" />
-                        Historia de {saint.name}
-                      </h2>
-                      <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
-                        {saint.description}
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </motion.div>
+            <div className="flex flex-wrap gap-3">
+              <Badge variant="secondary" className="gap-1.5 text-sm py-1 px-3">
+                <Calendar className="h-4 w-4" />
+                {formatFeastDate(saint.feast_month, saint.feast_day)}
+              </Badge>
+              {saint.country_code && (
+                <Badge variant="outline" className="gap-1.5 text-sm py-1 px-3">
+                  <MapPin className="h-4 w-4" />
+                  {countryNames[saint.country_code] || saint.country_code}
+                </Badge>
+              )}
             </div>
-          </div>
-        </section>
 
-        {/* History Section - Mobile only (desktop version is inside hero) */}
-        {saint.description && (
-          <section className="md:hidden container mx-auto max-w-5xl px-4 py-6">
-            <motion.div
+            {saint.tags && saint.tags.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {saint.tags.map((tag, index) => (
+                  <Badge key={index} variant="outline" className="text-xs">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            )}
+
+            <div className="flex flex-wrap gap-3 pt-2">
+              <Link to="/auth">
+                <Button className="gap-2">
+                  <Sparkles className="h-4 w-4" />
+                  Rezar con audio guiado
+                </Button>
+              </Link>
+              <Button variant="outline" className="gap-2" onClick={handleShare}>
+                <Share2 className="h-4 w-4" />
+                Compartir
+              </Button>
+            </div>
+          </motion.header>
+
+          {/* Story */}
+          {saint.description && (
+            <motion.section
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="space-y-4"
+              className="space-y-5"
             >
               <InspiredStoryBadge saint={saint} />
-              <div>
-                <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
-                  <BookOpen className="h-5 w-5 text-primary" />
-                  Historia de {saint.name}
-                </h2>
-                <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
-                  {saint.description}
-                </p>
+              <h2 className="text-xl font-semibold flex items-center gap-2">
+                <BookOpen className="h-5 w-5 text-primary" />
+                Historia de {saint.name}
+              </h2>
+              <div
+                className="text-foreground/90 whitespace-pre-line"
+                style={{ fontSize: "18px", lineHeight: 1.7 }}
+              >
+                {saint.description}
               </div>
-            </motion.div>
-          </section>
-        )}
+            </motion.section>
+          )}
 
-        {/* Datos verificables — único en el DOM, visible en todos los viewports */}
-        <section className="container mx-auto max-w-5xl px-4 pb-6">
-          <VerifiableDataBlock saint={saint} />
-        </section>
+          {/* Datos verificables — único en el DOM */}
+          <div className="mt-8">
+            <VerifiableDataBlock saint={saint} />
+          </div>
+        </article>
+
 
 
 

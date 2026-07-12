@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { FooterSection } from "@/components/landing/FooterSection";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { useIsAuthed } from "@/hooks/useIsAuthed";
 import logoElRugido from "@/assets/logo-elrugido.png";
 
 type Billing = "mensual" | "anual";
@@ -16,6 +17,7 @@ const Planes = () => {
   const [billing, setBilling] = useState<Billing>("anual");
   const [loadingPlan, setLoadingPlan] = useState<PlanKey | null>(null);
   const navigate = useNavigate();
+  const isAuthed = useIsAuthed();
 
   const handleCheckout = async (plan: PlanKey) => {
     setLoadingPlan(plan);
@@ -88,9 +90,17 @@ const Planes = () => {
             <img src={logoElRugido} alt="ElRugido - App de fe y apologética católica" className="w-9 h-9" />
             <span className="font-display font-bold text-lg">ElRugido</span>
           </Link>
-          <Link to="/auth" className="text-sm text-muted-foreground hover:text-foreground">
-            Iniciar sesión
-          </Link>
+          {isAuthed === null ? (
+            <span className="text-sm text-muted-foreground/60 w-24 h-4 rounded bg-muted/40 animate-pulse" aria-hidden />
+          ) : isAuthed ? (
+            <Link to="/dashboard" className="text-sm text-muted-foreground hover:text-foreground">
+              Ir a mi Dashboard
+            </Link>
+          ) : (
+            <Link to="/auth" className="text-sm text-muted-foreground hover:text-foreground">
+              Iniciar sesión
+            </Link>
+          )}
         </div>
       </header>
 

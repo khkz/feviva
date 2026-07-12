@@ -250,7 +250,7 @@ const Dashboard = () => {
           {/* ============ ACCIÓN DEL DÍA — sobre el pliegue ============ */}
           <section className="px-5 lg:px-0 pt-3 pb-2 lg:pt-6">
             <div className="mb-2">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-secondary/80">
+              <p className="text-[12px] font-semibold uppercase tracking-[0.15em] text-gold-ink">
                 Tu acción de hoy
               </p>
             </div>

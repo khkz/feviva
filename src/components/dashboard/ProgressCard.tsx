@@ -226,7 +226,7 @@ export function ProgressCard({
               </motion.div>
             </div>
             <p className="text-sm text-muted-foreground">
-              Te faltan <span className="font-semibold text-foreground">{Math.round(puntosParaSiguiente - puntosTotales)}</span> XP para alcanzar <span className="font-semibold text-secondary">{rankData.nextTitle}</span>
+              Te faltan <span className="font-semibold text-foreground">{Math.round(puntosParaSiguiente - puntosTotales)}</span> XP para alcanzar <span className="font-semibold text-gold-ink">{rankData.nextTitle}</span>
             </p>
           </div>
         </div>
