@@ -240,6 +240,13 @@ export default function SaintsVerificationPanel() {
         </CardContent>
       </Card>
 
+      <div className="rounded-lg border-2 border-amber-500/60 bg-amber-50 dark:bg-amber-950/30 p-4 text-sm text-amber-900 dark:text-amber-100 flex gap-3">
+        <AlertTriangle className="h-5 w-5 shrink-0 mt-0.5 text-amber-600" />
+        <p>
+          <strong>Ojo:</strong> Wikipedia a veces pone en el campo festividad la fecha de MUERTE del santo o la de una traslación de reliquias, no la fiesta litúrgica. Verifica cada caso contra una fuente católica (ACI Prensa, Vatican News, EWTN) antes de cambiar nada. De 37 discrepancias que detectó este mismo método, 22 resultaron ser falsos positivos.
+        </p>
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle className="text-red-600 flex items-center gap-2">
