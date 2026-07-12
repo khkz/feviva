@@ -1350,6 +1350,8 @@ export default function AdminSantos() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
