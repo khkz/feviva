@@ -571,7 +571,18 @@ export const AdminGratitude = () => {
                 </div>
               </CardContent>
             </Card>
-          )}
+              )}
+
+              {withoutAudio > 0 && (
+                <Button
+                  onClick={enqueueAllGratitudeTTS}
+                  variant="secondary"
+                  className="w-full bg-amber-600 hover:bg-amber-700 text-white"
+                >
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  🚀 Encolar TODAS ({withoutAudio}) en la cola del cron
+                </Button>
+              )}
         </TabsContent>
 
         {/* Audio Generation Tab */}
