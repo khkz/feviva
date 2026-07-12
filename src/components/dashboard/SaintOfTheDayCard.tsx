@@ -9,6 +9,7 @@ import { useSaintOfDay, CalendarSaint } from '@/hooks/useSaintOfDay';
 import { useNavigate } from 'react-router-dom';
 import { Church, BookOpen, Sparkles, PartyPopper, Star, Calendar, Share2 } from 'lucide-react';
 import { DailyShareButton } from '@/components/shared/DailyShareButton';
+import { formatSaintTag } from '@/lib/saintTags';
 
 interface SaintOfTheDayCardProps {
   userCountryCode?: string | null;
@@ -193,8 +194,8 @@ export const SaintOfTheDayCard = ({ userCountryCode }: SaintOfTheDayCardProps) =
             {saint.tags && saint.tags.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mb-4">
                 {saint.tags.slice(0, 3).map((tag) => (
-                  <Badge key={tag} variant="outline" className="text-xs capitalize">
-                    {tag.replace(/_/g, ' ')}
+                  <Badge key={tag} variant="outline" className="text-xs">
+                    {formatSaintTag(tag)}
                   </Badge>
                 ))}
               </div>
@@ -285,7 +286,7 @@ export const SaintOfTheDayCard = ({ userCountryCode }: SaintOfTheDayCardProps) =
                 <li><span className="font-medium text-foreground">Nombre:</span> {saint.name}</li>
                 <li><span className="font-medium text-foreground">Fiesta litúrgica:</span> {formatDate(saint.feast_month, saint.feast_day)}</li>
                 {saint.tags && saint.tags.length > 0 && (
-                  <li><span className="font-medium text-foreground">Reconocido/a por:</span> {saint.tags.slice(0, 4).map(t => t.replace(/_/g, ' ')).join(', ')}</li>
+                  <li><span className="font-medium text-foreground">Reconocido/a por:</span> {saint.tags.slice(0, 4).map(formatSaintTag).join(', ')}</li>
                 )}
                 <li className="italic">Canonizado/a por la Iglesia Católica.</li>
               </ul>
@@ -295,8 +296,8 @@ export const SaintOfTheDayCard = ({ userCountryCode }: SaintOfTheDayCardProps) =
                 <p className="text-sm font-medium mb-2">Patronazgos:</p>
                 <div className="flex flex-wrap gap-1.5">
                   {saint.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="capitalize">
-                      {tag.replace(/_/g, ' ')}
+                    <Badge key={tag} variant="secondary">
+                      {formatSaintTag(tag)}
                     </Badge>
                   ))}
                 </div>
