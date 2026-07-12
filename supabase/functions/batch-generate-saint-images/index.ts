@@ -33,7 +33,7 @@ serve(async (req) => {
 
     // Get optional filter from request body
     const body = await req.json().catch(() => ({}));
-    const { onlyPatrons = true, countryCode } = body;
+    const { onlyPatrons = false, countryCode, limit } = body;
 
     // Build query for saints without images
     let query = supabase
@@ -50,6 +50,9 @@ serve(async (req) => {
     if (countryCode) {
       query = query.eq('country_code', countryCode);
     }
+
+    const requestedLimit = Math.min(Math.max(Number(limit) || 8, 1), 25);
+    query = query.limit(requestedLimit);
 
     const { data: saints, error: fetchError } = await query;
 

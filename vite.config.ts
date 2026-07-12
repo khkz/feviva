@@ -15,7 +15,9 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "logo-elrugido.png", "robots.txt"],
+      injectRegister: null,
+      includeAssets: ["favicon.ico", "logo-elrugido.png", "pwa-192x192.png", "pwa-512x512.png", "apple-touch-icon.png", "robots.txt"],
+      devOptions: { enabled: false },
       manifest: {
         name: "ElRugido - Fe Católica",
         short_name: "ElRugido",
@@ -25,14 +27,27 @@ export default defineConfig(({ mode }) => ({
         display: "standalone",
         orientation: "portrait",
         scope: "/",
-        start_url: "/dashboard",
+        start_url: "/dashboard?source=pwa",
+        id: "/",
         categories: ["education", "lifestyle"],
         icons: [
           {
-            src: "/logo-elrugido.png",
+            src: "/pwa-192x192.png",
+            sizes: "192x192",
+            type: "image/png",
+            purpose: "any",
+          },
+          {
+            src: "/pwa-512x512.png",
             sizes: "512x512",
             type: "image/png",
-            purpose: "any maskable",
+            purpose: "any",
+          },
+          {
+            src: "/pwa-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "maskable",
           },
         ],
       },
@@ -40,7 +55,24 @@ export default defineConfig(({ mode }) => ({
         globPatterns: ["**/*.{js,css,html,ico,png,svg,jpg,webp,woff,woff2}"],
         navigateFallback: "/index.html",
         navigateFallbackDenylist: [/^\/~oauth/, /^\/api/],
-      runtimeCaching: [
+        runtimeCaching: [
+          {
+            urlPattern: ({ request }) => request.mode === "navigate",
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "app-shell-cache",
+              networkTimeoutSeconds: 3,
+              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 },
+            },
+          },
+          {
+            urlPattern: /^https?:\/\/[^/]+\/assets\/.*\.(?:js|css|woff2?|png|svg|webp|jpg|ico)$/,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "static-assets-cache",
+              expiration: { maxEntries: 80, maxAgeSeconds: 60 * 60 * 24 * 30 },
+            },
+          },
           {
             urlPattern: /^https:\/\/duggdnqpemwojkojfyei\.supabase\.co\/rest\/v1\/daily_content/,
             handler: "StaleWhileRevalidate",
@@ -51,10 +83,11 @@ export default defineConfig(({ mode }) => ({
           },
           {
             urlPattern: /^https:\/\/duggdnqpemwojkojfyei\.supabase\.co\/rest\/v1\/calendar_saints/,
-            handler: "StaleWhileRevalidate",
+            handler: "NetworkFirst",
             options: {
               cacheName: "saints-cache",
-              expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 },
+              networkTimeoutSeconds: 4,
+              expiration: { maxEntries: 50, maxAgeSeconds: 60 * 30 },
             },
           },
           {

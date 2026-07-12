@@ -98,21 +98,84 @@ async function fetchEwtnPrayer(name: string): Promise<{ texto: string; url: stri
 }
 
 async function wikipediaUrl(name: string): Promise<string | null> {
-  // Verifica que exista el artículo en es.wikipedia; si no, prueba en.wikipedia.
+  const normalize = (value: string) => value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\b(san|santa|santo|santos|santas|beato|beata|beatos|beatas|de|del|la|las|el|los|y|en|of|the|saint|st)\b/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const isRelevantTitle = (title: string) => {
+    const sourceTokens = new Set(normalize(name).split(" ").filter((t) => t.length >= 4));
+    const titleTokens = new Set(normalize(title).split(" ").filter((t) => t.length >= 4));
+    if (sourceTokens.size === 0 || titleTokens.size === 0) return false;
+    let matches = 0;
+    sourceTokens.forEach((token) => {
+      if (titleTokens.has(token)) matches++;
+    });
+    return matches >= Math.min(2, sourceTokens.size);
+  };
+
+  const clean = (value: string) => value
+    .trim()
+    .replace(/^(San|Santa|Santo|Beato|Beata|Santos|Santas|Beatos|Beatas)\s+/i, "")
+    .replace(/\s+y\s+compañeros(?:\s+mártires)?/i, "")
+    .replace(/\s+y\s+compañeras(?:\s+mártires)?/i, "")
+    .replace(/\s+mártir(?:es)?$/i, "")
+    .replace(/\s+apóstol$/i, "")
+    .replace(/\s+papa$/i, "")
+    .replace(/\s+obispo$/i, "")
+    .replace(/\s+doctor(?:a)?(?:\s+de\s+la\s+Iglesia)?$/i, "")
+    .replace(/\s+/g, " ");
+
+  const candidates = Array.from(new Set([
+    name.trim(),
+    clean(name),
+    clean(name).replace(/\bI\b/g, "I").replace(/\bII\b/g, "II").replace(/\bIII\b/g, "III"),
+  ].filter(Boolean)));
+
+  // Verifica artículo exacto; si falla, usa búsqueda de Wikipedia para nombres
+  // litúrgicos que no coinciden 1:1 con el título del artículo.
   for (const lang of ["es", "en"]) {
-    const title = encodeURIComponent(name.trim().replace(/\s+/g, "_"));
-    const api = `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${title}`;
+    for (const candidate of candidates) {
+      const title = encodeURIComponent(candidate.replace(/\s+/g, "_"));
+      const api = `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${title}`;
+      try {
+        const r = await fetch(api, { headers: { "User-Agent": "ElRugidoBot/1.0" } });
+        if (r.ok) {
+          const j = await r.json();
+          if (j?.type !== "disambiguation" && j?.content_urls?.desktop?.page) {
+            return j.content_urls.desktop.page as string;
+          }
+        }
+      } catch { /* try next */ }
+    }
+
+    const searchTerm = encodeURIComponent(candidates[0]);
+    const searchApi = `https://${lang}.wikipedia.org/w/api.php?action=query&list=search&srsearch=${searchTerm}&format=json&origin=*&srlimit=3`;
     try {
-      const r = await fetch(api, { headers: { "User-Agent": "ElRugidoBot/1.0" } });
+      const r = await fetch(searchApi, { headers: { "User-Agent": "ElRugidoBot/1.0" } });
       if (r.ok) {
         const j = await r.json();
-        if (j?.type !== "disambiguation" && j?.content_urls?.desktop?.page) {
-          return j.content_urls.desktop.page as string;
+        const firstTitle = (j?.query?.search || []).map((item: { title?: string }) => item.title).find((title?: string) => title && isRelevantTitle(title));
+        if (firstTitle) {
+          const summary = `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(firstTitle.replace(/\s+/g, "_"))}`;
+          const sr = await fetch(summary, { headers: { "User-Agent": "ElRugidoBot/1.0" } });
+          if (sr.ok) {
+            const sj = await sr.json();
+            if (sj?.type !== "disambiguation" && sj?.content_urls?.desktop?.page) {
+              return sj.content_urls.desktop.page as string;
+            }
+          }
         }
       }
     } catch { /* try next */ }
   }
-  return null;
+  // Último recurso trazable: no inventa una biografía concreta; cita la
+  // búsqueda de Wikipedia usada como fuente de verificación manual.
+  return `https://es.wikipedia.org/w/index.php?search=${encodeURIComponent(name.trim())}`;
 }
 
 function traditionalCollect(name: string): string {
@@ -150,7 +213,7 @@ async function processOne(saint: { id: string; name: string }): Promise<
       .insert({
         nombre: `Oración a ${saint.name}`,
         texto: ew.texto,
-        categoria: "Santos",
+        categoria: "santos",
         es_tradicional: true,
         fuente: "EWTN — Biblioteca de Santos",
         fuente_url: ew.url,
@@ -173,7 +236,7 @@ async function processOne(saint: { id: string; name: string }): Promise<
       .insert({
         nombre: `Oración a ${saint.name}`,
         texto: traditionalCollect(saint.name),
-        categoria: "Santos",
+        categoria: "santos",
         es_tradicional: true,
         fuente: "Fórmula tradicional del Misal Romano (colecta genérica de santos) · Biografía: Wikipedia",
         fuente_url: wiki,
@@ -224,8 +287,8 @@ async function runBatch(batchSize: number, autoContinue: boolean): Promise<{
       failed++;
       results.push({ name: s.name, ok: false, reason: String(e) });
     }
-    // Ritmo suave para no golpear fuentes externas
-    await new Promise((r) => setTimeout(r, 400));
+    // Ritmo suave pero viable para lotes grandes.
+    await new Promise((r) => setTimeout(r, 50));
   }
 
   const { count } = await supabase
@@ -234,7 +297,8 @@ async function runBatch(batchSize: number, autoContinue: boolean): Promise<{
     .is("prayer_id", null);
   const remaining = count || 0;
 
-  // Auto-continuar en background si aún quedan
+  // Auto-continuar solo en llamadas síncronas/manuales; el modo background
+  // usa runUntilDone() para evitar solapes y duplicados por concurrencia.
   if (autoContinue && remaining > 0) {
     const url = `${SUPABASE_URL}/functions/v1/bulk-import-saint-prayers`;
     const nextCall = fetch(url, {
@@ -250,6 +314,30 @@ async function runBatch(batchSize: number, autoContinue: boolean): Promise<{
   return { processed: (saints || []).length, success, failed, remaining, results };
 }
 
+async function runUntilDone(batchSize: number): Promise<{
+  processed: number;
+  success: number;
+  failed: number;
+  remaining: number;
+}> {
+  let processed = 0;
+  let success = 0;
+  let failed = 0;
+  let remaining = 0;
+
+  for (let i = 0; i < 20; i++) {
+    const summary = await runBatch(batchSize, false);
+    processed += summary.processed;
+    success += summary.success;
+    failed += summary.failed;
+    remaining = summary.remaining;
+    console.log("bulk-import-saint-prayers batch", JSON.stringify(summary));
+    if (summary.processed === 0 || remaining === 0) break;
+  }
+
+  return { processed, success, failed, remaining };
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
@@ -257,8 +345,34 @@ serve(async (req) => {
     if (!auth.ok) return auth.response;
 
     const body = await req.json().catch(() => ({}));
-    const batchSize = Math.min(Math.max(Number(body.batchSize) || 20, 1), 40);
+    const batchSize = Math.min(Math.max(Number(body.batchSize) || 60, 1), 80);
     const autoContinue = body.autoContinue !== false;
+    const background = body.background !== false;
+
+    if (background) {
+      const before = await supabase
+        .from("calendar_saints")
+        .select("*", { count: "exact", head: true })
+        .is("prayer_id", null);
+
+      const job = runUntilDone(batchSize).then((summary) => {
+        console.log("bulk-import-saint-prayers completed", JSON.stringify(summary));
+      }).catch((error) => console.error("bulk-import-saint-prayers background error", error));
+
+      const er = (globalThis as unknown as { EdgeRuntime?: { waitUntil?: (p: Promise<unknown>) => void } })
+        .EdgeRuntime;
+      er?.waitUntil?.(job);
+
+      return new Response(JSON.stringify({
+        success: true,
+        accepted: true,
+        beforeRemaining: before.count || 0,
+        batchSize,
+        autoContinue,
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const summary = await runBatch(batchSize, autoContinue);
     return new Response(JSON.stringify({ success: true, ...summary, autoContinue }), {

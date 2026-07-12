@@ -310,21 +310,23 @@ export default function AdminSantos() {
   // Batch generate images (fuerza refetch para que el contador se actualice)
   const batchImageMutation = useMutation({
     mutationFn: async () => {
+      const beforeMissing = stats.withoutImage;
       const { data, error } = await supabase.functions.invoke('batch-generate-saint-images', {
         body: {
           onlyPatrons: batchCategory === 'patron_country',
-          limit: batchLimit
+          limit: Math.min(batchLimit, beforeMissing)
         },
       });
       if (error) throw error;
-      return data;
+      return { ...data, beforeMissing };
     },
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({ queryKey: ['admin-calendar-saints'] });
-      await refetch(); // fuerza refetch inmediato — fix del contador "8 faltan" persistente
+      const refreshed = await refetch(); // fuerza refetch inmediato — fix del contador persistente
+      const afterMissing = (refreshed.data || []).filter((s) => !s.image_url).length;
       const ok = data?.successCount ?? data?.success ?? 0;
       const failed = data?.failed ?? 0;
-      toast.success(`Generadas ${ok} imágenes${failed ? ` (${failed} fallidas)` : ''}. Recuento actualizado.`);
+      toast.success(`Imágenes: ${data?.beforeMissing} faltaban → ${afterMissing} faltan. Generadas ${ok}${failed ? `, fallidas ${failed}` : ''}.`);
     },
     onError: (error) => {
       toast.error('Error en batch: ' + error.message);
@@ -335,7 +337,7 @@ export default function AdminSantos() {
   const bulkPrayersMutation = useMutation({
     mutationFn: async () => {
       const { data, error } = await supabase.functions.invoke('bulk-import-saint-prayers', {
-        body: { batchSize: 25, autoContinue: true },
+        body: { batchSize: 60, autoContinue: true, background: true },
       });
       if (error) throw error;
       return data;
@@ -343,8 +345,8 @@ export default function AdminSantos() {
     onSuccess: async (data) => {
       await refetch();
       toast.success(
-        `Lote inicial: ${data?.success || 0} oraciones creadas, ${data?.failed || 0} fallidas. ` +
-        `Quedan ${data?.remaining || 0}. Se sigue procesando en segundo plano — actualiza en 1-2 min.`,
+        `Importación aceptada: ${data?.beforeRemaining || stats.withoutPrayer} pendientes. ` +
+        `Procesa lotes de ${data?.batchSize || 60} en segundo plano — actualiza en 1-2 min.`,
         { duration: 8000 }
       );
     },
