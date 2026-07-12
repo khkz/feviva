@@ -293,6 +293,13 @@ All colors MUST be HSL.
     pointer-events: auto;
   }
 
+  /* Cuerpo de lectura larga (relato del santo). 18px / 1.7 para prosa. */
+  .saint-story-body,
+  .saint-story-body p {
+    font-size: 18px !important;
+    line-height: 1.7 !important;
+  }
+
   /* Fluid typography */
   .text-fluid-sm {
     font-size: clamp(0.875rem, 1.5vw + 0.25rem, 1rem);
