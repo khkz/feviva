@@ -55,7 +55,10 @@ import {
   Download,
   Cross,
   Globe,
+  ShieldCheck,
 } from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import SaintsVerificationPanel from '@/components/admin/SaintsVerificationPanel';
 
 interface CalendarSaint {
   id: string;
