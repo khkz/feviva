@@ -59,7 +59,7 @@ export default function SaintsVerificationPanel() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("calendar_saints")
-        .select("id,name,feast_day,feast_month,tags,estado_verificacion,fuente_url,description_source,discrepancia_detalle,verificado_at")
+        .select("id,name,feast_day,feast_month,tags,estado_verificacion,fuente_url,description_source,discrepancia_detalle,verificado_at,duplicado_de")
         .order("estado_verificacion")
         .order("feast_month")
         .order("feast_day")
