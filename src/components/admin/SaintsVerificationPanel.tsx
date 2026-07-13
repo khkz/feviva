@@ -179,18 +179,20 @@ export default function SaintsVerificationPanel() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
             <StatBox label="Total" value={counts.total} />
             <StatBox label="Sin verificar" value={counts.sin} color="text-muted-foreground" />
             <StatBox label="Contrastado OK" value={counts.ok} color="text-green-600" icon={<ShieldCheck className="h-4 w-4" />} />
+            <StatBox label="Corregidas" value={counts.corregida} color="text-blue-600" />
+            <StatBox label="Doble calendario" value={counts.dobleCal} color="text-indigo-600" />
             <StatBox label="Discrepancias" value={counts.disc} color="text-red-600" icon={<AlertTriangle className="h-4 w-4" />} />
-            <StatBox label="Sin fuente" value={counts.sinFuente} color="text-amber-600" icon={<HelpCircle className="h-4 w-4" />} />
+            <StatBox label="Fuente sin fecha" value={counts.fuenteSinFecha} color="text-amber-600" icon={<HelpCircle className="h-4 w-4" />} />
+            <StatBox label="Sin fuente" value={counts.sinFuente} color="text-orange-700" icon={<HelpCircle className="h-4 w-4" />} />
+          </div>
+          <div className="text-xs text-muted-foreground">
+            Duplicados marcados y ocultos en la app: <strong>{counts.duplicados}</strong>
           </div>
 
-          <div>
-            <div className="text-xs text-muted-foreground mb-1">Progreso: {done}/{counts.total} ({pct}%)</div>
-            <Progress value={pct} />
-          </div>
 
           <div className="flex flex-wrap gap-3 items-center">
             <select
