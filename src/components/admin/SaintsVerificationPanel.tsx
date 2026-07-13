@@ -193,6 +193,12 @@ export default function SaintsVerificationPanel() {
             Duplicados marcados y ocultos en la app: <strong>{counts.duplicados}</strong>
           </div>
 
+          <div>
+            <div className="text-xs text-muted-foreground mb-1">Progreso: {done}/{counts.total} ({pct}%)</div>
+            <Progress value={pct} />
+          </div>
+
+
 
           <div className="flex flex-wrap gap-3 items-center">
             <select
