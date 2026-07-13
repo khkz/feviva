@@ -45,6 +45,7 @@ interface VerifRow {
   description_source: string | null;
   discrepancia_detalle: Record<string, unknown> | null;
   verificado_at: string | null;
+  duplicado_de: string | null;
 }
 
 const MONTH = ["", "Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
@@ -58,7 +59,7 @@ export default function SaintsVerificationPanel() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("calendar_saints")
-        .select("id,name,feast_day,feast_month,tags,estado_verificacion,fuente_url,description_source,discrepancia_detalle,verificado_at")
+        .select("id,name,feast_day,feast_month,tags,estado_verificacion,fuente_url,description_source,discrepancia_detalle,verificado_at,duplicado_de")
         .order("estado_verificacion")
         .order("feast_month")
         .order("feast_day")
@@ -74,7 +75,11 @@ export default function SaintsVerificationPanel() {
     sin: rows.filter(r => r.estado_verificacion === "sin_verificar").length,
     ok: rows.filter(r => r.estado_verificacion === "contrastado_ok").length,
     disc: rows.filter(r => r.estado_verificacion === "discrepancia").length,
+    corregida: rows.filter(r => r.estado_verificacion === "discrepancia_corregida").length,
+    dobleCal: rows.filter(r => r.estado_verificacion === "doble_calendario").length,
+    fuenteSinFecha: rows.filter(r => r.estado_verificacion === "fuente_sin_fecha").length,
     sinFuente: rows.filter(r => r.estado_verificacion === "sin_fuente").length,
+    duplicados: rows.filter(r => (r as any).duplicado_de).length,
   };
   const done = counts.total - counts.sin;
   const pct = counts.total ? Math.round((done / counts.total) * 100) : 0;
@@ -158,6 +163,7 @@ export default function SaintsVerificationPanel() {
 
   const discrepancias = rows.filter(r => r.estado_verificacion === "discrepancia");
   const sinFuente = rows.filter(r => r.estado_verificacion === "sin_fuente");
+  const fuenteSinFecha = rows.filter(r => r.estado_verificacion === "fuente_sin_fecha");
 
   return (
     <div className="space-y-6">
@@ -174,18 +180,26 @@ export default function SaintsVerificationPanel() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
             <StatBox label="Total" value={counts.total} />
             <StatBox label="Sin verificar" value={counts.sin} color="text-muted-foreground" />
             <StatBox label="Contrastado OK" value={counts.ok} color="text-green-600" icon={<ShieldCheck className="h-4 w-4" />} />
+            <StatBox label="Corregidas" value={counts.corregida} color="text-blue-600" />
+            <StatBox label="Doble calendario" value={counts.dobleCal} color="text-indigo-600" />
             <StatBox label="Discrepancias" value={counts.disc} color="text-red-600" icon={<AlertTriangle className="h-4 w-4" />} />
-            <StatBox label="Sin fuente" value={counts.sinFuente} color="text-amber-600" icon={<HelpCircle className="h-4 w-4" />} />
+            <StatBox label="Fuente sin fecha" value={counts.fuenteSinFecha} color="text-amber-600" icon={<HelpCircle className="h-4 w-4" />} />
+            <StatBox label="Sin fuente" value={counts.sinFuente} color="text-orange-700" icon={<HelpCircle className="h-4 w-4" />} />
+          </div>
+          <div className="text-xs text-muted-foreground">
+            Duplicados marcados y ocultos en la app: <strong>{counts.duplicados}</strong>
           </div>
 
           <div>
             <div className="text-xs text-muted-foreground mb-1">Progreso: {done}/{counts.total} ({pct}%)</div>
             <Progress value={pct} />
           </div>
+
+
 
           <div className="flex flex-wrap gap-3 items-center">
             <select
@@ -308,14 +322,50 @@ export default function SaintsVerificationPanel() {
         <CardHeader>
           <CardTitle className="text-amber-600 flex items-center gap-2">
             <HelpCircle className="h-5 w-5" />
-            Sin fuente verificable ({sinFuente.length})
+            Fuente citada, pero sin fecha estructurada ({fuenteSinFecha.length})
           </CardTitle>
-          <CardDescription>No hay Wikipedia u otra fuente registrada para contrastar.</CardDescription>
+          <CardDescription>
+            Tienen artículo de Wikipedia guardado, pero el artículo no declara la festividad en un campo estructurado.
+            La fecha de la app puede ser correcta; requiere verificación manual.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <ScrollArea className="h-[260px] pr-2">
+            {fuenteSinFecha.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Ninguno en este estado.</p>
+            ) : (
+              <ul className="text-sm space-y-1">
+                {fuenteSinFecha.map((r) => (
+                  <li key={r.id} className="flex justify-between border-b py-1 gap-2">
+                    <span className="truncate">{r.name}</span>
+                    <span className="flex items-center gap-2 text-xs text-muted-foreground shrink-0">
+                      {r.feast_day} {MONTH[r.feast_month]}
+                      {r.fuente_url && (
+                        <a href={r.fuente_url} target="_blank" rel="noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">
+                          fuente <ExternalLink className="h-3 w-3" />
+                        </a>
+                      )}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </ScrollArea>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-orange-700 flex items-center gap-2">
+            <HelpCircle className="h-5 w-5" />
+            Sin fuente registrada ({sinFuente.length})
+          </CardTitle>
+          <CardDescription>No hay Wikipedia u otra fuente URL guardada para contrastar.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ScrollArea className="h-[200px] pr-2">
             {sinFuente.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Todos los verificados tenían fuente.</p>
+              <p className="text-sm text-muted-foreground">Todos tienen fuente.</p>
             ) : (
               <ul className="text-sm space-y-1">
                 {sinFuente.map((r) => (

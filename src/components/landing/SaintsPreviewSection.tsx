@@ -35,6 +35,7 @@ export function SaintsPreviewSection() {
         .from('calendar_saints')
         .select('id, name, slug, image_url, feast_day, feast_month, category, country_code, description')
         .eq('category', 'patron_country')
+        .is('duplicado_de', null)
         .not('image_url', 'is', null)
         .limit(6);
 
