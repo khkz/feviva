@@ -1,0 +1,2 @@
+ALTER TABLE public.calendar_saints ADD COLUMN IF NOT EXISTS duplicado_de UUID REFERENCES public.calendar_saints(id) ON DELETE SET NULL;
+CREATE INDEX IF NOT EXISTS idx_calendar_saints_duplicado_de ON public.calendar_saints(duplicado_de);

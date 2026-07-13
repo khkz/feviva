@@ -378,6 +378,7 @@ export type Database = {
           description: string | null
           description_source: string | null
           discrepancia_detalle: Json | null
+          duplicado_de: string | null
           estado_verificacion: string
           feast_day: number
           feast_month: number
@@ -402,6 +403,7 @@ export type Database = {
           description?: string | null
           description_source?: string | null
           discrepancia_detalle?: Json | null
+          duplicado_de?: string | null
           estado_verificacion?: string
           feast_day: number
           feast_month: number
@@ -426,6 +428,7 @@ export type Database = {
           description?: string | null
           description_source?: string | null
           discrepancia_detalle?: Json | null
+          duplicado_de?: string | null
           estado_verificacion?: string
           feast_day?: number
           feast_month?: number
@@ -444,6 +447,13 @@ export type Database = {
           verificado_por_agente?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "calendar_saints_duplicado_de_fkey"
+            columns: ["duplicado_de"]
+            isOneToOne: false
+            referencedRelation: "calendar_saints"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "calendar_saints_prayer_id_fkey"
             columns: ["prayer_id"]
@@ -2788,6 +2798,7 @@ export type Database = {
           description: string | null
           description_source: string | null
           discrepancia_detalle: Json | null
+          duplicado_de: string | null
           estado_verificacion: string
           feast_day: number
           feast_month: number
