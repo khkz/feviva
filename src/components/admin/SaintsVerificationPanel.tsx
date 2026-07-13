@@ -74,7 +74,11 @@ export default function SaintsVerificationPanel() {
     sin: rows.filter(r => r.estado_verificacion === "sin_verificar").length,
     ok: rows.filter(r => r.estado_verificacion === "contrastado_ok").length,
     disc: rows.filter(r => r.estado_verificacion === "discrepancia").length,
+    corregida: rows.filter(r => r.estado_verificacion === "discrepancia_corregida").length,
+    dobleCal: rows.filter(r => r.estado_verificacion === "doble_calendario").length,
+    fuenteSinFecha: rows.filter(r => r.estado_verificacion === "fuente_sin_fecha").length,
     sinFuente: rows.filter(r => r.estado_verificacion === "sin_fuente").length,
+    duplicados: rows.filter(r => (r as any).duplicado_de).length,
   };
   const done = counts.total - counts.sin;
   const pct = counts.total ? Math.round((done / counts.total) * 100) : 0;
