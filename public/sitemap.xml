@@ -82,6 +82,16 @@
     </image:image>
   </url>
   <url>
+    <loc>https://elrugido.com/santo/san-oscar-romero</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-oscar-romero-1768247984182.jpg</image:loc>
+      <image:title>San Óscar Romero</image:title>
+    </image:image>
+  </url>
+  <url>
     <loc>https://elrugido.com/santo/santa-isabel-de-portugal</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -99,6 +109,76 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-adrian-iii-1768260865322.jpg</image:loc>
       <image:title>San Adrián III</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-pelayo-de-cordoba</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-pelayo-de-cordoba-1768260800601.jpg</image:loc>
+      <image:title>San Pelayo de Córdoba</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-frumencio</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-frumencio-1768270194677.jpg</image:loc>
+      <image:title>San Frumencio</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-aniceto</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-aniceto-1768253409338.jpg</image:loc>
+      <image:title>San Aniceto</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/nuestra-senora-del-buen-consejo</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/nuestra-senora-del-buen-consejo-1768259802845.jpg</image:loc>
+      <image:title>Nuestra Señora del Buen Consejo</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-junipero-serra</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-junipero-serra-1768260824731.jpg</image:loc>
+      <image:title>San Junípero Serra</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/natividad-de-san-juan-bautista</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/natividad-de-san-juan-bautista-1768260792112.jpg</image:loc>
+      <image:title>Natividad de San Juan Bautista</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/santos-primeros-martires-de-roma</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santos-primeros-martires-de-roma-1768260821544.jpg</image:loc>
+      <image:title>Santos Primeros Mártires de Roma</image:title>
     </image:image>
   </url>
   <url>
@@ -132,26 +212,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/natividad-de-san-juan-bautista</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/natividad-de-san-juan-bautista-1768260792112.jpg</image:loc>
-      <image:title>Natividad de San Juan Bautista</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/santos-primeros-martires-de-roma</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santos-primeros-martires-de-roma-1768260821544.jpg</image:loc>
-      <image:title>Santos Primeros Mártires de Roma</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/san-sergio-de-radonez</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -159,6 +219,26 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-sergio-de-radonez-1768268988888.jpg</image:loc>
       <image:title>San Sergio de Radonez</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-cristobal-magallanes-y-companeros</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-cristobal-magallanes-y-companeros-1768259913642.jpg</image:loc>
+      <image:title>San Cristóbal Magallanes y compañeros</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/presentacion-del-senor</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/presentacion-del-senor-1768247429429.jpg</image:loc>
+      <image:title>Presentación del Señor</image:title>
     </image:image>
   </url>
   <url>
@@ -189,16 +269,6 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-rosa-venerini-1768259855012.jpg</image:loc>
       <image:title>Santa Rosa Venerini</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/san-juan-bautista-rossi</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-juan-bautista-rossi-1768259930282.jpg</image:loc>
-      <image:title>San Juan Bautista Rossi</image:title>
     </image:image>
   </url>
   <url>
@@ -242,13 +312,53 @@
     </image:image>
   </url>
   <url>
+    <loc>https://elrugido.com/santo/santos-andres-kim-y-companeros</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santos-andres-kim-y-companeros-1783825947898.webp</image:loc>
+      <image:title>Santos Andrés Kim y compañeros</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-nicodemo</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-nicodemo-1768268371504.jpg</image:loc>
+      <image:title>San Nicodemo</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-juan-bautista-rossi</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-juan-bautista-rossi-1768259930282.jpg</image:loc>
+      <image:title>San Juan Bautista Rossi</image:title>
+    </image:image>
+  </url>
+  <url>
     <loc>https://elrugido.com/santo/san-leonardo-de-noblac</loc>
-    <lastmod>2026-07-12</lastmod>
+    <lastmod>2026-07-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-leonardo-de-noblac-1768270250112.jpg</image:loc>
       <image:title>San Leonardo de Noblac</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-cayetano</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-cayetano-1768054827427.webp</image:loc>
+      <image:title>San Cayetano</image:title>
     </image:image>
   </url>
   <url>
@@ -292,6 +402,106 @@
     </image:image>
   </url>
   <url>
+    <loc>https://elrugido.com/santo/san-casimiro</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-casimiro-1768014898792.webp</image:loc>
+      <image:title>San Casimiro</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/virgen-del-libano</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/virgen-del-libano-1768015126381.webp</image:loc>
+      <image:title>Virgen del Líbano</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-andres-de-escocia</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-andres-de-escocia-1768015867373.webp</image:loc>
+      <image:title>San Andrés de Escocia</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/virgen-de-la-asuncion-de-nueva-zelanda</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/virgen-de-la-asuncion-de-nueva-zelanda-1768015478150.webp</image:loc>
+      <image:title>Virgen de la Asunción de Nueva Zelanda</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-sotero-y-san-cayo</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-sotero-y-san-cayo-1768253437716.jpg</image:loc>
+      <image:title>San Sotero y San Cayo</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/dedicacion-de-la-basilica-de-letran</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/dedicacion-de-la-basilica-de-letran-1768270265558.jpg</image:loc>
+      <image:title>Dedicación de la Basílica de Letrán</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/santiago-apostol</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santiago-apostol-1768015357286.webp</image:loc>
+      <image:title>Santiago Apóstol</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-joaquin-y-santa-ana</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-joaquin-y-santa-ana-1768268332791.jpg</image:loc>
+      <image:title>San Joaquín y Santa Ana</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/transfiguracion-del-senor</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/transfiguracion-del-senor-1768268385843.jpg</image:loc>
+      <image:title>Transfiguración del Señor</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/virgen-de-la-asuncion-de-sudafrica</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/virgen-de-la-asuncion-de-sudafrica-1768015409908.webp</image:loc>
+      <image:title>Virgen de la Asunción de Sudáfrica</image:title>
+    </image:image>
+  </url>
+  <url>
     <loc>https://elrugido.com/santo/santa-pelagia-de-antioquia</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -312,6 +522,16 @@
     </image:image>
   </url>
   <url>
+    <loc>https://elrugido.com/santo/inmaculado-corazon-de-maria-de-angola</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/inmaculado-corazon-de-maria-de-angola-1768015531658.webp</image:loc>
+      <image:title>Inmaculado Corazón de María de Angola</image:title>
+    </image:image>
+  </url>
+  <url>
     <loc>https://elrugido.com/santo/santos-juan-fisher-y-tomas-moro</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -329,6 +549,106 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-benito-de-nursia-1768054763633.webp</image:loc>
       <image:title>San Benito de Nursia</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-zacarias-e-isabel</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-zacarias-e-isabel-1768268895012.jpg</image:loc>
+      <image:title>San Zacarías e Isabel</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-jenaro</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-jenaro-1768268954333.jpg</image:loc>
+      <image:title>San Jenaro</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-nicolas-de-bari</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-nicolas-de-bari-1768270789612.jpg</image:loc>
+      <image:title>San Nicolás de Bari</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-pantaleon</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-pantaleon-1768268336229.jpg</image:loc>
+      <image:title>San Pantaleón</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-andres-de-grecia</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-andres-de-grecia-1768015841609.webp</image:loc>
+      <image:title>San Andrés de Grecia</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/santos-nazario-y-celso</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santos-nazario-y-celso-1768268342988.jpg</image:loc>
+      <image:title>Santos Nazario y Celso</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/santa-juana-de-valois</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-juana-de-valois-1768247439491.jpg</image:loc>
+      <image:title>Santa Juana de Valois</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/santa-ines</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-ines-1768244123414.jpg</image:loc>
+      <image:title>Santa Inés</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-sebastian</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-sebastian-1768244119127.png</image:loc>
+      <image:title>San Sebastián</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/santa-matilde-de-ringelheim</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-matilde-de-ringelheim-1768247880417.jpg</image:loc>
+      <image:title>Santa Matilde de Ringelheim</image:title>
     </image:image>
   </url>
   <url>
@@ -362,6 +682,26 @@
     </image:image>
   </url>
   <url>
+    <loc>https://elrugido.com/santo/san-pedro-y-san-pablo</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-pedro-y-san-pablo-1768260815924.jpg</image:loc>
+      <image:title>San Pedro y San Pablo</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-edmundo-de-abingdon</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-edmundo-de-abingdon-1768270713325.jpg</image:loc>
+      <image:title>San Edmundo de Abingdon</image:title>
+    </image:image>
+  </url>
+  <url>
     <loc>https://elrugido.com/santo/santa-teresa-de-jesus</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -379,6 +719,46 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-laura-de-cordoba-1768269101478.jpg</image:loc>
       <image:title>Santa Laura de Córdoba</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-juan-de-capistrano</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-juan-de-capistrano-1768270177555.jpg</image:loc>
+      <image:title>San Juan de Capistrano</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/inmaculada-concepcion-de-caacupe</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/inmaculada-concepcion-de-caacupe-1768014141249.webp</image:loc>
+      <image:title>Inmaculada Concepción de Caacupé</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/santa-maria-la-antigua</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-maria-la-antigua-1768013957658.webp</image:loc>
+      <image:title>Santa María la Antigua</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/virgen-de-guadalupe</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/virgen-de-guadalupe-1768014172464.webp</image:loc>
+      <image:title>Virgen de Guadalupe</image:title>
     </image:image>
   </url>
   <url>
@@ -422,16 +802,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/dedicacion-de-las-basilicas-de-pedro-y-pablo</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/dedicacion-de-las-basilicas-de-pedro-y-pablo-1768270316622.jpg</image:loc>
-      <image:title>Dedicación de las Basílicas de Pedro y Pablo</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/san-juan-francisco-regis</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -439,6 +809,16 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-juan-francisco-regis-1768260751040.jpg</image:loc>
       <image:title>San Juan Francisco Regis</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/dedicacion-de-las-basilicas-de-pedro-y-pablo</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/dedicacion-de-las-basilicas-de-pedro-y-pablo-1768270316622.jpg</image:loc>
+      <image:title>Dedicación de las Basílicas de Pedro y Pablo</image:title>
     </image:image>
   </url>
   <url>
@@ -472,16 +852,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/santa-cecilia</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-cecilia-1768270724510.jpg</image:loc>
-      <image:title>Santa Cecilia</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/san-juan-damasceno</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -492,13 +862,13 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/dedicacion-de-santa-maria-la-mayor</loc>
-    <lastmod>2026-07-12</lastmod>
+    <loc>https://elrugido.com/santo/santa-cecilia</loc>
+    <lastmod>2026-07-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/dedicacion-de-santa-maria-la-mayor-1768268381215.jpg</image:loc>
-      <image:title>Dedicación de Santa María la Mayor</image:title>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-cecilia-1768270724510.jpg</image:loc>
+      <image:title>Santa Cecilia</image:title>
     </image:image>
   </url>
   <url>
@@ -539,6 +909,16 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-juan-de-la-cruz-1768270821708.jpg</image:loc>
       <image:title>San Juan de la Cruz</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/dedicacion-de-santa-maria-la-mayor</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/dedicacion-de-santa-maria-la-mayor-1768268381215.jpg</image:loc>
+      <image:title>Dedicación de Santa María la Mayor</image:title>
     </image:image>
   </url>
   <url>
@@ -632,6 +1012,26 @@
     </image:image>
   </url>
   <url>
+    <loc>https://elrugido.com/santo/exaltacion-de-la-santa-cruz</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/exaltacion-de-la-santa-cruz-1768268927030.jpg</image:loc>
+      <image:title>Exaltación de la Santa Cruz</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-esteban-de-hungria</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-esteban-de-hungria-1768015506409.webp</image:loc>
+      <image:title>San Esteban de Hungría</image:title>
+    </image:image>
+  </url>
+  <url>
     <loc>https://elrugido.com/santo/san-antonio-abad</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -642,26 +1042,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/san-esteban-de-hungria</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-esteban-de-hungria-1768015506409.webp</image:loc>
-      <image:title>San Esteban de Hungría</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/exaltacion-de-la-santa-cruz</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/exaltacion-de-la-santa-cruz-1768268927030.jpg</image:loc>
-      <image:title>Exaltación de la Santa Cruz</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/santa-maria-di-rosa</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -669,16 +1049,6 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-maria-di-rosa-1768270826001.jpg</image:loc>
       <image:title>Santa María di Rosa</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/santa-maria-virgen-reina</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-maria-virgen-reina-1768268826551.png</image:loc>
-      <image:title>Santa María Virgen Reina</image:title>
     </image:image>
   </url>
   <url>
@@ -699,6 +1069,16 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-juan-jose-de-la-cruz-1768247840962.jpg</image:loc>
       <image:title>San Juan José de la Cruz</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/santa-maria-virgen-reina</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-maria-virgen-reina-1768268826551.png</image:loc>
+      <image:title>Santa María Virgen Reina</image:title>
     </image:image>
   </url>
   <url>
@@ -743,7 +1123,7 @@
   </url>
   <url>
     <loc>https://elrugido.com/santo/san-eulogio-de-cordoba</loc>
-    <lastmod>2026-07-12</lastmod>
+    <lastmod>2026-07-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <image:image>
@@ -762,26 +1142,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/santa-juana-jugan</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-juana-jugan-1768268859933.jpg</image:loc>
-      <image:title>Santa Juana Jugan</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/santa-familia-de-jesus-maria-y-jose</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-familia-de-jesus-maria-y-jose-1768271540259.jpg</image:loc>
-      <image:title>Santa Familia de Jesús, María y José</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/san-clemente-maria-hofbauer</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -792,8 +1152,28 @@
     </image:image>
   </url>
   <url>
+    <loc>https://elrugido.com/santo/santa-juana-jugan</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-juana-jugan-1768268859933.jpg</image:loc>
+      <image:title>Santa Juana Jugan</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/santa-familia-de-jesus-maria-y-jose</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-familia-de-jesus-maria-y-jose-1768271540259.jpg</image:loc>
+      <image:title>Santa Familia de Jesús, María y José</image:title>
+    </image:image>
+  </url>
+  <url>
     <loc>https://elrugido.com/santo/beato-bartolome-gutierrez</loc>
-    <lastmod>2026-07-12</lastmod>
+    <lastmod>2026-07-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <image:image>
@@ -823,7 +1203,7 @@
   </url>
   <url>
     <loc>https://elrugido.com/santo/santisimo-nombre-de-maria</loc>
-    <lastmod>2026-07-12</lastmod>
+    <lastmod>2026-07-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <image:image>
@@ -873,7 +1253,7 @@
   </url>
   <url>
     <loc>https://elrugido.com/santo/virgen-de-la-divina-pastora</loc>
-    <lastmod>2026-07-12</lastmod>
+    <lastmod>2026-07-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <image:image>
@@ -893,7 +1273,7 @@
   </url>
   <url>
     <loc>https://elrugido.com/santo/nuestra-senora-del-carmen</loc>
-    <lastmod>2026-07-12</lastmod>
+    <lastmod>2026-07-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <image:image>
@@ -1053,7 +1433,7 @@
   </url>
   <url>
     <loc>https://elrugido.com/santo/san-canuto-iv</loc>
-    <lastmod>2026-07-12</lastmod>
+    <lastmod>2026-07-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <image:image>
@@ -1063,22 +1443,12 @@
   </url>
   <url>
     <loc>https://elrugido.com/santo/san-jose-de-austria</loc>
-    <lastmod>2026-07-12</lastmod>
+    <lastmod>2026-07-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-jose-de-austria-1768014957893.webp</image:loc>
       <image:title>San José de Austria</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/san-mario-y-companeros-martires</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-mario-y-companeros-martires-1768244103252.jpg</image:loc>
-      <image:title>San Mario y compañeros mártires</image:title>
     </image:image>
   </url>
   <url>
@@ -1089,6 +1459,26 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-maria-josefa-del-corazon-de-jesus-1768247962252.jpg</image:loc>
       <image:title>Santa María Josefa del Corazón de Jesús</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-mario-y-companeros-martires</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-mario-y-companeros-martires-1768244103252.jpg</image:loc>
+      <image:title>San Mario y compañeros mártires</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-enrique-de-upsala</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-enrique-de-upsala-1768014790878.webp</image:loc>
+      <image:title>San Enrique de Upsala</image:title>
     </image:image>
   </url>
   <url>
@@ -1112,16 +1502,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/san-enrique-de-upsala</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-enrique-de-upsala-1768014790878.webp</image:loc>
-      <image:title>San Enrique de Upsala</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/san-vicente-pallotti</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -1139,16 +1519,6 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-josefina-bakhita-1768247718382.jpg</image:loc>
       <image:title>Santa Josefina Bakhita</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/san-simeon-de-jerusalen</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-simeon-de-jerusalen-1768247765597.jpg</image:loc>
-      <image:title>San Simeón de Jerusalén</image:title>
     </image:image>
   </url>
   <url>
@@ -1172,8 +1542,18 @@
     </image:image>
   </url>
   <url>
+    <loc>https://elrugido.com/santo/san-simeon-de-jerusalen</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-simeon-de-jerusalen-1768247765597.jpg</image:loc>
+      <image:title>San Simeón de Jerusalén</image:title>
+    </image:image>
+  </url>
+  <url>
     <loc>https://elrugido.com/santo/santa-catalina-de-ricci</loc>
-    <lastmod>2026-07-12</lastmod>
+    <lastmod>2026-07-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <image:image>
@@ -1193,7 +1573,7 @@
   </url>
   <url>
     <loc>https://elrugido.com/santo/los-siete-santos-fundadores-servitas</loc>
-    <lastmod>2026-07-12</lastmod>
+    <lastmod>2026-07-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <image:image>
@@ -1203,7 +1583,7 @@
   </url>
   <url>
     <loc>https://elrugido.com/santo/santa-maria-cleofas</loc>
-    <lastmod>2026-07-12</lastmod>
+    <lastmod>2026-07-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <image:image>
@@ -1229,6 +1609,16 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-peregrino-laziosi-1768054735480.webp</image:loc>
       <image:title>San Peregrino Laziosi</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/el-santisimo-nombre-de-jesus</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/el-santisimo-nombre-de-jesus-1768054835427.webp</image:loc>
+      <image:title>El Santísimo Nombre de Jesús</image:title>
     </image:image>
   </url>
   <url>
@@ -1259,16 +1649,6 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/beato-eduardo-poppe-1768260726161.jpg</image:loc>
       <image:title>Beato Eduardo Poppe</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/el-santisimo-nombre-de-jesus</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/el-santisimo-nombre-de-jesus-1768054835427.webp</image:loc>
-      <image:title>El Santísimo Nombre de Jesús</image:title>
     </image:image>
   </url>
   <url>
@@ -1322,16 +1702,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/divino-salvador-del-mundo</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/divino-salvador-del-mundo-1768013869444.webp</image:loc>
-      <image:title>Divino Salvador del Mundo</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/san-martin-de-tours</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -1352,13 +1722,13 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/san-cayetano</loc>
-    <lastmod>2026-07-12</lastmod>
+    <loc>https://elrugido.com/santo/divino-salvador-del-mundo</loc>
+    <lastmod>2026-07-13</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.8</priority>
     <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-cayetano-1768054827427.webp</image:loc>
-      <image:title>San Cayetano</image:title>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/divino-salvador-del-mundo-1768013869444.webp</image:loc>
+      <image:title>Divino Salvador del Mundo</image:title>
     </image:image>
   </url>
   <url>
@@ -1369,16 +1739,6 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/virgen-de-la-altagracia-1768013783734.webp</image:loc>
       <image:title>Virgen de la Altagracia</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/san-oscar-romero</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-oscar-romero-1768247984182.jpg</image:loc>
-      <image:title>San Óscar Romero</image:title>
     </image:image>
   </url>
   <url>
@@ -1419,6 +1779,16 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-pablo-de-malta-1768014844339.webp</image:loc>
       <image:title>San Pablo de Malta</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/inmaculada-concepcion-de-portugal</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/inmaculada-concepcion-de-portugal-1768015923931.webp</image:loc>
+      <image:title>Inmaculada Concepción de Portugal</image:title>
     </image:image>
   </url>
   <url>
@@ -1502,16 +1872,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/inmaculada-concepcion-de-portugal</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/inmaculada-concepcion-de-portugal-1768015923931.webp</image:loc>
-      <image:title>Inmaculada Concepción de Portugal</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/san-juan-de-dios</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -1529,16 +1889,6 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-bertoldo-del-monte-carmelo-1768248021298.jpg</image:loc>
       <image:title>San Bertoldo del Monte Carmelo</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/san-casimiro</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-casimiro-1768014898792.webp</image:loc>
-      <image:title>San Casimiro</image:title>
     </image:image>
   </url>
   <url>
@@ -1582,6 +1932,16 @@
     </image:image>
   </url>
   <url>
+    <loc>https://elrugido.com/santo/san-miguel-de-papua-nueva-guinea</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-miguel-de-papua-nueva-guinea-1768015727826.webp</image:loc>
+      <image:title>San Miguel de Papúa Nueva Guinea</image:title>
+    </image:image>
+  </url>
+  <url>
     <loc>https://elrugido.com/santo/san-miguel-de-ucrania</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -1592,6 +1952,16 @@
     </image:image>
   </url>
   <url>
+    <loc>https://elrugido.com/santo/virgen-reina-de-nigeria</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/virgen-reina-de-nigeria-1768015755991.webp</image:loc>
+      <image:title>Virgen Reina de Nigeria</image:title>
+    </image:image>
+  </url>
+  <url>
     <loc>https://elrugido.com/santo/san-andres-kim-taegon</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -1599,26 +1969,6 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-andres-kim-taegon-1768015619276.webp</image:loc>
       <image:title>San Andrés Kim Taegon</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/san-miguel-de-papua-nueva-guinea</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-miguel-de-papua-nueva-guinea-1768015727826.webp</image:loc>
-      <image:title>San Miguel de Papúa Nueva Guinea</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/virgen-reina-de-nigeria</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/virgen-reina-de-nigeria-1768015755991.webp</image:loc>
-      <image:title>Virgen Reina de Nigeria</image:title>
     </image:image>
   </url>
   <url>
@@ -1642,26 +1992,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/virgen-del-libano</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/virgen-del-libano-1768015126381.webp</image:loc>
-      <image:title>Virgen del Líbano</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/san-andres-de-escocia</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-andres-de-escocia-1768015867373.webp</image:loc>
-      <image:title>San Andrés de Escocia</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/virgen-del-perpetuo-socorro-de-haiti</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -1669,26 +1999,6 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/virgen-del-perpetuo-socorro-de-haiti-1768015268043.webp</image:loc>
       <image:title>Virgen del Perpetuo Socorro de Haití</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/virgen-de-la-asuncion-de-nueva-zelanda</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/virgen-de-la-asuncion-de-nueva-zelanda-1768015478150.webp</image:loc>
-      <image:title>Virgen de la Asunción de Nueva Zelanda</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/san-pelayo-de-cordoba</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-pelayo-de-cordoba-1768260800601.jpg</image:loc>
-      <image:title>San Pelayo de Córdoba</image:title>
     </image:image>
   </url>
   <url>
@@ -1732,13 +2042,13 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/san-frumencio</loc>
-    <lastmod>2026-07-12</lastmod>
+    <loc>https://elrugido.com/santo/san-serapion-de-thmuis</loc>
+    <lastmod>2026-07-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-frumencio-1768270194677.jpg</image:loc>
-      <image:title>San Frumencio</image:title>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-serapion-de-thmuis-1768247972095.jpg</image:loc>
+      <image:title>San Serapión de Thmuis</image:title>
     </image:image>
   </url>
   <url>
@@ -1759,16 +2069,6 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-adelaida-de-italia-1768270830112.jpg</image:loc>
       <image:title>Santa Adelaida de Italia</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/san-serapion-de-thmuis</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-serapion-de-thmuis-1768247972095.jpg</image:loc>
-      <image:title>San Serapión de Thmuis</image:title>
     </image:image>
   </url>
   <url>
@@ -1862,16 +2162,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/san-sotero-y-san-cayo</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-sotero-y-san-cayo-1768253437716.jpg</image:loc>
-      <image:title>San Sotero y San Cayo</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/san-gotardo-de-hildesheim</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -1912,16 +2202,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/dedicacion-de-la-basilica-de-letran</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/dedicacion-de-la-basilica-de-letran-1768270265558.jpg</image:loc>
-      <image:title>Dedicación de la Basílica de Letrán</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/san-isidoro-de-sevilla</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -1942,16 +2222,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/san-aniceto</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-aniceto-1768253409338.jpg</image:loc>
-      <image:title>San Aniceto</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/nuestra-senora-de-loreto</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -1959,16 +2229,6 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/nuestra-senora-de-loreto-1768270802152.jpg</image:loc>
       <image:title>Nuestra Señora de Loreto</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/nuestra-senora-del-buen-consejo</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/nuestra-senora-del-buen-consejo-1768259802845.jpg</image:loc>
-      <image:title>Nuestra Señora del Buen Consejo</image:title>
     </image:image>
   </url>
   <url>
@@ -2072,16 +2332,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/san-junipero-serra</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-junipero-serra-1768260824731.jpg</image:loc>
-      <image:title>San Junípero Serra</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/san-marcelo-el-centurion</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -2102,13 +2352,13 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/san-joaquin-y-santa-ana</loc>
-    <lastmod>2026-07-12</lastmod>
+    <loc>https://elrugido.com/santo/san-buenaventura</loc>
+    <lastmod>2026-07-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-joaquin-y-santa-ana-1768268332791.jpg</image:loc>
-      <image:title>San Joaquín y Santa Ana</image:title>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-buenaventura-1768268282434.jpg</image:loc>
+      <image:title>San Buenaventura</image:title>
     </image:image>
   </url>
   <url>
@@ -2142,16 +2392,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/san-buenaventura</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-buenaventura-1768268282434.jpg</image:loc>
-      <image:title>San Buenaventura</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/san-federico-de-utrecht</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -2159,16 +2399,6 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-federico-de-utrecht-1768268300412.jpg</image:loc>
       <image:title>San Federico de Utrecht</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/santiago-apostol</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santiago-apostol-1768015357286.webp</image:loc>
-      <image:title>Santiago Apóstol</image:title>
     </image:image>
   </url>
   <url>
@@ -2189,36 +2419,6 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-juan-maria-vianney-1768268374982.jpg</image:loc>
       <image:title>San Juan María Vianney</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/transfiguracion-del-senor</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/transfiguracion-del-senor-1768268385843.jpg</image:loc>
-      <image:title>Transfiguración del Señor</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/virgen-de-la-asuncion-de-sudafrica</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/virgen-de-la-asuncion-de-sudafrica-1768015409908.webp</image:loc>
-      <image:title>Virgen de la Asunción de Sudáfrica</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/inmaculado-corazon-de-maria-de-angola</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/inmaculado-corazon-de-maria-de-angola-1768015531658.webp</image:loc>
-      <image:title>Inmaculado Corazón de María de Angola</image:title>
     </image:image>
   </url>
   <url>
@@ -2259,16 +2459,6 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-clemente-i-1768270728682.jpg</image:loc>
       <image:title>San Clemente I</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/virgen-de-guadalupe</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/virgen-de-guadalupe-1768014172464.webp</image:loc>
-      <image:title>Virgen de Guadalupe</image:title>
     </image:image>
   </url>
   <url>
@@ -2332,26 +2522,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/san-zacarias-e-isabel</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-zacarias-e-isabel-1768268895012.jpg</image:loc>
-      <image:title>San Zacarías e Isabel</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/san-jenaro</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-jenaro-1768268954333.jpg</image:loc>
-      <image:title>San Jenaro</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/asuncion-de-la-virgen-maria</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -2373,7 +2543,7 @@
   </url>
   <url>
     <loc>https://elrugido.com/santo/senor-de-los-milagros</loc>
-    <lastmod>2026-07-12</lastmod>
+    <lastmod>2026-07-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <image:image>
@@ -2383,7 +2553,7 @@
   </url>
   <url>
     <loc>https://elrugido.com/santo/santa-bibiana</loc>
-    <lastmod>2026-07-12</lastmod>
+    <lastmod>2026-07-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <image:image>
@@ -2409,16 +2579,6 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-medardo-de-noyon-1768260716083.jpg</image:loc>
       <image:title>San Medardo de Noyon</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/san-nicolas-de-bari</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-nicolas-de-bari-1768270789612.jpg</image:loc>
-      <image:title>San Nicolás de Bari</image:title>
     </image:image>
   </url>
   <url>
@@ -2452,16 +2612,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/san-pantaleon</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-pantaleon-1768268336229.jpg</image:loc>
-      <image:title>San Pantaleón</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/san-olaf</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -2489,6 +2639,16 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/virgen-de-coromoto-1768013989246.webp</image:loc>
       <image:title>Virgen de Coromoto</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-jose-de-canada</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-jose-de-canada-1768014987968.webp</image:loc>
+      <image:title>San José de Canadá</image:title>
     </image:image>
   </url>
   <url>
@@ -2572,16 +2732,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/san-jose-de-canada</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-jose-de-canada-1768014987968.webp</image:loc>
-      <image:title>San José de Canadá</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/san-ignacio-de-loyola</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -2642,16 +2792,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/san-mauricio-y-companeros</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://upload.wikimedia.org/wikipedia/commons/8/84/Blanco_y_negro_%28IA_blancoynegro8188unse%29.pdf</image:loc>
-      <image:title>San Mauricio y compañeros</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/nuestra-senora-aparecida</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -2659,6 +2799,16 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/nuestra-senora-aparecida-1767996273607.webp</image:loc>
       <image:title>Nuestra Señora Aparecida</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-mauricio-y-companeros</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://upload.wikimedia.org/wikipedia/commons/8/84/Blanco_y_negro_%28IA_blancoynegro8188unse%29.pdf</image:loc>
+      <image:title>San Mauricio y compañeros</image:title>
     </image:image>
   </url>
   <url>
@@ -2682,16 +2832,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/san-andres-de-grecia</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-andres-de-grecia-1768015841609.webp</image:loc>
-      <image:title>San Andrés de Grecia</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/inmaculada-concepcion-de-maria</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -2702,16 +2842,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/san-nicodemo</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-nicodemo-1768268371504.jpg</image:loc>
-      <image:title>San Nicodemo</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/san-justino-martir</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -2719,16 +2849,6 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-justino-martir-1768259963023.jpg</image:loc>
       <image:title>San Justino Mártir</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/santos-nazario-y-celso</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santos-nazario-y-celso-1768268342988.jpg</image:loc>
-      <image:title>Santos Nazario y Celso</image:title>
     </image:image>
   </url>
   <url>
@@ -2832,6 +2952,16 @@
     </image:image>
   </url>
   <url>
+    <loc>https://elrugido.com/santo/santa-monica</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-monica-1768268847307.jpg</image:loc>
+      <image:title>Santa Mónica</image:title>
+    </image:image>
+  </url>
+  <url>
     <loc>https://elrugido.com/santo/san-efren-de-siria</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -2852,16 +2982,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/santa-monica</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-monica-1768268847307.jpg</image:loc>
-      <image:title>Santa Mónica</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/san-roberto-belarmino</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -2869,16 +2989,6 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-roberto-belarmino-1768268940749.png</image:loc>
       <image:title>San Roberto Belarmino</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/santa-juana-de-valois</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-juana-de-valois-1768247439491.jpg</image:loc>
-      <image:title>Santa Juana de Valois</image:title>
     </image:image>
   </url>
   <url>
@@ -2909,6 +3019,16 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-valero-de-zaragoza-1768247396083.jpg</image:loc>
       <image:title>San Valero de Zaragoza</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-blas</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-blas-1768247435662.jpg</image:loc>
+      <image:title>San Blas</image:title>
     </image:image>
   </url>
   <url>
@@ -2979,26 +3099,6 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-jose-de-cupertino-1768268944113.jpg</image:loc>
       <image:title>San José de Cupertino</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/san-blas</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-blas-1768247435662.jpg</image:loc>
-      <image:title>San Blas</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/santa-ines</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-ines-1768244123414.jpg</image:loc>
-      <image:title>Santa Inés</image:title>
     </image:image>
   </url>
   <url>
@@ -3073,22 +3173,12 @@
   </url>
   <url>
     <loc>https://elrugido.com/santo/san-bruno</loc>
-    <lastmod>2026-07-12</lastmod>
+    <lastmod>2026-07-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-bruno-1768269039867.jpg</image:loc>
       <image:title>San Bruno</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/san-cristobal-magallanes-y-companeros</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-cristobal-magallanes-y-companeros-1768259913642.jpg</image:loc>
-      <image:title>San Cristóbal Magallanes y compañeros</image:title>
     </image:image>
   </url>
   <url>
@@ -3142,16 +3232,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/san-sebastian</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-sebastian-1768244119127.png</image:loc>
-      <image:title>San Sebastián</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/san-esteban-harding</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -3202,16 +3282,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/nuestra-senora-de-guadalupe</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/nuestra-senora-de-guadalupe-1768270814816.jpg</image:loc>
-      <image:title>Nuestra Señora de Guadalupe</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/santa-lucia</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -3219,6 +3289,16 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-lucia-1768270819027.png</image:loc>
       <image:title>Santa Lucía</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/nuestra-senora-de-guadalupe</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/nuestra-senora-de-guadalupe-1768270814816.jpg</image:loc>
+      <image:title>Nuestra Señora de Guadalupe</image:title>
     </image:image>
   </url>
   <url>
@@ -3292,16 +3372,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/presentacion-del-senor</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/presentacion-del-senor-1768247429429.jpg</image:loc>
-      <image:title>Presentación del Señor</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/san-gabriel-de-la-dolorosa</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -3323,7 +3393,7 @@
   </url>
   <url>
     <loc>https://elrugido.com/santo/san-carlos-el-bueno</loc>
-    <lastmod>2026-07-12</lastmod>
+    <lastmod>2026-07-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <image:image>
@@ -3389,16 +3459,6 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-hilario-de-roma-1768247825028.jpg</image:loc>
       <image:title>San Hilario de Roma</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/santa-matilde-de-ringelheim</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-matilde-de-ringelheim-1768247880417.jpg</image:loc>
-      <image:title>Santa Matilde de Ringelheim</image:title>
     </image:image>
   </url>
   <url>
@@ -3602,6 +3662,16 @@
     </image:image>
   </url>
   <url>
+    <loc>https://elrugido.com/santo/san-juan-de-sahagun</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-juan-de-sahagun-1768260734870.jpg</image:loc>
+      <image:title>San Juan de Sahagún</image:title>
+    </image:image>
+  </url>
+  <url>
     <loc>https://elrugido.com/santo/san-carlos-lwanga-y-companeros</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -3609,16 +3679,6 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-carlos-lwanga-y-companeros-1783825857796.webp</image:loc>
       <image:title>San Carlos Lwanga y compañeros</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/san-juan-de-sahagun</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-juan-de-sahagun-1768260734870.jpg</image:loc>
-      <image:title>San Juan de Sahagún</image:title>
     </image:image>
   </url>
   <url>
@@ -3639,16 +3699,6 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-romualdo-1768260758516.jpg</image:loc>
       <image:title>San Romualdo</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/san-pedro-y-san-pablo</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-pedro-y-san-pablo-1768260815924.jpg</image:loc>
-      <image:title>San Pedro y San Pablo</image:title>
     </image:image>
   </url>
   <url>
@@ -3732,13 +3782,13 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/santos-andres-kim-y-companeros</loc>
-    <lastmod>2026-07-12</lastmod>
+    <loc>https://elrugido.com/santo/santa-elena</loc>
+    <lastmod>2026-07-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santos-andres-kim-y-companeros-1783825947898.webp</image:loc>
-      <image:title>Santos Andrés Kim y compañeros</image:title>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-elena-1768268804401.jpg</image:loc>
+      <image:title>Santa Elena</image:title>
     </image:image>
   </url>
   <url>
@@ -3749,6 +3799,16 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/natividad-de-la-virgen-maria-1768268904651.jpg</image:loc>
       <image:title>Natividad de la Virgen María</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/santa-rosa-de-viterbo</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-rosa-de-viterbo-1768268886013.gif</image:loc>
+      <image:title>Santa Rosa de Viterbo</image:title>
     </image:image>
   </url>
   <url>
@@ -3782,16 +3842,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/santa-elena</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-elena-1768268804401.jpg</image:loc>
-      <image:title>Santa Elena</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/san-bernardo-de-claraval</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -3822,16 +3872,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/santa-rosa-de-viterbo</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-rosa-de-viterbo-1768268886013.gif</image:loc>
-      <image:title>Santa Rosa de Viterbo</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/san-clodoaldo</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -3853,7 +3893,7 @@
   </url>
   <url>
     <loc>https://elrugido.com/santo/san-jeronimo</loc>
-    <lastmod>2026-07-12</lastmod>
+    <lastmod>2026-07-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <image:image>
@@ -3909,26 +3949,6 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-lucas-evangelista-1768269088626.jpg</image:loc>
       <image:title>San Lucas Evangelista</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/san-edmundo-de-abingdon</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-edmundo-de-abingdon-1768270713325.jpg</image:loc>
-      <image:title>San Edmundo de Abingdon</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/san-juan-de-capistrano</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-juan-de-capistrano-1768270177555.jpg</image:loc>
-      <image:title>San Juan de Capistrano</image:title>
     </image:image>
   </url>
   <url>
@@ -3993,7 +4013,7 @@
   </url>
   <url>
     <loc>https://elrugido.com/santo/santos-marcelino-y-pedro</loc>
-    <lastmod>2026-07-12</lastmod>
+    <lastmod>2026-07-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <image:image>
@@ -4049,16 +4069,6 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-francisco-javier-1768270776737.jpg</image:loc>
       <image:title>San Francisco Javier</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/inmaculada-concepcion-de-caacupe</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/inmaculada-concepcion-de-caacupe-1768014141249.webp</image:loc>
-      <image:title>Inmaculada Concepción de Caacupé</image:title>
     </image:image>
   </url>
   <url>
@@ -4163,7 +4173,7 @@
   </url>
   <url>
     <loc>https://elrugido.com/santo/santa-francisca-javier-cabrini</loc>
-    <lastmod>2026-07-12</lastmod>
+    <lastmod>2026-07-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <image:image>
@@ -4199,16 +4209,6 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/virgen-de-la-caridad-del-cobre-1768013930783.webp</image:loc>
       <image:title>Virgen de la Caridad del Cobre</image:title>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://elrugido.com/santo/santa-maria-la-antigua</loc>
-    <lastmod>2026-07-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-maria-la-antigua-1768013957658.webp</image:loc>
-      <image:title>Santa María la Antigua</image:title>
     </image:image>
   </url>
   <url>
