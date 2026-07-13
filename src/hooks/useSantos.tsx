@@ -38,6 +38,7 @@ export function useSantos(options: UseSantosOptions = {}) {
       const { data, error } = await supabase
         .from('calendar_saints')
         .select('*')
+        .is('duplicado_de', null)
         .order('feast_month', { ascending: true })
         .order('feast_day', { ascending: true })
         .limit(3000);
