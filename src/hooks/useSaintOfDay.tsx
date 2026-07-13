@@ -36,7 +36,8 @@ export const useSaintOfDay = (userCountryCode?: string | null): UseSaintOfDayRes
         .from('calendar_saints')
         .select('*')
         .eq('feast_month', currentMonth)
-        .eq('feast_day', currentDay);
+        .eq('feast_day', currentDay)
+        .is('duplicado_de', null);
 
       if (error) throw error;
       return data as CalendarSaint[];
