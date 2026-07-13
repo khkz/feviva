@@ -322,14 +322,50 @@ export default function SaintsVerificationPanel() {
         <CardHeader>
           <CardTitle className="text-amber-600 flex items-center gap-2">
             <HelpCircle className="h-5 w-5" />
-            Sin fuente verificable ({sinFuente.length})
+            Fuente citada, pero sin fecha estructurada ({fuenteSinFecha.length})
           </CardTitle>
-          <CardDescription>No hay Wikipedia u otra fuente registrada para contrastar.</CardDescription>
+          <CardDescription>
+            Tienen artículo de Wikipedia guardado, pero el artículo no declara la festividad en un campo estructurado.
+            La fecha de la app puede ser correcta; requiere verificación manual.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <ScrollArea className="h-[260px] pr-2">
+            {fuenteSinFecha.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Ninguno en este estado.</p>
+            ) : (
+              <ul className="text-sm space-y-1">
+                {fuenteSinFecha.map((r) => (
+                  <li key={r.id} className="flex justify-between border-b py-1 gap-2">
+                    <span className="truncate">{r.name}</span>
+                    <span className="flex items-center gap-2 text-xs text-muted-foreground shrink-0">
+                      {r.feast_day} {MONTH[r.feast_month]}
+                      {r.fuente_url && (
+                        <a href={r.fuente_url} target="_blank" rel="noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">
+                          fuente <ExternalLink className="h-3 w-3" />
+                        </a>
+                      )}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </ScrollArea>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-orange-700 flex items-center gap-2">
+            <HelpCircle className="h-5 w-5" />
+            Sin fuente registrada ({sinFuente.length})
+          </CardTitle>
+          <CardDescription>No hay Wikipedia u otra fuente URL guardada para contrastar.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ScrollArea className="h-[200px] pr-2">
             {sinFuente.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Todos los verificados tenían fuente.</p>
+              <p className="text-sm text-muted-foreground">Todos tienen fuente.</p>
             ) : (
               <ul className="text-sm space-y-1">
                 {sinFuente.map((r) => (
