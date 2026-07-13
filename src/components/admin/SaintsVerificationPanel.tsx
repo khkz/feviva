@@ -45,6 +45,7 @@ interface VerifRow {
   description_source: string | null;
   discrepancia_detalle: Record<string, unknown> | null;
   verificado_at: string | null;
+  duplicado_de: string | null;
 }
 
 const MONTH = ["", "Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
