@@ -163,6 +163,7 @@ export default function SaintsVerificationPanel() {
 
   const discrepancias = rows.filter(r => r.estado_verificacion === "discrepancia");
   const sinFuente = rows.filter(r => r.estado_verificacion === "sin_fuente");
+  const fuenteSinFecha = rows.filter(r => r.estado_verificacion === "fuente_sin_fecha");
 
   return (
     <div className="space-y-6">
