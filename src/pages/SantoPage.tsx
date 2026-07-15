@@ -437,6 +437,11 @@ export default function SantoPage() {
                 </Badge>
               )}
             </div>
+            {(saint.discrepancia_detalle as { fecha_alternativa_nota?: string } | null)?.fecha_alternativa_nota && (
+              <p className="text-xs text-muted-foreground italic -mt-1">
+                {(saint.discrepancia_detalle as { fecha_alternativa_nota?: string }).fecha_alternativa_nota}
+              </p>
+            )}
 
             {saint.tags && saint.tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
