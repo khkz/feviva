@@ -12,8 +12,9 @@ export default function SobreNosotros() {
     url: "https://elrugido.com",
     logo: "https://elrugido.com/logo-elrugido.png",
     foundingDate: "2025",
+    founder: { "@type": "Person", name: "Carlos Caro" },
     description:
-      "Plataforma católica de formación espiritual: oración diaria, evangelio, novenas, calendario de santos, coach de apologética y plan bíblico de 365 días.",
+      "ElRugido es una iniciativa de fieles laicos católicos. Su contenido se fundamenta en el Catecismo de la Iglesia Católica, la Sagrada Escritura y el Magisterio.",
     sameAs: ["https://elrugido.com"],
     knowsAbout: [
       "Apologética Católica",
@@ -23,9 +24,9 @@ export default function SobreNosotros() {
       "Hagiografía",
       "Oración",
     ],
-    publishingPrinciples: "https://elrugido.com/sobre-nosotros",
+    publishingPrinciples: "https://elrugido.com/como-trabajamos",
     editorialPolicy:
-      "Todo el contenido doctrinal cita literalmente el Magisterio, la Sagrada Escritura o el Catecismo. No se inventa doctrina. El contenido es revisado humanamente antes de su publicación definitiva.",
+      "Todo el contenido doctrinal cita literalmente el Magisterio, la Sagrada Escritura o el Catecismo. No se inventa doctrina.",
   };
 
   return (
