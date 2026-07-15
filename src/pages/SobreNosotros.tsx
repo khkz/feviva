@@ -12,8 +12,9 @@ export default function SobreNosotros() {
     url: "https://elrugido.com",
     logo: "https://elrugido.com/logo-elrugido.png",
     foundingDate: "2025",
+    founder: { "@type": "Person", name: "Carlos Caro" },
     description:
-      "Plataforma católica de formación espiritual: oración diaria, evangelio, novenas, calendario de santos, coach de apologética y plan bíblico de 365 días.",
+      "ElRugido es una iniciativa de fieles laicos católicos. Su contenido se fundamenta en el Catecismo de la Iglesia Católica, la Sagrada Escritura y el Magisterio.",
     sameAs: ["https://elrugido.com"],
     knowsAbout: [
       "Apologética Católica",
@@ -23,9 +24,9 @@ export default function SobreNosotros() {
       "Hagiografía",
       "Oración",
     ],
-    publishingPrinciples: "https://elrugido.com/sobre-nosotros",
+    publishingPrinciples: "https://elrugido.com/como-trabajamos",
     editorialPolicy:
-      "Todo el contenido doctrinal cita literalmente el Magisterio, la Sagrada Escritura o el Catecismo. No se inventa doctrina. El contenido es revisado humanamente antes de su publicación definitiva.",
+      "Todo el contenido doctrinal cita literalmente el Magisterio, la Sagrada Escritura o el Catecismo. No se inventa doctrina.",
   };
 
   return (
@@ -103,10 +104,10 @@ export default function SobreNosotros() {
             </Card>
             <Card className="p-5 space-y-2">
               <Shield className="h-6 w-6 text-primary" />
-              <h3 className="font-semibold">Revisión humana</h3>
+              <h3 className="font-semibold">Fuentes al alcance</h3>
               <p className="text-sm text-muted-foreground">
-                Todo contenido generado con asistencia de IA es revisado por
-                un editor humano antes de marcarse como verificado.
+                Publicamos las fuentes que sustentan cada contenido para que
+                cualquiera pueda contrastarlas por su cuenta.
               </p>
             </Card>
             <Card className="p-5 space-y-2">

@@ -13,11 +13,11 @@ const faqs = [
   },
   {
     q: "¿Es fiel a la doctrina católica?",
-    a: "Sí. Nuestro contenido se fundamenta en el Catecismo de la Iglesia Católica, documentos del Concilio Vaticano II, encíclicas papales y la Sagrada Escritura. Cada respuesta del coach está diseñada para ser doctrinalmente sólida y es revisada por nuestro asesor teológico.",
+    a: "Sí. Nuestro contenido se fundamenta en el Catecismo de la Iglesia Católica, documentos del Concilio Vaticano II, encíclicas papales y la Sagrada Escritura. Las respuestas del coach se diseñan para ser doctrinalmente sólidas y citan literalmente las fuentes oficiales cuando corresponde. Si detectás un error, escribinos y lo corregimos.",
   },
   {
     q: "¿Quién está detrás de ElRugido?",
-    a: "Un equipo pequeño de católicos comprometidos —desarrolladores y colaboradores teológicos— que en 2025 lanzó ElRugido para hacer la formación en apologética accesible desde el celular. No sustituimos la guía de un sacerdote ni la vida sacramental.",
+    a: "ElRugido es una iniciativa de Carlos Caro, un fiel laico católico, con la ayuda de herramientas digitales y de IA. No hay teólogos ni sacerdotes en el equipo: por eso todo el contenido se fundamenta en fuentes oficiales de la Iglesia (Catecismo, Escritura, Magisterio) y no sustituye la guía de un párroco ni la vida sacramental.",
   },
   {
     q: "¿Puedo cancelar cuando quiera?",

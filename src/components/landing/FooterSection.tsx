@@ -196,6 +196,16 @@ export const FooterSection = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/quienes-somos" className="hover:text-foreground transition-colors">
+                  Quiénes somos
+                </Link>
+              </li>
+              <li>
+                <Link to="/como-trabajamos" className="hover:text-foreground transition-colors">
+                  Cómo trabajamos
+                </Link>
+              </li>
+              <li>
                 <Link
                   to="/sobre-nosotros"
                   className="hover:text-foreground transition-colors inline-flex items-center gap-1.5"

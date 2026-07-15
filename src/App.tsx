@@ -59,6 +59,8 @@ const NovenasPublic = lazy(() => import("./pages/NovenasPublic"));
 const NovenaPublicPage = lazy(() => import("./pages/NovenaPublicPage"));
 const CapsulaDelDia = lazy(() => import("./pages/CapsulaDelDia"));
 const SobreNosotros = lazy(() => import("./pages/SobreNosotros"));
+const QuienesSomos = lazy(() => import("./pages/QuienesSomos"));
+const ComoTrabajamos = lazy(() => import("./pages/ComoTrabajamos"));
 
 // Frontera Final
 const FronteraFinal = lazy(() => import("./pages/FronteraFinal"));
@@ -145,6 +147,8 @@ const App = () => (
                   <Route path="/capsula-del-dia" element={<CapsulaDelDia />} />
                   <Route path="/sobre-nosotros" element={<SobreNosotros />} />
                   <Route path="/about" element={<SobreNosotros />} />
+                  <Route path="/quienes-somos" element={<QuienesSomos />} />
+                  <Route path="/como-trabajamos" element={<ComoTrabajamos />} />
                   <Route path="/search" element={<ProtectedRoute><KnowledgeSearch /></ProtectedRoute>} />
                   <Route path="/historias-de-fe" element={<ProtectedRoute><HistoriasDeFe /></ProtectedRoute>} />
                   <Route path="/frontera-final" element={<ProtectedRoute><FronteraFinal /></ProtectedRoute>} />

@@ -38,7 +38,7 @@ export function InspiredStoryBadge({ saint }: { saint: SaintLike }) {
     return (
       <div className="flex items-center gap-2 text-xs text-emerald-700">
         <CheckCircle2 className="h-4 w-4" />
-        Datos verificados por el equipo editorial.
+        Datos contrastados con fuentes católicas oficiales.
       </div>
     );
   }
