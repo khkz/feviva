@@ -91,10 +91,10 @@ export const FinalCTASection = () => {
             <div>
               <h3 className="font-semibold text-foreground text-sm mb-1">Sobre ElRugido</h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                ElRugido es un proyecto fundado en 2025 por un equipo de católicos comprometidos con hacer la fe accesible en la era digital. 
-                Nuestro contenido se fundamenta en el <strong>Catecismo de la Iglesia Católica</strong> (CIC), documentos del <strong>Concilio Vaticano II</strong>, 
-                encíclicas papales y la <strong>Sagrada Escritura</strong>. Las biografías de santos se verifican con fuentes como la Catholic Encyclopedia y Wikipedia. 
-                No sustituimos la guía espiritual de un sacerdote ni la participación en los sacramentos.
+                ElRugido es una iniciativa fundada en 2025 por Carlos Caro, un fiel laico católico, para poner al servicio de otros creyentes herramientas digitales y de IA que ayuden a conocer, vivir y dar razón de la fe.
+                Nuestro contenido se fundamenta en el <strong>Catecismo de la Iglesia Católica</strong> (CIC), documentos del <strong>Concilio Vaticano II</strong>,
+                encíclicas papales y la <strong>Sagrada Escritura</strong>. Las biografías de santos se contrastan con fuentes católicas reconocidas (ACI Prensa, Vatican News, EWTN) y con Wikipedia.
+                No es una publicación oficial de la Iglesia ni sustituye la guía de un sacerdote ni la vida sacramental.
               </p>
             </div>
           </div>
