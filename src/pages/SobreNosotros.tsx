@@ -104,10 +104,10 @@ export default function SobreNosotros() {
             </Card>
             <Card className="p-5 space-y-2">
               <Shield className="h-6 w-6 text-primary" />
-              <h3 className="font-semibold">Revisión humana</h3>
+              <h3 className="font-semibold">Fuentes al alcance</h3>
               <p className="text-sm text-muted-foreground">
-                Todo contenido generado con asistencia de IA es revisado por
-                un editor humano antes de marcarse como verificado.
+                Publicamos las fuentes que sustentan cada contenido para que
+                cualquiera pueda contrastarlas por su cuenta.
               </p>
             </Card>
             <Card className="p-5 space-y-2">
