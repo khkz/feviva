@@ -322,16 +322,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/san-nicodemo</loc>
-    <lastmod>2026-07-13</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-nicodemo-1768268371504.jpg</image:loc>
-      <image:title>San Nicodemo</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/san-juan-bautista-rossi</loc>
     <lastmod>2026-07-13</lastmod>
     <changefreq>monthly</changefreq>
@@ -359,6 +349,16 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-cayetano-1768054827427.webp</image:loc>
       <image:title>San Cayetano</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-nicodemo</loc>
+    <lastmod>2026-07-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-nicodemo-1768268371504.jpg</image:loc>
+      <image:title>San Nicodemo</image:title>
     </image:image>
   </url>
   <url>
@@ -1022,16 +1022,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/san-esteban-de-hungria</loc>
-    <lastmod>2026-07-13</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-esteban-de-hungria-1768015506409.webp</image:loc>
-      <image:title>San Esteban de Hungría</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/san-antonio-abad</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -1049,6 +1039,16 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-maria-di-rosa-1768270826001.jpg</image:loc>
       <image:title>Santa María di Rosa</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/san-esteban-de-hungria</loc>
+    <lastmod>2026-07-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/san-esteban-de-hungria-1768015506409.webp</image:loc>
+      <image:title>San Esteban de Hungría</image:title>
     </image:image>
   </url>
   <url>
@@ -1473,7 +1473,7 @@
   </url>
   <url>
     <loc>https://elrugido.com/santo/san-enrique-de-upsala</loc>
-    <lastmod>2026-07-13</lastmod>
+    <lastmod>2026-07-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <image:image>
@@ -4172,16 +4172,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://elrugido.com/santo/santa-francisca-javier-cabrini</loc>
-    <lastmod>2026-07-13</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-francisca-javier-cabrini-1768270284478.jpg</image:loc>
-      <image:title>Santa Francisca Javier Cabrini</image:title>
-    </image:image>
-  </url>
-  <url>
     <loc>https://elrugido.com/santo/santa-rosa-de-lima</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -4199,6 +4189,16 @@
     <image:image>
       <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/virgen-de-la-providencia-1768014081508.webp</image:loc>
       <image:title>Virgen de la Providencia</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrugido.com/santo/santa-francisca-javier-cabrini</loc>
+    <lastmod>2026-07-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://duggdnqpemwojkojfyei.supabase.co/storage/v1/object/public/saint-images/santa-francisca-javier-cabrini-1768270284478.jpg</image:loc>
+      <image:title>Santa Francisca Javier Cabrini</image:title>
     </image:image>
   </url>
   <url>
