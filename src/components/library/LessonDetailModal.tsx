@@ -14,6 +14,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLessonAudio, useLessonEnrichment } from "@/hooks/useLessonEnrichment";
 import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
 import { ContentFeedback } from "@/components/feedback/ContentFeedback";
+import { isCurrentUserAdmin } from "@/lib/isCurrentUserAdmin";
+import { toast as sonnerToast } from "sonner";
 
 interface Lesson {
   id: string;
@@ -117,8 +119,15 @@ export function LessonDetailModal({
       return;
     }
 
-    // If no audio exists but we have a summary, generate it first
+    // If no audio exists but we have a summary, only ADMINS may generate on the fly.
     if (!hasAudio && enrichedContent?.resumen_audio) {
+      const isAdmin = await isCurrentUserAdmin();
+      if (!isAdmin) {
+        sonnerToast("Audio aún no disponible", {
+          description: "Podés leer la lección; el audio se publicará pronto.",
+        });
+        return;
+      }
       const url = await generateAudio(enrichedContent.resumen_audio);
       if (url) {
         playGlobal({
@@ -139,6 +148,11 @@ export function LessonDetailModal({
         audioUrl: audioUrl,
         type: 'lesson',
         originalData: lesson
+      });
+    } else {
+      // No audio and no summary — inform the user without hitting any TTS endpoint.
+      sonnerToast("Audio aún no disponible", {
+        description: "Esta lección todavía no tiene audio publicado.",
       });
     }
   };
