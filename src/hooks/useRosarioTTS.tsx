@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { requireAuth } from "@/lib/auth-guard";
 import { useAudioCache } from "@/hooks/useAudioCache";
 import { ORACIONES_ROSARIO } from "@/lib/rosarioData";
+import { isCurrentUserAdmin } from "@/lib/isCurrentUserAdmin";
 // Note: TTS uses static fallback data directly - DB data flows through RosarioContext
 
 type PrayerType = 'padreNuestro' | 'aveMaria' | 'gloria' | 'salveRegina';
@@ -63,6 +64,13 @@ export function useRosarioTTS() {
     try {
       if (!(await requireAuth())) return null;
 
+      // TTS generation is admin-only. Regular users play pre-generated audio only.
+      const isAdmin = await isCurrentUserAdmin();
+      if (!isAdmin) {
+        return null;
+      }
+
+
       const prayerTexts: Record<PrayerType, string> = {
         padreNuestro: ORACIONES_ROSARIO.padreNuestro,
         aveMaria: ORACIONES_ROSARIO.aveMaria,
@@ -118,11 +126,21 @@ export function useRosarioTTS() {
   const playPrayer = useCallback(async (prayerType: PrayerType) => {
     let url = audioUrls[prayerType];
 
-    // Generate if not available
+    // Only admins can trigger TTS generation. For regular users, if the
+    // pre-generated audio isn't there, show a clean message and bail out.
     if (!url) {
+      const isAdmin = await isCurrentUserAdmin();
+      if (!isAdmin) {
+        toast({
+          title: "Audio aún no disponible",
+          description: "Estamos preparando el audio de esta oración.",
+        });
+        return;
+      }
       url = await generatePrayerAudio(prayerType);
       if (!url) return;
     }
+
 
     // Get cached blob URL for faster playback
     const cachedUrl = await getAudioWithCache(url);

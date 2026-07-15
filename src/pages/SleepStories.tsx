@@ -105,7 +105,18 @@ const SleepStories = () => {
 
   const handleGenerateAudio = async () => {
     if (!currentStory) return;
-    
+
+    // TTS generation is admin-only. Regular users only play pre-generated audio.
+    const { isCurrentUserAdmin } = await import("@/lib/isCurrentUserAdmin");
+    const admin = await isCurrentUserAdmin();
+    if (!admin) {
+      const { toast: sonnerToast } = await import("sonner");
+      sonnerToast("Audio aún no disponible", {
+        description: "Esta historia todavía no tiene audio publicado.",
+      });
+      return;
+    }
+
     audioPlayer.setIsGenerating(true);
     const audioUrl = await generateAudio(currentStory);
     if (audioUrl) {

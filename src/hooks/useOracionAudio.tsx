@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAudioCache } from "@/hooks/useAudioCache";
 import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
+import { isCurrentUserAdmin } from "@/lib/isCurrentUserAdmin";
 
 interface UseOracionAudioProps {
   oracionId: string;
@@ -81,9 +82,19 @@ export function useOracionAudio({ oracionId, nombre, texto, existingAudioUrl }: 
 
   const play = useCallback(async () => {
     let url = cachedUrl || audioUrl;
-    
-    // Generate audio if not available
+
+    // Generate audio if not available — ADMIN ONLY.
+    // Regular users only play pre-generated audio; if it doesn't exist,
+    // show a clean info message instead of hitting the TTS edge function.
     if (!url) {
+      const isAdmin = await isCurrentUserAdmin();
+      if (!isAdmin) {
+        toast({
+          title: "Audio aún no disponible",
+          description: "Esta oración todavía no tiene audio. Podés leerla mientras tanto.",
+        });
+        return;
+      }
       url = await generateAudio();
       if (!url) return;
     }
