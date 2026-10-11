@@ -93,6 +93,7 @@ export const AudioPlayer = ({ src, title, compact = false }: AudioPlayerProps) =
           size="icon"
           className="h-8 w-8"
           onClick={togglePlay}
+          aria-label={isPlaying ? "Pausar audio" : "Reproducir audio"}
         >
           {isPlaying ? (
             <Pause className="h-4 w-4" />
@@ -127,6 +128,7 @@ export const AudioPlayer = ({ src, title, compact = false }: AudioPlayerProps) =
           size="icon"
           className="h-10 w-10 shrink-0"
           onClick={togglePlay}
+          aria-label={isPlaying ? "Pausar audio" : "Reproducir audio"}
         >
           {isPlaying ? (
             <Pause className="h-5 w-5" />
@@ -154,6 +156,7 @@ export const AudioPlayer = ({ src, title, compact = false }: AudioPlayerProps) =
           size="sm"
           className="text-xs px-2"
           onClick={cyclePlaybackRate}
+          aria-label={`Cambiar velocidad de reproducción. Velocidad actual ${playbackRate}x`}
         >
           {playbackRate}x
         </Button>
@@ -163,6 +166,7 @@ export const AudioPlayer = ({ src, title, compact = false }: AudioPlayerProps) =
           size="icon"
           className="h-8 w-8"
           onClick={toggleMute}
+          aria-label={isMuted ? "Activar sonido" : "Silenciar audio"}
         >
           {isMuted ? (
             <VolumeX className="h-4 w-4" />

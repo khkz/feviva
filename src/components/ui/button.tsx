@@ -6,8 +6,7 @@ import { cn } from "@/lib/utils";
 
 // Áreas táctiles mínimas: WCAG/Apple 44px, Google 48dp.
 // - default/lg: se agrandan visiblemente a >=44px.
-// - sm/icon: mantienen su tamaño visual pero exponen un tap-target invisible
-//   de 44px vía pseudo-elemento (::after), para no romper filas apretadas.
+// - sm/icon: usan 44px reales para que el área táctil no dependa de pseudo-elementos.
 const buttonVariants = cva(
   "relative inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
@@ -22,9 +21,9 @@ const buttonVariants = cva(
       },
       size: {
         default: "h-11 px-4 py-2",
-        sm: "h-9 rounded-md px-3 tap-target-44",
+        sm: "h-11 rounded-md px-3",
         lg: "h-12 rounded-md px-8",
-        icon: "h-10 w-10 tap-target-44",
+        icon: "h-11 w-11",
       },
     },
     defaultVariants: {
