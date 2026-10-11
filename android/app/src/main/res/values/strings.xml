@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">El Rugido</string>
+    <string name="title_activity_main">El Rugido</string>
+    <string name="package_name">com.elrugido.app</string>
+    <string name="custom_url_scheme">com.elrugido.app</string>
+</resources>
