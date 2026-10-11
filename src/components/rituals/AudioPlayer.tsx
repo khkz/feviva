@@ -91,7 +91,6 @@ export const AudioPlayer = ({ src, title, compact = false }: AudioPlayerProps) =
         <Button
           variant="outline"
           size="icon"
-          className="h-8 w-8"
           onClick={togglePlay}
           aria-label={isPlaying ? "Pausar audio" : "Reproducir audio"}
         >
@@ -126,7 +125,7 @@ export const AudioPlayer = ({ src, title, compact = false }: AudioPlayerProps) =
         <Button
           variant="outline"
           size="icon"
-          className="h-10 w-10 shrink-0"
+          className="shrink-0"
           onClick={togglePlay}
           aria-label={isPlaying ? "Pausar audio" : "Reproducir audio"}
         >
@@ -164,7 +163,6 @@ export const AudioPlayer = ({ src, title, compact = false }: AudioPlayerProps) =
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8"
           onClick={toggleMute}
           aria-label={isMuted ? "Activar sonido" : "Silenciar audio"}
         >

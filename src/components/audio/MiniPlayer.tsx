@@ -131,7 +131,7 @@ export function MiniPlayer({ className }: MiniPlayerProps) {
                   variant="ghost"
                   size="icon"
                   className={cn(
-                    "w-8 h-8 rounded-full",
+                    "hidden h-11 w-11 rounded-full sm:inline-flex",
                     isOracion 
                       ? "text-secondary-foreground/60 hover:text-secondary-foreground hover:bg-secondary-foreground/10"
                       : "text-white/60 hover:text-white hover:bg-white/10"
@@ -149,7 +149,7 @@ export function MiniPlayer({ className }: MiniPlayerProps) {
                 variant="ghost"
                 size="icon"
                 className={cn(
-                  "w-10 h-10 rounded-full",
+                  "h-11 w-11 rounded-full",
                   isOracion 
                     ? "text-secondary-foreground hover:text-secondary-foreground hover:bg-secondary-foreground/10"
                     : "text-white hover:text-white hover:bg-white/10"
@@ -171,7 +171,7 @@ export function MiniPlayer({ className }: MiniPlayerProps) {
                   variant="ghost"
                   size="icon"
                   className={cn(
-                    "w-8 h-8 rounded-full",
+                    "hidden h-11 w-11 rounded-full sm:inline-flex",
                     isOracion 
                       ? "text-secondary-foreground/60 hover:text-secondary-foreground hover:bg-secondary-foreground/10"
                       : "text-white/60 hover:text-white hover:bg-white/10"
@@ -189,7 +189,7 @@ export function MiniPlayer({ className }: MiniPlayerProps) {
                 variant="ghost"
                 size="icon"
                 className={cn(
-                  "w-8 h-8 rounded-full",
+                  "h-11 w-11 rounded-full",
                   isOracion 
                     ? "text-secondary-foreground/60 hover:text-secondary-foreground hover:bg-secondary-foreground/10"
                     : "text-white/60 hover:text-white hover:bg-white/10"

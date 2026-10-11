@@ -153,7 +153,7 @@ export function UnifiedMiniPlayer({ className }: UnifiedMiniPlayerProps) {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className={cn("w-8 h-8 rounded-full", theme.textMuted, theme.text, theme.buttonHover)}
+                    className={cn("hidden h-11 w-11 rounded-full sm:inline-flex", theme.textMuted, theme.text, theme.buttonHover)}
                     onClick={playPrevious}
                     disabled={!hasPrevious}
                     aria-label="Reproducir anterior"
@@ -166,7 +166,7 @@ export function UnifiedMiniPlayer({ className }: UnifiedMiniPlayerProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={cn("w-10 h-10 rounded-full", theme.text, theme.buttonHover)}
+                  className={cn("h-11 w-11 rounded-full", theme.text, theme.buttonHover)}
                   onClick={togglePlay}
                   disabled={!audioUrl || isGenerating}
                   aria-label={isGenerating ? "Preparando audio" : isPlaying ? "Pausar audio" : "Reproducir audio"}
@@ -185,7 +185,7 @@ export function UnifiedMiniPlayer({ className }: UnifiedMiniPlayerProps) {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className={cn("w-8 h-8 rounded-full", theme.textMuted, theme.text, theme.buttonHover)}
+                    className={cn("hidden h-11 w-11 rounded-full sm:inline-flex", theme.textMuted, theme.text, theme.buttonHover)}
                     onClick={playNext}
                     disabled={!hasNext}
                     aria-label="Reproducir siguiente"
@@ -198,7 +198,7 @@ export function UnifiedMiniPlayer({ className }: UnifiedMiniPlayerProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={cn("w-8 h-8 rounded-full", theme.textMuted, theme.text, theme.buttonHover)}
+                  className={cn("hidden h-11 w-11 rounded-full sm:inline-flex", theme.textMuted, theme.text, theme.buttonHover)}
                   onClick={() => setShowPlaylist(true)}
                   aria-label="Abrir lista de reproducción"
                 >
@@ -209,7 +209,7 @@ export function UnifiedMiniPlayer({ className }: UnifiedMiniPlayerProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={cn("w-8 h-8 rounded-full", theme.textMuted, theme.text, theme.buttonHover)}
+                  className={cn("h-11 w-11 rounded-full", theme.textMuted, theme.text, theme.buttonHover)}
                   onClick={close}
                   aria-label="Cerrar reproductor"
                 >
