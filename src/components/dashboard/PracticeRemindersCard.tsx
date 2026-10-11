@@ -129,7 +129,7 @@ export function PracticeRemindersCard() {
                           type="time"
                           value={editHour}
                           onChange={(e) => setEditHour(e.target.value)}
-                          className="h-7 w-24 text-xs"
+                          className="h-11 w-28 text-xs"
                         />
                         <Button
                           size="sm"
@@ -141,8 +141,11 @@ export function PracticeRemindersCard() {
                         </Button>
                       </div>
                     ) : (
-                      <button
-                        className="flex min-h-11 items-center gap-1 px-2 text-xs text-muted-foreground transition-colors hover:text-foreground"
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        className="gap-1 px-2 text-xs text-muted-foreground hover:text-foreground"
                         onClick={() => {
                           setEditingPractice(reminder.practice);
                           setEditHour(reminder.hour);
@@ -150,7 +153,7 @@ export function PracticeRemindersCard() {
                       >
                         <Clock className="w-3 h-3" />
                         {reminder.hour}
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </div>
