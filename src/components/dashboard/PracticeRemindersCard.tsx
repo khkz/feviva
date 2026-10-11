@@ -134,7 +134,7 @@ export function PracticeRemindersCard() {
                         <Button
                           size="sm"
                           variant="ghost"
-                          className="h-7 px-2 text-xs"
+                          className="px-2 text-xs"
                           onClick={() => handleSaveHour(reminder.practice)}
                         >
                           Guardar
@@ -142,7 +142,7 @@ export function PracticeRemindersCard() {
                       </div>
                     ) : (
                       <button
-                        className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                        className="flex min-h-11 items-center gap-1 px-2 text-xs text-muted-foreground transition-colors hover:text-foreground"
                         onClick={() => {
                           setEditingPractice(reminder.practice);
                           setEditHour(reminder.hour);
@@ -159,6 +159,7 @@ export function PracticeRemindersCard() {
                   checked={reminder.enabled}
                   onCheckedChange={() => handleToggle(reminder.practice, reminder.enabled)}
                   disabled={!isSupported || permission === "denied"}
+                  aria-label={`${reminder.enabled ? "Desactivar" : "Activar"} recordatorio de ${reminder.practice}`}
                 />
               </motion.div>
             ))}
