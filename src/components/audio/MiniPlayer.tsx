@@ -95,6 +95,7 @@ export function MiniPlayer({ className }: MiniPlayerProps) {
                   src={currentItem.imageUrl} 
                   alt={currentItem.title}
                   className="w-full h-full object-cover"
+                  decoding="async"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
@@ -130,13 +131,14 @@ export function MiniPlayer({ className }: MiniPlayerProps) {
                   variant="ghost"
                   size="icon"
                   className={cn(
-                    "w-8 h-8 rounded-full",
+                    "hidden h-11 w-11 rounded-full sm:inline-flex",
                     isOracion 
                       ? "text-secondary-foreground/60 hover:text-secondary-foreground hover:bg-secondary-foreground/10"
                       : "text-white/60 hover:text-white hover:bg-white/10"
                   )}
                   onClick={playPrevious}
                   disabled={!hasPrevious}
+                  aria-label="Reproducir anterior"
                 >
                   <SkipBack className="w-4 h-4" />
                 </Button>
@@ -147,13 +149,14 @@ export function MiniPlayer({ className }: MiniPlayerProps) {
                 variant="ghost"
                 size="icon"
                 className={cn(
-                  "w-10 h-10 rounded-full",
+                  "h-11 w-11 rounded-full",
                   isOracion 
                     ? "text-secondary-foreground hover:text-secondary-foreground hover:bg-secondary-foreground/10"
                     : "text-white hover:text-white hover:bg-white/10"
                 )}
                 onClick={togglePlay}
                 disabled={!audioUrl || isGenerating}
+                aria-label={isPlaying ? "Pausar audio" : "Reproducir audio"}
               >
                 {isPlaying ? (
                   <Pause className="w-5 h-5" />
@@ -168,13 +171,14 @@ export function MiniPlayer({ className }: MiniPlayerProps) {
                   variant="ghost"
                   size="icon"
                   className={cn(
-                    "w-8 h-8 rounded-full",
+                    "hidden h-11 w-11 rounded-full sm:inline-flex",
                     isOracion 
                       ? "text-secondary-foreground/60 hover:text-secondary-foreground hover:bg-secondary-foreground/10"
                       : "text-white/60 hover:text-white hover:bg-white/10"
                   )}
                   onClick={playNext}
                   disabled={!hasNext}
+                  aria-label="Reproducir siguiente"
                 >
                   <SkipForward className="w-4 h-4" />
                 </Button>
@@ -185,12 +189,13 @@ export function MiniPlayer({ className }: MiniPlayerProps) {
                 variant="ghost"
                 size="icon"
                 className={cn(
-                  "w-8 h-8 rounded-full",
+                  "h-11 w-11 rounded-full",
                   isOracion 
                     ? "text-secondary-foreground/60 hover:text-secondary-foreground hover:bg-secondary-foreground/10"
                     : "text-white/60 hover:text-white hover:bg-white/10"
                 )}
                 onClick={close}
+                aria-label="Cerrar reproductor"
               >
                 <X className="w-4 h-4" />
               </Button>

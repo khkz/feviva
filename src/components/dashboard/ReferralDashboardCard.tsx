@@ -91,7 +91,7 @@ export const ReferralDashboardCard = () => {
               <span>
                 Código: <code className="font-mono font-semibold text-foreground tracking-wider">{referralCode}</code>
               </span>
-              <Link to="/profile" className="inline-flex items-center gap-1 text-primary hover:underline">
+              <Link to="/profile" className="inline-flex min-h-11 items-center gap-1 px-2 text-primary hover:underline">
                 Ver detalle
                 <ArrowRight className="h-3 w-3" />
               </Link>

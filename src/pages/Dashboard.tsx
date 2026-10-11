@@ -1,8 +1,6 @@
-import { useEffect, useState, lazy, Suspense, useMemo, useCallback } from "react";
+import { useEffect, lazy, Suspense, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { BookOpen, Shield } from "lucide-react";
+import { Shield } from "lucide-react";
 import { FirstDayExperience } from "@/components/ftue/FirstDayExperience";
 import { useUserStats } from "@/hooks/useUserStats";
 import { useNovenas } from "@/hooks/useNovenas";
@@ -26,7 +24,10 @@ import { GospelCard } from "@/components/gospel/GospelCard";
 import { FronteraFinalCard } from "@/components/dashboard/FronteraFinalCard";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { motion } from "framer-motion";
+import { AsyncState } from "@/components/shared/AsyncState";
+import { useDashboardProfile } from "@/features/dashboard/useDashboardProfile";
+import { useDashboardPrefetch } from "@/features/dashboard/useDashboardPrefetch";
+import { DashboardSectionHeading } from "@/features/dashboard/DashboardSectionHeading";
 
 // Lazy load heavy components
 const PracticeStreaksCard = lazy(() => import("@/components/dashboard/PracticeStreaksCard").then(m => ({ default: m.PracticeStreaksCard })));
@@ -40,13 +41,6 @@ const DailyMission = lazy(() => import("@/components/dashboard/DailyMission").th
 const DailyRoutineCard = lazy(() => import("@/components/dashboard/DailyRoutineCard").then(m => ({ default: m.DailyRoutineCard })));
 const DailyCapsuleWidget = lazy(() => import("@/components/dashboard/DailyCapsuleWidget").then(m => ({ default: m.DailyCapsuleWidget })));
 
-interface Profile {
-  nombre: string;
-  perfil_doctrinal: string;
-  edad_segmento: string;
-  country_code: string | null;
-}
-
 const CardSkeleton = ({ height = "h-40" }: { height?: string }) => (
   <div className="mb-4">
     <Skeleton className={`${height} w-full rounded-xl`} />
@@ -55,9 +49,7 @@ const CardSkeleton = ({ height = "h-40" }: { height?: string }) => (
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [ftueCompleted, setFtueCompleted] = useState(true); // default true to avoid flash
+  const { profile, isLoading, isError, retry, ftueCompleted, completeFtue } = useDashboardProfile();
   const {
     stats,
     getPointsForNextLevel,
@@ -72,47 +64,7 @@ const Dashboard = () => {
   useDailyGospel();
   useSaintOfDay(profile?.country_code);
   useDailyCapsule();
-
-  // Prefetch datos de páginas internas (oraciones, rosario, comunidad)
-  // para que al navegar aparezcan al instante en lugar de en blanco.
-  const queryClient = useQueryClient();
-  useEffect(() => {
-    const idle = (cb: () => void) =>
-      (typeof window !== "undefined" && (window as any).requestIdleCallback)
-        ? (window as any).requestIdleCallback(cb, { timeout: 2500 })
-        : setTimeout(cb, 800);
-
-    idle(() => {
-      queryClient.prefetchQuery({
-        queryKey: ["oraciones"],
-        queryFn: async () => {
-          const { data } = await supabase
-            .from("oraciones")
-            .select("*")
-            .order("orden", { ascending: true })
-            .limit(3000);
-          return data ?? [];
-        },
-        staleTime: 5 * 60 * 1000,
-      });
-      queryClient.prefetchQuery({
-        queryKey: ["rosario-misterios"],
-        queryFn: async () => {
-          const { data } = await supabase.from("rosario_misterios").select("*");
-          return data ?? [];
-        },
-        staleTime: 60 * 60 * 1000,
-      });
-      queryClient.prefetchQuery({
-        queryKey: ["rosario-oraciones"],
-        queryFn: async () => {
-          const { data } = await supabase.from("rosario_oraciones").select("*");
-          return data ?? [];
-        },
-        staleTime: 60 * 60 * 1000,
-      });
-    });
-  }, [queryClient]);
+  useDashboardPrefetch();
 
   // Progressive disclosure: determine user maturity level
   const userMaturity = useMemo(() => {
@@ -127,64 +79,24 @@ const Dashboard = () => {
   }, [stats]);
 
   useEffect(() => {
-    loadProfile();
-  }, []);
-
-  useEffect(() => {
     if (stats) {
       updateStreak();
     }
   }, [stats?.id]);
 
-  const loadProfile = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
-
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("nombre, perfil_doctrinal, edad_segmento, country_code")
-      .eq("id", session.user.id)
-      .single();
-
-    if (error) {
-      console.error("Error fetching profile:", error);
-    } else {
-      setProfile(data);
-    }
-    
-    // Check if user has ever completed the FTUE (stored in localStorage)
-    const ftueKey = `ftue_completed_${session.user.id}`;
-    const hasCompleted = localStorage.getItem(ftueKey) === "true";
-    setFtueCompleted(hasCompleted);
-    
-    setLoading(false);
-  };
-
-  const handleFtueComplete = useCallback(() => {
-    const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        localStorage.setItem(`ftue_completed_${session.user.id}`, "true");
-      }
-    };
-    getSession();
-    setFtueCompleted(true);
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <motion.div 
-          className="text-secondary"
-          animate={{ 
-            scale: [1, 1.1, 1],
-            rotate: [0, 5, -5, 0]
-          }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-        >
-          <BookOpen className="w-12 h-12" />
-        </motion.div>
-      </div>
+      <main className="flex min-h-screen items-center justify-center bg-background">
+        <AsyncState kind="loading" title="Preparando tu día" description="Estamos reuniendo tus propuestas de hoy." />
+      </main>
+    );
+  }
+
+  if (isError) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-background">
+        <AsyncState kind="error" actionLabel="Intentar de nuevo" onAction={() => void retry()} />
+      </main>
     );
   }
 
@@ -193,13 +105,12 @@ const Dashboard = () => {
     return (
       <FirstDayExperience
         userName={profile?.nombre?.split(" ")[0] || ""}
-        onComplete={handleFtueComplete}
+        onComplete={() => completeFtue()}
       />
     );
   }
 
   // Show more content as user matures
-  const showDailyMission = true; // always
   const showDailyRoutine = true; // always
   const showSaintAndGospel = true; // always (core 3)
   const showQuickActions = true; // always — navigation is essential
@@ -259,26 +170,18 @@ const Dashboard = () => {
               completedLessons={Math.floor((stats?.puntos_totales || 0) / 100)}
               totalLessons={10}
             />
-            {showDailyMission && (
-              <Suspense fallback={<CardSkeleton height="h-48" />}>
-                <DailyMission />
-              </Suspense>
-            )}
-
-            {/* Coach al centro: función estrella, acceso grande y recurrente */}
-            <div className="mt-4">
-              <CoachHighlightCard streak={stats?.racha_actual_dias} />
-            </div>
           </section>
 
           {/* ============ HOY ============ */}
           <section className="lg:px-0 mt-2">
-            <div className="px-5 lg:px-0 mb-3">
-              <h2 className="font-heading text-xl font-bold text-foreground">Hoy</h2>
-            </div>
+            <DashboardSectionHeading title="Hoy" />
 
             <div className="space-y-4">
               <StreakBanner streak={stats?.racha_actual_dias || 0} />
+
+              <Suspense fallback={<div className="px-5 lg:px-0"><CardSkeleton height="h-48" /></div>}>
+                <DailyMission />
+              </Suspense>
 
               {showSoulTriage && <SoulTriageHero />}
 
@@ -307,11 +210,10 @@ const Dashboard = () => {
 
           {/* ============ FORMACIÓN ============ */}
           <section className="mt-8">
-            <div className="px-5 lg:px-0 mb-3">
-              <h2 className="font-heading text-xl font-bold text-foreground">Formación</h2>
-              <p className="text-xs text-muted-foreground mt-1">
-                Ruta del Apóstol, Coach IA, Biblioteca, Apologética 101 y Pupilo Digital.
-              </p>
+            <DashboardSectionHeading title="Formación" description="Entrena, estudia y profundiza a tu ritmo." />
+
+            <div className="px-5 lg:px-0">
+              <CoachHighlightCard streak={stats?.racha_actual_dias} />
             </div>
 
             {showExploreGrid && (
@@ -337,12 +239,7 @@ const Dashboard = () => {
 
           {/* ============ ORACIÓN ============ */}
           <section className="mt-8">
-            <div className="px-5 lg:px-0 mb-3">
-              <h2 className="font-heading text-xl font-bold text-foreground">Oración</h2>
-              <p className="text-xs text-muted-foreground mt-1">
-                Rosario, Novenas, Oraciones, Historias para Dormir y Diario de Gratitud.
-              </p>
-            </div>
+            <DashboardSectionHeading title="Oración" description="Encuentra un momento de silencio, escucha y encuentro." />
 
             <div className="space-y-4">
               {showDailyRoutine && (
@@ -373,12 +270,7 @@ const Dashboard = () => {
 
           {/* ============ PROGRESO ============ */}
           <section className="mt-8 mb-6">
-            <div className="px-5 lg:px-0 mb-3">
-              <h2 className="font-heading text-xl font-bold text-foreground">Progreso</h2>
-              <p className="text-xs text-muted-foreground mt-1">
-                Tu nivel, XP, rachas, desafío diario y logros.
-              </p>
-            </div>
+            <DashboardSectionHeading title="Progreso" description="Una mirada serena a tu constancia y próximos pasos." />
 
             <div className="px-5 lg:px-0 grid lg:grid-cols-2 gap-4">
               {stats && (

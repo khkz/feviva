@@ -86,7 +86,16 @@ const AdminSantos = lazy(() => import("./pages/admin").then(m => ({ default: m.A
 const AdminBiblePlan = lazy(() => import("./pages/admin/AdminBiblePlan"));
 const AdminInvitations = lazy(() => import("./pages/admin/AdminInvitations"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,
+      gcTime: 30 * 60 * 1000,
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>

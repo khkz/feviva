@@ -129,20 +129,23 @@ export function PracticeRemindersCard() {
                           type="time"
                           value={editHour}
                           onChange={(e) => setEditHour(e.target.value)}
-                          className="h-7 w-24 text-xs"
+                          className="h-11 w-28 text-xs"
                         />
                         <Button
                           size="sm"
                           variant="ghost"
-                          className="h-7 px-2 text-xs"
+                          className="px-2 text-xs"
                           onClick={() => handleSaveHour(reminder.practice)}
                         >
                           Guardar
                         </Button>
                       </div>
                     ) : (
-                      <button
-                        className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        className="gap-1 px-2 text-xs text-muted-foreground hover:text-foreground"
                         onClick={() => {
                           setEditingPractice(reminder.practice);
                           setEditHour(reminder.hour);
@@ -150,7 +153,7 @@ export function PracticeRemindersCard() {
                       >
                         <Clock className="w-3 h-3" />
                         {reminder.hour}
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </div>
@@ -159,6 +162,7 @@ export function PracticeRemindersCard() {
                   checked={reminder.enabled}
                   onCheckedChange={() => handleToggle(reminder.practice, reminder.enabled)}
                   disabled={!isSupported || permission === "denied"}
+                  aria-label={`${reminder.enabled ? "Desactivar" : "Activar"} recordatorio de ${reminder.practice}`}
                 />
               </motion.div>
             ))}

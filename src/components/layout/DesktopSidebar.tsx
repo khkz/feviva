@@ -121,7 +121,7 @@ export function DesktopSidebar({ userName, userLevel, userStreak }: DesktopSideb
                   key={item.path}
                   to={item.path}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group",
+                    "flex min-h-11 items-center gap-3 px-3 py-2.5 rounded-xl transition-all group",
                     isActive 
                       ? "bg-primary text-primary-foreground shadow-medium" 
                       : "text-muted-foreground hover:bg-accent hover:text-foreground"
@@ -158,7 +158,7 @@ export function DesktopSidebar({ userName, userLevel, userStreak }: DesktopSideb
                   key={item.path}
                   to={item.path}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group",
+                    "flex min-h-11 items-center gap-3 px-3 py-2.5 rounded-xl transition-all group",
                     isActive 
                       ? "bg-primary text-primary-foreground shadow-medium" 
                       : "text-muted-foreground hover:bg-accent hover:text-foreground"

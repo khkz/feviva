@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 const navItems = [
   { path: "/dashboard", icon: Home, label: "Inicio" },
   { path: "/oraciones/app", icon: Hand, label: "Orar" },
-  { path: "/library", icon: BookOpen, label: "Aprender" },
+  { path: "/library", icon: BookOpen, label: "Formación" },
   { path: "/santos/app", icon: Sparkles, label: "Santos" },
   { path: "/profile", icon: User, label: "Perfil" },
 ];

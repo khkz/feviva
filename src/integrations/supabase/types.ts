@@ -1876,6 +1876,7 @@ export type Database = {
           devotion_primary: string | null
           edad_segmento: Database["public"]["Enums"]["edad_segmento"] | null
           email: string | null
+          ftue_completed_at: string | null
           id: string
           iglesia: string | null
           nombre: string
@@ -1894,6 +1895,7 @@ export type Database = {
           devotion_primary?: string | null
           edad_segmento?: Database["public"]["Enums"]["edad_segmento"] | null
           email?: string | null
+          ftue_completed_at?: string | null
           id: string
           iglesia?: string | null
           nombre: string
@@ -1912,6 +1914,7 @@ export type Database = {
           devotion_primary?: string | null
           edad_segmento?: Database["public"]["Enums"]["edad_segmento"] | null
           email?: string | null
+          ftue_completed_at?: string | null
           id?: string
           iglesia?: string | null
           nombre?: string

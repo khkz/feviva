@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { MessageSquare, Sparkles, ArrowRight, Flame } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 /**
  * Tarjeta destacada del Coach de Debate.
@@ -52,14 +51,10 @@ export const CoachHighlightCard = ({ streak }: { streak?: number }) => {
               <Flame className="w-3 h-3" /> {streak}d
             </span>
           )}
-          <Button
-            size="sm"
-            className="bg-secondary hover:bg-secondary/90 text-primary font-bold group-hover:translate-x-0.5 transition-transform"
-            tabIndex={-1}
-          >
+          <span className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-secondary px-3 text-sm font-bold text-primary transition-transform group-hover:translate-x-0.5">
             Entrenar
             <ArrowRight className="ml-1 w-4 h-4" />
-          </Button>
+          </span>
         </div>
 
         <ArrowRight className="sm:hidden w-5 h-5 text-white/70 shrink-0" />

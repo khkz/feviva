@@ -268,8 +268,9 @@ export function GratitudePrompt() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 text-amber-500 hover:text-amber-600 hover:bg-amber-100 dark:hover:bg-amber-900/30"
+                className="text-gold-ink hover:bg-secondary/10"
                 onClick={() => setShowWhyModal(true)}
+                aria-label="Por qué llevar un diario de gratitud"
               >
                 <HelpCircle className="w-5 h-5" />
               </Button>

@@ -131,14 +131,14 @@ export function ExploreGrid() {
       </div>
 
       <motion.div 
-        className="grid grid-cols-2 gap-4"
+        className="grid grid-cols-2 gap-4 lg:grid-cols-3"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
         {exploreItems.map((item) => (
           <motion.button
-            key={item.path}
+            key={`${item.path}-${item.label}`}
             onClick={() => navigate(item.path)}
             className="relative h-48 lg:h-56 rounded-2xl overflow-hidden group text-left"
             variants={cardVariants}
@@ -150,6 +150,8 @@ export function ExploreGrid() {
               src={item.image}
               alt={item.label}
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              loading="lazy"
+              decoding="async"
             />
             
             {/* Dark Overlay */}

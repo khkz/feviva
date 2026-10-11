@@ -166,6 +166,7 @@ export function CommentSection({ postId, isOpen, onToggle }: CommentSectionProps
                 disabled={!newComment.trim() || submitting}
                 size="icon"
                 className="shrink-0"
+                aria-label="Publicar comentario"
               >
                 <Send className="w-4 h-4" />
               </Button>
@@ -212,8 +213,9 @@ export function CommentSection({ postId, isOpen, onToggle }: CommentSectionProps
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-6 w-6 text-muted-foreground hover:text-destructive"
+                            className="text-muted-foreground hover:text-destructive"
                             onClick={() => deleteComment(comment.id)}
+                            aria-label="Eliminar comentario"
                           >
                             <Trash2 className="w-3 h-3" />
                           </Button>
