@@ -40,7 +40,7 @@ export const DailyCapsuleWidget = () => {
             <Zap className="w-4 h-4 text-primary" />
             <span className="text-sm font-semibold text-foreground">Cápsula del día</span>
           </div>
-          <Link to="/capsula-del-dia" className="text-xs text-primary hover:underline flex items-center gap-1">
+          <Link to="/capsula-del-dia" className="inline-flex min-h-11 items-center gap-1 px-2 text-xs text-primary hover:underline">
             Ver más <ArrowRight className="w-3 h-3" />
           </Link>
         </div>
