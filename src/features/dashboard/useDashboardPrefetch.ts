@@ -2,10 +2,10 @@ import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getDashboardOraciones, getRosarioMisterios, getRosarioOraciones } from "@/data/dashboard";
 
-interface IdleWindow extends Window {
+type IdleWindow = Window & {
   requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number;
   cancelIdleCallback?: (id: number) => void;
-}
+};
 
 export function useDashboardPrefetch() {
   const queryClient = useQueryClient();

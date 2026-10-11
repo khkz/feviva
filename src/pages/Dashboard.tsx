@@ -111,7 +111,6 @@ const Dashboard = () => {
   }
 
   // Show more content as user matures
-  const showDailyMission = true; // always
   const showDailyRoutine = true; // always
   const showSaintAndGospel = true; // always (core 3)
   const showQuickActions = true; // always — navigation is essential
@@ -171,9 +170,6 @@ const Dashboard = () => {
               completedLessons={Math.floor((stats?.puntos_totales || 0) / 100)}
               totalLessons={10}
             />
-            {showDailyMission && (
-              null
-            )}
           </section>
 
           {/* ============ HOY ============ */}
