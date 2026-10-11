@@ -8,6 +8,7 @@ import { ThemeProvider } from "next-themes";
 import { AudioPlayerProvider } from "@/contexts/AudioPlayerContext";
 import { RosarioProvider } from "@/contexts/RosarioContext";
 import { UnifiedMiniPlayer } from "@/components/audio/UnifiedMiniPlayer";
+import { MediaSessionBridge } from "@/components/audio/MediaSessionBridge";
 import { OracionPlayer } from "@/components/oraciones/OracionPlayer";
 import { RosarioMiniPlayer } from "@/components/rosario/RosarioMiniPlayer";
 import { RosarioInterstellar } from "@/components/frontera-final/RosarioInterstellar";
@@ -192,6 +193,7 @@ const App = () => (
               {/* Global Players */}
               <OracionPlayer />
               <UnifiedMiniPlayer />
+              <MediaSessionBridge />
               <RosarioMiniPlayer />
               <RosarioInterstellar />
             </BrowserRouter>

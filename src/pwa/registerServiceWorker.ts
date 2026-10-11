@@ -1,4 +1,5 @@
 import { registerSW } from "virtual:pwa-register";
+import { Capacitor } from "@capacitor/core";
 
 const isLovablePreviewHost = (hostname: string) =>
   hostname.startsWith("id-preview--") ||
@@ -25,6 +26,9 @@ export function registerAppServiceWorker() {
 
   const shouldSkip =
     !import.meta.env.PROD ||
+    // Inside the iOS/Android app the assets ship with the binary; a service worker
+    // would only serve stale bundles after an app update.
+    Capacitor.isNativePlatform() ||
     window.self !== window.top ||
     isLovablePreviewHost(window.location.hostname) ||
     new URLSearchParams(window.location.search).get("sw") === "off";

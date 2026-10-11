@@ -1,0 +1,125 @@
+import { useEffect, useRef } from "react";
+import { useAudioPlayer, type AudioQueueItem } from "@/contexts/AudioPlayerContext";
+
+const SEEK_STEP_SECONDS = 15;
+const FALLBACK_ARTWORK = "/pwa-512x512.png";
+
+const TYPE_LABEL: Record<AudioQueueItem["type"], string> = {
+  oracion: "Oración",
+  sleep_story: "Historia para dormir",
+  lesson: "Lección",
+};
+
+const hasMediaSession = () =>
+  typeof navigator !== "undefined" && "mediaSession" in navigator;
+
+const setHandler = (action: MediaSessionAction, handler: MediaSessionActionHandler | null) => {
+  try {
+    navigator.mediaSession.setActionHandler(action, handler);
+  } catch {
+    // Some browsers do not support every action (e.g. seekto on older Safari).
+  }
+};
+
+const ACTIONS: MediaSessionAction[] = [
+  "play",
+  "pause",
+  "stop",
+  "previoustrack",
+  "nexttrack",
+  "seekbackward",
+  "seekforward",
+  "seekto",
+];
+
+/**
+ * Publishes the global audio player to the OS media controls
+ * (lock screen, notification shade, headphones, Bluetooth, smartwatch).
+ * Renders nothing. Must live inside AudioPlayerProvider.
+ */
+export function MediaSessionBridge() {
+  const player = useAudioPlayer();
+  const { currentItem, isPlaying, currentTime, duration, playbackRate } = player;
+
+  // Handlers registered with the OS must always call the latest player functions.
+  const playerRef = useRef(player);
+  playerRef.current = player;
+
+  // Metadata: title, subtitle and artwork shown on the lock screen.
+  useEffect(() => {
+    if (!hasMediaSession()) return;
+    if (!currentItem) {
+      navigator.mediaSession.metadata = null;
+      return;
+    }
+    const artworkSrc = currentItem.imageUrl || FALLBACK_ARTWORK;
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: currentItem.title,
+      artist: currentItem.subtitle || TYPE_LABEL[currentItem.type],
+      album: "El Rugido",
+      artwork: [
+        { src: artworkSrc, sizes: "512x512", type: artworkSrc.endsWith(".png") ? "image/png" : "image/jpeg" },
+      ],
+    });
+  }, [currentItem]);
+
+  // Play/pause state.
+  useEffect(() => {
+    if (!hasMediaSession()) return;
+    navigator.mediaSession.playbackState = currentItem ? (isPlaying ? "playing" : "paused") : "none";
+  }, [currentItem, isPlaying]);
+
+  // Action handlers (registered once while an item is active).
+  const isActive = Boolean(currentItem);
+  useEffect(() => {
+    if (!hasMediaSession() || !isActive) return;
+
+    const audio = () => playerRef.current.audioRef.current;
+    const seekBy = (delta: number) => {
+      const el = audio();
+      if (!el) return;
+      const max = Number.isFinite(el.duration) ? el.duration : Infinity;
+      playerRef.current.seek(Math.min(Math.max(0, el.currentTime + delta), max));
+    };
+
+    setHandler("play", () => {
+      if (!playerRef.current.isPlaying) playerRef.current.togglePlay();
+    });
+    setHandler("pause", () => playerRef.current.pause());
+    setHandler("stop", () => playerRef.current.close());
+    setHandler("previoustrack", () => {
+      if (playerRef.current.hasPrevious) playerRef.current.playPrevious();
+    });
+    setHandler("nexttrack", () => {
+      if (playerRef.current.hasNext) playerRef.current.playNext();
+    });
+    setHandler("seekbackward", (details) => seekBy(-(details.seekOffset ?? SEEK_STEP_SECONDS)));
+    setHandler("seekforward", (details) => seekBy(details.seekOffset ?? SEEK_STEP_SECONDS));
+    setHandler("seekto", (details) => {
+      if (typeof details.seekTime === "number") playerRef.current.seek(details.seekTime);
+    });
+
+    return () => {
+      ACTIONS.forEach((action) => setHandler(action, null));
+    };
+  }, [isActive]);
+
+  // Progress bar on the lock screen; refreshed every ~5 s instead of every timeupdate.
+  const positionBucket = Math.floor(currentTime / 5);
+  useEffect(() => {
+    if (!hasMediaSession() || !("setPositionState" in navigator.mediaSession)) return;
+    if (!currentItem || !Number.isFinite(duration) || duration <= 0) return;
+    try {
+      navigator.mediaSession.setPositionState({
+        duration,
+        playbackRate: playbackRate || 1,
+        position: Math.min(Math.max(0, currentTime), duration),
+      });
+    } catch {
+      // Ignore invalid states (e.g. position briefly beyond duration while loading).
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentItem, duration, playbackRate, positionBucket]);
+
+  return null;
+}
