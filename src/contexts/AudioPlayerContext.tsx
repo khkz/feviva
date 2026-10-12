@@ -1,102 +1,17 @@
 import React, { createContext, useContext, useState, useRef, useCallback, useEffect } from "react";
 
-// Generic audio queue item that works for both sleep stories and prayers
-export interface AudioQueueItem {
-  id: string;
-  title: string;
-  subtitle?: string;
-  imageUrl?: string;
-  audioUrl: string | null;
-  type: 'oracion' | 'sleep_story' | 'lesson';
-  // Original data for reference
-  originalData?: unknown;
-}
+import {
+  clearSessionProgress,
+  readSessionProgress,
+  writeSessionProgress,
+  type AudioPlayerContextType,
+  type AudioQueueItem,
+  type RepeatMode,
+} from "@/features/audio";
 
-interface AudioPlayerState {
-  // Current item (backwards compatible with currentStory)
-  currentItem: AudioQueueItem | null;
-  audioUrl: string | null;
-  isPlaying: boolean;
-  currentTime: number;
-  duration: number;
-  volume: number;
-  playbackRate: number;
-  isMinimized: boolean;
-  isGenerating: boolean;
-  timerRemaining: number | null;
-  // Queue management
-  queue: AudioQueueItem[];
-  currentIndex: number;
-  repeatMode: 'off' | 'one' | 'all';
-}
-
-interface AudioPlayerContextType extends AudioPlayerState {
-  // Existing functions (backwards compatible)
-  play: (item: AudioQueueItem) => void;
-  pause: () => void;
-  togglePlay: () => void;
-  seek: (time: number) => void;
-  setVolume: (volume: number) => void;
-  setPlaybackRate: (rate: number) => void;
-  minimize: () => void;
-  expand: () => void;
-  close: () => void;
-  setAudioUrl: (url: string) => void;
-  setIsGenerating: (generating: boolean) => void;
-  setTimer: (minutes: number) => void;
-  // Queue functions
-  playQueue: (items: AudioQueueItem[], startIndex?: number) => void;
-  playNext: () => void;
-  playPrevious: () => void;
-  addToQueue: (item: AudioQueueItem) => void;
-  removeFromQueue: (index: number) => void;
-  clearQueue: () => void;
-  toggleRepeatMode: () => void;
-  // Helper to check if there's next/prev
-  hasNext: boolean;
-  hasPrevious: boolean;
-  audioRef: React.RefObject<HTMLAudioElement>;
-}
+export type { AudioQueueItem } from "@/features/audio";
 
 const AudioPlayerContext = createContext<AudioPlayerContextType | null>(null);
-
-const SESSION_PROGRESS_KEY = "elrugido.audio.sessionProgress";
-
-const getProgressKey = (item: AudioQueueItem) => `${item.type}:${item.id}`;
-
-const readSessionProgress = (item: AudioQueueItem | null) => {
-  if (!item || typeof window === "undefined") return 0;
-  try {
-    const progress = JSON.parse(sessionStorage.getItem(SESSION_PROGRESS_KEY) || "{}");
-    const savedTime = Number(progress[getProgressKey(item)] || 0);
-    return Number.isFinite(savedTime) ? savedTime : 0;
-  } catch {
-    return 0;
-  }
-};
-
-const writeSessionProgress = (item: AudioQueueItem | null, time: number, duration: number) => {
-  if (!item || typeof window === "undefined" || !Number.isFinite(time) || time < 1) return;
-  if (Number.isFinite(duration) && duration > 0 && duration - time < 5) return;
-  try {
-    const progress = JSON.parse(sessionStorage.getItem(SESSION_PROGRESS_KEY) || "{}");
-    progress[getProgressKey(item)] = time;
-    sessionStorage.setItem(SESSION_PROGRESS_KEY, JSON.stringify(progress));
-  } catch {
-    // Session progress is a convenience feature; playback should never fail because storage is unavailable.
-  }
-};
-
-const clearSessionProgress = (item: AudioQueueItem | null) => {
-  if (!item || typeof window === "undefined") return;
-  try {
-    const progress = JSON.parse(sessionStorage.getItem(SESSION_PROGRESS_KEY) || "{}");
-    delete progress[getProgressKey(item)];
-    sessionStorage.setItem(SESSION_PROGRESS_KEY, JSON.stringify(progress));
-  } catch {
-    // Ignore storage errors.
-  }
-};
 
 export function AudioPlayerProvider({ children }: { children: React.ReactNode }) {
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -115,7 +30,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   // Queue state
   const [queue, setQueue] = useState<AudioQueueItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [repeatMode, setRepeatMode] = useState<'off' | 'one' | 'all'>('off');
+  const [repeatMode, setRepeatMode] = useState<RepeatMode>('off');
 
   // Timer countdown effect
   useEffect(() => {
