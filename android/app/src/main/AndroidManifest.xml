@@ -38,4 +38,8 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Not needed for the playback notification: media-session notifications are exempt on
+         Android 13+. Declared for future push notifications (requested at runtime then).
+         The media service, wake lock and foreground-service permissions come from capacitor-plugin-playlist. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 </manifest>

@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Play, Trash2, ListMusic, Cross, Moon, BookOpen, GripVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
+import { useAudioPlayer, type AudioQueueItem } from "@/contexts/AudioPlayerContext";
 import { usePlaylistManager, PlaylistItem } from "@/hooks/usePlaylistManager";
 import { cn } from "@/lib/utils";
 
@@ -178,14 +178,15 @@ function QueueItem({
 }: {
   title: string;
   subtitle?: string;
-  type: 'oracion' | 'sleep_story' | 'lesson';
+  type: AudioQueueItem['type'];
   imageUrl?: string;
   isActive?: boolean;
   onClick: () => void;
 }) {
-  const IconComponent = type === 'oracion' ? Cross : type === 'lesson' ? BookOpen : Moon;
-  const iconBg = type === 'oracion' ? "bg-secondary/10" : type === 'lesson' ? "bg-blue-500/10" : "bg-indigo-500/10";
-  const iconColor = type === 'oracion' ? "text-secondary" : type === 'lesson' ? "text-blue-400" : "text-indigo-400";
+  const isPrayer = type === 'oracion' || type === 'ritual' || type === 'rosario';
+  const IconComponent = isPrayer ? Cross : type === 'lesson' ? BookOpen : Moon;
+  const iconBg = isPrayer ? "bg-secondary/10" : type === 'lesson' ? "bg-blue-500/10" : "bg-indigo-500/10";
+  const iconColor = isPrayer ? "text-secondary" : type === 'lesson' ? "text-blue-400" : "text-indigo-400";
 
   return (
     <motion.button
