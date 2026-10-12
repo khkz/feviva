@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { MISTERIOS, ORACIONES_ROSARIO, TipoMisterio, Misterio } from "@/lib/rosarioData";
@@ -37,8 +38,9 @@ export function useRosarioData() {
     staleTime: 1000 * 60 * 60,
   });
 
-  // Transform DB data to match existing structure, fallback to static
-  const misterios: Record<TipoMisterio, MisterioGroup> = (() => {
+  // Transform DB data to match existing structure, fallback to static.
+  // Memoized: the rosary context re-renders with every playback tick of the global player.
+  const misterios: Record<TipoMisterio, MisterioGroup> = useMemo(() => {
     if (!dbMisterios || dbMisterios.length === 0) return MISTERIOS;
 
     const grouped: Record<string, MisterioGroup> = {};
@@ -54,9 +56,9 @@ export function useRosarioData() {
       });
     }
     return grouped as Record<TipoMisterio, MisterioGroup>;
-  })();
+  }, [dbMisterios]);
 
-  const oraciones = (() => {
+  const oraciones = useMemo(() => {
     if (!dbOraciones || dbOraciones.length === 0) return ORACIONES_ROSARIO;
 
     const map: Record<string, string> = {};
@@ -70,7 +72,7 @@ export function useRosarioData() {
       salveRegina: map.salveRegina || ORACIONES_ROSARIO.salveRegina,
       credo: map.credo || ORACIONES_ROSARIO.credo,
     };
-  })();
+  }, [dbOraciones]);
 
   return { misterios, oraciones };
 }

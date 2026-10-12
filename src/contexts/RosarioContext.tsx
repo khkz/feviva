@@ -1,61 +1,9 @@
-import { createContext, useContext, useState, useCallback, useRef, ReactNode, useEffect } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo, useRef, ReactNode, useEffect } from 'react';
 import { getMisterioDelDia, TipoMisterio } from '@/lib/rosarioData';
 import { supabase } from '@/integrations/supabase/client';
-import { useRosarioTTS } from '@/hooks/useRosarioTTS';
 import { useRosarioData } from '@/hooks/useRosarioData';
-
-interface RosarioState {
-  // Display state
-  isOpen: boolean;
-  isMinimized: boolean;
-  
-  // Rosario progress
-  currentMysteryType: TipoMisterio;
-  currentMysteryIndex: number;
-  currentPrayer: number;
-  
-  // Playback
-  isPlaying: boolean;
-  isMuted: boolean;
-  ttsEnabled: boolean;
-  ambientVolume: number;
-  
-  // User data
-  rosariosCompletados: number;
-  userId: string | null;
-}
-
-interface RosarioContextType extends RosarioState {
-  // TTS state
-  isTtsGenerating: boolean;
-  isTtsPlaying: boolean;
-  
-  // Actions
-  open: () => void;
-  close: () => void;
-  minimize: () => void;
-  expand: () => void;
-  togglePlay: () => void;
-  next: () => void;
-  previous: () => void;
-  reset: () => void;
-  setMysteryType: (type: TipoMisterio) => void;
-  setMysteryIndex: (index: number) => void;
-  toggleMute: () => void;
-  toggleTts: () => void;
-  setAmbientVolume: (volume: number) => void;
-  
-  // Audio context for ambient sounds
-  audioContext: AudioContext | null;
-  initAudioContext: () => void;
-  
-  // Helpers
-  getCurrentPrayerName: () => string;
-  getCurrentPrayerText: () => string;
-  totalProgress: number;
-  mysteryData: { nombre: string; dia: string; misterios: { numero: number; titulo: string; fruto: string; meditacion: string }[] };
-  currentMystery: { numero: number; titulo: string; fruto: string; meditacion: string };
-}
+import { useToast } from '@/hooks/use-toast';
+import { prayerName, useRosaryAudio, useRosarioSounds, type RosarioContextType, type RosaryPosition } from '@/features/rosario';
 
 const RosarioContext = createContext<RosarioContextType | null>(null);
 
@@ -69,48 +17,29 @@ export function useRosario() {
 
 export function RosarioProvider({ children }: { children: ReactNode }) {
   const { misterios: MISTERIOS, oraciones: ORACIONES_ROSARIO } = useRosarioData();
+  const { toast } = useToast();
   // State
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [currentMysteryType, setCurrentMysteryType] = useState<TipoMisterio>(getMisterioDelDia());
   const [currentMysteryIndex, setCurrentMysteryIndex] = useState(0);
   const [currentPrayer, setCurrentPrayer] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
+  // What the user asked for; while the voice is on, the global player decides (see isPlaying).
+  const [isPlayingIntent, setIsPlayingIntent] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const [ttsEnabled, setTtsEnabled] = useState(true);
   const [ambientVolume, setAmbientVolume] = useState(30);
   const [rosariosCompletados, setRosariosCompletados] = useState(0);
   const [userId, setUserId] = useState<string | null>(null);
-  const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
-  
-  // Refs for ambient sounds
-  const ambientOscillators = useRef<OscillatorNode[]>([]);
-  const ambientGains = useRef<GainNode[]>([]);
-  
-  // TTS Hook
-  const { 
-    isGenerating: isTtsGenerating, 
-    isPlaying: isTtsPlaying, 
-    playPrayer, 
-    stop: stopTts,
-    getPrayerTypeFromIndex,
-    setOnEnded,
-  } = useRosarioTTS();
-
-  // Ref to track if we should auto-advance after TTS ends
-  const shouldAutoAdvanceRef = useRef(false);
 
   // Computed values
   const mysteryData = MISTERIOS[currentMysteryType];
   const currentMystery = mysteryData.misterios[currentMysteryIndex];
   const totalProgress = (currentMysteryIndex * 12 + currentPrayer) / (5 * 12);
-
-  // Ambient frequencies
-  const ambientFrequencies = [
-    { freq: 60, type: 'sine' as OscillatorType, gain: 0.03 },
-    { freq: 120, type: 'sine' as OscillatorType, gain: 0.02 },
-    { freq: 180, type: 'sine' as OscillatorType, gain: 0.015 },
-  ];
+  const position = useMemo<RosaryPosition>(
+    () => ({ mystery: currentMysteryIndex, prayer: currentPrayer }),
+    [currentMysteryIndex, currentPrayer],
+  );
 
   // Load user data when opened
   useEffect(() => {
@@ -129,131 +58,6 @@ export function RosarioProvider({ children }: { children: ReactNode }) {
     if (isOpen || isMinimized) loadUser();
   }, [isOpen, isMinimized]);
 
-  // Initialize audio context
-  const initAudioContext = useCallback(() => {
-    if (!audioContext) {
-      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      setAudioContext(ctx);
-    }
-  }, [audioContext]);
-
-  // Ambient sound controls
-  const startAmbient = useCallback(() => {
-    if (!audioContext) return;
-    stopAmbient();
-
-    ambientFrequencies.forEach((config, i) => {
-      const osc = audioContext.createOscillator();
-      const gain = audioContext.createGain();
-      
-      osc.type = config.type;
-      osc.frequency.value = config.freq;
-      gain.gain.value = config.gain * (ambientVolume / 100);
-      
-      osc.connect(gain);
-      gain.connect(audioContext.destination);
-      osc.start();
-      
-      ambientOscillators.current[i] = osc;
-      ambientGains.current[i] = gain;
-    });
-  }, [audioContext, ambientVolume]);
-
-  const stopAmbient = useCallback(() => {
-    ambientOscillators.current.forEach(osc => {
-      try { osc?.stop(); } catch {}
-    });
-    ambientOscillators.current = [];
-    ambientGains.current = [];
-  }, []);
-
-  // Play bell sound
-  const playBellSound = useCallback(() => {
-    if (!audioContext || isMuted) return;
-
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-    const filter = audioContext.createBiquadFilter();
-
-    oscillator.connect(filter);
-    filter.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-
-    filter.type = "lowpass";
-    filter.frequency.value = 2000;
-    
-    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-    oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.5);
-
-    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.8);
-
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.8);
-  }, [audioContext, isMuted]);
-
-  // Play completion chord
-  const playCompletionChord = useCallback(() => {
-    if (!audioContext || isMuted) return;
-
-    const notes = [261.63, 329.63, 392.00, 523.25];
-    
-    notes.forEach((freq, i) => {
-      const osc = audioContext.createOscillator();
-      const gain = audioContext.createGain();
-      
-      osc.connect(gain);
-      gain.connect(audioContext.destination);
-      
-      osc.frequency.value = freq;
-      osc.type = "sine";
-      
-      const startTime = audioContext.currentTime + i * 0.1;
-      gain.gain.setValueAtTime(0.15, startTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, startTime + 1.5);
-      
-      osc.start(startTime);
-      osc.stop(startTime + 1.5);
-    });
-  }, [audioContext, isMuted]);
-
-  // Handle ambient start/stop based on play state
-  useEffect(() => {
-    if (!audioContext || isMuted) {
-      stopAmbient();
-      return;
-    }
-
-    if (isPlaying) {
-      startAmbient();
-    } else {
-      stopAmbient();
-    }
-
-    return () => stopAmbient();
-  }, [audioContext, isPlaying, isMuted, startAmbient, stopAmbient]);
-
-  // Update ambient volume
-  useEffect(() => {
-    ambientGains.current.forEach((gain, i) => {
-      if (gain) {
-        gain.gain.setValueAtTime(
-          ambientFrequencies[i].gain * (ambientVolume / 100),
-          audioContext?.currentTime || 0
-        );
-      }
-    });
-  }, [ambientVolume, audioContext]);
-
-
-  // Play TTS when prayer changes
-  useEffect(() => {
-    if (ttsEnabled && (isOpen || isMinimized) && isPlaying && !isTtsPlaying && !isTtsGenerating) {
-      const prayerType = getPrayerTypeFromIndex(currentPrayer);
-      playPrayer(prayerType);
-    }
-  }, [currentPrayer, ttsEnabled, isOpen, isMinimized, isPlaying]);
-
   // Save progress to database
   const saveProgress = async () => {
     if (!userId) return;
@@ -269,6 +73,58 @@ export function RosarioProvider({ children }: { children: ReactNode }) {
       console.error('Error saving rosary progress:', error);
     }
   };
+  const saveProgressRef = useRef(saveProgress);
+  saveProgressRef.current = saveProgress;
+  const soundsRef = useRef({ playBellSound: () => {}, playCompletionChord: () => {} });
+
+  // Voice: the remaining prayers play as one queue in the global player
+  const audio = useRosaryAudio({
+    enabled: ttsEnabled,
+    tipo: currentMysteryType,
+    position,
+    getMysteryData: (tipo) => MISTERIOS[tipo as TipoMisterio],
+    onPlayerMoved: (next, advanced) => {
+      if (advanced) {
+        soundsRef.current.playBellSound();
+        if (next.mystery !== currentMysteryIndex) soundsRef.current.playCompletionChord();
+      }
+      setCurrentMysteryIndex(next.mystery);
+      setCurrentPrayer(next.prayer);
+    },
+    onCompleted: () => {
+      soundsRef.current.playBellSound();
+      soundsRef.current.playCompletionChord();
+      setIsPlayingIntent(false);
+      saveProgressRef.current();
+    },
+    onUnavailable: () => {
+      setTtsEnabled(false);
+      toast({
+        title: "Audio aún no disponible",
+        description: "Estamos preparando el audio de esta oración. Puedes seguir rezando con el texto.",
+      });
+    },
+    onTakenOver: () => setIsPlayingIntent(false),
+  });
+
+  const isPlaying = audio.isActive ? audio.isPlaying : isPlayingIntent;
+
+  // Ambient drone, bell and completion chord (Web Audio)
+  const { audioContext, initAudioContext, stopAmbient, playBellSound, playCompletionChord } = useRosarioSounds({
+    isPlaying,
+    isMuted,
+    ambientVolume,
+  });
+  soundsRef.current = { playBellSound, playCompletionChord };
+
+  // Another audio took over the global player while the rosary was playing.
+  const wasAudioActiveRef = useRef(false);
+  useEffect(() => {
+    if (wasAudioActiveRef.current && !audio.isActive && ttsEnabled && !audio.isPreparing) {
+      setIsPlayingIntent(false);
+    }
+    wasAudioActiveRef.current = audio.isActive;
+  }, [audio.isActive, audio.isPreparing, ttsEnabled]);
 
   // Actions
   const open = useCallback(() => {
@@ -280,10 +136,10 @@ export function RosarioProvider({ children }: { children: ReactNode }) {
   const close = useCallback(() => {
     setIsOpen(false);
     setIsMinimized(false);
-    setIsPlaying(false);
-    stopTts();
+    setIsPlayingIntent(false);
+    audio.stop();
     stopAmbient();
-  }, [stopTts, stopAmbient]);
+  }, [audio, stopAmbient]);
 
   const minimize = useCallback(() => {
     setIsOpen(false);
@@ -296,142 +152,181 @@ export function RosarioProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const togglePlay = useCallback(() => {
-    setIsPlaying(prev => !prev);
-    if (!isPlaying) {
-      initAudioContext();
+    if (!isPlaying) initAudioContext();
+    if (!ttsEnabled) {
+      setIsPlayingIntent(!isPlaying);
+      return;
     }
-  }, [isPlaying, initAudioContext]);
+    if (isPlaying) {
+      setIsPlayingIntent(false);
+      audio.pause();
+      return;
+    }
+    setIsPlayingIntent(true);
+    if (audio.isActive && !audio.hasEnded) audio.resume();
+    else audio.start(position, currentMysteryType);
+  }, [isPlaying, ttsEnabled, audio, position, currentMysteryType, initAudioContext]);
+
+  const moveTo = useCallback((target: RosaryPosition) => {
+    setCurrentMysteryIndex(target.mystery);
+    setCurrentPrayer(target.prayer);
+    if (ttsEnabled) audio.goTo(target);
+  }, [ttsEnabled, audio]);
 
   const next = useCallback(() => {
     playBellSound();
-    stopTts();
 
     if (currentPrayer < 11) {
-      setCurrentPrayer(prev => prev + 1);
+      moveTo({ mystery: currentMysteryIndex, prayer: currentPrayer + 1 });
     } else if (currentMysteryIndex < 4) {
       playCompletionChord();
-      setCurrentMysteryIndex(prev => prev + 1);
-      setCurrentPrayer(0);
+      moveTo({ mystery: currentMysteryIndex + 1, prayer: 0 });
     } else {
       playCompletionChord();
-      setIsPlaying(false);
-      saveProgress();
+      setIsPlayingIntent(false);
+      audio.stop();
+      saveProgressRef.current();
     }
-  }, [currentPrayer, currentMysteryIndex, playBellSound, playCompletionChord, stopTts]);
-
-  // Set up TTS onEnded callback for auto-advance (after next is defined)
-  useEffect(() => {
-    if (ttsEnabled && isPlaying) {
-      setOnEnded(() => {
-        // Auto-advance to next prayer when TTS finishes
-        shouldAutoAdvanceRef.current = true;
-        next();
-      });
-    } else {
-      setOnEnded(null);
-    }
-  }, [ttsEnabled, isPlaying, setOnEnded, next]);
+  }, [currentPrayer, currentMysteryIndex, playBellSound, playCompletionChord, moveTo, audio]);
 
   const previous = useCallback(() => {
-    stopTts();
     if (currentPrayer > 0) {
-      setCurrentPrayer(prev => prev - 1);
+      moveTo({ mystery: currentMysteryIndex, prayer: currentPrayer - 1 });
     } else if (currentMysteryIndex > 0) {
-      setCurrentMysteryIndex(prev => prev - 1);
-      setCurrentPrayer(11);
+      moveTo({ mystery: currentMysteryIndex - 1, prayer: 11 });
     }
-  }, [currentPrayer, currentMysteryIndex, stopTts]);
+  }, [currentPrayer, currentMysteryIndex, moveTo]);
 
   const reset = useCallback(() => {
     setCurrentMysteryIndex(0);
     setCurrentPrayer(0);
-    setIsPlaying(false);
-    stopTts();
-  }, [stopTts]);
+    setIsPlayingIntent(false);
+    audio.stop();
+  }, [audio]);
 
   const setMysteryType = useCallback((type: TipoMisterio) => {
     setCurrentMysteryType(type);
     setCurrentMysteryIndex(0);
     setCurrentPrayer(0);
-  }, []);
+    if (ttsEnabled && isPlaying) audio.start({ mystery: 0, prayer: 0 }, type);
+    else audio.stop(); // don't leave the other mysteries' queue loaded (and on the lock screen)
+  }, [ttsEnabled, isPlaying, audio]);
 
   const setMysteryIndex = useCallback((index: number) => {
-    setCurrentMysteryIndex(index);
-    setCurrentPrayer(0);
-  }, []);
+    moveTo({ mystery: index, prayer: 0 });
+  }, [moveTo]);
 
   const toggleMute = useCallback(() => {
     setIsMuted(prev => !prev);
   }, []);
 
-  const toggleTts = useCallback(async () => {
+  const toggleTts = useCallback(() => {
     if (!ttsEnabled) {
+      // Turning the voice on starts praying aloud from the current prayer.
       setTtsEnabled(true);
-      const prayerType = getPrayerTypeFromIndex(currentPrayer);
-      await playPrayer(prayerType);
+      setIsPlayingIntent(true);
+      initAudioContext();
+      audio.start(position, currentMysteryType);
     } else {
+      setIsPlayingIntent(isPlaying);
       setTtsEnabled(false);
-      stopTts();
+      audio.stop();
     }
-  }, [ttsEnabled, currentPrayer, getPrayerTypeFromIndex, playPrayer, stopTts]);
+  }, [ttsEnabled, isPlaying, audio, position, currentMysteryType, initAudioContext]);
 
   // Helpers
-  const getCurrentPrayerName = useCallback(() => {
-    if (currentPrayer === 0) return "Padre Nuestro";
-    if (currentPrayer >= 1 && currentPrayer <= 10) return `Ave María (${currentPrayer}/10)`;
-    return "Gloria";
-  }, [currentPrayer]);
+  const getCurrentPrayerName = useCallback(() => prayerName(currentPrayer), [currentPrayer]);
 
   const getCurrentPrayerText = useCallback(() => {
     if (currentPrayer === 0) return ORACIONES_ROSARIO.padreNuestro;
     if (currentPrayer >= 1 && currentPrayer <= 10) return ORACIONES_ROSARIO.aveMaria;
     return ORACIONES_ROSARIO.gloria;
-  }, [currentPrayer]);
+  }, [currentPrayer, ORACIONES_ROSARIO]);
 
-  const value: RosarioContextType = {
-    // State
-    isOpen,
-    isMinimized,
-    currentMysteryType,
-    currentMysteryIndex,
-    currentPrayer,
-    isPlaying,
-    isMuted,
-    ttsEnabled,
-    ambientVolume,
-    rosariosCompletados,
-    userId,
-    
-    // TTS state
-    isTtsGenerating,
-    isTtsPlaying,
-    
-    // Actions
-    open,
-    close,
-    minimize,
-    expand,
-    togglePlay,
-    next,
-    previous,
-    reset,
-    setMysteryType,
-    setMysteryIndex,
-    toggleMute,
-    toggleTts,
-    setAmbientVolume,
-    
-    // Audio
-    audioContext,
-    initAudioContext,
-    
-    // Helpers
-    getCurrentPrayerName,
-    getCurrentPrayerText,
-    totalProgress,
-    mysteryData,
-    currentMystery,
-  };
+  const isTtsGenerating = audio.isPreparing;
+  const isTtsPlaying = audio.isPlaying;
+
+  // Memoized: the global player re-renders this provider on every playback tick.
+  const value = useMemo<RosarioContextType>(
+    () => ({
+      // State
+      isOpen,
+      isMinimized,
+      currentMysteryType,
+      currentMysteryIndex,
+      currentPrayer,
+      isPlaying,
+      isMuted,
+      ttsEnabled,
+      ambientVolume,
+      rosariosCompletados,
+      userId,
+
+      // TTS state
+      isTtsGenerating,
+      isTtsPlaying,
+
+      // Actions
+      open,
+      close,
+      minimize,
+      expand,
+      togglePlay,
+      next,
+      previous,
+      reset,
+      setMysteryType,
+      setMysteryIndex,
+      toggleMute,
+      toggleTts,
+      setAmbientVolume,
+
+      // Audio
+      audioContext,
+      initAudioContext,
+
+      // Helpers
+      getCurrentPrayerName,
+      getCurrentPrayerText,
+      totalProgress,
+      mysteryData,
+      currentMystery,
+    }),
+    [
+      isOpen,
+      isMinimized,
+      currentMysteryType,
+      currentMysteryIndex,
+      currentPrayer,
+      isPlaying,
+      isMuted,
+      ttsEnabled,
+      ambientVolume,
+      rosariosCompletados,
+      userId,
+      isTtsGenerating,
+      isTtsPlaying,
+      open,
+      close,
+      minimize,
+      expand,
+      togglePlay,
+      next,
+      previous,
+      reset,
+      setMysteryType,
+      setMysteryIndex,
+      toggleMute,
+      toggleTts,
+      audioContext,
+      initAudioContext,
+      getCurrentPrayerName,
+      getCurrentPrayerText,
+      totalProgress,
+      mysteryData,
+      currentMystery,
+    ],
+  );
 
   return (
     <RosarioContext.Provider value={value}>

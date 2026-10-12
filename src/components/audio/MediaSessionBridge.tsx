@@ -1,17 +1,13 @@
 import { useEffect, useRef } from "react";
-import { useAudioPlayer, type AudioQueueItem } from "@/contexts/AudioPlayerContext";
+import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
+import { AUDIO_TYPE_LABEL, isNativeAudio } from "@/features/audio";
 
 const SEEK_STEP_SECONDS = 15;
 const FALLBACK_ARTWORK = "/pwa-512x512.png";
 
-const TYPE_LABEL: Record<AudioQueueItem["type"], string> = {
-  oracion: "Oración",
-  sleep_story: "Historia para dormir",
-  lesson: "Lección",
-};
-
+// Inside the iOS/Android app the native player owns the lock screen; this bridge is for browsers.
 const hasMediaSession = () =>
-  typeof navigator !== "undefined" && "mediaSession" in navigator;
+  !isNativeAudio() && typeof navigator !== "undefined" && "mediaSession" in navigator;
 
 const setHandler = (action: MediaSessionAction, handler: MediaSessionActionHandler | null) => {
   try {
@@ -55,7 +51,7 @@ export function MediaSessionBridge() {
     const artworkSrc = currentItem.imageUrl || FALLBACK_ARTWORK;
     navigator.mediaSession.metadata = new MediaMetadata({
       title: currentItem.title,
-      artist: currentItem.subtitle || TYPE_LABEL[currentItem.type],
+      artist: currentItem.subtitle || AUDIO_TYPE_LABEL[currentItem.type],
       album: "El Rugido",
       artwork: [
         { src: artworkSrc, sizes: "512x512", type: artworkSrc.endsWith(".png") ? "image/png" : "image/jpeg" },
@@ -74,12 +70,10 @@ export function MediaSessionBridge() {
   useEffect(() => {
     if (!hasMediaSession() || !isActive) return;
 
-    const audio = () => playerRef.current.audioRef.current;
     const seekBy = (delta: number) => {
-      const el = audio();
-      if (!el) return;
-      const max = Number.isFinite(el.duration) ? el.duration : Infinity;
-      playerRef.current.seek(Math.min(Math.max(0, el.currentTime + delta), max));
+      const { currentTime: position, duration: length, seek } = playerRef.current;
+      const max = length > 0 ? length : Infinity;
+      seek(Math.min(Math.max(0, position + delta), max));
     };
 
     setHandler("play", () => {

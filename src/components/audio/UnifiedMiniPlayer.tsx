@@ -31,11 +31,14 @@ export function UnifiedMiniPlayer({ className }: UnifiedMiniPlayerProps) {
 
   const [showPlaylist, setShowPlaylist] = useState(false);
 
-  // Only show when minimized and there's an active item
-  if (!currentItem || !isMinimized) return null;
+  // Only show when minimized and there's an active item.
+  // The audio rosary has its own mini player (RosarioMiniPlayer).
+  if (!currentItem || !isMinimized || currentItem.type === 'rosario') return null;
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
   const hasQueue = queue.length > 1;
+  // Daily audios have no full-screen player: expanding would only hide the mini player.
+  const canExpand = currentItem.type !== 'ritual';
 
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);
@@ -45,7 +48,7 @@ export function UnifiedMiniPlayer({ className }: UnifiedMiniPlayerProps) {
 
   // Theme based on content type
   const theme = 
-    currentItem.type === 'oracion'
+    currentItem.type === 'oracion' || currentItem.type === 'ritual'
       ? {
           bg: "from-secondary/95 via-secondary/90 to-primary/90",
           progressBg: "from-primary to-secondary",
@@ -55,7 +58,7 @@ export function UnifiedMiniPlayer({ className }: UnifiedMiniPlayerProps) {
           border: "border-secondary/20",
           icon: Cross,
           iconBg: "from-secondary/30 to-primary/20",
-          subtitle: "Oración"
+          subtitle: currentItem.type === 'ritual' ? "Oración del día" : "Oración"
         }
       : currentItem.type === 'lesson'
       ? {
@@ -99,12 +102,13 @@ export function UnifiedMiniPlayer({ className }: UnifiedMiniPlayerProps) {
         >
           <div
             className={cn(
-              "relative overflow-hidden rounded-2xl backdrop-blur-xl border shadow-lg cursor-pointer",
+              "relative overflow-hidden rounded-2xl backdrop-blur-xl border shadow-lg",
+              canExpand && "cursor-pointer",
               "bg-gradient-to-r",
               theme.bg,
               theme.border
             )}
-            onClick={expand}
+            onClick={canExpand ? expand : undefined}
           >
             {/* Progress bar at top */}
             <div className="absolute top-0 left-0 right-0 h-1 bg-white/10">

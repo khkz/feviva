@@ -1,7 +1,8 @@
-import { useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Play, Pause, Volume2, VolumeX } from "lucide-react";
+import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
 
 interface AudioPlayerProps {
   src: string | null;
@@ -9,67 +10,76 @@ interface AudioPlayerProps {
   compact?: boolean;
 }
 
+const RATES = [0.75, 1, 1.25, 1.5, 2];
+
+// "Escuchar laudes" → "Laudes" for the lock screen and the mini player.
+const itemTitle = (title?: string) => {
+  const name = (title ?? "").replace(/^escuchar\s+/i, "").trim();
+  return name ? name.charAt(0).toUpperCase() + name.slice(1) : "Audio del día";
+};
+
+/**
+ * Inline controls for the day's audio (laudes, completas, verse, reflection…).
+ * Playback goes through the global player, so it keeps playing with the
+ * screen locked and shows up in the mini player and on the lock screen.
+ */
 export const AudioPlayer = ({ src, title, compact = false }: AudioPlayerProps) => {
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [isMuted, setIsMuted] = useState(false);
-  const [playbackRate, setPlaybackRate] = useState(1);
+  const player = useAudioPlayer();
+  // Duration from a metadata-only preload, shown before playback starts (as before).
+  const [previewDuration, setPreviewDuration] = useState(0);
+  // Where the slider is dragged to before playing; playback starts there on release.
+  const [startAt, setStartAt] = useState<number | null>(null);
+  const isCurrent = !!src && player.currentItem?.type === "ritual" && player.currentItem.id === src;
+
+  // Once playing, the slider follows the player. (Radix reports the keyboard commit before the
+  // change, so the last drag value can't be cleared in the commit handler itself.)
+  useEffect(() => {
+    if (isCurrent) setStartAt(null);
+  }, [isCurrent]);
 
   if (!src) return null;
 
+  const isPlaying = isCurrent && player.isPlaying;
+  const currentTime = isCurrent ? player.currentTime : (startAt ?? 0);
+  const duration = isCurrent && player.duration > 0 ? player.duration : previewDuration;
+  // Speed and mute of the daily audios, kept apart from the prayers' settings.
+  const { isMuted, playbackRate } = player.settingsFor("ritual");
+  const item = {
+    id: src,
+    title: itemTitle(title),
+    subtitle: "Oración del día",
+    audioUrl: src,
+    type: "ritual" as const,
+  };
+
   const togglePlay = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
+    if (isCurrent) {
+      player.togglePlay();
+      return;
     }
+    player.play(item);
+    player.minimize();
   };
 
   const toggleMute = () => {
-    if (audioRef.current) {
-      audioRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
-    }
-  };
-
-  const handleTimeUpdate = () => {
-    if (audioRef.current) {
-      setCurrentTime(audioRef.current.currentTime);
-    }
-  };
-
-  const handleLoadedMetadata = () => {
-    if (audioRef.current) {
-      setDuration(audioRef.current.duration);
-    }
+    player.updateSettings("ritual", { isMuted: !isMuted });
   };
 
   const handleSeek = (value: number[]) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = value[0];
-      setCurrentTime(value[0]);
-    }
+    if (isCurrent) player.seek(value[0]);
+    else setStartAt(value[0]);
   };
 
-  const handleEnded = () => {
-    setIsPlaying(false);
-    setCurrentTime(0);
+  // Moving the slider before playing starts the audio there, as the old inline player allowed.
+  const handleSeekCommit = (value: number[]) => {
+    if (isCurrent) return;
+    player.play(item, value[0]);
+    player.minimize();
   };
 
   const cyclePlaybackRate = () => {
-    const rates = [0.75, 1, 1.25, 1.5, 2];
-    const currentIndex = rates.indexOf(playbackRate);
-    const nextIndex = (currentIndex + 1) % rates.length;
-    const newRate = rates[nextIndex];
-    setPlaybackRate(newRate);
-    if (audioRef.current) {
-      audioRef.current.playbackRate = newRate;
-    }
+    const currentIndex = RATES.indexOf(playbackRate);
+    player.updateSettings("ritual", { playbackRate: RATES[(currentIndex + 1) % RATES.length] });
   };
 
   const formatTime = (time: number) => {
@@ -78,16 +88,22 @@ export const AudioPlayer = ({ src, title, compact = false }: AudioPlayerProps) =
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
+  const metadataPreload = (
+    <audio
+      src={src}
+      preload="metadata"
+      muted
+      onLoadedMetadata={(event) => {
+        const value = event.currentTarget.duration;
+        if (Number.isFinite(value)) setPreviewDuration(value);
+      }}
+    />
+  );
+
   if (compact) {
     return (
       <div className="flex items-center gap-2">
-        <audio
-          ref={audioRef}
-          src={src}
-          onTimeUpdate={handleTimeUpdate}
-          onLoadedMetadata={handleLoadedMetadata}
-          onEnded={handleEnded}
-        />
+        {metadataPreload}
         <Button
           variant="outline"
           size="icon"
@@ -109,18 +125,12 @@ export const AudioPlayer = ({ src, title, compact = false }: AudioPlayerProps) =
 
   return (
     <div className="bg-secondary/20 rounded-lg p-4 space-y-3">
-      <audio
-        ref={audioRef}
-        src={src}
-        onTimeUpdate={handleTimeUpdate}
-        onLoadedMetadata={handleLoadedMetadata}
-        onEnded={handleEnded}
-      />
-      
+      {metadataPreload}
+
       {title && (
         <p className="text-sm font-medium text-foreground">{title}</p>
       )}
-      
+
       <div className="flex items-center gap-3">
         <Button
           variant="outline"
@@ -135,13 +145,14 @@ export const AudioPlayer = ({ src, title, compact = false }: AudioPlayerProps) =
             <Play className="h-5 w-5" />
           )}
         </Button>
-        
+
         <div className="flex-1 space-y-1">
           <Slider
             value={[currentTime]}
             max={duration || 100}
             step={1}
             onValueChange={handleSeek}
+            onValueCommit={handleSeekCommit}
             className="cursor-pointer"
           />
           <div className="flex justify-between text-xs text-muted-foreground">
@@ -149,7 +160,7 @@ export const AudioPlayer = ({ src, title, compact = false }: AudioPlayerProps) =
             <span>{formatTime(duration)}</span>
           </div>
         </div>
-        
+
         <Button
           variant="ghost"
           size="sm"
@@ -159,7 +170,7 @@ export const AudioPlayer = ({ src, title, compact = false }: AudioPlayerProps) =
         >
           {playbackRate}x
         </Button>
-        
+
         <Button
           variant="ghost"
           size="icon"

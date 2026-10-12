@@ -13,4 +13,7 @@ ext {
     androidxJunitVersion = '1.3.0'
     androidxEspressoCoreVersion = '3.7.0'
     cordovaAndroidVersion = '14.0.1'
+    // Read by capacitor-plugin-playlist (rootProject.ext.kotlin_version); matches the Kotlin
+    // Gradle plugin that the plugin's own buildscript brings.
+    kotlin_version = '2.4.20'
 }

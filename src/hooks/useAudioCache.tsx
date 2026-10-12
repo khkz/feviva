@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { isNativeAudio } from '@/features/audio';
 
 const CACHE_NAME = 'elrugido-audio-cache';
 const MAX_CACHE_ITEMS = 50;
@@ -66,6 +67,9 @@ export function useAudioCache() {
    */
   const getAudioWithCache = useCallback(async (url: string): Promise<string | null> => {
     if (!url) return null;
+
+    // The native player can't read blob: URLs from the WebView; it streams and caches the original.
+    if (isNativeAudio()) return url;
     
     // First check cache
     const cachedBlob = await getCachedAudio(url);
